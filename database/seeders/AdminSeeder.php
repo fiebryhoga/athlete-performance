@@ -15,7 +15,7 @@ class AdminSeeder extends Seeder
     {
         // 1. Akun UTAMA (Coach)
         User::create([
-            'name' => 'Coach Zakiyudin',
+            'name' => 'Coach ZK15',
             'athlete_id' => 'admin', // Login: admin
             'role' => 'admin',
             'password' => Hash::make('password'),

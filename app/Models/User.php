@@ -22,6 +22,7 @@ class User extends Authenticatable
         'athlete_id', // Pengganti email
         'password',
         'role',
+        'sport_id',
         'age',
         'gender',
         'height',
@@ -50,5 +51,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function sport()
+    {
+        return $this->belongsTo(Sport::class);
+    }
+
+    public function performanceTests()
+    {
+        return $this->hasMany(PerformanceTest::class);
+    }
+
+    public function testResults() {
+        return $this->hasManyThrough(TestResult::class, PerformanceTest::class);
     }
 }

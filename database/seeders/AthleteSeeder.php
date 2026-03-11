@@ -36,19 +36,5 @@ class AthleteSeeder extends Seeder
             'weight' => 50.0,
             'sport_category' => 'Renang',
         ]);
-
-        for ($i = 3; $i <= 12; $i++) {
-            User::create([
-                'name' => 'Atlet Demo ' . $i,
-                'athlete_id' => 'ATL-2026-' . str_pad($i, 3, '0', STR_PAD_LEFT), // Format: ATL-2026-003
-                'role' => 'athlete',
-                'password' => Hash::make('password'),
-                'age' => rand(17, 25),
-                'gender' => rand(0, 1) ? 'L' : 'P',
-                'height' => rand(155, 185),
-                'weight' => rand(45, 85),
-                'sport_category' => 'General',
-            ]);
-        }
     }
 }

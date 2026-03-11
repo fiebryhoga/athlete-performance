@@ -1,7 +1,14 @@
 import { useEffect } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
+    // 1. Get Global Settings (Dynamic Branding)
+    const { app_settings } = usePage().props;
+    
+    // Default values if settings are missing
+    const appName = app_settings?.name || 'Performance Dashboard';
+    const appLogo = app_settings?.logo; 
+
     const { data, setData, post, processing, errors, reset } = useForm({
         athlete_id: '',
         password: '',
@@ -20,31 +27,50 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center font-sans p-6 relative overflow-hidden">
-            <Head title="Log in - Performance Dashboard" />
+        <div className="min-h-screen flex flex-col justify-center items-center font-sans p-6 relative overflow-hidden bg-slate-50">
+            {/* Dynamic Browser Title */}
+            <Head title={`Log in - ${appName}`} />
 
-            {/* Background Accent (Blob Halus) agar tidak terlalu sepi */}
+            {/* Background Accent (Soft Blobs) */}
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
 
             <div className="w-full max-w-[420px] z-10">
-                {/* Header Section */}
+                
+                {/* --- HEADER SECTION --- */}
                 <div className="text-center mb-8 flex flex-col justify-center items-center">
-                    <div className='flex flex-row w-16 justify-center items-center mb-4'>
-                        <img src="assets/images/app-logo.png" alt="App-Logo" />
+                    <div className='flex justify-center items-center mb-4 h-20 w-20'>
+                        {appLogo ? (
+                            // Display Uploaded Logo
+                            <img 
+                                src={appLogo} 
+                                alt="App Logo" 
+                                className="w-full h-full object-contain drop-shadow-sm" 
+                            />
+                        ) : (
+                            // Fallback Initial Logo
+                            <div className="w-16 h-16 bg-[#00488b] text-white rounded-2xl flex items-center justify-center text-3xl font-bold shadow-lg shadow-blue-900/20">
+                                {appName.charAt(0)}
+                            </div>
+                        )}
                     </div>
-                    <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Performance Dashboard</h1>
-                    <p className="text-sm text-slate-500 font-medium">Zakiyudin Sports Analytics</p>
+                    <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                        {appName}
+                    </h1>
+                    <p className="text-sm text-slate-500 font-medium">
+                        Sports Analytics System
+                    </p>
                 </div>
 
                 {/* Main Card */}
-                <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 sm:p-10 backdrop-blur-sm">
+                <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 sm:p-10 backdrop-blur-sm relative">
                     
                     <form onSubmit={submit} className="space-y-5">
-                        {/* Input Athlete ID */}
+                        
+                        {/* Input: Athlete ID / Username */}
                         <div className="space-y-1.5">
                             <label htmlFor="athlete_id" className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">
-                                Athlete ID
+                                User ID / Athlete
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -67,7 +93,7 @@ export default function Login({ status, canResetPassword }) {
                             )}
                         </div>
 
-                        {/* Input Password */}
+                        {/* Input: Password */}
                         <div className="space-y-1.5">
                             <label htmlFor="password" className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">
                                 Password
@@ -104,15 +130,9 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                         className="w-4 h-4 text-[#00488b] border-slate-300 rounded focus:ring-[#00488b] cursor-pointer"
                                     />
-                                    <span className="ml-2 text-xs sm:text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Ingat Saya</span>
+                                    <span className="ml-2 text-xs sm:text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Remember me</span>
                                 </div>
                             </label>
-                            
-                            {canResetPassword && (
-                                <a href="#" className="text-xs sm:text-sm font-semibold text-[#00488b] hover:text-blue-700 transition-colors">
-                                    Lupa Password?
-                                </a>
-                            )}
                         </div>
 
                         {/* Submit Button */}
@@ -127,23 +147,23 @@ export default function Login({ status, canResetPassword }) {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             ) : (
-                                "Masuk Dashboard"
+                                "Sign In to Dashboard"
                             )}
                         </button>
                     </form>
 
-                    {/* Required Text 1 */}
+                    {/* Footer Info */}
                     <div className="mt-8 text-center pt-6 border-t border-slate-100">
                         <p className="text-slate-400 text-xs leading-relaxed">
-                            Hubungi Admin/Coach jika Anda mengalami kendala saat login.
+                            Contact Admin if you have trouble logging in.
                         </p>
                     </div>
                 </div>
 
-                {/* Required Text 2 (Footer) */}
+                {/* Footer Branding */}
                 <div className="mt-8 text-center">
                     <p className="text-[10px] text-slate-400 tracking-wider opacity-70 uppercase">
-                        Protected by Zakiyudin Secure Systems v1.0
+                        {appName} &copy; {new Date().getFullYear()}
                     </p>
                 </div>
             </div>
