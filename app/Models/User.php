@@ -28,6 +28,7 @@ class User extends Authenticatable
         'height',
         'weight',
         'sport_category',
+        'training_start_date',
     ];
 
     /**

@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
 {
     Schema::table('test_results', function (Blueprint $table) {
-        // Ubah menjadi DECIMAL dengan 2 angka di belakang koma
-        // Contoh: menyimpang 92.06
         $table->decimal('score', 10, 2)->change(); 
     });
 }

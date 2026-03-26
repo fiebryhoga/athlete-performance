@@ -6,7 +6,8 @@ import {
     Trophy, 
     ClipboardList,
     Shield,
-    Settings // 1. Import Icon Settings
+    Settings,
+    Activity // 1. Import Icon baru untuk Daily Monitoring
 } from 'lucide-react';
 
 export default function Sidebar({ className }) {
@@ -50,6 +51,15 @@ export default function Sidebar({ className }) {
             icon: ClipboardList,
             roles: ['admin', 'coach', 'athlete'] 
         },
+
+        // --- 2. MENU BARU: DAILY MONITORING ---
+        { 
+            name: 'Daily Monitoring', 
+            route: 'admin.daily-metrics.index', // Pastikan nama route ini sesuai dengan di web.php nanti
+            checkPath: '/admin/daily-metrics', 
+            icon: Activity,
+            roles: ['admin', 'coach', 'athlete'] // Atur siapa saja yang bisa lihat
+        },
         
         { 
             name: 'admin access', 
@@ -59,7 +69,7 @@ export default function Sidebar({ className }) {
             roles: ['admin'] 
         },
 
-        // --- 2. MENU BARU: CONFIGURATION ---
+        // --- CONFIGURATION ---
         { 
             name: 'configuration', 
             route: 'admin.settings.index', 
@@ -69,7 +79,6 @@ export default function Sidebar({ className }) {
         },
     ];
 
-    
     const visibleMenuItems = menuItems.filter(item => item.roles.includes(userRole));
 
     return (
@@ -129,7 +138,7 @@ export default function Sidebar({ className }) {
                                                 active ? 'text-white' : 'text-slate-400 group-hover:text-[#00488b]'
                                             }`}
                                         />
-                                        <span className=" ">{item.name}</span>
+                                        <span className="capitalize">{item.name}</span>
                                         
                                         {active && (
                                             <span className="absolute right-3 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse"></span>
@@ -152,7 +161,7 @@ export default function Sidebar({ className }) {
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all shadow-sm group"
                 >
                     <LogOut className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                    <span className=" ">sign out system</span>
+                    <span className="capitalize">sign out system</span>
                 </Link>
             </div>
         </aside>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AthleteController;
 use App\Http\Controllers\Admin\BenchmarkController;
 use App\Http\Controllers\Admin\PerformanceController;
 use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\DailyMetricController;
 use App\Http\Controllers\Admin\GlobalSearchController;
 use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Foundation\Application;
@@ -140,6 +141,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/admin/performance/{performanceTest}/input', [PerformanceController::class, 'edit'])->name('admin.performance.edit');
         Route::put('/admin/performance/{performanceTest}', [PerformanceController::class, 'update'])->name('admin.performance.update');
         Route::delete('/admin/performance/{performanceTest}', [PerformanceController::class, 'destroy'])->name('admin.performance.destroy');
+
+
+        // DAILY MONITORING ROUTES
+        Route::post('/admin/daily-metrics/set-start-date/{user}', [\App\Http\Controllers\Admin\DailyMetricController::class, 'setStartDate'])->name('admin.daily-metrics.set-start-date');
+        
+        Route::get('/admin/daily-metrics/athlete/{user}', [\App\Http\Controllers\Admin\DailyMetricController::class, 'show'])->name('admin.daily-metrics.show');
+        
+        // PENTING: Tambahkan except(['show']) di sini agar tidak bentrok
+        Route::resource('/admin/daily-metrics', \App\Http\Controllers\Admin\DailyMetricController::class)
+            ->names('admin.daily-metrics')
+            ->except(['show']);
 
         Route::resource('/admin/athletes', AthleteController::class)->names([
             'index'   => 'admin.athletes.index',
