@@ -7,7 +7,8 @@ import {
     ClipboardList,
     Shield,
     Settings,
-    Activity // 1. Import Icon baru untuk Daily Monitoring
+    Activity,
+    HeartPulse // 1. Import Icon baru untuk Wellness & Load
 } from 'lucide-react';
 
 export default function Sidebar({ className }) {
@@ -20,6 +21,7 @@ export default function Sidebar({ className }) {
 
     const isActive = (path) => url.startsWith(path);
 
+    // 2. Tambahkan menu baru ke dalam array menuItems
     const menuItems = [
         { 
             name: 'dashboard', 
@@ -51,14 +53,21 @@ export default function Sidebar({ className }) {
             icon: ClipboardList,
             roles: ['admin', 'coach', 'athlete'] 
         },
-
-        // --- 2. MENU BARU: DAILY MONITORING ---
         { 
             name: 'Daily Monitoring', 
-            route: 'admin.daily-metrics.index', // Pastikan nama route ini sesuai dengan di web.php nanti
+            route: 'admin.daily-metrics.index', 
             checkPath: '/admin/daily-metrics', 
             icon: Activity,
-            roles: ['admin', 'coach', 'athlete'] // Atur siapa saja yang bisa lihat
+            roles: ['admin', 'coach', 'athlete']
+        },
+
+        // --- MENU BARU: WELLNESS & LOAD ---
+        { 
+            name: 'Wellness & Load', 
+            route: 'admin.training-loads.index', 
+            checkPath: '/admin/training-loads', 
+            icon: HeartPulse,
+            roles: ['admin', 'coach', 'athlete'] 
         },
         
         { 

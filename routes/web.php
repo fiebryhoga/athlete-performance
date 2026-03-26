@@ -153,6 +153,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
             ->names('admin.daily-metrics')
             ->except(['show']);
 
+        Route::get('/admin/training-loads', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'index'])->name('admin.training-loads.index');
+        Route::get('/admin/training-loads/athlete/{user}', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'show'])->name('admin.training-loads.show');
+        Route::post('/admin/training-loads/store', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'store'])->name('admin.training-loads.store');
+
         Route::resource('/admin/athletes', AthleteController::class)->names([
             'index'   => 'admin.athletes.index',
             'store'   => 'admin.athletes.store',

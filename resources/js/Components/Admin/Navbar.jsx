@@ -1,5 +1,5 @@
 import { Link, usePage, useForm, router } from '@inertiajs/react';
-import { Search, Menu, LogOut, User, Lock, X, Settings, ChevronDown, Save, Shield, Loader2, ArrowRight } from 'lucide-react';
+import { Search, Menu, LogOut, User, Lock, X, Settings, ChevronDown, Save, Shield, Loader2, ArrowRight, Camera, UploadCloud } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios'; 
 
@@ -8,26 +8,20 @@ export default function Navbar({ onMenuClick }) {
     const user = auth.user;
     const isAthlete = user.role === 'athlete';
 
-    
     const [keyword, setKeyword] = useState('');
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
     
-    
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-
-    
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    
     
     const dropdownRef = useRef(null);
     const searchRef = useRef(null);
     const searchInputRef = useRef(null);
     const mobileInputRef = useRef(null);
 
-    
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (keyword.length > 1) {
@@ -44,7 +38,6 @@ export default function Navbar({ onMenuClick }) {
     const performSearch = async (query) => {
         setIsLoading(true);
         try {
-            
             const response = await axios.get(route('global.search'), {
                 params: { query }
             });
@@ -57,14 +50,11 @@ export default function Navbar({ onMenuClick }) {
         }
     };
 
-    
     useEffect(() => {
         function handleClickOutside(event) {
-            
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
             }
-            
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowResults(false);
             }
@@ -73,7 +63,6 @@ export default function Navbar({ onMenuClick }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [dropdownRef, searchRef]);
 
-    
     useEffect(() => {
         if (isMobileSearchOpen && mobileInputRef.current) {
             mobileInputRef.current.focus();
@@ -86,7 +75,6 @@ export default function Navbar({ onMenuClick }) {
             <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200/60 transition-all">
                 <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto relative">
                     
-                    {/* ================= MOBILE SEARCH OVERLAY ================= */}
                     {isMobileSearchOpen ? (
                         <div className="absolute inset-0 bg-white z-50 flex items-center px-4 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
                             <div className="flex-1 relative">
@@ -100,22 +88,14 @@ export default function Navbar({ onMenuClick }) {
                                     placeholder="Search athlete..."
                                 />
                             </div>
-                            <button 
-                                onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); }}
-                                className="p-2 text-slate-500 hover:text-slate-800"
-                            >
+                            <button onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); }} className="p-2 text-slate-500 hover:text-slate-800">
                                 <span className="text-xs font-bold">Cancel</span>
                             </button>
                         </div>
                     ) : (
-                        /* ================= NORMAL NAVBAR CONTENT ================= */
                         <>
-                            {/* 1. LEFT: Mobile Toggle & Branding */}
                             <div className="flex items-center gap-4">
-                                <button 
-                                    onClick={onMenuClick}
-                                    className="p-2 text-slate-500 hover:bg-slate-100 hover:text-[#00488b] rounded-xl lg:hidden transition-all"
-                                >
+                                <button onClick={onMenuClick} className="p-2 text-slate-500 hover:bg-slate-100 hover:text-[#00488b] rounded-xl lg:hidden transition-all">
                                     <Menu className="h-6 w-6" />
                                 </button>
                                 
@@ -127,43 +107,27 @@ export default function Navbar({ onMenuClick }) {
                                 </div>
                             </div>
 
-                            {/* 2. CENTER: Global Search Bar (Desktop) */}
                             {!isAthlete && (
                                 <div className="hidden lg:flex flex-1 justify-center max-w-xl mx-auto px-6" ref={searchRef}>
                                     <div className="w-full relative group">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            {isLoading ? (
-                                                <Loader2 className="h-4 w-4 text-[#00488b] animate-spin" />
-                                            ) : (
-                                                <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#00488b] transition-colors" />
-                                            )}
+                                            {isLoading ? <Loader2 className="h-4 w-4 text-[#00488b] animate-spin" /> : <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#00488b] transition-colors" />}
                                         </div>
-                                        
                                         <input 
-                                            ref={searchInputRef}
-                                            type="text" 
-                                            value={keyword}
-                                            onChange={(e) => setKeyword(e.target.value)}
+                                            ref={searchInputRef} type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)}
                                             onFocus={() => { if(results.length > 0) setShowResults(true); }}
                                             placeholder="Search athletes, test results, or reports..." 
                                             className="block w-full pl-11 pr-4 py-2.5 rounded-xl border-none bg-slate-100/50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00488b]/10 focus:bg-white transition-all font-medium text-sm shadow-sm hover:bg-slate-100"
                                         />
 
-                                        {/* DROPDOWN HASIL PENCARIAN */}
                                         {showResults && (
                                             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                                                 {results.length > 0 ? (
                                                     <ul className="py-2">
-                                                        <li className="px-4 py-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                                                            Search Results
-                                                        </li>
+                                                        <li className="px-4 py-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Search Results</li>
                                                         {results.map((result) => (
                                                             <li key={result.id}>
-                                                                <Link 
-                                                                    href={result.url}
-                                                                    onClick={() => { setShowResults(false); setKeyword(''); }}
-                                                                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group"
-                                                                >
+                                                                <Link href={result.url} onClick={() => { setShowResults(false); setKeyword(''); }} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors group">
                                                                     <div className="flex items-center gap-3">
                                                                         <div className="h-8 w-8 rounded-full bg-blue-50 text-[#00488b] flex items-center justify-center font-bold text-xs">
                                                                             {result.title.charAt(0)}
@@ -179,9 +143,7 @@ export default function Navbar({ onMenuClick }) {
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <div className="p-4 text-center text-sm text-slate-500">
-                                                        No results found for "{keyword}".
-                                                    </div>
+                                                    <div className="p-4 text-center text-sm text-slate-500">No results found for "{keyword}".</div>
                                                 )}
                                             </div>
                                         )}
@@ -189,33 +151,29 @@ export default function Navbar({ onMenuClick }) {
                                 </div>
                             )}
 
-                            {/* 3. RIGHT: Profile & Actions */}
                             <div className="flex items-center justify-end gap-3 sm:gap-4 pl-4" ref={dropdownRef}>
-                                
-                                {/* Search Trigger (Mobile Only) */}
                                 {!isAthlete && (
-                                    <button 
-                                        onClick={() => setIsMobileSearchOpen(true)}
-                                        className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all"
-                                    >
+                                    <button onClick={() => setIsMobileSearchOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
                                         <Search className="h-5 w-5" />
                                     </button>
                                 )}
 
                                 <div className="h-8 w-px bg-slate-200 hidden sm:block mx-1"></div>
 
-                                {/* User Menu Dropdown */}
                                 <div className="relative">
                                     <button 
                                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                         className={`flex items-center gap-3 pl-1.5 pr-2.5 py-1.5 rounded-full border transition-all duration-200 group ${
-                                            isDropdownOpen 
-                                            ? 'bg-white border-[#00488b]/20 shadow-md ring-2 ring-[#00488b]/5' 
-                                            : 'bg-transparent border-transparent hover:bg-white hover:border-slate-100 hover:shadow-sm'
+                                            isDropdownOpen ? 'bg-white border-[#00488b]/20 shadow-md ring-2 ring-[#00488b]/5' : 'bg-transparent border-transparent hover:bg-white hover:border-slate-100 hover:shadow-sm'
                                         }`}
                                     >
-                                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#00488b] to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-blue-900/20 group-hover:scale-105 transition-transform">
-                                            {user.name.charAt(0).toUpperCase()}
+                                        {/* TAMPILKAN FOTO PROFIL (JIKA ADA) ATAU INISIAL (JIKA KOSONG) */}
+                                        <div className="h-9 w-9 rounded-full overflow-hidden bg-gradient-to-br from-[#00488b] to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-blue-900/20 group-hover:scale-105 transition-transform">
+                                            {user.profile_photo_url ? (
+                                                <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                user.name.charAt(0).toUpperCase()
+                                            )}
                                         </div>
                                         
                                         <div className="hidden md:block text-left mr-1">
@@ -229,7 +187,6 @@ export default function Navbar({ onMenuClick }) {
                                         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 hidden md:block ${isDropdownOpen ? 'rotate-180 text-[#00488b]' : ''}`} />
                                     </button>
 
-                                    {/* Dropdown Content */}
                                     {isDropdownOpen && (
                                         <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
                                             <div className="px-5 py-4 border-b border-slate-50 md:hidden bg-slate-50/50 mb-1">
@@ -251,12 +208,7 @@ export default function Navbar({ onMenuClick }) {
                                             </div>
                                             <div className="h-px bg-slate-100 my-1 mx-2"></div>
                                             <div className="p-1.5">
-                                                <Link 
-                                                    href={route('logout')} 
-                                                    method="post" 
-                                                    as="button"
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 font-bold rounded-xl transition-colors group"
-                                                >
+                                                <Link href={route('logout')} method="post" as="button" className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 font-bold rounded-xl transition-colors group">
                                                     <div className="p-1.5 rounded-lg bg-red-50 text-red-500 group-hover:bg-white group-hover:shadow-sm transition-all">
                                                         <LogOut className="w-4 h-4" />
                                                     </div>
@@ -271,55 +223,47 @@ export default function Navbar({ onMenuClick }) {
                     )}
                 </div>
                 
-                {/* --- MOBILE SEARCH RESULTS (DROPDOWN KHUSUS MOBILE) --- */}
                 {isMobileSearchOpen && showResults && (
                     <div className="absolute top-20 left-0 w-full bg-white shadow-xl border-t border-slate-100 max-h-[60vh] overflow-y-auto z-40">
                          {results.length > 0 ? (
                             <ul className="divide-y divide-slate-50">
                                 {results.map((result) => (
                                     <li key={result.id}>
-                                        <Link 
-                                            href={result.url}
-                                            onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); }}
-                                            className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50"
-                                        >
-                                            <div className="h-10 w-10 rounded-full bg-blue-50 text-[#00488b] flex items-center justify-center font-bold text-sm">
-                                                {result.title.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-800">{result.title}</p>
-                                                <p className="text-xs text-slate-500">{result.subtitle}</p>
-                                            </div>
+                                        <Link href={result.url} onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); }} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50">
+                                            <div className="h-10 w-10 rounded-full bg-blue-50 text-[#00488b] flex items-center justify-center font-bold text-sm">{result.title.charAt(0)}</div>
+                                            <div><p className="text-sm font-bold text-slate-800">{result.title}</p><p className="text-xs text-slate-500">{result.subtitle}</p></div>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
-                        ) : (
-                            <div className="p-6 text-center text-slate-500 text-sm">No results found.</div>
-                        )}
+                        ) : <div className="p-6 text-center text-slate-500 text-sm">No results found.</div>}
                     </div>
                 )}
             </nav>
 
-            {/* --- MODAL EDIT PROFILE --- */}
             {isEditModalOpen && (
-                <EditProfileModal 
-                    user={user} 
-                    isOpen={isEditModalOpen} 
-                    onClose={() => setIsEditModalOpen(false)} 
-                />
+                <EditProfileModal user={user} isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
             )}
         </>
     );
 }
 
-
+// ==========================================
+// MODAL EDIT PROFILE (DENGAN UPLOAD FOTO)
+// ==========================================
 function EditProfileModal({ user, isOpen, onClose }) {
-    const { data, setData, patch, processing, errors, reset, clearErrors } = useForm({
+    
+    // State untuk preview foto secara lokal
+    const [photoPreview, setPhotoPreview] = useState(user.profile_photo_url || null);
+    const fileInputRef = useRef(null);
+
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         name: user.name || '',
         current_password: '',
         password: '',
         password_confirmation: '',
+        profile_photo: null,
+        _method: 'PATCH', // Penting untuk spoofing form-data di Laravel
     });
 
     useEffect(() => {
@@ -327,12 +271,29 @@ function EditProfileModal({ user, isOpen, onClose }) {
             reset();
             clearErrors();
             setData('name', user.name);
+            setPhotoPreview(user.profile_photo_url || null);
         }
     }, [isOpen]);
 
+    // Handler ketika file dipilih
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('profile_photo', file);
+            // Buat preview gambar langsung di browser
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(route('profile.update'), { 
+        // Gunakan post dengan _method: PATCH dan forceFormData: true untuk kirim file
+        post(route('profile.update'), { 
+            forceFormData: true,
             onSuccess: () => {
                 onClose();
                 reset();
@@ -348,6 +309,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
             <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                
                 <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                     <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2.5">
                         <div className="p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-[#00488b]">
@@ -359,7 +321,33 @@ function EditProfileModal({ user, isOpen, onClose }) {
                         <X className="w-5 h-5" />
                     </button>
                 </div>
+
                 <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
+                    
+                    {/* AREA UPLOAD FOTO TENGAH */}
+                    <div className="flex flex-col items-center mb-6">
+                        <div 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="relative w-24 h-24 rounded-full border-2 border-dashed border-slate-300 hover:border-[#00488b] bg-slate-50 hover:bg-blue-50/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all group shadow-sm"
+                        >
+                            {photoPreview ? (
+                                <>
+                                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Camera className="w-6 h-6 text-white" />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center text-slate-400 group-hover:text-[#00488b]">
+                                    <UploadCloud className="w-6 h-6 mb-1" />
+                                    <span className="text-[10px] font-bold uppercase">Photo</span>
+                                </div>
+                            )}
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" className="hidden" />
+                        {errors.profile_photo && <p className="text-red-500 text-xs mt-2 font-medium">{errors.profile_photo}</p>}
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Full Name</label>
                         <div className="relative group">
@@ -376,6 +364,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
                         </div>
                         {errors.name && <p className="text-red-500 text-xs font-bold ml-1">{errors.name}</p>}
                     </div>
+                    
                     <div className="space-y-4 pt-2">
                         <div className="flex items-center gap-2 mb-2">
                             <div className="h-px bg-slate-100 flex-1"></div>
@@ -412,6 +401,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
                             {errors.password && <p className="text-red-500 text-xs font-bold ml-1">{errors.password}</p>}
                         </div>
                     </div>
+
                     <div className="flex gap-3 pt-4">
                         <button 
                             type="button"

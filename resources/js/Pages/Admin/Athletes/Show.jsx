@@ -12,7 +12,6 @@ import {
 
 export default function Show({ athlete, stats, radar_data, comparison_data, item_analysis, history_data, strengths, weaknesses, has_data }) {
 
-    
     const calculateBMI = (h, w) => {
         if (!h || !w) return '-';
         const heightInM = h / 100;
@@ -29,7 +28,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
         return Number(val).toLocaleString('en-US', { maximumFractionDigits: 2 });
     };
 
-    
     const GrowthIndicator = ({ value }) => {
         if (value === undefined || value === null) return <span className="text-slate-300">-</span>;
         if (value > 0) return <span className="flex items-center text-emerald-600 text-[10px] font-bold"><TrendingUp className="w-3 h-3 mr-1" /> +{value}%</span>;
@@ -41,7 +39,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
     const bmi = calculateBMI(safeAthlete.height, safeAthlete.weight);
     const initial = safeAthlete.name ? safeAthlete.name.charAt(0).toUpperCase() : '-';
 
-    
     const current_score = stats?.latest_score || 0;
     const previous_score = stats?.previous_score || 0;
 
@@ -78,9 +75,21 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     {/* Decorative Background */}
                     <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-blue-50/80 to-transparent"></div>
                     
-                    <div className="relative z-10 w-24 h-24 bg-[#00488b] rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-900/10 border-4 border-white">
-                        {initial}
+                    {/* FOTO PROFIL ATLET */}
+                    <div className="relative z-10 w-28 h-28 mb-4">
+                        {safeAthlete.profile_photo_url ? (
+                            <img 
+                                src={safeAthlete.profile_photo_url} 
+                                alt={safeAthlete.name} 
+                                className="w-full h-full rounded-full object-cover shadow-xl shadow-blue-900/10 border-4 border-white"
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-[#00488b] rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-blue-900/10 border-4 border-white">
+                                {initial}
+                            </div>
+                        )}
                     </div>
+                    
                     <h2 className="text-xl font-bold text-slate-800">{safeAthlete.name || 'Unknown Name'}</h2>
                     <p className="text-sm text-slate-500 font-mono mb-2">{safeAthlete.athlete_id || '-'}</p>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-[#00488b] rounded-full text-xs font-bold border border-blue-100 mb-6">

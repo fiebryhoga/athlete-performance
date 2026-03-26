@@ -12,9 +12,6 @@ use Inertia\Inertia;
 
 class AthleteController extends Controller
 {
-    /**
-     * Menampilkan daftar atlet (Read/Index)
-     */
     public function index(Request $request)
     {
         $query = User::query()->where('role', 'athlete')->with('sport');
@@ -27,18 +24,19 @@ class AthleteController extends Controller
         }
 
         return Inertia::render('Admin/Athletes/Index', [
-            'athletes' => $query->latest()->paginate(10)->withQueryString(),
+            // Tambahkan profile_photo_url ke respons JSON
+            'athletes' => $query->latest()->paginate(10)->through(function ($athlete) {
+                $athlete->profile_photo_url = $athlete->profile_photo_url; 
+                return $athlete;
+            })->withQueryString(),
+            
             'sports' => Sport::all(),
             'filters' => $request->only(['search']),
         ]);
     }
 
-    /**
-     * Menyimpan atlet baru (Create)
-     */
     public function store(Request $request)
     {
-        // 1. Validasi Input
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'athlete_id' => 'required|string|max:255|unique:users,athlete_id',
@@ -48,34 +46,35 @@ class AthleteController extends Controller
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
+            // Validasi Foto (opsional, maks 2MB, format gambar)
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', 
         ]);
 
-        // 2. Simpan ke Database
+        $photoPath = null;
+        if ($request->hasFile('profile_photo')) {
+            $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
+
         User::create([
             'name' => $validated['name'],
             'athlete_id' => $validated['athlete_id'],
             'password' => Hash::make($validated['password']),
-            'role' => 'athlete', // Hardcode role
+            'role' => 'athlete', 
             'sport_id' => $validated['sport_id'],
             'gender' => $validated['gender'],
             'age' => $validated['age'],
             'height' => $validated['height'],
             'weight' => $validated['weight'],
+            'profile_photo' => $photoPath, // Simpan path foto
         ]);
 
         return redirect()->back()->with('message', 'Atlet berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui data atlet (Update)
-     * Menggunakan $id manual untuk menghindari error binding
-     */
     public function update(Request $request, $id)
     {
-        // 1. Cari User Manual
         $athlete = User::findOrFail($id);
 
-        // 2. Validasi (Ignore unique ID milik user ini sendiri)
         $request->validate([
             'name' => 'required|string|max:255',
             'athlete_id' => [
@@ -83,15 +82,15 @@ class AthleteController extends Controller
                 'string',
                 Rule::unique('users', 'athlete_id')->ignore($athlete->id)
             ],
-            'password' => 'nullable|string|min:6', // Password boleh kosong jika tidak diganti
+            'password' => 'nullable|string|min:6',
             'sport_id' => 'nullable|exists:sports,id',
             'gender' => 'required|in:L,P',
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
-        // 3. Siapkan Data Update
         $dataToUpdate = [
             'name' => $request->name,
             'athlete_id' => $request->athlete_id,
@@ -102,26 +101,33 @@ class AthleteController extends Controller
             'weight' => $request->weight,
         ];
 
-        // 4. Update Password HANYA jika diisi
         if ($request->filled('password')) {
             $dataToUpdate['password'] = Hash::make($request->password);
         }
 
-        // 5. Eksekusi Update
+        // Cek jika ada foto baru yang diupload
+        if ($request->hasFile('profile_photo')) {
+            // Hapus foto lama jika ada
+            if ($athlete->profile_photo) {
+                Storage::disk('public')->delete($athlete->profile_photo);
+            }
+            // Simpan foto baru
+            $dataToUpdate['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
+
         $athlete->update($dataToUpdate);
 
         return redirect()->back()->with('message', 'Data atlet diperbarui.');
     }
 
-    /**
-     * Menghapus atlet (Delete)
-     */
     public function destroy($id)
     {
         $athlete = User::findOrFail($id);
         
-        // Opsional: Cek apakah boleh dihapus (misal ada data relasi)
-        // $athlete->performanceTests()->delete(); // Jika ingin hapus data terkait dulu
+        // Hapus foto dari server sebelum menghapus data user
+        if ($athlete->profile_photo) {
+            Storage::disk('public')->delete($athlete->profile_photo);
+        }
         
         $athlete->delete();
 

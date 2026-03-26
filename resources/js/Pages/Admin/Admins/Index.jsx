@@ -1,23 +1,28 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog 
+    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud 
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Index({ admins, filters }) {
     const [search, setSearch] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); 
     const [editUser, setEditUser] = useState(null);
+    
+    // State & Ref untuk Foto Profil
+    const [photoPreview, setPhotoPreview] = useState(null);
+    const fileInputRef = useRef(null);
 
-    const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         name: '',
         athlete_id: '', 
         password: '',
+        profile_photo: null, // Tambahan untuk file foto
+        _method: 'POST',     // Untuk method spoofing
     });
 
-    
     useEffect(() => {
         const timer = setTimeout(() => {
             router.get(route('manage-admins.index'), { search }, { preserveState: true, replace: true });
@@ -25,36 +30,63 @@ export default function Index({ admins, filters }) {
         return () => clearTimeout(timer);
     }, [search]);
 
-    
+    // Handler Foto
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('profile_photo', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const openCreateModal = () => {
         setModalMode('create');
         setEditUser(null);
+        setPhotoPreview(null);
         reset();
         clearErrors();
+        setData('_method', 'POST');
         setIsModalOpen(true);
     };
 
     const openEditModal = (user) => {
         setModalMode('edit');
         setEditUser(user);
+        setPhotoPreview(user.profile_photo_url || null);
         clearErrors();
         setData({
             name: user.name,
             athlete_id: user.athlete_id,
             password: '', 
+            profile_photo: null,
+            _method: 'PUT', // Spoofing agar bisa kirim file via PUT di Laravel
         });
         setIsModalOpen(true);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Selalu gunakan POST dengan forceFormData, tapi backend akan baca _method
         if (modalMode === 'create') {
             post(route('manage-admins.store'), {
-                onSuccess: () => setIsModalOpen(false)
+                forceFormData: true,
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    reset();
+                }
             });
         } else {
-            put(route('manage-admins.update', editUser.id), {
-                onSuccess: () => setIsModalOpen(false)
+            post(route('manage-admins.update', editUser.id), {
+                forceFormData: true,
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    reset();
+                }
             });
         }
     };
@@ -117,8 +149,13 @@ export default function Index({ admins, filters }) {
                                     <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs border border-purple-100">
-                                                    {user.name.substring(0, 2).toUpperCase()}
+                                                {/* Tampilan Foto Profil di Tabel */}
+                                                <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs border border-purple-100 overflow-hidden">
+                                                    {user.profile_photo_url ? (
+                                                        <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        user.name.substring(0, 2).toUpperCase()
+                                                    )}
                                                 </div>
                                                 <span className="font-bold text-slate-800">{user.name}</span>
                                             </div>
@@ -167,7 +204,7 @@ export default function Index({ admins, filters }) {
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         
                         <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -181,18 +218,43 @@ export default function Index({ admins, filters }) {
 
                         <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
                             
+                            {/* PHOTO UPLOAD AREA */}
+                            <div className="flex flex-col items-center mb-6">
+                                <div 
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="relative w-24 h-24 rounded-full border-2 border-dashed border-slate-300 hover:border-[#00488b] bg-slate-50 hover:bg-blue-50/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all group shadow-sm"
+                                >
+                                    {photoPreview ? (
+                                        <>
+                                            <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="w-6 h-6 text-white" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-[#00488b]">
+                                            <UploadCloud className="w-6 h-6 mb-1" />
+                                            <span className="text-[10px] font-bold uppercase">Photo</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <input type="file" ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" className="hidden" />
+                                {errors.profile_photo && <p className="text-red-500 text-xs mt-2 font-medium">{errors.profile_photo}</p>}
+                            </div>
+
                             {/* Name */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Full Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-3 text-slate-400" size={16} />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-[#00488b] transition-colors" />
+                                    </div>
                                     <input 
                                         type="text" 
-                                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#00488b] focus:border-[#00488b] text-sm placeholder:text-slate-400"
+                                        className="block w-full pl-11 pr-4 py-3 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-[#00488b] focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-slate-800"
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
                                         placeholder="e.g. John Doe"
-                                        autoFocus
                                     />
                                 </div>
                                 {errors.name && <p className="text-red-500 text-xs mt-1 font-bold ml-1">{errors.name}</p>}
@@ -203,7 +265,7 @@ export default function Index({ admins, filters }) {
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1">Login ID (Username)</label>
                                 <input 
                                     type="text" 
-                                    className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#00488b] focus:border-[#00488b] text-sm font-mono placeholder:text-slate-400"
+                                    className="block w-full px-4 py-3 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-[#00488b] focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-mono text-slate-800"
                                     value={data.athlete_id}
                                     onChange={e => setData('athlete_id', e.target.value)}
                                     placeholder="e.g. admin_01"
@@ -213,15 +275,17 @@ export default function Index({ admins, filters }) {
 
                             {/* Password */}
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1 flex justify-between">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5 ml-1 flex justify-between items-end">
                                     Password
-                                    {modalMode === 'edit' && <span className="text-slate-400 font-normal   normal-case text-[10px]">(leave blank to keep current)</span>}
+                                    {modalMode === 'edit' && <span className="text-slate-400 font-normal normal-case text-[10px]">(leave blank to keep current)</span>}
                                 </label>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-3 text-slate-400" size={16} />
+                                <div className="relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-[#00488b] transition-colors" />
+                                    </div>
                                     <input 
                                         type="password" 
-                                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#00488b] focus:border-[#00488b] text-sm placeholder:text-slate-400"
+                                        className="block w-full pl-11 pr-4 py-3 rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-[#00488b] focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-slate-800"
                                         value={data.password}
                                         onChange={e => setData('password', e.target.value)}
                                         placeholder="••••••••"
@@ -235,14 +299,14 @@ export default function Index({ admins, filters }) {
                                 <button 
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-4 py-2.5 text-slate-500 font-bold text-sm hover:bg-slate-100 rounded-xl transition-colors"
+                                    className="flex-1 px-4 py-3 text-slate-500 font-bold text-sm hover:bg-slate-100 rounded-xl transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="flex-[2] px-4 py-2.5 bg-[#00488b] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-900/10 hover:bg-[#003666] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                                    className="flex-[2] px-4 py-3 bg-[#00488b] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-900/10 hover:bg-[#003666] transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
                                 >
                                     {processing ? 'Saving...' : (modalMode === 'create' ? 'Create Account' : 'Update Account')}
                                 </button>
