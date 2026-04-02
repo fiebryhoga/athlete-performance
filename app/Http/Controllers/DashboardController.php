@@ -34,6 +34,32 @@ class DashboardController extends Controller
             $hasData = $tests->count() > 0;
             $latestTest = $tests->last();
 
+            // --- TAMBAHAN BARU: Ambil data Daily Metric & Training Load (30 Hari Terakhir) ---
+            $dailyMetrics = \App\Models\DailyMetric::where('user_id', $user->id)
+                ->where('recovery_status', '!=', 'KOSONG') // Hanya ambil hari yang ada datanya
+                ->orderBy('record_date', 'asc')
+                ->take(30)
+                ->get()
+                ->map(function($metric) {
+                    return [
+                        'date' => date('d/m', strtotime($metric->record_date)),
+                        'recovery' => (float) $metric->quick_recovery_score,
+                    ];
+                });
+
+            $trainingLoads = \App\Models\TrainingLoad::where('user_id', $user->id)
+                ->orderBy('record_date', 'asc')
+                ->take(30)
+                ->get()
+                ->map(function($load) {
+                    return [
+                        'date' => date('d/m', strtotime($load->record_date)),
+                        'daily_load' => (float) $load->daily_load,
+                        'wellness' => (float) $load->wellness_score,
+                    ];
+                });
+            // -------------------------------------------------------------------
+
             // 2. Statistik Utama
             $avgScore = $hasData ? round($tests->flatMap(function($test) { return $test->results; })->avg('score'), 1) : 0;
             $maxScore = $hasData ? round($tests->map(function($t) { return $t->results->avg('score'); })->max(), 1) : 0;
@@ -41,39 +67,25 @@ class DashboardController extends Controller
             // Cari Kategori Terbaik
             $bestCategory = '-';
             if ($hasData) {
-                $catScores = $tests->flatMap(function ($test) {
-                        return $test->results;
-                    })
-                    ->groupBy(function ($result) {
-                        return optional(optional($result->testItem)->category)->name;
-                    })
-                    ->map(function ($items) {
-                        return $items->avg('score');
-                    })
+                $catScores = $tests->flatMap(function ($test) { return $test->results; })
+                    ->groupBy(function ($result) { return optional(optional($result->testItem)->category)->name; })
+                    ->map(function ($items) { return $items->avg('score'); })
                     ->sortDesc();
                 $bestCategory = $catScores->keys()->first() ?? '-';
             }
 
-            // 3. Radar Chart Data (Rata-rata per Kategori dari Tes Terakhir)
+            // 3. Radar Chart Data
             $radarData = [];
             if ($latestTest) {
                 $radarData = $latestTest->results->groupBy('testItem.category.name')
                     ->map(function ($results, $categoryName) {
-                        return [
-                            'subject' => $categoryName,
-                            'A' => round($results->avg('score'), 1), // Nilai Atlet
-                            'B' => 100, // Target Benchmark (Selalu 100%)
-                            'fullMark' => 100
-                        ];
+                        return [ 'subject' => $categoryName, 'A' => round($results->avg('score'), 1), 'B' => 100, 'fullMark' => 100 ];
                     })->values()->toArray();
             }
 
             // 4. Trend Data (Grafik Area - 6 Sesi Terakhir)
             $trendData = $tests->take(-6)->map(function ($test) {
-                return [
-                    'date' => Carbon::parse($test->date)->format('d/m'),
-                    'score' => round($test->results->avg('score'), 1) ?? 0
-                ];
+                return [ 'date' => Carbon::parse($test->date)->format('d/m'), 'score' => round($test->results->avg('score'), 1) ?? 0 ];
             })->values();
 
             // 5. History List (Untuk Tabel)
@@ -85,12 +97,12 @@ class DashboardController extends Controller
                     'name' => $test->name ?? 'Sesi Latihan',
                     'items_count' => $test->results->count(),
                     'score' => $score,
-                    'status' => $this->getStatusBadge($score) // Helper function di bawah
+                    'status' => $this->getStatusBadge($score)
                 ];
             })->values();
 
             // Return ke Tampilan Atlet
-            return Inertia::render('Athlete/Dashboard', [ // Pastikan file jsx ada di folder Pages/Athlete/Dashboard.jsx
+            return Inertia::render('Athlete/Dashboard', [
                 'user' => $user,
                 'stats' => [
                     'sport' => $user->sport->name ?? '-',
@@ -101,7 +113,10 @@ class DashboardController extends Controller
                 ],
                 'radarData' => $radarData,
                 'trendData' => $trendData,
-                'history' => $history
+                'history' => $history,
+                // Kirim variabel baru ke React
+                'daily_metrics' => $dailyMetrics, 
+                'training_loads' => $trainingLoads 
             ]);
         }
 

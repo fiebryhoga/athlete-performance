@@ -137,10 +137,12 @@ class AthleteController extends Controller
     /**
      * Menampilkan detail & statistik atlet (Read Detail)
      */
+    /**
+     * Menampilkan detail & statistik atlet (Read Detail)
+     */
     public function show($id)
     {
         // 1. Load Data Lengkap dengan Relasi
-        // Menggunakan findOrFail($id) agar aman jika ID tidak ditemukan
         $athlete = User::with(['sport', 'performanceTests.results.testItem.category'])->findOrFail($id);
 
         // 2. Urutkan Tes (Terlama -> Terbaru) untuk perhitungan tren
@@ -153,6 +155,7 @@ class AthleteController extends Controller
             'highest_score' => 0,
             'average_score' => 0,
             'latest_score' => 0,
+            'previous_score' => 0,
             'latest_date' => '-'
         ];
 
@@ -164,7 +167,6 @@ class AthleteController extends Controller
 
         // 4. Logika Perhitungan Statistik (Jika ada data tes)
         if ($hasData) {
-            // A. Hitung Statistik Dasar
             $allResults = $tests->flatMap->results;
             
             $stats['highest_score'] = $tests->map(function ($t) {
@@ -173,16 +175,23 @@ class AthleteController extends Controller
             
             $stats['average_score'] = round($allResults->avg('score') ?? 0, 1);
             
-            // Ambil Tes Terakhir & Tes Sebelumnya
+            // Ambil Tes Terakhir
             $latestTest = $tests->last();
-            $prevTest = $tests->count() > 1 ? $tests[$tests->count() - 2] : null;
+            
+            // --- PERUBAHAN: Ambil hingga 4 tes sebelum tes terbaru ---
+            // Slice dari index 0 hingga tepat sebelum tes terbaru (index terakhir), lalu ambil maksimal 4 dari belakang
+            $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
 
             if ($latestTest) {
                 $stats['latest_score'] = round($latestTest->results->avg('score') ?? 0, 1);
                 $stats['latest_date'] = date('d M Y', strtotime($latestTest->date));
-                $stats['previous_score'] = $prevTest ? round($prevTest->results->avg('score') ?? 0, 1) : 0;
+                
+                // Hitung rata-rata skor dari 4 tes sebelumnya
+                $stats['previous_score'] = $previousTests->count() > 0 
+                    ? round($previousTests->flatMap->results->avg('score') ?? 0, 1) 
+                    : 0;
 
-                // B. Analisis Per Kategori (Untuk Radar Chart & SWOT)
+                // B. Analisis Per Kategori (Untuk Radar Chart & SWOT) - Berdasarkan semua data
                 $categoryStats = $allResults->groupBy(function($res) {
                         return $res->testItem->category->name ?? 'Uncategorized';
                     })
@@ -200,13 +209,13 @@ class AthleteController extends Controller
                 $radarData = $categoryStats->map(function($cat) {
                     return [
                         'subject' => $cat['name'],
-                        'A' => $cat['score'], // Skor Atlet
-                        'B' => 100,           // Target Ideal
+                        'A' => $cat['score'], 
+                        'B' => 100,           
                         'fullMark' => 100
                     ];
                 })->values();
 
-                // C. SWOT Analysis (Top & Bottom Categories)
+                // C. SWOT Analysis
                 $strengths = $categoryStats->filter(function($item) {
                     return $item['score'] > 70;
                 })->sortByDesc('score')->values();
@@ -215,16 +224,18 @@ class AthleteController extends Controller
                     return $item['score'] <= 70;
                 })->sortBy('score')->take(3)->values();
 
-                // D. Perbandingan Kategori (Bar Chart: Latest vs Previous)
+                // D. Perbandingan Kategori (Bar Chart: Latest vs Avg of Previous 4)
                 $latestCats = $latestTest->results->groupBy(function($r) {
                     return $r->testItem->category->name ?? 'Uncat';
                 })->map(function($i) { return round($i->avg('score'), 1); });
 
-                $prevCats = $prevTest 
-                    ? $prevTest->results->groupBy(function($r) {
+                // Hitung rata-rata skor per kategori dari 4 tes sebelumnya
+                $prevCats = collect();
+                if ($previousTests->count() > 0) {
+                    $prevCats = $previousTests->flatMap->results->groupBy(function($r) {
                         return $r->testItem->category->name ?? 'Uncat';
-                    })->map(function($i) { return round($i->avg('score'), 1); })
-                    : collect([]);
+                    })->map(function($i) { return round($i->avg('score'), 1); });
+                }
                 
                 $allCatNames = $latestCats->keys()->merge($prevCats->keys())->unique();
                 
@@ -236,17 +247,26 @@ class AthleteController extends Controller
                     ];
                 })->values();
 
-                // E. DETAIL PER ITEM (Tabel Rincian)
-                $itemAnalysis = $latestTest->results->map(function($res) use ($prevTest) {
+                // E. DETAIL PER ITEM (Tabel Rincian: Latest vs Avg of Previous 4)
+                $itemAnalysis = $latestTest->results->map(function($res) use ($previousTests) {
                     $item = $res->testItem;
                     $prevScore = 0;
                     $growth = 0;
 
-                    // Cari item yang sama di tes sebelumnya untuk hitung growth
-                    if ($prevTest) {
-                        $prevItem = $prevTest->results->where('test_item_id', $item->id)->first();
-                        if ($prevItem) {
-                            $prevScore = floatval($prevItem->score);
+                    if ($previousTests->count() > 0) {
+                        // Kumpulkan semua hasil dari 4 tes sebelumnya untuk item tes ini
+                        $prevItemResults = collect();
+                        foreach ($previousTests as $pt) {
+                            $resPrev = $pt->results->where('test_item_id', $item->id)->first();
+                            if ($resPrev) {
+                                $prevItemResults->push($resPrev);
+                            }
+                        }
+
+                        if ($prevItemResults->count() > 0) {
+                            // Rata-rata dari skor tes sebelumnya
+                            $prevScore = $prevItemResults->avg('score');
+                            
                             if ($prevScore > 0) {
                                 $growth = (($res->score - $prevScore) / $prevScore) * 100;
                             }
@@ -259,8 +279,8 @@ class AthleteController extends Controller
                         'category' => $item->category->name ?? '-',
                         'unit' => $item->unit,
                         'target_value' => $item->target_value,
-                        'result_value' => $res->result, // Nilai asli (misal: 10.5 detik)
-                        'score' => round($res->score, 1), // Persentase (misal: 85%)
+                        'result_value' => $res->result,
+                        'score' => round($res->score, 1),
                         'previous_score' => round($prevScore, 1),
                         'growth' => round($growth, 1)
                     ];
@@ -268,7 +288,7 @@ class AthleteController extends Controller
             }
         }
 
-        // 5. Data History (Untuk Grafik Area Chart)
+        // 5. Data History (Untuk Grafik Area Chart / Log)
         $historyData = $tests->map(function($test) {
             return [
                 'date' => date('d/m/y', strtotime($test->date)),

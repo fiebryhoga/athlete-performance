@@ -69,7 +69,7 @@ export default function Login({ status, canResetPassword }) {
                         
                         {/* Input: Athlete ID / Username */}
                         <div className="space-y-1.5">
-                            <label htmlFor="athlete_id" className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">
+                            <label htmlFor="athlete_id" className="text-xs font-bold text-slate-600   tracking-wider ml-1">
                                 User ID / Athlete
                             </label>
                             <div className="relative">
@@ -95,7 +95,7 @@ export default function Login({ status, canResetPassword }) {
 
                         {/* Input: Password */}
                         <div className="space-y-1.5">
-                            <label htmlFor="password" className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1">
+                            <label htmlFor="password" className="text-xs font-bold text-slate-600   tracking-wider ml-1">
                                 Password
                             </label>
                             <div className="relative">
@@ -162,7 +162,7 @@ export default function Login({ status, canResetPassword }) {
 
                 {/* Footer Branding */}
                 <div className="mt-8 text-center">
-                    <p className="text-[10px] text-slate-400 tracking-wider opacity-70 uppercase">
+                    <p className="text-[10px] text-slate-400 tracking-wider opacity-70  ">
                         {appName} &copy; {new Date().getFullYear()}
                     </p>
                 </div>

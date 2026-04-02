@@ -23,7 +23,13 @@ export default function Index({ athletes }) {
                 </div>
                 <div className="relative w-full sm:w-72">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input type="text" placeholder="Cari atlet..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#00488b]/20 transition-all" />
+                    <input 
+                        type="text" 
+                        placeholder="Cari atlet..." 
+                        value={searchQuery} 
+                        onChange={(e) => setSearchQuery(e.target.value)} 
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#00488b]/20 transition-all" 
+                    />
                 </div>
             </div>
 
@@ -31,9 +37,15 @@ export default function Index({ athletes }) {
                 {filteredAthletes.map((athlete) => (
                     <Link key={athlete.id} href={route('admin.daily-metrics.show', athlete.id)} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-[#00488b]/30 hover:shadow-md transition-all group flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-blue-50 text-[#00488b] rounded-full flex items-center justify-center font-bold text-lg">
-                                {athlete.name.charAt(0)}
+                            {/* AREA FOTO PROFIL */}
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-50 text-[#00488b] flex items-center justify-center font-bold text-lg shrink-0 border border-blue-100">
+                                {athlete.profile_photo_url ? (
+                                    <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    athlete.name.charAt(0).toUpperCase()
+                                )}
                             </div>
+                            
                             <div>
                                 <h3 className="font-bold text-slate-800 group-hover:text-[#00488b] transition-colors">{athlete.name}</h3>
                                 <p className="text-xs text-slate-500">{athlete.sport?.name || 'Tanpa Cabor'} • {athlete.total_records} Records</p>

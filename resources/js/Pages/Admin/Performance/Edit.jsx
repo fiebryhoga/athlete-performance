@@ -49,7 +49,7 @@ const ResultInput = ({ item, value, onChange }) => {
                     onWheel={(e) => e.target.blur()} 
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.unit}</span>
+                    <span className="text-xs font-bold text-slate-400   tracking-wider">{item.unit}</span>
                 </div>
             </div>
             
@@ -149,7 +149,7 @@ export default function Edit({ test, categories }) {
                                     <div className="w-1 h-5 md:h-6 bg-[#00488b] rounded-full"></div>
                                     <h3 className="font-bold text-slate-800 text-sm md:text-lg  ">{category.name}</h3>
                                 </div>
-                                <span className="text-[10px] md:text-xs font-bold bg-white border border-slate-200 text-slate-500 px-2 py-1 rounded-full uppercase tracking-wider">
+                                <span className="text-[10px] md:text-xs font-bold bg-white border border-slate-200 text-slate-500 px-2 py-1 rounded-full   tracking-wider">
                                     {category.test_items.length} items
                                 </span>
                             </div>

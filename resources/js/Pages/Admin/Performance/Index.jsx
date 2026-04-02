@@ -179,7 +179,7 @@ export default function Index({ tests, sports, filters = {} }) {
                                 {/* Card Header */}
                                 <div className="px-6 py-5 border-b border-slate-50 bg-white">
                                     <div className="flex justify-between items-start mb-3">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide border ${status.badge}`}>
+                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold   tracking-wide border ${status.badge}`}>
                                             {status.label}
                                         </span>
                                         <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
@@ -201,14 +201,14 @@ export default function Index({ tests, sports, filters = {} }) {
                                 {/* Main Score Display */}
                                 <div className="px-6 py-6 bg-slate-50/50 border-b border-slate-50 flex items-center justify-between">
                                     <div>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Score</p>
+                                        <p className="text-[10px] text-slate-400 font-bold   tracking-widest mb-1">Total Score</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-4xl font-black text-slate-800 tracking-tight">{test.average_score}</span>
                                             <span className="text-sm font-bold text-slate-400">/100</span>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Target Ideal</p>
+                                        <p className="text-[10px] text-slate-400 font-bold   tracking-widest mb-1">Target Ideal</p>
                                         <div className="flex items-center justify-end gap-1 text-slate-600">
                                             <Target className="w-3.5 h-3.5 text-slate-400" />
                                             <p className="text-lg font-bold">100</p>
@@ -218,7 +218,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                 {/* Breakdown Category */}
                                 <div className="px-6 py-5 bg-white flex-1">
-                                    <p className="text-xs font-bold text-slate-400 mb-4 flex items-center gap-1.5 uppercase tracking-wide">
+                                    <p className="text-xs font-bold text-slate-400 mb-4 flex items-center gap-1.5   tracking-wide">
                                         <Activity className="w-3.5 h-3.5" /> Performance Breakdown
                                     </p>
                                     <div className="space-y-3">

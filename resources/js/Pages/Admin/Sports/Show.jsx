@@ -255,7 +255,7 @@ export default function Show({ sport, categories }) {
                         <form onSubmit={submitForm} className="p-6 space-y-6">
                             
                             <div className="space-y-2">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">item name</label>
+                                <label className="block text-xs font-bold text-slate-500   tracking-wide ml-1">item name</label>
                                 <input 
                                     type="text" 
                                     value={data.name}
@@ -268,7 +268,7 @@ export default function Show({ sport, categories }) {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">parameter type</label>
+                                <label className="block text-xs font-bold text-slate-500   tracking-wide ml-1">parameter type</label>
                                 <div className="relative">
                                     <select 
                                         value={data.parameter_type}
@@ -290,7 +290,7 @@ export default function Show({ sport, categories }) {
                             </div>
 
                             <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-2">
-                                <label className="block text-xs font-bold text-[#00488b] uppercase tracking-wide ml-1">
+                                <label className="block text-xs font-bold text-[#00488b]   tracking-wide ml-1">
                                     target benchmark (100%)
                                 </label>
                                 

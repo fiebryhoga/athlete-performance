@@ -240,7 +240,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                             <div className="text-[10px] text-slate-400 font-bold mt-0.5  ">{item.category}</div>
                                         </td>
                                         <td className="px-4 md:px-6 py-3 text-center font-bold text-slate-800 text-base">{formatNumber(item.result_value)}</td>
-                                        <td className="px-4 md:px-6 py-3 text-center text-slate-400 text-xs font-bold uppercase">{item.unit}</td>
+                                        <td className="px-4 md:px-6 py-3 text-center text-slate-400 text-xs font-bold  ">{item.unit}</td>
                                         <td className="px-4 md:px-6 py-3 text-center">
                                             <div className="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-md text-xs font-bold text-slate-600 border border-slate-200">
                                                 <Target className="w-3 h-3 text-slate-400" />

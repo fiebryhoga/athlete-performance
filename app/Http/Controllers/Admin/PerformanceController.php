@@ -142,7 +142,7 @@ class PerformanceController extends Controller
         $user = auth()->user();
 
         // Proteksi Akses
-        if ($user->role === 'athlete' && $performanceTest->user_id !== $user->id) {
+        if ($user->role === 'athlete' && $performanceTest->user_id != $user->id) {
             abort(403, 'Akses Ditolak.');
         }
 

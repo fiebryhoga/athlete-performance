@@ -133,7 +133,7 @@ export default function Index({ sports }) {
                         
                         <form onSubmit={submit} className="p-6 space-y-5">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">sport name</label>
+                                <label className="block text-xs font-bold text-slate-500   tracking-wider mb-1.5">sport name</label>
                                 <input 
                                     type="text" 
                                     value={data.name}
@@ -146,7 +146,7 @@ export default function Index({ sports }) {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">description (optional)</label>
+                                <label className="block text-xs font-bold text-slate-500   tracking-wider mb-1.5">description (optional)</label>
                                 <textarea 
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}

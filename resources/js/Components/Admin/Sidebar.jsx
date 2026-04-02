@@ -124,7 +124,7 @@ export default function Sidebar({ className }) {
             <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
                 
                 <div className="mb-8">
-                    <p className="px-3 text-[10px] font-bold text-slate-400 tracking-widest mb-2 opacity-70 uppercase">
+                    <p className="px-3 text-[10px] font-bold text-slate-400 tracking-widest mb-2 opacity-70  ">
                         main menu
                     </p>
                     <ul className="space-y-1">
