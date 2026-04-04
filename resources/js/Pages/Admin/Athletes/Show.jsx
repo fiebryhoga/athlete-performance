@@ -10,7 +10,7 @@ import {
     BarChart, Bar
 } from 'recharts';
 
-export default function Show({ athlete, stats, radar_data, comparison_data, item_analysis, history_data, strengths, weaknesses, has_data }) {
+export default function Show({ athlete, stats, radar_data, comparison_data, item_analysis, history_data, strengths, weaknesses, has_data, historical_labels }) {
 
     const calculateBMI = (h, w) => {
         if (!h || !w) return '-';
@@ -41,6 +41,9 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
 
     const current_score = stats?.latest_score || 0;
     const previous_score = stats?.previous_score || 0;
+
+    // Palet warna untuk riwayat tes gradasi abu-abu
+    const historicalColors = ['#f1f5f9', '#e2e8f0', '#cbd5e1', '#94a3b8'];
 
     return (
         <AdminLayout title={`Profile - ${safeAthlete.name}`}>
@@ -73,7 +76,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     
                     {/* 1. PROFILE CARD (LEFT COLUMN) */}
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center text-center h-full">
-                        {/* FOTO PROFIL ATLET */}
                         <div className="relative z-10 w-24 h-24 mb-5">
                             {safeAthlete.profile_photo_url ? (
                                 <img 
@@ -117,7 +119,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     {/* 2. STATS & CHARTS (RIGHT COLUMN) */}
                     <div className="xl:col-span-2 flex flex-col gap-6">
                         
-                        {/* A. Stats Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                                 <p className="text-xs text-slate-500 font-medium mb-2">Total Sessions</p>
@@ -137,10 +138,8 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             </div>
                         </div>
 
-                        {/* B. Main Charts */}
                         {has_data ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-                                {/* 1. Radar Chart */}
                                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
                                     <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
                                         <Target className="w-4 h-4 text-blue-500" />
@@ -161,11 +160,10 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     </div>
                                 </div>
 
-                                {/* 2. Comparison Bar Chart */}
                                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
                                     <h3 className="text-sm font-semibold text-slate-800 mb-4 flex items-center gap-2">
                                         <Activity className="w-4 h-4 text-purple-500" />
-                                        Comparison: Latest vs Previous
+                                        Comparison: Latest vs Previous Avg
                                     </h3>
                                     <div className="flex-1 min-h-[250px]">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +173,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                                 <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                                                 <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'1px solid #e2e8f0', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                                                <Bar name="Previous" dataKey="previous" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={16} />
+                                                <Bar name="Previous Avg" dataKey="previous" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={16} />
                                                 <Bar name="Latest" dataKey="latest" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={16} />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -191,109 +189,51 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     </div>
                 </div>
 
-                {/* C. ITEM ANALYSIS (Full Width) */}
+                {/* C. ITEM ANALYSIS (MULTI-COMPARISON) */}
                 {has_data && item_analysis && item_analysis.length > 0 && (
                     <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
                         <h3 className="text-sm font-semibold text-slate-800 mb-6 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-blue-500" />
-                            Detailed Item Progress (Current vs Previous)
+                            Detailed Item Progress (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)
                         </h3>
                         <div className="h-64 w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={item_analysis} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={4}>
+                                <BarChart data={item_analysis} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} interval={0} />
                                     <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                                     <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'1px solid #e2e8f0', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                                    <Bar name="Previous" dataKey="previous_score" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={12} />
-                                    <Bar name="Current" dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={12} />
+                                    
+                                    {/* LOOP BAR UNTUK TES SEBELUMNYA */}
+                                    {historical_labels && historical_labels.map((label, index) => {
+                                        const colorIndex = 4 - historical_labels.length + index; 
+                                        const color = historicalColors[colorIndex] || '#cbd5e1';
+                                        
+                                        return (
+                                            <Bar 
+                                                key={label.key} 
+                                                name={label.name} 
+                                                dataKey={label.key} 
+                                                fill={color} 
+                                                radius={[4, 4, 0, 0]} 
+                                                barSize={12} 
+                                            />
+                                        );
+                                    })}
+
+                                    {/* BAR UNTUK TES SAAT INI */}
+                                    <Bar name="Current Test" dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={12} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
                 )}
 
-                {/* D. DETAILED TABLE (Responsive Scrolling) */}
-                {has_data && item_analysis && (
-                    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mb-8">
-                        <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800">Latest Test Breakdown</h3>
-                        </div>
-                        
-                        <div className="overflow-x-auto w-full">
-                            <table className="w-full text-sm text-left min-w-[800px]">
-                                <thead className="text-xs text-slate-500 bg-slate-50/80 border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-6 py-4 font-medium">Test Item</th>
-                                        <th className="px-6 py-4 text-center font-medium">Raw Result</th>
-                                        <th className="px-6 py-4 text-center font-medium">Benchmark</th>
-                                        <th className="px-6 py-4 text-center font-medium">Prev (%)</th>
-                                        <th className="px-6 py-4 text-center font-medium">Curr (%)</th>
-                                        <th className="px-6 py-4 text-center font-medium">Trend</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {item_analysis.map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-medium text-slate-800">{item.name}</div>
-                                                <div className="text-xs text-slate-500 mt-0.5">{item.category}</div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center text-slate-700 font-medium">
-                                                {formatNumber(item.result_value)} <span className="text-xs text-slate-400 font-normal">{item.unit}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs text-slate-600 bg-slate-100">
-                                                    <Target className="w-3 h-3 text-slate-400" />
-                                                    {formatNumber(item.target_value)}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center text-slate-500">
-                                                {item.previous_score > 0 ? formatScore(item.previous_score) + '%' : '-'}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="inline-block font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md min-w-[60px]">
-                                                    {formatScore(item.score)}%
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center flex justify-center">
-                                                <GrowthIndicator value={item.growth} />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    
-                                    {/* FOOTER: AVERAGE SUMMARY */}
-                                    <tr className="bg-slate-50 border-t border-slate-200">
-                                        <td colSpan="3" className="px-6 py-5 text-right font-medium text-slate-600 text-sm align-middle">
-                                            Total Average Score:
-                                        </td>
-                                        <td colSpan="3" className="px-8 py-5">
-                                            <div className="flex items-center justify-end gap-6">
-                                                {previous_score > 0 && (
-                                                    <div className="text-right opacity-70">
-                                                        <span className="block text-xs text-slate-500 mb-1">Previous</span>
-                                                        <span className="text-lg font-medium text-slate-500 line-through">{formatScore(previous_score)}%</span>
-                                                    </div>
-                                                )}
-                                                <div className="text-right">
-                                                    <span className="block text-xs text-blue-600 font-medium mb-1">Current</span>
-                                                    <span className="text-2xl font-bold text-blue-600">{formatScore(current_score)}%</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-
-                {/* E. SWOT ANALYSIS */}
+                {/* D. SWOT ANALYSIS */}
                 {has_data && (
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
                         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                            {/* Strengths */}
                             <div className="p-6 md:p-8">
                                 <h3 className="text-base font-semibold text-slate-800 mb-6 flex items-center gap-2">
                                     <Zap className="w-5 h-5 text-emerald-500" />
@@ -315,7 +255,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 </div>
                             </div>
 
-                            {/* Weaknesses */}
                             <div className="p-6 md:p-8">
                                 <h3 className="text-base font-semibold text-slate-800 mb-6 flex items-center gap-2">
                                     <AlertCircle className="w-5 h-5 text-red-500" />
@@ -340,7 +279,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     </div>
                 )}
 
-                {/* F. HISTORY TABLE (Responsive) */}
+                {/* E. HISTORY TABLE */}
                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                     <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <h3 className="font-semibold text-slate-800 flex items-center gap-2">

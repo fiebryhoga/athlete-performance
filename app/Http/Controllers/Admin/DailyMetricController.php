@@ -95,7 +95,8 @@ class DailyMetricController extends Controller
                         'hr_max' => 0,
                         'hr_ratio' => 0,
                         'vo2_max' => 0,
-                        'recovery_status' => 'KOSONG' // Menandakan hari libur/kosong
+                        'recovery_status' => 'KOSONG', // Menandakan hari libur/kosong
+                        'notes' => null
                     ]);
                     
                     $metricsDB->put($dateString, $newMetric);
@@ -145,9 +146,35 @@ class DailyMetricController extends Controller
         }
 
         $request->validate(['training_start_date' => 'required|date']);
+        
+        // 1. Update Start Date di profil User
         $user->update(['training_start_date' => $request->training_start_date]);
 
-        return redirect()->back()->with('message', 'Tanggal mulai latihan berhasil disetting!');
+        // 2. REKALKULASI SEMUA LABEL MINGGU DI TABEL DAILY METRIC
+        $startDate = Carbon::parse($request->training_start_date)->startOfDay();
+        
+        // Ambil semua riwayat metrik atlet ini
+        $metrics = DailyMetric::where('user_id', $user->id)->get();
+
+        foreach ($metrics as $metric) {
+            $recordDate = Carbon::parse($metric->record_date)->startOfDay();
+
+            // Hitung ulang posisi minggu dan hari
+            if ($recordDate->greaterThanOrEqualTo($startDate)) {
+                $diffInDays = $startDate->diffInDays($recordDate);
+                $week = floor($diffInDays / 7) + 1;
+                $day = ($diffInDays % 7) + 1;
+                $weekLabel = "Week $week, Day $day";
+            } else {
+                // Jika ternyata ada data yang tanggalnya mendahului Start Date yang baru
+                $weekLabel = 'Sebelum Program'; 
+            }
+
+            // Simpan label minggu yang sudah diperbarui ke database
+            $metric->update(['week' => $weekLabel]);
+        }
+
+        return redirect()->back()->with('message', 'Tanggal mulai latihan berhasil disetting dan seluruh kalender minggu telah disesuaikan ulang!');
     }
 
     /**
@@ -165,6 +192,7 @@ class DailyMetricController extends Controller
             'spo2' => 'required|numeric',
             'weight' => 'required|numeric',
             'vj' => 'required|numeric',
+            'notes' => 'nullable|string|max:1000', // <-- Validasi notes ditambahkan di sini
         ]);
 
         // --- PROTEKSI AKSES: Cegah atlet simpan data untuk atlet lain melalui manipulasi form ---
@@ -262,7 +290,8 @@ class DailyMetricController extends Controller
                 'hr_max' => round($hr_max, 2),
                 'hr_ratio' => round($hr_ratio, 2),
                 'vo2_max' => round($vo2_max, 2),
-                'recovery_status' => $validated['rhr'] > 0 ? $recovery_status : 'KOSONG' 
+                'recovery_status' => $validated['rhr'] > 0 ? $recovery_status : 'KOSONG',
+                'notes' => $validated['notes'] ?? null // <-- Simpan notes di sini
             ]
         );
 

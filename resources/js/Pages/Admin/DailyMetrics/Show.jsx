@@ -35,8 +35,10 @@ export default function Show({ athlete, dailyHistory }) {
     // 3. Setup Modal Form Input Metrik
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDateLabel, setSelectedDateLabel] = useState('');
+    
+
     const formMetric = useForm({
-        user_id: athlete?.id, record_date: '', rhr: '', spo2: '', weight: '', vj: ''
+        user_id: athlete?.id, record_date: '', rhr: '', spo2: '', weight: '', vj: '', notes: ''
     });
 
     const openModal = (historyItem) => {
@@ -47,7 +49,8 @@ export default function Show({ athlete, dailyHistory }) {
             rhr: historyItem.data?.rhr > 0 ? historyItem.data.rhr : '',
             spo2: historyItem.data?.spo2 > 0 ? historyItem.data.spo2 : '',
             weight: historyItem.data?.weight > 0 ? historyItem.data.weight : (athlete?.weight || ''),
-            vj: historyItem.data?.vj > 0 ? historyItem.data.vj : ''
+            vj: historyItem.data?.vj > 0 ? historyItem.data.vj : '',
+            notes: historyItem.data?.notes || ''
         });
         setIsModalOpen(true);
     };

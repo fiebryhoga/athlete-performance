@@ -22,26 +22,38 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                 <form onSubmit={submit} className="p-6">
                     <div className="grid grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500   tracking-wider">RHR <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">RHR <span className="text-red-500">*</span></label>
                             <input type="number" step="0.1" required value={form.data.rhr} onChange={e => form.setData('rhr', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all" placeholder="Contoh: 65"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500   tracking-wider">SpO2 (%) <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">SpO2 (%) <span className="text-red-500">*</span></label>
                             <input type="number" step="0.1" required value={form.data.spo2} onChange={e => form.setData('spo2', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all" placeholder="Contoh: 98"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500   tracking-wider">Weight / BB (Kg) <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Weight / BB (Kg) <span className="text-red-500">*</span></label>
                             <input type="number" step="0.1" required value={form.data.weight} onChange={e => form.setData('weight', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500   tracking-wider">Vertical Jump (VJ) <span className="text-red-500">*</span></label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Vertical Jump (VJ) <span className="text-red-500">*</span></label>
                             <input type="number" step="0.01" required value={form.data.vj} onChange={e => form.setData('vj', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all"/>
+                        </div>
+                        
+                        {/* INPUT CATATAN (NOTES) */}
+                        <div className="col-span-2 space-y-1.5 mt-1">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
+                            <textarea 
+                                rows="2" 
+                                value={form.data.notes} 
+                                onChange={e => form.setData('notes', e.target.value)} 
+                                className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all resize-none" 
+                                placeholder="Cth: Tidur larut malam, otot agak pegal..."
+                            ></textarea>
                         </div>
                     </div>
                     
                     <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-100 mt-6">
                         <p className="text-xs text-[#00488b] font-medium leading-relaxed">
-                            <span className="font-bold   tracking-wider flex items-center gap-1.5 mb-1.5"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
+                            <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
                             Sistem otomatis menghitung <b>VO2Max</b>, <b>Peak Power</b>, dan <b>Status Recovery</b>.
                         </p>
                     </div>

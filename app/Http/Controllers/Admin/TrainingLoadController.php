@@ -99,6 +99,9 @@ class TrainingLoadController extends Controller
             'pm_session_type' => 'nullable|string|max:100',
             'pm_rpe' => 'nullable|integer|min:0|max:10',
             'pm_duration' => 'nullable|integer|min:0',
+
+            // Tambahkan validasi notes
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         // --- PROTEKSI AKSES: Cegah atlet menginput data atas nama orang lain ---
@@ -155,7 +158,8 @@ class TrainingLoadController extends Controller
                 'pm_duration' => $validated['pm_duration'],
                 'pm_load' => $pm_load,
                 
-                'daily_load' => $daily_load
+                'daily_load' => $daily_load,
+                'notes' => $validated['notes'] ?? null, // <-- Simpan notes di sini
             ]
         );
 

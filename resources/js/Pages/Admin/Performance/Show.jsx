@@ -36,12 +36,12 @@ const getScoreColor = (val) => {
     return '#ef4444'; 
 };
 
-export default function Show({ test, current_score, radar_data, item_analysis, history }) {
-    const { auth, app_settings } = usePage().props; // Get app_settings here
+// MENERIMA `historical_labels` DARI CONTROLLER
+export default function Show({ test, current_score, radar_data, item_analysis, history, historical_labels }) {
+    const { auth, app_settings } = usePage().props; 
     const isAthlete = auth.user.role === 'athlete';
     const hasPrevious = history && history.length > 1;
 
-    // Use app settings or fallbacks
     const appName = app_settings?.name || 'ZK15 Sports Analytics';
     const appLogo = app_settings?.logo || '/assets/images/zk-logo.png';
 
@@ -49,11 +49,13 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
         window.print();
     };
 
+    // Palet warna untuk riwayat tes agar terlihat gradasi
+    const historicalColors = ['#f1f5f9', '#e2e8f0', '#cbd5e1', '#94a3b8'];
+
     return (
         <AdminLayout title="test result details">
             <Head title="result details" />
 
-            {/* --- PRINT CSS & RESPONSIVE FIX --- */}
             <style>{`
                 @media print {
                     @page { margin: 0; size: auto; }
@@ -110,18 +112,18 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-200 pb-6 mb-6 gap-4">
                     <div className="flex items-center gap-4">
                             <img 
-                                src={appLogo} // Changed here
+                                src={appLogo}
                                 alt="App Logo" 
                                 className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
                                 onError={(e) => {
-                                    // Fallback jika gambar tidak ditemukan / error load
                                     e.target.style.display = 'none';
                                     e.target.nextSibling.style.display = 'flex';
                                 }}
                             />
                         <div>
                             <h1 className="text-xl md:text-2xl text-blue-900 font-extrabold tracking-tight  ">Performance Report</h1>
-                            <p className="text-xs md:text-sm text-slate-500 font-bold tracking-wide  ">{appName}</p> {/* Changed here */}                        </div>
+                            <p className="text-xs md:text-sm text-slate-500 font-bold tracking-wide  ">{appName}</p> 
+                        </div>
                     </div>
                     <div className="text-left md:text-right w-full md:w-auto bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-lg">
                         <div className="inline-block px-2 py-0.5 bg-white md:bg-slate-50 rounded md:rounded-lg border border-slate-200 md:border-slate-100 mb-1">
@@ -200,17 +202,36 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
                 </div>
 
-                {/* 4. BAR CHART */}
+                {/* 4. BAR CHART (MULTI-COMPARISON) */}
                 <div className="mb-10 border border-slate-100 rounded-2xl p-4 md:p-6 bg-slate-50/30" style={{ pageBreakInside: 'avoid' }}>
-                    <h3 className="text-xs font-bold text-slate-500 mb-4  ">item comparison (prev vs current)</h3>
+                    <h3 className="text-xs font-bold text-slate-500 mb-4  ">item comparison (last {historical_labels ? historical_labels.length + 1 : 1} tests)</h3>
                     <div className="h-64 md:h-72 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={item_analysis} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={2}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                 <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#64748b', fontWeight:600 }} axisLine={false} tickLine={false} interval={0} />
                                 <YAxis domain={[0, 100]} hide />
+                                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'12px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                                <Bar name="previous test" dataKey="previous_score" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={20} />
+                                
+                                {/* Loop untuk me-render tes-tes sebelumnya dengan gradasi warna abu */}
+                                {historical_labels && historical_labels.map((label, index) => {
+                                    const colorIndex = 4 - historical_labels.length + index; 
+                                    const color = historicalColors[colorIndex] || '#cbd5e1';
+                                    
+                                    return (
+                                        <Bar 
+                                            key={label.key} 
+                                            name={label.name} 
+                                            dataKey={label.key} 
+                                            fill={color} 
+                                            radius={[4, 4, 0, 0]} 
+                                            barSize={15} 
+                                        />
+                                    );
+                                })}
+
+                                {/* Bar untuk Tes Saat Ini */}
                                 <Bar name="current test" dataKey="score" fill="#00488b" radius={[4, 4, 0, 0]} barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>
@@ -247,6 +268,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                                 {formatNumber(item.target_value)}
                                             </div>
                                         </td>
+                                        {/* Untuk tabel, kita tetap membandingkan trend dengan SATU tes yang paling terakhir saja */}
                                         <td className="px-4 md:px-6 py-3 text-center bg-slate-50/30 text-slate-400 font-medium print:bg-transparent print:text-slate-600">
                                             {hasPrevious ? formatPercent(item.previous_score) : '-'}
                                         </td>
@@ -281,7 +303,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 </div>
                 
                 <div className="text-center pt-8 text-[10px] text-slate-300 font-bold tracking-widest print:text-slate-500  ">
-                    Generated by {appName} • {new Date().getFullYear()} {/* Changed here */}
+                    Generated by {appName} • {new Date().getFullYear()} 
                 </div>
             </div>
         </AdminLayout>

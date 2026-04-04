@@ -30,6 +30,7 @@ class TrainingLoad extends Model
         'pm_duration',
         'pm_load',
         'daily_load',
+        'notes',
     ];
 
     // Relasi ke tabel User (Atlet)

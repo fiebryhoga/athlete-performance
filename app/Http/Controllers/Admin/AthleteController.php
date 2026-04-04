@@ -8,7 +8,9 @@ use App\Models\Sport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Carbon\Carbon; // <-- Pastikan Carbon di-import
 
 class AthleteController extends Controller
 {
@@ -24,7 +26,6 @@ class AthleteController extends Controller
         }
 
         return Inertia::render('Admin/Athletes/Index', [
-            // Tambahkan profile_photo_url ke respons JSON
             'athletes' => $query->latest()->paginate(10)->through(function ($athlete) {
                 $athlete->profile_photo_url = $athlete->profile_photo_url; 
                 return $athlete;
@@ -46,7 +47,6 @@ class AthleteController extends Controller
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
-            // Validasi Foto (opsional, maks 2MB, format gambar)
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', 
         ]);
 
@@ -65,7 +65,7 @@ class AthleteController extends Controller
             'age' => $validated['age'],
             'height' => $validated['height'],
             'weight' => $validated['weight'],
-            'profile_photo' => $photoPath, // Simpan path foto
+            'profile_photo' => $photoPath,
         ]);
 
         return redirect()->back()->with('message', 'Atlet berhasil ditambahkan.');
@@ -105,13 +105,10 @@ class AthleteController extends Controller
             $dataToUpdate['password'] = Hash::make($request->password);
         }
 
-        // Cek jika ada foto baru yang diupload
         if ($request->hasFile('profile_photo')) {
-            // Hapus foto lama jika ada
             if ($athlete->profile_photo) {
                 Storage::disk('public')->delete($athlete->profile_photo);
             }
-            // Simpan foto baru
             $dataToUpdate['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
         }
 
@@ -124,7 +121,6 @@ class AthleteController extends Controller
     {
         $athlete = User::findOrFail($id);
         
-        // Hapus foto dari server sebelum menghapus data user
         if ($athlete->profile_photo) {
             Storage::disk('public')->delete($athlete->profile_photo);
         }
@@ -137,19 +133,13 @@ class AthleteController extends Controller
     /**
      * Menampilkan detail & statistik atlet (Read Detail)
      */
-    /**
-     * Menampilkan detail & statistik atlet (Read Detail)
-     */
     public function show($id)
     {
-        // 1. Load Data Lengkap dengan Relasi
         $athlete = User::with(['sport', 'performanceTests.results.testItem.category'])->findOrFail($id);
 
-        // 2. Urutkan Tes (Terlama -> Terbaru) untuk perhitungan tren
         $tests = $athlete->performanceTests->sortBy('date')->values();
         $hasData = $tests->count() > 0;
 
-        // 3. Inisialisasi Variable Statistik
         $stats = [
             'total_sessions' => $tests->count(),
             'highest_score' => 0,
@@ -164,8 +154,8 @@ class AthleteController extends Controller
         $itemAnalysis = []; 
         $strengths = [];
         $weaknesses = [];
+        $historicalLabels = collect();
 
-        // 4. Logika Perhitungan Statistik (Jika ada data tes)
         if ($hasData) {
             $allResults = $tests->flatMap->results;
             
@@ -175,23 +165,30 @@ class AthleteController extends Controller
             
             $stats['average_score'] = round($allResults->avg('score') ?? 0, 1);
             
-            // Ambil Tes Terakhir
             $latestTest = $tests->last();
             
-            // --- PERUBAHAN: Ambil hingga 4 tes sebelum tes terbaru ---
-            // Slice dari index 0 hingga tepat sebelum tes terbaru (index terakhir), lalu ambil maksimal 4 dari belakang
+            // Ambil hingga 4 tes sebelumnya
             $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
 
             if ($latestTest) {
                 $stats['latest_score'] = round($latestTest->results->avg('score') ?? 0, 1);
                 $stats['latest_date'] = date('d M Y', strtotime($latestTest->date));
                 
-                // Hitung rata-rata skor dari 4 tes sebelumnya
                 $stats['previous_score'] = $previousTests->count() > 0 
-                    ? round($previousTests->flatMap->results->avg('score') ?? 0, 1) 
+                    ? round($previousTests->last()->results->avg('score') ?? 0, 1) 
                     : 0;
 
-                // B. Analisis Per Kategori (Untuk Radar Chart & SWOT) - Berdasarkan semua data
+                // Label dinamis untuk grafik Bar Chart Multi-Tes
+                if ($previousTests->count() > 0) {
+                    $historicalLabels = $previousTests->map(function($pt, $index) {
+                        return [
+                            'key' => 'prev_' . $index,
+                            'name' => Carbon::parse($pt->date)->format('d M y'),
+                        ];
+                    });
+                }
+
+                // Radar & SWOT Logic (Tetap sama)
                 $categoryStats = $allResults->groupBy(function($res) {
                         return $res->testItem->category->name ?? 'Uncategorized';
                     })
@@ -205,7 +202,6 @@ class AthleteController extends Controller
                         ];
                     });
 
-                // Format Data Radar Chart
                 $radarData = $categoryStats->map(function($cat) {
                     return [
                         'subject' => $cat['name'],
@@ -215,7 +211,6 @@ class AthleteController extends Controller
                     ];
                 })->values();
 
-                // C. SWOT Analysis
                 $strengths = $categoryStats->filter(function($item) {
                     return $item['score'] > 70;
                 })->sortByDesc('score')->values();
@@ -224,12 +219,11 @@ class AthleteController extends Controller
                     return $item['score'] <= 70;
                 })->sortBy('score')->take(3)->values();
 
-                // D. Perbandingan Kategori (Bar Chart: Latest vs Avg of Previous 4)
+                // Comparison Bar Chart (Category Avg)
                 $latestCats = $latestTest->results->groupBy(function($r) {
                     return $r->testItem->category->name ?? 'Uncat';
                 })->map(function($i) { return round($i->avg('score'), 1); });
 
-                // Hitung rata-rata skor per kategori dari 4 tes sebelumnya
                 $prevCats = collect();
                 if ($previousTests->count() > 0) {
                     $prevCats = $previousTests->flatMap->results->groupBy(function($r) {
@@ -247,48 +241,49 @@ class AthleteController extends Controller
                     ];
                 })->values();
 
-                // E. DETAIL PER ITEM (Tabel Rincian: Latest vs Avg of Previous 4)
+                // DETAIL PER ITEM (Multi-Test Bar Chart Data)
                 $itemAnalysis = $latestTest->results->map(function($res) use ($previousTests) {
                     $item = $res->testItem;
-                    $prevScore = 0;
+                    $rawScore = floatval($res->score);
+                    $prevScoreForGrowth = 0;
                     $growth = 0;
 
-                    if ($previousTests->count() > 0) {
-                        // Kumpulkan semua hasil dari 4 tes sebelumnya untuk item tes ini
-                        $prevItemResults = collect();
-                        foreach ($previousTests as $pt) {
-                            $resPrev = $pt->results->where('test_item_id', $item->id)->first();
-                            if ($resPrev) {
-                                $prevItemResults->push($resPrev);
-                            }
-                        }
-
-                        if ($prevItemResults->count() > 0) {
-                            // Rata-rata dari skor tes sebelumnya
-                            $prevScore = $prevItemResults->avg('score');
-                            
-                            if ($prevScore > 0) {
-                                $growth = (($res->score - $prevScore) / $prevScore) * 100;
-                            }
-                        }
-                    }
-
-                    return [
+                    $data = [
                         'id' => $res->id,
                         'name' => $item->name,
                         'category' => $item->category->name ?? '-',
                         'unit' => $item->unit,
                         'target_value' => $item->target_value,
                         'result_value' => $res->result,
-                        'score' => round($res->score, 1),
-                        'previous_score' => round($prevScore, 1),
-                        'growth' => round($growth, 1)
+                        'score' => round($rawScore, 1)
                     ];
+
+                    if ($previousTests->count() > 0) {
+                        foreach ($previousTests as $index => $pt) {
+                            $resPrev = $pt->results->where('test_item_id', $item->id)->first();
+                            $pScore = $resPrev ? floatval($resPrev->score) : 0;
+                            
+                            $data['prev_' . $index] = round($pScore, 1);
+                            
+                            // Untuk persentase trend, selalu gunakan tes yang SEBELUM tes terakhir ini
+                            if ($index === $previousTests->count() - 1) {
+                                $prevScoreForGrowth = $pScore;
+                            }
+                        }
+
+                        if ($prevScoreForGrowth > 0) {
+                            $growth = (($rawScore - $prevScoreForGrowth) / $prevScoreForGrowth) * 100;
+                        }
+                    }
+
+                    $data['previous_score'] = round($prevScoreForGrowth, 1);
+                    $data['growth'] = round($growth, 1);
+
+                    return $data;
                 })->values();
             }
         }
 
-        // 5. Data History (Untuk Grafik Area Chart / Log)
         $historyData = $tests->map(function($test) {
             return [
                 'date' => date('d/m/y', strtotime($test->date)),
@@ -298,7 +293,6 @@ class AthleteController extends Controller
             ];
         })->values();
 
-        // 6. Return ke View Inertia
         return Inertia::render('Admin/Athletes/Show', [
             'athlete' => $athlete,
             'stats' => $stats,
@@ -308,7 +302,8 @@ class AthleteController extends Controller
             'history_data' => $historyData,
             'strengths' => $strengths,
             'weaknesses' => $weaknesses,
-            'has_data' => $hasData
+            'has_data' => $hasData,
+            'historical_labels' => $historicalLabels // Kirim label ini ke React
         ]);
     }
 }
