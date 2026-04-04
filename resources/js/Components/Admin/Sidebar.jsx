@@ -8,7 +8,8 @@ import {
     Shield,
     Settings,
     Activity,
-    HeartPulse // 1. Import Icon baru untuk Wellness & Load
+    HeartPulse,
+    Dumbbell // <-- Import Icon baru untuk Training Logs
 } from 'lucide-react';
 
 export default function Sidebar({ className }) {
@@ -21,7 +22,7 @@ export default function Sidebar({ className }) {
 
     const isActive = (path) => url.startsWith(path);
 
-    // 2. Tambahkan menu baru ke dalam array menuItems
+    // Array definisi Menu
     const menuItems = [
         { 
             name: 'dashboard', 
@@ -60,13 +61,20 @@ export default function Sidebar({ className }) {
             icon: Activity,
             roles: ['admin', 'coach', 'athlete']
         },
-
-        // --- MENU BARU: WELLNESS & LOAD ---
         { 
             name: 'Wellness & Load', 
             route: 'admin.training-loads.index', 
             checkPath: '/admin/training-loads', 
             icon: HeartPulse,
+            roles: ['admin', 'coach', 'athlete'] 
+        },
+
+        // --- MENU BARU: TRAINING LOGS ---
+        { 
+            name: 'Training Logs', 
+            route: 'admin.training-logs.index', 
+            checkPath: '/admin/training-logs', 
+            icon: Dumbbell,
             roles: ['admin', 'coach', 'athlete'] 
         },
         

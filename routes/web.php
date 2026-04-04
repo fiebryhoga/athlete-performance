@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\DailyMetricController;
 use App\Http\Controllers\Admin\GlobalSearchController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\TrainingLogController;
 use Illuminate\Foundation\Application;
 use Inertia\Inertia;
 
@@ -108,6 +109,17 @@ Route::middleware([
         Route::get('/admin/training-loads', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'index'])->name('admin.training-loads.index');
         Route::get('/admin/training-loads/athlete/{user}', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'show'])->name('admin.training-loads.show');
         Route::post('/admin/training-loads/store', [\App\Http\Controllers\Admin\TrainingLoadController::class, 'store'])->name('admin.training-loads.store');
+
+        Route::get('/admin/training-logs', [\App\Http\Controllers\Admin\TrainingLogController::class, 'index'])->name('admin.training-logs.index');
+        Route::post('/admin/training-logs/session', [\App\Http\Controllers\Admin\TrainingLogController::class, 'storeSession'])->name('admin.training-logs.session.store');
+        Route::put('/admin/training-logs/session/{trainingSession}', [\App\Http\Controllers\Admin\TrainingLogController::class, 'updateSession'])->name('admin.training-logs.session.update');
+        Route::get('/admin/training-logs/show/{trainingSession}', [\App\Http\Controllers\Admin\TrainingLogController::class, 'show'])->name('admin.training-logs.show');
+        Route::put('/admin/training-logs/{trainingSession}', [\App\Http\Controllers\Admin\TrainingLogController::class, 'update'])->name('admin.training-logs.update');
+        Route::post('/admin/training-logs/{trainingSession}/add-row', [\App\Http\Controllers\Admin\TrainingLogController::class, 'addRow'])->name('admin.training-logs.add-row');
+        Route::delete('/admin/training-logs/{trainingSession}', [\App\Http\Controllers\Admin\TrainingLogController::class, 'destroy'])->name('admin.training-logs.destroy');
+        Route::post('/admin/training-logs/exercises', [\App\Http\Controllers\Admin\TrainingLogController::class, 'storeExercise'])->name('admin.training-logs.exercises.store');
+        Route::delete('admin/training-logs/exercises', [App\Http\Controllers\Admin\TrainingLogController::class, 'destroyExercise'])->name('admin.training-logs.exercises.destroy');
+        
         
     });
 
@@ -154,6 +166,8 @@ Route::middleware([
             'destroy' => 'admin.athletes.destroy',
             'edit'    => 'admin.athletes.edit',
         ]);
+
+        
 
         // Configuration & Settings
         Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
