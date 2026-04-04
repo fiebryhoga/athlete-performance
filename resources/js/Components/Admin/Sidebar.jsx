@@ -9,7 +9,8 @@ import {
     Settings,
     Activity,
     HeartPulse,
-    Dumbbell // <-- Import Icon baru untuk Training Logs
+    Dumbbell,
+    Scale
 } from 'lucide-react';
 
 export default function Sidebar({ className }) {
@@ -53,6 +54,13 @@ export default function Sidebar({ className }) {
             checkPath: '/admin/performance', 
             icon: ClipboardList,
             roles: ['admin', 'coach', 'athlete'] 
+        },
+        { 
+            name: 'Body Composition', 
+            route: 'admin.composition-tests.create', 
+            checkPath: '/admin/composition-tests', 
+            icon: Scale, // Menggunakan ikon timbangan
+            roles: ['admin', 'coach'] // Biasanya diakses Admin/Coach untuk menginput
         },
         { 
             name: 'Daily Monitoring', 

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\DailyMetricController;
 use App\Http\Controllers\Admin\GlobalSearchController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TrainingLogController;
+use App\Http\Controllers\Admin\CompositionTestController;
 use Illuminate\Foundation\Application;
 use Inertia\Inertia;
 
@@ -119,6 +120,9 @@ Route::middleware([
         Route::delete('/admin/training-logs/{trainingSession}', [\App\Http\Controllers\Admin\TrainingLogController::class, 'destroy'])->name('admin.training-logs.destroy');
         Route::post('/admin/training-logs/exercises', [\App\Http\Controllers\Admin\TrainingLogController::class, 'storeExercise'])->name('admin.training-logs.exercises.store');
         Route::delete('admin/training-logs/exercises', [App\Http\Controllers\Admin\TrainingLogController::class, 'destroyExercise'])->name('admin.training-logs.exercises.destroy');
+
+        Route::get('composition-tests/create', [CompositionTestController::class, 'create'])->name('admin.composition-tests.create');
+        Route::post('composition-tests', [CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
         
         
     });
