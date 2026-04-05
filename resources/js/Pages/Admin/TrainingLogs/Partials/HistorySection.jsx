@@ -18,7 +18,7 @@ export default function HistorySection({ historySessions, userName }) {
                     <History className="w-5 h-5" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-black text-slate-800">Riwayat Latihan Terdahulu</h3>
+                    <h3 className="text-lg  font-bold text-slate-800">Riwayat Latihan Terdahulu</h3>
                     <p className="text-sm text-slate-500 font-medium">5 Sesi terakhir milik {userName}</p>
                 </div>
             </div>
@@ -43,7 +43,7 @@ export default function HistorySection({ historySessions, userName }) {
                                     <td className="px-6 py-4 font-bold text-slate-700">
                                         {new Date(hist.date).toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
                                     </td>
-                                    <td className="px-6 py-4 text-center font-black text-[#00488b]">{hist.session_number}</td>
+                                    <td className="px-6 py-4 text-center  font-bold text-[#00488b]">{hist.session_number}</td>
                                     <td className="px-6 py-4 font-bold text-slate-800">{hist.training_type}</td>
                                     <td className="px-6 py-4 text-right">
                                         <button 

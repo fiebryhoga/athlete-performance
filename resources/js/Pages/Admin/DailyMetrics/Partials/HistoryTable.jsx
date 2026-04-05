@@ -157,27 +157,27 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">RHR</p>
-                                    <p className="font-black text-slate-800 text-xl">{detailItem.data?.rhr} <span className="text-xs font-medium text-slate-500">bpm</span></p>
+                                    <p className=" font-bold text-slate-800 text-xl">{detailItem.data?.rhr} <span className="text-xs font-medium text-slate-500">bpm</span></p>
                                 </div>
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">SpO2</p>
-                                    <p className="font-black text-slate-800 text-xl">{detailItem.data?.spo2}<span className="text-xs font-medium text-slate-500">%</span></p>
+                                    <p className=" font-bold text-slate-800 text-xl">{detailItem.data?.spo2}<span className="text-xs font-medium text-slate-500">%</span></p>
                                 </div>
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Berat Badan</p>
-                                    <p className="font-black text-slate-800 text-xl">{detailItem.data?.weight} <span className="text-xs font-medium text-slate-500">kg</span></p>
+                                    <p className=" font-bold text-slate-800 text-xl">{detailItem.data?.weight} <span className="text-xs font-medium text-slate-500">kg</span></p>
                                 </div>
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Vertical Jump</p>
-                                    <p className="font-black text-slate-800 text-xl">{detailItem.data?.vj} <span className="text-xs font-medium text-slate-500">cm</span></p>
+                                    <p className=" font-bold text-slate-800 text-xl">{detailItem.data?.vj} <span className="text-xs font-medium text-slate-500">cm</span></p>
                                 </div>
                                 <div className="bg-sky-50 p-4 rounded-2xl border border-sky-100">
                                     <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">VO2Max</p>
-                                    <p className="font-black text-sky-700 text-xl">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
+                                    <p className=" font-bold text-sky-700 text-xl">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
                                 </div>
                                 <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
                                     <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-1 flex items-center gap-1"><Zap className="w-3 h-3"/> Power</p>
-                                    <p className="font-black text-amber-700 text-xl">{Number(detailItem.data?.peak_power).toLocaleString('id-ID', { minimumFractionDigits: 0 })} <span className="text-xs font-medium">W</span></p>
+                                    <p className=" font-bold text-amber-700 text-xl">{Number(detailItem.data?.peak_power).toLocaleString('id-ID', { minimumFractionDigits: 0 })} <span className="text-xs font-medium">W</span></p>
                                 </div>
                             </div>
 
@@ -196,7 +196,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className={`text-3xl font-black ${recColors.text}`}>{detailItem.data?.quick_recovery_score}%</span>
+                                            <span className={`text-3xl  font-bold ${recColors.text}`}>{detailItem.data?.quick_recovery_score}%</span>
                                         </div>
                                     </div>
                                 );

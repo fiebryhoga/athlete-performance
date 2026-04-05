@@ -48,19 +48,22 @@ export default function Sidebar({ className }) {
             icon: Users,
             roles: ['admin', 'coach'] 
         },
+        // 1. PERBAIKAN PHYSICAL TEST
         { 
             name: 'Physical Test', 
             route: 'admin.performance.index', 
-            checkPath: '/admin/performance', 
+            checkPath: '/performance', // <--- UBAH DI SINI (Hapus /admin/)
             icon: ClipboardList,
             roles: ['admin', 'coach', 'athlete'] 
         },
+        
+        // 2. PERBAIKAN BODY COMPOSITION
         { 
             name: 'Body Composition', 
-            route: 'admin.composition-tests.create', 
-            checkPath: '/admin/composition-tests', 
-            icon: Scale, // Menggunakan ikon timbangan
-            roles: ['admin', 'coach'] // Biasanya diakses Admin/Coach untuk menginput
+            route: 'admin.composition-tests.index',
+            checkPath: '/admin/composition', // <--- UBAH DI SINI (Hapus -tests)
+            icon: Scale, 
+            roles: ['admin', 'coach', 'athlete'] 
         },
         { 
             name: 'Daily Monitoring', 
@@ -140,8 +143,8 @@ export default function Sidebar({ className }) {
             <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
                 
                 <div className="mb-8">
-                    <p className="px-3 text-[10px] font-bold text-slate-400 tracking-widest mb-2 opacity-70  ">
-                        main menu
+                    <p className="px-3 text-sm font-bold text-slate-400 mb-2 opacity-70  ">
+                        Main Menu
                     </p>
                     <ul className="space-y-1">
                         {visibleMenuItems.map((item) => {

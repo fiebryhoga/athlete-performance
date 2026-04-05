@@ -85,8 +85,8 @@ export default function Show({ session, exercisesList, nextSession, historySessi
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-2xl mb-6 flex items-center gap-4 shadow-sm">
                         <div className="bg-white p-2.5 rounded-xl shadow-sm text-blue-500 shrink-0"><CalendarDays className="w-6 h-6" /></div>
                         <div>
-                            <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-0.5">Informasi Jadwal Berikutnya</p>
-                            <p className="text-sm text-slate-700 font-medium">Latihan selanjutnya adalah <span className="font-black text-[#00488b]">{nextSession.training_type}</span> pada <span className="font-bold text-[#00488b] underline decoration-blue-200 underline-offset-2">{new Date(nextSession.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>.</p>
+                            <p className="text-[10px]  font-bold text-blue-500 uppercase tracking-widest mb-0.5">Informasi Jadwal Berikutnya</p>
+                            <p className="text-sm text-slate-700 font-medium">Latihan selanjutnya adalah <span className=" font-bold text-[#00488b]">{nextSession.training_type}</span> pada <span className="font-bold text-[#00488b] underline decoration-blue-200 underline-offset-2">{new Date(nextSession.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>.</p>
                         </div>
                     </div>
                 )}

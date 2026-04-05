@@ -23,7 +23,7 @@ export default function AthleteList({ athletes, filters }) {
                 {/* HEADER & SEARCH BAR */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <h2 className="text-2xl md:text-3xl  font-bold text-slate-800 tracking-tight flex items-center gap-2">
                             <ClipboardList className="w-8 h-8 text-[#00488b]" />
                             Training Session Logs
                         </h2>

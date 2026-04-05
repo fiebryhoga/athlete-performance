@@ -92,7 +92,7 @@ export default function Create({ athletes }) {
             
             <div className="max-w-4xl mx-auto pb-20">
                 <div className="mb-8">
-                    <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                    <h2 className="text-2xl  font-bold text-slate-800 flex items-center gap-2">
                         <Scale className="w-6 h-6 text-[#00488b]"/> Body Composition Test
                     </h2>
                     <p className="text-slate-500 font-medium mt-1 text-sm">
@@ -159,7 +159,7 @@ export default function Create({ athletes }) {
                                     <span>BMI (Kg/M2)</span>
                                     {bmiInfo && <span className={`px-2 py-0.5 rounded text-[8px] ${bmiInfo.color}`}>{bmiInfo.label}</span>}
                                 </label>
-                                <input type="number" value={data.bmi} readOnly className="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500 font-black cursor-not-allowed"/>
+                                <input type="number" value={data.bmi} readOnly className="w-full rounded-xl border-slate-200 text-sm bg-slate-100 text-slate-500  font-bold cursor-not-allowed"/>
                             </div>
 
                             <div className="relative">
@@ -202,7 +202,7 @@ export default function Create({ athletes }) {
                     </div>
 
                     <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button type="submit" disabled={processing} className="px-8 py-3 bg-[#00488b] text-white font-black text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex items-center gap-2">
+                        <button type="submit" disabled={processing} className="px-8 py-3 bg-[#00488b] text-white  font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex items-center gap-2">
                             {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>}
                             SIMPAN COMPOSITION TEST
                         </button>

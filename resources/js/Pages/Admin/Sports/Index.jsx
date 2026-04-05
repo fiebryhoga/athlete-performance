@@ -1,6 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Plus, Users, Dumbbell, ChevronRight, Activity, X, Save, Trash2 } from 'lucide-react';
+import { Plus, Users, Dumbbell, ChevronRight, Activity, X, Save, Trash2, Trophy } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Index({ sports }) {
@@ -22,7 +22,6 @@ export default function Index({ sports }) {
     };
 
     // --- HANDLE DELETE UPDATE ---
-    // Terima parameter jumlah atlet (count) untuk warning yang lebih baik
     const handleDelete = (e, sportId, sportName, athleteCount) => {
         e.preventDefault(); 
         e.stopPropagation(); 
@@ -45,135 +44,140 @@ export default function Index({ sports }) {
     };
 
     return (
-        <AdminLayout title="sports management">
-            <Head title="sports management" />
+        <AdminLayout title="Sports Management">
+            <Head title="Sports Management" />
 
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Sports Categories</h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage sports data and physical training specifications.</p>
+            {/* HEADER UTAMA YANG SELARAS DENGAN TEMA BARU */}
+            <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-50"></div>
+                <div className="relative z-10">
+                    <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Management</span>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        Sports Categories
+                    </h2>
+                    <p className="text-slate-500 font-medium mt-1 text-sm">Kelola data cabang olahraga dan spesifikasi parameter tes fisik.</p>
                 </div>
+
                 <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-[#00488b] text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-[#003666] transition-all shadow-lg shadow-blue-900/20 active:scale-95 lowercase"
+                    className="relative z-10 flex items-center gap-2 bg-[#00488b] text-white px-6 py-3 rounded-lg text-sm font-bold hover:bg-[#003666] transition-all shadow-lg shadow-blue-900/20 active:scale-95"
                 >
-                    <Plus className="w-4 h-4" />
-                    add sport
+                    <Plus className="w-4 h-4" /> Add Sport
                 </button>
             </div>
 
+            {/* KONTEN KARTU CABOR */}
             {sports.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
                     {sports.map((sport) => (
                         <Link 
                             key={sport.id} 
                             href={route('admin.sports.show', sport.id)}
-                            className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-[#00488b] hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full"
+                            className="group bg-white p-6 rounded-lg border border-slate-200 hover:border-[#00488b] hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full"
                         >
                             <div className="flex justify-between items-start mb-4">
-                                <div className="p-3 bg-blue-50 text-[#00488b] rounded-xl group-hover:bg-[#00488b] group-hover:text-white transition-colors duration-300">
+                                <div className="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden bg-blue-50 text-[#00488b] flex justify-center items-center group-hover:bg-[#00488b] group-hover:text-white transition-colors duration-300">
                                     <Dumbbell className="w-6 h-6" />
                                 </div>
                                 
                                 {/* ACTION BUTTONS */}
                                 <div className="flex items-center gap-2">
                                     <button 
-                                        // Kirim jumlah atlet ke fungsi delete
                                         onClick={(e) => handleDelete(e, sport.id, sport.name, sport.athletes_count)}
-                                        className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all z-10 relative"
-                                        title="delete sport"
+                                        className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all z-10 relative"
+                                        title="Delete Sport"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                     
-                                    <div className="p-1.5 rounded-full bg-slate-50 group-hover:bg-blue-50 transition-colors">
+                                    <div className="p-2 rounded-lg bg-slate-50 group-hover:bg-blue-50 transition-colors">
                                         <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#00488b]" />
                                     </div>
                                 </div>
                             </div>
                             
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-[#00488b] transition-colors  ">{sport.name}</h3>
-                            <p className="text-xs text-slate-500 mb-6 line-clamp-2 flex-grow leading-relaxed  ">
-                                {sport.description || 'no additional description for this sport.'}
+                            <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-[#00488b] transition-colors">{sport.name}</h3>
+                            <p className="text-xs text-slate-500 mb-6 line-clamp-2 flex-grow leading-relaxed font-medium">
+                                {sport.description || 'No additional description provided for this sport.'}
                             </p>
 
-                            <div className="flex items-center justify-between text-xs font-semibold text-slate-400 pt-4 border-t border-slate-100 mt-auto">
-                                <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md  ">
-                                    <Users className="w-3.5 h-3.5" />
-                                    <span>{sport.athletes_count} athletes</span>
+                            <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-4 border-t border-slate-100 mt-auto">
+                                <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                                    <Users className="w-3.5 h-3.5 text-[#00488b]" />
+                                    <span>{sport.athletes_count} Athletes</span>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md  ">
-                                    <Activity className="w-3.5 h-3.5" />
-                                    <span>{sport.test_items_count} test types</span>
+                                <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                                    <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                                    <span>{sport.test_items_count} Tests</span>
                                 </div>
                             </div>
                         </Link>
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-300 text-center">
+                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg border border-dashed border-slate-300 text-center shadow-sm">
                     <div className="p-4 bg-slate-50 rounded-full mb-3">
-                        <Dumbbell className="w-8 h-8 text-slate-300" />
+                        <Trophy className="w-8 h-8 text-slate-300" />
                     </div>
-                    <h3 className="text-slate-800 font-bold  ">no sports categories found</h3>
-                    <p className="text-slate-500 text-xs mt-1  ">please add new data to get started.</p>
+                    <h3 className="text-slate-800 font-bold text-lg">No Sports Categories Found</h3>
+                    <p className="text-slate-500 text-sm mt-1 font-medium">Please add new data to get started.</p>
                 </div>
             )}
 
+            {/* MODAL TAMBAH CABOR */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => { setIsModalOpen(false); reset(); }}></div>
-                    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="relative bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-slate-800  ">add new sport</h3>
-                            <button onClick={() => { setIsModalOpen(false); reset(); }} className="text-slate-400 hover:text-slate-600 transition-colors">
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">Add New Sport</h3>
+                                <p className="text-xs text-slate-500 font-medium mt-0.5">Register a new sports category.</p>
+                            </div>
+                            <button onClick={() => { setIsModalOpen(false); reset(); }} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-lg transition-colors">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         
                         <form onSubmit={submit} className="p-6 space-y-5">
                             <div>
-                                <label className="block text-xs font-bold text-slate-500   tracking-wider mb-1.5">sport name</label>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Sport Name</label>
                                 <input 
                                     type="text" 
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
-                                    className="w-full rounded-xl border-slate-200 focus:ring-[#00488b] focus:border-[#00488b] text-sm py-2.5 placeholder-slate-400 lowercase"
-                                    placeholder="e.g. football"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#00488b]/20 focus:border-[#00488b] text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
+                                    placeholder="e.g. Basketball, Swimming..."
                                     autoFocus
                                 />
-                                {errors.name && <p className="text-red-500 text-xs mt-1  ">{errors.name}</p>}
+                                {errors.name && <p className="text-rose-500 text-xs mt-1 font-medium">{errors.name}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-500   tracking-wider mb-1.5">description (optional)</label>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Description (Optional)</label>
                                 <textarea 
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    className="w-full rounded-xl border-slate-200 focus:ring-[#00488b] focus:border-[#00488b] text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none"
-                                    placeholder="brief description about this sport..."
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#00488b]/20 focus:border-[#00488b] text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none transition-all outline-none"
+                                    placeholder="Brief description about this sport..."
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-2">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                                 <button 
                                     type="button" 
                                     onClick={() => { setIsModalOpen(false); reset(); }} 
-                                    className="px-5 py-2.5 text-slate-500 font-bold text-sm hover:bg-slate-50 rounded-xl transition-colors lowercase"
+                                    className="px-5 py-2.5 text-slate-500 font-bold text-sm hover:bg-slate-100 rounded-lg transition-colors"
                                 >
-                                    cancel
+                                    Cancel
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={processing} 
-                                    className="px-6 py-2.5 bg-[#00488b] text-white font-bold text-sm rounded-xl hover:bg-[#003666] transition-colors shadow-lg shadow-blue-900/10 disabled:opacity-50 flex items-center gap-2 lowercase"
+                                    className="px-6 py-2.5 bg-[#00488b] text-white font-bold text-sm rounded-lg hover:bg-[#003666] transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50 flex items-center gap-2"
                                 >
-                                    {processing ? (
-                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                    ) : (
-                                        <Save className="w-4 h-4" />
-                                    )}
-                                    {processing ? 'saving...' : 'save data'}
+                                    {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
+                                    {processing ? 'Saving...' : 'Save Data'}
                                 </button>
                             </div>
                         </form>

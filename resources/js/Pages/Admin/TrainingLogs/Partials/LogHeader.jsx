@@ -20,7 +20,7 @@ export default function LogHeader({ session }) {
                         )}
                     </div>
                     {/* Badge Sesi menempel di sudut foto */}
-                    <div className="absolute -bottom-3 -right-3 bg-[#00488b] text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-lg border-2 border-white uppercase tracking-widest z-20">
+                    <div className="absolute -bottom-3 -right-3 bg-[#00488b] text-white text-[10px]  font-bold px-3 py-1.5 rounded-xl shadow-lg border-2 border-white uppercase tracking-widest z-20">
                         Sesi {session.session_number}
                     </div>
                 </div>
@@ -32,7 +32,7 @@ export default function LogHeader({ session }) {
                         <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Training Program</span>
                     </div>
                     
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-800 uppercase tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl  font-bold text-slate-800 uppercase tracking-tight">
                         {session.training_type}
                     </h2>
                     

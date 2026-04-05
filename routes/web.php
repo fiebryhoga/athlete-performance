@@ -123,6 +123,13 @@ Route::middleware([
 
         Route::get('composition-tests/create', [CompositionTestController::class, 'create'])->name('admin.composition-tests.create');
         Route::post('composition-tests', [CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
+        Route::get('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'index'])->name('admin.composition-tests.index');
+
+        Route::post('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
+        Route::delete('/admin/composition/{compositionTest}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'destroy'])->name('admin.composition-tests.destroy');
+        
+        Route::post('/admin/composition/benchmarks', [\App\Http\Controllers\Admin\CompositionTestController::class, 'saveBenchmarks'])->name('admin.composition-tests.save-benchmarks');
+        Route::get('/admin/composition/{user}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'show'])->name('admin.composition-tests.show');
         
         
     });

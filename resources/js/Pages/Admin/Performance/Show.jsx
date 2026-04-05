@@ -157,7 +157,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                         <div className="space-y-1.5 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-200 mt-2 sm:mt-0">
                             <p className="text-xs text-slate-400 font-bold tracking-wider  ">total avg score</p>
                             <div className="flex items-center gap-2 text-[#00488b]">
-                                <span className="text-2xl md:text-3xl font-black tracking-tight">{formatPercent(current_score)}</span>
+                                <span className="text-2xl md:text-3xl  font-bold tracking-tight">{formatPercent(current_score)}</span>
                             </div>
                         </div>
                     </div>
@@ -273,7 +273,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                             {hasPrevious ? formatPercent(item.previous_score) : '-'}
                                         </td>
                                         <td className="px-4 md:px-6 py-3 text-right bg-blue-50/10 print:bg-transparent">
-                                            <span className="font-black text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
+                                            <span className=" font-bold text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
                                         </td>
                                         <td className="px-4 md:px-6 py-3 text-center flex justify-center">
                                             <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm print:shadow-none print:border-slate-300">
@@ -284,7 +284,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                 ))}
                                 <tr className="bg-blue-50/50 border-t-2 border-slate-200 print:bg-slate-100" style={{ pageBreakInside: 'avoid' }}>
                                     <td colSpan="5" className="px-4 md:px-6 py-5 text-right font-bold text-slate-500 text-xs tracking-wider  ">total average score :</td>
-                                    <td className="px-4 md:px-6 py-5 text-right font-black text-2xl text-[#00488b]">{formatPercent(current_score)}</td>
+                                    <td className="px-4 md:px-6 py-5 text-right  font-bold text-2xl text-[#00488b]">{formatPercent(current_score)}</td>
                                     <td></td>
                                 </tr>
                             </tbody>

@@ -43,28 +43,28 @@ export default function Index({ tests, sports, filters = {} }) {
         
         if (score >= 90) return { 
             label: 'Excellent', 
-            badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', 
+            badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', 
             bar: 'bg-emerald-500' 
         };
         if (score >= 80) return { 
             label: 'Good', 
-            badge: 'bg-blue-100 text-blue-700 border-blue-200', 
+            badge: 'bg-blue-50 text-blue-700 border-blue-200', 
             bar: 'bg-blue-500' 
         };
         if (score >= 70) return { 
             label: 'Average', 
-            badge: 'bg-yellow-100 text-yellow-700 border-yellow-200', 
-            bar: 'bg-yellow-400' 
+            badge: 'bg-amber-50 text-amber-700 border-amber-200', 
+            bar: 'bg-amber-400' 
         };
         if (score >= 60) return { 
             label: 'Fair', 
-            badge: 'bg-orange-100 text-orange-700 border-orange-200', 
+            badge: 'bg-orange-50 text-orange-700 border-orange-200', 
             bar: 'bg-orange-500' 
         };
         return { 
             label: 'Poor', 
-            badge: 'bg-red-100 text-red-700 border-red-200', 
-            bar: 'bg-red-500' 
+            badge: 'bg-rose-50 text-rose-700 border-rose-200', 
+            bar: 'bg-rose-500' 
         };
     };
 
@@ -79,28 +79,33 @@ export default function Index({ tests, sports, filters = {} }) {
         <AdminLayout title="Performance History">
             <Head title="Performance History" />
 
-            {/* --- HEADER --- */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Performance History</h1>
-                    <p className="text-slate-500 text-sm mt-1">Monitor athlete scores and progress over time.</p>
+            {/* --- HEADER UTAMA (Selaras Tema Baru) --- */}
+            <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-50 pointer-events-none"></div>
+                <div className="relative z-10 w-full md:w-auto">
+                    <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Evaluation</span>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        Performance History
+                    </h2>
+                    <p className="text-slate-500 font-medium mt-1 text-sm">Monitor athlete scores and physical progress over time.</p>
                 </div>
-                
+
                 {!isAthlete && (
-                    <Link 
-                        href={route('admin.performance.create')} 
-                        className="flex items-center gap-2 bg-[#00488b] text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-900/10 hover:bg-[#003666] hover:shadow-xl transition-all transform active:scale-95 text-sm"
-                    >
-                        <Plus className="w-5 h-5" />
-                        New Test Entry
-                    </Link>
+                    <div className="relative z-10 w-full md:w-auto flex justify-end">
+                        <Link 
+                            href={route('admin.performance.create')} 
+                            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#00488b] text-white px-6 py-3 rounded-lg text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all active:scale-95"
+                        >
+                            <Plus className="w-4 h-4" /> New Test Entry
+                        </Link>
+                    </div>
                 )}
             </div>
 
-            {/* --- FILTER --- */}
-            <div className="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row gap-2 items-center relative z-20">
+            {/* --- FILTER BAR --- */}
+            <div className="bg-white p-2 rounded-lg border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row gap-2 items-center relative z-20">
                 <div className="relative w-full md:flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Search className="h-4 w-4 text-slate-400" />
                     </div>
                     <input
@@ -108,7 +113,7 @@ export default function Index({ tests, sports, filters = {} }) {
                         placeholder="Search athlete name..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-transparent placeholder-slate-400 focus:ring-2 focus:ring-[#00488b]/20 text-sm font-medium text-slate-700"
+                        className="block w-full pl-9 pr-3 py-2.5 border border-slate-100 hover:border-slate-200 rounded-lg bg-slate-50 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#00488b]/20 text-sm font-medium text-slate-700 transition-colors outline-none"
                     />
                 </div>
 
@@ -120,7 +125,7 @@ export default function Index({ tests, sports, filters = {} }) {
                     )}
                     <button 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors text-sm font-medium text-slate-700 group"
+                        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-lg transition-colors text-sm font-medium text-slate-700 group"
                     >
                         <div className="flex items-center gap-2 truncate">
                             <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#00488b]' : 'text-slate-400'}`} />
@@ -132,22 +137,22 @@ export default function Index({ tests, sports, filters = {} }) {
                     </button>
 
                     {isDropdownOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-full md:w-72 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
+                        <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-lg shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
                             <div 
-                                className={`px-4 py-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport === '' ? 'bg-blue-50/50' : ''}`}
+                                className={`px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport === '' ? 'bg-blue-50/50' : ''}`}
                                 onClick={() => { setSelectedSport(''); setIsDropdownOpen(false); }}
                             >
-                                <span className={`text-sm  ${selectedSport === '' ? 'font-bold text-[#00488b]' : 'text-slate-600'}`}>All Sports</span>
+                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#00488b]' : 'text-slate-600 font-medium'}`}>All Sports</span>
                                 {selectedSport === '' && <Check className="w-4 h-4 text-[#00488b]" />}
                             </div>
                             <div className="h-px bg-slate-100 my-1"></div>
                             {sports.map((sport) => (
                                 <div 
                                     key={sport.id}
-                                    className={`px-4 py-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport == sport.id ? 'bg-blue-50/50' : ''}`}
+                                    className={`px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport == sport.id ? 'bg-blue-50/50' : ''}`}
                                     onClick={() => { setSelectedSport(sport.id); setIsDropdownOpen(false); }}
                                 >
-                                    <span className={`text-sm  ${selectedSport == sport.id ? 'font-bold text-[#00488b]' : 'text-slate-600'}`}>{sport.name}</span>
+                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#00488b]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
                                     {selectedSport == sport.id && <Check className="w-4 h-4 text-[#00488b]" />}
                                 </div>
                             ))}
@@ -158,7 +163,7 @@ export default function Index({ tests, sports, filters = {} }) {
                 {(search || selectedSport) && (
                     <button 
                         onClick={resetFilters}
-                        className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all border border-transparent hover:border-rose-100 w-full md:w-auto flex justify-center items-center"
                         title="Reset Filters"
                     >
                         <X className="w-4 h-4" />
@@ -170,28 +175,27 @@ export default function Index({ tests, sports, filters = {} }) {
             {tests.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-0">
                     {tests.map((test) => {
-                        // Calculate Status in Frontend
                         const status = getPerformanceStatus(test.average_score);
 
                         return (
-                            <div key={test.id} className="group bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col overflow-hidden">
+                            <div key={test.id} className="group bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col overflow-hidden">
                                 
                                 {/* Card Header */}
-                                <div className="px-6 py-5 border-b border-slate-50 bg-white">
+                                <div className="px-5 py-4 border-b border-slate-50 bg-white">
                                     <div className="flex justify-between items-start mb-3">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold   tracking-wide border ${status.badge}`}>
+                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${status.badge}`}>
                                             {status.label}
                                         </span>
-                                        <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                                            <Calendar className="w-3.5 h-3.5" /> {test.date}
+                                        <span className="text-[11px] text-slate-400 font-bold flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                                            <Calendar className="w-3 h-3" /> {test.date}
                                         </span>
                                     </div>
                                     
-                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-[#00488b] transition-colors">
+                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-[#00488b] transition-colors mt-1">
                                         {test.athlete?.name || 'Unknown Athlete'}
                                     </h3>
-                                    <div className="flex items-center gap-1.5 mt-1">
-                                        <div className="p-1 rounded bg-slate-100 text-slate-500"><User className="w-3 h-3" /></div>
+                                    <div className="flex items-center gap-1.5 mt-1.5">
+                                        <div className="p-1 rounded-md bg-slate-100 text-slate-500"><User className="w-3 h-3" /></div>
                                         <p className="text-xs text-slate-500 font-medium">
                                             {test.athlete?.sport?.name || '-'}
                                         </p>
@@ -199,26 +203,26 @@ export default function Index({ tests, sports, filters = {} }) {
                                 </div>
 
                                 {/* Main Score Display */}
-                                <div className="px-6 py-6 bg-slate-50/50 border-b border-slate-50 flex items-center justify-between">
+                                <div className="px-5 py-5 bg-slate-50/50 border-y border-slate-100 flex items-center justify-between">
                                     <div>
-                                        <p className="text-[10px] text-slate-400 font-bold   tracking-widest mb-1">Total Score</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Score</p>
                                         <div className="flex items-baseline gap-1">
-                                            <span className="text-4xl font-black text-slate-800 tracking-tight">{test.average_score}</span>
-                                            <span className="text-sm font-bold text-slate-400">/100</span>
+                                            <span className="text-3xl font-black text-slate-800 tracking-tight leading-none">{test.average_score}</span>
+                                            <span className="text-xs font-bold text-slate-400">/100</span>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-slate-400 font-bold   tracking-widest mb-1">Target Ideal</p>
-                                        <div className="flex items-center justify-end gap-1 text-slate-600">
-                                            <Target className="w-3.5 h-3.5 text-slate-400" />
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Target Ideal</p>
+                                        <div className="flex items-center justify-end gap-1 text-slate-500">
+                                            <Target className="w-3.5 h-3.5 text-slate-300" />
                                             <p className="text-lg font-bold">100</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Breakdown Category */}
-                                <div className="px-6 py-5 bg-white flex-1">
-                                    <p className="text-xs font-bold text-slate-400 mb-4 flex items-center gap-1.5   tracking-wide">
+                                <div className="px-5 py-4 bg-white flex-1">
+                                    <p className="text-[10px] font-bold text-slate-400 mb-3 flex items-center gap-1.5 uppercase tracking-widest">
                                         <Activity className="w-3.5 h-3.5" /> Performance Breakdown
                                     </p>
                                     <div className="space-y-3">
@@ -226,9 +230,9 @@ export default function Index({ tests, sports, filters = {} }) {
                                             const catStatus = getPerformanceStatus(score);
                                             return (
                                                 <div key={category} className="group/item">
-                                                    <div className="flex justify-between items-end mb-1">
-                                                        <span className="text-xs font-semibold text-slate-600 truncate max-w-[120px]">{category}</span>
-                                                        <span className="text-xs font-bold text-slate-800">{score}</span>
+                                                    <div className="flex justify-between items-end mb-1.5">
+                                                        <span className="text-xs font-bold text-slate-600 truncate max-w-[120px]">{category}</span>
+                                                        <span className="text-xs font-black text-slate-800">{score}</span>
                                                     </div>
                                                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                         <div 
@@ -240,23 +244,23 @@ export default function Index({ tests, sports, filters = {} }) {
                                             );
                                         })}
                                         {Object.keys(test.category_scores || {}).length > 3 && (
-                                            <p className="text-[10px] text-center text-slate-400 pt-1 italic">
+                                            <p className="text-[10px] text-center text-slate-400 pt-2 font-medium italic">
                                                 +{Object.keys(test.category_scores).length - 3} other categories...
                                             </p>
                                         )}
                                         {Object.keys(test.category_scores || {}).length === 0 && (
-                                            <p className="text-[10px] text-slate-400 italic">No breakdown details available.</p>
+                                            <p className="text-xs text-slate-400 italic font-medium">No breakdown details available.</p>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Actions Footer */}
-                                <div className={`grid ${isAthlete ? 'grid-cols-1' : 'grid-cols-3 divide-x divide-slate-100'} border-t border-slate-100`}>
+                                <div className={`grid ${isAthlete ? 'grid-cols-1' : 'grid-cols-3 divide-x divide-slate-100'} border-t border-slate-100 bg-slate-50/30`}>
                                     {!isAthlete && (
                                         <>
                                             <button
                                                 onClick={() => handleDelete(test.id, test.athlete?.name)}
-                                                className="py-3.5 text-xs font-bold text-slate-400 hover:text-red-600 hover:bg-red-50/50 transition-colors flex items-center justify-center gap-2"
+                                                className="py-3 text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5"
                                                 title="Delete Record"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Delete</span>
@@ -264,7 +268,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                             <Link 
                                                 href={route('admin.performance.edit', test.id)}
-                                                className="py-3.5 text-xs font-bold text-slate-500 hover:text-amber-600 hover:bg-amber-50/50 transition-colors flex items-center justify-center gap-2"
+                                                className="py-3 text-xs font-bold text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center gap-1.5"
                                                 title="Edit Score"
                                             >
                                                 <Edit3 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Edit</span>
@@ -274,7 +278,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                     <Link 
                                         href={route('admin.performance.show', test.id)}
-                                        className="py-3.5 text-xs font-bold text-[#00488b] hover:text-white hover:bg-[#00488b] transition-colors flex items-center justify-center gap-2 group/btn"
+                                        className="py-3 text-xs font-bold text-[#00488b] hover:text-white hover:bg-[#00488b] transition-colors flex items-center justify-center gap-1.5 group/btn"
                                     >
                                         Details <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                                     </Link>
@@ -285,17 +289,17 @@ export default function Index({ tests, sports, filters = {} }) {
                 </div>
             ) : (
                 /* Empty State */
-                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-lg border border-dashed border-slate-300 shadow-sm">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <Search className="w-8 h-8 text-slate-300" />
                     </div>
                     <h3 className="text-slate-800 font-bold text-lg">No Data Found</h3>
-                    <p className="text-slate-500 text-sm mt-1 mb-6">Try changing your search keywords or filters.</p>
+                    <p className="text-slate-500 text-sm mt-1 mb-6 font-medium">Try changing your search keywords or filters.</p>
                     <button 
                         onClick={resetFilters} 
-                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all text-sm shadow-sm"
+                        className="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-sm shadow-sm"
                     >
-                        Reset Filter
+                        Reset Filters
                     </button>
                 </div>
             )}

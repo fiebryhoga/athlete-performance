@@ -184,7 +184,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
                             {strengths.length > 0 ? strengths.map((item, idx) => (
                                 <div key={idx} className="flex items-center justify-between group">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-3xl font-black text-slate-100 group-hover:text-emerald-100 transition-colors">0{idx + 1}</span>
+                                        <span className="text-3xl  font-bold text-slate-100 group-hover:text-emerald-100 transition-colors">0{idx + 1}</span>
                                         <div>
                                             <p className="font-bold text-slate-700">{item.subject}</p>
                                             <p className="text-xs text-slate-400">Score &gt; Target</p>
@@ -206,7 +206,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
                             {weaknesses.length > 0 ? weaknesses.map((item, idx) => (
                                 <div key={idx} className="flex items-center justify-between group">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-3xl font-black text-slate-100 group-hover:text-red-100 transition-colors">0{idx + 1}</span>
+                                        <span className="text-3xl  font-bold text-slate-100 group-hover:text-red-100 transition-colors">0{idx + 1}</span>
                                         <div>
                                             <p className="font-bold text-slate-700">{item.subject}</p>
                                             <p className="text-xs text-slate-400">Target: <span className="font-bold">{item.B}</span></p>
@@ -351,7 +351,7 @@ function StatCard({ label, value, icon: Icon, color, isText = false }) {
                 <p className="text-xs text-slate-400 font-bold mb-2 flex items-center gap-1">
                     <Icon className="w-3 h-3" /> {label}
                 </p>
-                <p className={`font-black ${isText ? 'text-lg leading-tight' : 'text-3xl'} ${color}`}>
+                <p className={` font-bold ${isText ? 'text-lg leading-tight' : 'text-3xl'} ${color}`}>
                     {displayValue || '-'}
                 </p>
             </div>

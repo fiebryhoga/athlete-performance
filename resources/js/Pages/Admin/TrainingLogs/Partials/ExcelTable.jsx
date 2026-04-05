@@ -4,7 +4,7 @@ import { Plus, X } from 'lucide-react'; // Pastikan import icon ini
 export default function ExcelTable({ data, is_athlete, handleExChange, libExercises, handleAddNewExercise, addNewRow, removeRow, onDeleteExercise }) {    return (
         <div className="bg-white border border-slate-300 rounded-3xl overflow-x-auto shadow-sm custom-scrollbar relative z-20">
             <table className="w-full min-w-[850px] table-fixed text-sm text-left border-collapse">
-                <thead className="bg-[#00488b] text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider">
+                <thead className="bg-[#00488b] text-white text-[10px] sm:text-[11px]  font-bold uppercase tracking-wider">
                     <tr>
                         <th rowSpan="2" className="border border-blue-800 px-3 py-3 text-center w-[23%]">EXERCISE</th>
                         <th colSpan="2" className="border border-blue-800 px-1 py-2 text-center bg-blue-900/50 w-[12%]">SET 1</th>
@@ -69,7 +69,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                                         className="text-rose-400 hover:text-rose-600 hover:bg-rose-50 p-2 rounded-lg transition-colors mx-auto"
                                         title="Hapus Baris"
                                     >
-                                        <X className="w-4 h-4 font-black" />
+                                        <X className="w-4 h-4  font-bold" />
                                     </button>
                                 </td>
                             )}

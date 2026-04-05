@@ -17,15 +17,15 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-md transition-all group">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-500 transition-colors"/> Total Sessions</p>
-                    <p className="text-3xl font-black text-slate-800">{stats?.total_sessions || 0}</p>
+                    <p className="text-3xl  font-bold text-slate-800">{stats?.total_sessions || 0}</p>
                 </div>
                 <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-md transition-all group">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#00488b] transition-colors"/> Avg Score</p>
-                    <p className="text-3xl font-black text-[#00488b]">{formatScore(stats?.average_score)}</p>
+                    <p className="text-3xl  font-bold text-[#00488b]">{formatScore(stats?.average_score)}</p>
                 </div>
                 <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all group">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors"/> Best Score</p>
-                    <p className="text-3xl font-black text-emerald-500">{formatScore(stats?.highest_score)}</p>
+                    <p className="text-3xl  font-bold text-emerald-500">{formatScore(stats?.highest_score)}</p>
                 </div>
                 <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-md transition-all group">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-500 transition-colors"/> Last Activity</p>
@@ -147,7 +147,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                 {strengths && strengths.length > 0 ? strengths.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between group p-3 rounded-xl hover:bg-emerald-50/50 transition-colors border border-transparent hover:border-emerald-100">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-2xl font-black text-slate-100 group-hover:text-emerald-200 transition-colors">0{idx + 1}</span>
+                                            <span className="text-2xl  font-bold text-slate-100 group-hover:text-emerald-200 transition-colors">0{idx + 1}</span>
                                             <div>
                                                 <p className="font-bold text-slate-700">{item.name}</p>
                                                 <p className="text-xs text-slate-400 font-medium">Physical Category</p>
@@ -170,7 +170,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                 {weaknesses && weaknesses.length > 0 ? weaknesses.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between group p-3 rounded-xl hover:bg-red-50/50 transition-colors border border-transparent hover:border-red-100">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-2xl font-black text-slate-100 group-hover:text-red-200 transition-colors">0{idx + 1}</span>
+                                            <span className="text-2xl  font-bold text-slate-100 group-hover:text-red-200 transition-colors">0{idx + 1}</span>
                                             <div>
                                                 <p className="font-bold text-slate-700">{item.name}</p>
                                                 <p className="text-xs text-slate-400 font-medium">Physical Category</p>

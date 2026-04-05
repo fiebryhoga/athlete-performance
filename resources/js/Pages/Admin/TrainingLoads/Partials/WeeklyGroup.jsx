@@ -41,7 +41,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     )}
                     <div className="bg-slate-50 border border-slate-200 px-4 py-1.5 rounded-lg flex items-center gap-2 w-fit">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Weekly Wellness:</span>
-                        <span className="font-black text-slate-600 text-lg">{week.metrics.weeklyWellnessScore} <span className="text-xs font-bold text-slate-400">/ 280</span></span>
+                        <span className=" font-bold text-slate-600 text-lg">{week.metrics.weeklyWellnessScore} <span className="text-xs font-bold text-slate-400">/ 280</span></span>
                     </div>
                 </div>
             </div>
@@ -69,14 +69,14 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Puncak Beban Latihan</p>
                             <p className="font-bold text-slate-800 text-sm mt-0.5">Hari dengan Load Tertinggi</p>
                         </div>
-                        <span className="font-black text-2xl text-[#00488b] group-hover:scale-110 transition-transform">{Math.max(...week.days.map(d => d.load))} <span className="text-sm font-bold text-slate-400">AU</span></span>
+                        <span className=" font-bold text-2xl text-[#00488b] group-hover:scale-110 transition-transform">{Math.max(...week.days.map(d => d.load))} <span className="text-sm font-bold text-slate-400">AU</span></span>
                     </div>
                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-colors">
                         <div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kebugaran Minimum</p>
                             <p className="font-bold text-slate-800 text-sm mt-0.5">Hari dengan Wellness Terendah</p>
                         </div>
-                        <span className="font-black text-2xl text-rose-500 group-hover:scale-110 transition-transform">
+                        <span className=" font-bold text-2xl text-rose-500 group-hover:scale-110 transition-transform">
                             {week.days.filter(d => d.wellness > 0).length > 0 ? Math.min(...week.days.filter(d => d.wellness > 0).map(d => d.wellness)) : 0} 
                             <span className="text-sm font-bold text-rose-300">/40</span>
                         </span>
@@ -107,7 +107,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     {day.wellness ? (
-                                        <span className="font-black text-rose-500 bg-rose-50 px-3 py-1 rounded-lg">{day.wellness}</span>
+                                        <span className=" font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-lg">{day.wellness}</span>
                                     ) : <span className="text-slate-300">-</span>}
                                 </td>
                                 <td className="px-4 py-3">
@@ -128,7 +128,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     {day.load ? (
-                                        <span className="font-black text-[#00488b] bg-blue-50 px-3 py-1 rounded-lg">{day.load}</span>
+                                        <span className=" font-bold text-[#00488b] bg-blue-50 px-3 py-1 rounded-lg">{day.load}</span>
                                     ) : <span className="text-slate-300">-</span>}
                                 </td>
                                 
@@ -166,12 +166,12 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     <h4 className="text-xs font-bold uppercase tracking-widest">Load Metrics & Monitoring</h4>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4 divide-x divide-blue-700/50">
-                    <div className="px-4 first:pl-0"><p className="text-[10px] font-bold text-blue-200 uppercase mb-1">Weekly Load</p><p className="text-3xl font-black">{week.metrics.weeklyLoad}</p></div>
+                    <div className="px-4 first:pl-0"><p className="text-[10px] font-bold text-blue-200 uppercase mb-1">Weekly Load</p><p className="text-3xl  font-bold">{week.metrics.weeklyLoad}</p></div>
                     
                     {/* ACWR BLOCK */}
                     <div className="px-4">
                         <p className="text-[10px] font-bold text-blue-200 uppercase mb-1">ACWR Ratio</p>
-                        <p className={`text-3xl font-black mt-1 ${getAcwrColor(week.metrics.acwr)}`}>
+                        <p className={`text-3xl  font-bold mt-1 ${getAcwrColor(week.metrics.acwr)}`}>
                             {week.metrics.acwr ? week.metrics.acwr : <span className="text-blue-400 font-medium text-lg italic">N/A</span>}
                         </p>
                     </div>
@@ -205,7 +205,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                         ))}
                     </div>
                     <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3.5 h-fit">
-                        <div className="flex justify-between items-center pb-2.5 border-b border-slate-100"><span className="text-[10px] font-bold text-slate-500 uppercase">Total (Train/Match/Travel)</span><span className="text-xl font-black text-[#00488b]">{week.metrics.totals.all}</span></div>
+                        <div className="flex justify-between items-center pb-2.5 border-b border-slate-100"><span className="text-[10px] font-bold text-slate-500 uppercase">Total (Train/Match/Travel)</span><span className="text-xl  font-bold text-[#00488b]">{week.metrics.totals.all}</span></div>
                         <div className="flex justify-between items-center pb-2.5 border-b border-slate-100"><span className="text-[10px] font-bold text-slate-500 uppercase">Total Training Sessions</span><span className="text-base font-extrabold text-slate-800">{week.metrics.totals.training}</span></div>
                         <div className="flex justify-between items-center pb-2.5 border-b border-slate-100"><span className="text-[10px] font-bold text-slate-500 uppercase">Num. Physical Prep</span><span className="text-sm font-bold text-slate-600">{week.metrics.totals.physical}</span></div>
                         <div className="flex justify-between items-center pb-2.5 border-b border-slate-100"><span className="text-[10px] font-bold text-slate-500 uppercase">Num. Skill Sessions</span><span className="text-sm font-bold text-slate-600">{week.metrics.totals.skill}</span></div>
