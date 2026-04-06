@@ -1,8 +1,7 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-// PASTIKAN 5 BARIS IMPORT INI ADA
 import ProfileHeader from './Partials/ProfileHeader';
 import AnalyticsDashboard from './Partials/AnalyticsDashboard';
 import SmartInsights from './Partials/SmartInsights';
@@ -10,6 +9,10 @@ import HistoryTable from './Partials/HistoryTable';
 import CompositionModal from './Partials/CompositionModal';
 
 export default function Show({ athlete, history, benchmarks }) {
+    // CEK ROLE USER YANG SEDANG LOGIN
+    const { auth } = usePage().props;
+    const is_athlete = auth.user.role === 'athlete';
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data, setData, post, processing, reset } = useForm({
@@ -39,38 +42,36 @@ export default function Show({ athlete, history, benchmarks }) {
         <AdminLayout title={`Composition - ${athlete.name}`}>
             <Head title={`Tes Komposisi - ${athlete.name}`} />
             
-            <div className="max-w-[1400px] mx-auto pb-12 px-4 md:px-6">
+            <div className="max-w-[1400px] mx-auto pb-12">
                 
-                {/* 1. HEADER PROFIL */}
-                <ProfileHeader athlete={athlete} onOpenModal={() => setIsModalOpen(true)} />
+                {/* 1. HEADER PROFIL (Kirim status is_athlete) */}
+                <ProfileHeader athlete={athlete} onOpenModal={() => setIsModalOpen(true)} is_athlete={is_athlete} />
 
-                {/* 2. ANALISIS DATA & GRAFIK (Hanya muncul jika sudah ada histori) */}
+                {/* 2. ANALISIS DATA & GRAFIK */}
                 {history.length > 0 && (
                     <div className="mb-8 space-y-6">
-                        {/* Saran / Insight Otomatis */}
                         <SmartInsights history={history} athlete={athlete} benchmarks={benchmarks} />
-                        
-                        {/* 4 Grafik Visualisasi Data */}
-                        {/* 4 Grafik Visualisasi Data */}
                         <AnalyticsDashboard history={history} athlete={athlete} benchmarks={benchmarks} />
                     </div>
                 )}
 
-                {/* 3. TABEL RIWAYAT */}
-                <HistoryTable history={history} athlete={athlete} benchmarks={benchmarks} />
+                {/* 3. TABEL RIWAYAT (Kirim status is_athlete) */}
+                <HistoryTable history={history} athlete={athlete} benchmarks={benchmarks} is_athlete={is_athlete} />
 
             </div>
 
-            {/* 4. MODAL INPUT DATA */}
-            <CompositionModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                data={data} 
-                setData={setData} 
-                submit={submit} 
-                processing={processing} 
-                athlete={athlete} 
-            />
+            {/* 4. MODAL INPUT DATA (Jika admin maksa buka via inspect element, form tetap dicegah) */}
+            {!is_athlete && (
+                <CompositionModal 
+                    isOpen={isModalOpen} 
+                    onClose={() => setIsModalOpen(false)} 
+                    data={data} 
+                    setData={setData} 
+                    submit={submit} 
+                    processing={processing} 
+                    athlete={athlete} 
+                />
+            )}
 
         </AdminLayout>
     );
