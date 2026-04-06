@@ -70,7 +70,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center text-center h-full relative overflow-hidden">
                     <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-[#00488b]/10 to-transparent"></div>
                     
-                    <div className="relative z-10 w-24 h-24 bg-[#00488b] rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-900/20 border-4 border-white overflow-hidden shrink-0">
+                    <div className="relative z-10 w-24 h-24 bg-[#ff4d00] rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-blue-900/20 border-4 border-white overflow-hidden shrink-0">
                         {user.profile_photo_url ? (
                             <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
@@ -129,7 +129,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
                         {/* Radar Chart */}
                         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
                             <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                                <span className="w-1.5 h-4 bg-[#00488b] rounded-full"></span> Peta Kemampuan vs Target
+                                <span className="w-1.5 h-4 bg-[#ff4d00] rounded-full"></span> Peta Kemampuan vs Target
                             </h3>
                             <div className="flex-1 min-h-[250px]">
                                 <ResponsiveContainer width="100%" height="100%">

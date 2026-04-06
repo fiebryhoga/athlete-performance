@@ -202,7 +202,7 @@ export default function Create({ athletes }) {
                     </div>
 
                     <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button type="submit" disabled={processing} className="px-8 py-3 bg-[#00488b] text-white  font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex items-center gap-2">
+                        <button type="submit" disabled={processing} className="px-8 py-3 bg-[#ff4d00] text-white  font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex items-center gap-2">
                             {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>}
                             SIMPAN COMPOSITION TEST
                         </button>

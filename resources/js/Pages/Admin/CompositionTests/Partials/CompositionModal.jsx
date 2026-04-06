@@ -84,46 +84,86 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
 
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            <div className="bg-white w-full max-w-6xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-auto flex flex-col xl:flex-row">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+            {/* Wrapper Modal Utama - max-height agar bisa di-scroll di HP */}
+            <div className="bg-white w-full max-w-6xl rounded-lg shadow-2xl flex flex-col xl:flex-row my-auto max-h-[95vh] xl:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
                 
                 {/* ========================================== */}
                 {/* KIRI: FORMULIR INPUT UTAMA */}
                 {/* ========================================== */}
-                <div className="flex-1 xl:w-7/12 border-b xl:border-b-0 xl:border-r border-slate-200 flex flex-col">
-                    <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
-                        <h3 className=" font-bold text-lg text-slate-800 flex items-center gap-2">
-                            <Scale className="w-5 h-5 text-[#00488b]"/> Record Composition
+                <div className="flex-1 xl:w-7/12 border-b xl:border-b-0 xl:border-r border-slate-200 flex flex-col overflow-y-auto custom-scrollbar">
+                    
+                    {/* Header Kiri (Sticky di HP) */}
+                    <div className="sticky top-0 z-20 px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-white shadow-sm">
+                        <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
+                            <Scale className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/> Record Composition
                         </h3>
-                        <button onClick={onClose} className="xl:hidden p-2 text-slate-400 hover:bg-slate-100 rounded-full"><X className="w-5 h-5"/></button>
+                        <button onClick={onClose} className="p-1.5 md:p-2 text-slate-400 hover:bg-slate-100 rounded-lg transition-colors"><X className="w-5 h-5"/></button>
                     </div>
 
-                    <form onSubmit={submit} className="p-6 sm:p-8 grid grid-cols-2 gap-4 sm:gap-6 bg-white overflow-y-auto custom-scrollbar flex-1">
-                        <div className="col-span-1"><label className="text-[10px]  font-bold uppercase text-slate-400 mb-1 block tracking-widest">Tanggal Tes</label><input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b]" required/></div>
-                        <div className="col-span-1"><label className="text-[10px]  font-bold uppercase text-slate-400 mb-1 block tracking-widest">Usia Biologis</label><input type="number" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm" required/></div>
+                    <form onSubmit={submit} className="p-4 md:p-6 sm:p-8 flex-1 flex flex-col bg-white">
                         
-                        <div className="col-span-1 p-3 sm:p-4 bg-blue-50/50 rounded-lg border border-blue-100">
-                            <label className="text-[10px]  font-bold uppercase text-blue-500 mb-1 block tracking-widest">Berat (KG)</label>
-                            <input type="number" step="0.01" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full rounded-lg border-white focus:border-blue-300 text-lg font-bold shadow-sm" required placeholder="0.00"/>
+                        {/* Baris 1: Tanggal & Usia */}
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
+                            <div className="col-span-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400 mb-1.5 block tracking-widest">Tanggal Tes</label>
+                                <input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
+                            </div>
+                            <div className="col-span-1">
+                                <label className="text-[10px] font-bold uppercase text-slate-400 mb-1.5 block tracking-widest">Usia Biologis</label>
+                                <input type="number" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
+                            </div>
                         </div>
-                        <div className="col-span-1 p-3 sm:p-4 bg-blue-50/50 rounded-lg border border-blue-100">
-                            <label className="text-[10px]  font-bold uppercase text-blue-500 mb-1 block tracking-widest">Tinggi (Meter)</label>
-                            <input type="number" step="0.01" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full rounded-lg border-white focus:border-blue-300 text-lg font-bold shadow-sm" required placeholder="1.70"/>
+                        
+                        {/* Baris 2: Berat & Tinggi (Warna Oranye) */}
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
+                            <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
+                                <label className="text-[10px] font-bold uppercase text-[#ff4d00] mb-1 block tracking-widest">Berat (KG)</label>
+                                <input type="number" step="0.01" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="0.00"/>
+                            </div>
+                            <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
+                                <label className="text-[10px] font-bold uppercase text-[#ff4d00] mb-1 block tracking-widest">Tinggi (Meter)</label>
+                                <input type="number" step="0.01" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="1.70"/>
+                            </div>
                         </div>
 
-                        <div className="col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-5 mt-1">
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Bodyfat %</label><input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Muscle Mass</label><input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Bone Mass</label><input type="number" step="0.1" value={data.bone_mass} onChange={e=>setData('bone_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Visceral Fat</label><input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">BMR (Kcal)</label><input type="number" value={data.bmr} onChange={e=>setData('bmr', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">TBW % (Air)</label><input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50"/></div>
-                            <div><label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Metabolic Age</label><input type="number" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-full rounded-lg border-slate-200 text-sm focus:ring-[#00488b] bg-slate-50" placeholder="Opsional"/></div>
+                        {/* Baris 3: Metrik Detail Grid 2 Kolom (HP) atau 3 Kolom (Tablet/Desktop) */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 border-t border-slate-100 pt-5">
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Bodyfat %</label>
+                                <input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Muscle Mass</label>
+                                <input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Bone Mass</label>
+                                <input type="number" step="0.1" value={data.bone_mass} onChange={e=>setData('bone_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Visceral Fat</label>
+                                <input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">BMR (Kcal)</label>
+                                <input type="number" value={data.bmr} onChange={e=>setData('bmr', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">TBW % (Air)</label>
+                                <input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                            </div>
+                            <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Metabolic Age</label>
+                                <input type="number" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm" placeholder="Opsional"/>
+                            </div>
                         </div>
 
-                        <div className="col-span-2 pt-4 border-t border-slate-100 mt-auto">
-                            <button type="submit" disabled={processing} className="w-full py-4 bg-[#00488b] text-white font-bold rounded-lg shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
-                                <Save className="w-5 h-5"/> {processing ? 'MENYIMPAN DATA...' : 'Simpan Rekaman Tes'}
+                        {/* Tombol Save (Tetap di bawah area Kiri) */}
+                        <div className="pt-6 md:pt-8 mt-auto border-t border-slate-100 hidden xl:block">
+                            <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm disabled:opacity-70">
+                                {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
+                                {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}
                             </button>
                         </div>
                     </form>
@@ -132,63 +172,66 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                 {/* ========================================== */}
                 {/* KANAN: HELPER TOOLS (KALKULATOR ESTIMASI) */}
                 {/* ========================================== */}
-                <div className="xl:w-5/12 bg-slate-50 flex flex-col relative h-[85vh] xl:h-auto">
-                    <button onClick={onClose} className="absolute top-5 right-6 hidden xl:block p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 rounded-full transition-colors z-10"><X className="w-5 h-5"/></button>
+                <div className="xl:w-5/12 bg-slate-50 flex flex-col relative border-t xl:border-t-0 border-slate-200 xl:border-none overflow-y-auto custom-scrollbar">
                     
-                    <div className="px-6 py-6 border-b border-slate-200">
-                        <h3 className=" font-bold text-lg text-slate-800 flex items-center gap-2"><Calculator className="w-5 h-5 text-indigo-500"/> Helper Tools</h3>
-                        <p className="text-xs text-slate-500 mt-1">Kalkulator jika Anda hanya membawa meteran pita.</p>
+                    <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-200 bg-slate-50 sticky top-0 z-10 flex justify-between items-center">
+                        <div>
+                            <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
+                                <Calculator className="w-4 h-4 md:w-5 md:h-5 text-teal-600"/> Helper Tools
+                            </h3>
+                            <p className="text-[10px] md:text-xs text-slate-500 mt-0.5">Kalkulator jika Anda hanya membawa meteran pita.</p>
+                        </div>
                     </div>
 
-                    <div className="flex px-4 pt-3 border-b border-slate-200 overflow-x-auto custom-scrollbar bg-slate-100">
-                        <button onClick={() => setActiveTool('bodyfat')} className={`pb-3 px-3 text-xs md:text-sm font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'bodyfat' ? 'border-indigo-500 text-indigo-600 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400'}`}>1. Lemak & Visceral</button>
-                        <button onClick={() => setActiveTool('bmr')} className={`pb-3 px-3 text-xs md:text-sm font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'bmr' ? 'border-indigo-500 text-indigo-600 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400'}`}>2. BMR & Air</button>
-                        <button onClick={() => setActiveTool('mass')} className={`pb-3 px-3 text-xs md:text-sm font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'mass' ? 'border-indigo-500 text-indigo-600 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400'}`}>3. Otot & Tulang</button>
+                    <div className="flex px-3 md:px-4 pt-3 border-b border-slate-200 overflow-x-auto custom-scrollbar bg-slate-100 sticky top-[60px] md:top-[70px] z-10">
+                        <button onClick={() => setActiveTool('bodyfat')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'bodyfat' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>1. Lemak & Visc</button>
+                        <button onClick={() => setActiveTool('bmr')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'bmr' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>2. BMR & Air</button>
+                        <button onClick={() => setActiveTool('mass')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'mass' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>3. Otot & Tulang</button>
                     </div>
 
-                    <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="p-4 md:p-6 flex-1 flex flex-col pb-8">
                         
                         {/* ------------------------------------------------ */}
                         {/* TAB 1: BODY FAT NAVY METHOD & VISCERAL */}
                         {/* ------------------------------------------------ */}
                         {activeTool === 'bodyfat' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
-                                <div className="bg-indigo-50/50 p-4 rounded-lg border border-indigo-100 text-xs text-indigo-800 font-medium leading-relaxed">
-                                    Menggunakan metode ukur US Navy Pastikan input Tinggi Badan di form utama sebelah kiri sudah terisi.
+                                <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
+                                    Menggunakan metode ukur US Navy. Pastikan input <strong className="font-bold text-teal-900">Tinggi Badan</strong> di form utama sudah terisi.
                                 </div>
                                 
-                                <div className="grid grid-cols-2 gap-4 mb-2">
+                                <div className="grid grid-cols-2 gap-3 md:gap-4 mb-2">
                                     <div className="col-span-2 sm:col-span-1">
-                                        <label className="text-xs font-bold text-slate-500 mb-1 block">Lingkar Leher (cm)</label>
-                                        <input type="number" step="0.1" value={neck} onChange={e=>setNeck(e.target.value)} className="w-full rounded-lg border-slate-200 text-sm" placeholder="Cth: 38" />
+                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Leher (cm)</label>
+                                        <input type="number" step="0.1" value={neck} onChange={e=>setNeck(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Cth: 38" />
                                     </div>
                                     <div className="col-span-2 sm:col-span-1">
-                                        <label className="text-xs font-bold text-slate-500 mb-1 block">Lingkar Perut (cm)</label>
-                                        <input type="number" step="0.1" value={waist} onChange={e=>setWaist(e.target.value)} className="w-full rounded-lg border-slate-200 text-sm" placeholder="Pada pusar" />
+                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Perut (cm)</label>
+                                        <input type="number" step="0.1" value={waist} onChange={e=>setWaist(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Pada pusar" />
                                     </div>
                                     {athlete.gender === 'P' && (
                                         <div className="col-span-2">
-                                            <label className="text-xs font-bold text-slate-500 mb-1 block">Lingkar Pinggul (cm) - Khusus Wanita</label>
-                                            <input type="number" step="0.1" value={hip} onChange={e=>setHip(e.target.value)} className="w-full rounded-lg border-slate-200 text-sm" placeholder="Bagian terlebar" />
+                                            <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Pinggul (cm) - Wanita</label>
+                                            <input type="number" step="0.1" value={hip} onChange={e=>setHip(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Bagian terlebar" />
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="bg-white p-5 rounded-lg border border-slate-200 flex flex-col gap-3 shadow-sm">
+                                <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex flex-col gap-3 shadow-sm">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-indigo-500"/> Body Fat %</div>
-                                            <p className="text-2xl font-semibold text-indigo-600">{estimatedBF ? `${estimatedBF}%` : '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-teal-500"/> Body Fat %</div>
+                                            <p className="text-xl md:text-2xl font-black text-teal-600">{estimatedBF ? `${estimatedBF}%` : '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBF && setData('body_fat_percentage', estimatedBF)} disabled={!estimatedBF} className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBF && setData('body_fat_percentage', estimatedBF)} disabled={!estimatedBF} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
                                     <div className="h-px bg-slate-100 w-full"></div>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><HeartPulse className="w-3.5 h-3.5 text-rose-500"/> Visceral Rating</div>
-                                            <p className="text-2xl font-semibold text-rose-600">{estimatedVisceral || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><HeartPulse className="w-3.5 h-3.5 text-rose-500"/> Visceral Rating</div>
+                                            <p className="text-xl md:text-2xl font-black text-rose-600">{estimatedVisceral || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedVisceral && setData('visceral_fat', estimatedVisceral)} disabled={!estimatedVisceral} className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedVisceral && setData('visceral_fat', estimatedVisceral)} disabled={!estimatedVisceral} className="px-3 md:px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
@@ -199,25 +242,25 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         {/* ------------------------------------------------ */}
                         {activeTool === 'bmr' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
-                                <div className="bg-amber-50/50 p-4 rounded-lg border border-amber-100 text-xs text-amber-800 font-medium leading-relaxed">
-                                    Menggunakan rumus Mifflin-St Jeor (BMR) dan Watson (Air). Pastikan Usia, Berat, dan Tinggi di form utama sudah terisi.
+                                <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
+                                    Menggunakan rumus Mifflin-St Jeor (BMR) dan Watson (Air). Pastikan <strong className="font-bold text-teal-900">Usia, Berat, dan Tinggi</strong> di form utama sudah terisi.
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-4 mt-2">
-                                    <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
+                                <div className="grid grid-cols-1 gap-3 md:gap-4 mt-2">
+                                    <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><Zap className="w-3.5 h-3.5 text-amber-500"/> BMR (Kcal)</div>
-                                            <p className="text-2xl font-semibold text-amber-600">{estimatedBMR || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Zap className="w-3.5 h-3.5 text-amber-500"/> BMR (Kcal)</div>
+                                            <p className="text-xl md:text-2xl font-black text-amber-600">{estimatedBMR || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBMR && setData('bmr', estimatedBMR)} disabled={!estimatedBMR} className="px-4 py-2 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBMR && setData('bmr', estimatedBMR)} disabled={!estimatedBMR} className="px-3 md:px-4 py-2 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
 
-                                    <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
+                                    <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><Droplets className="w-3.5 h-3.5 text-blue-500"/> Air / TBW (%)</div>
-                                            <p className="text-2xl font-semibold text-blue-600">{estimatedTBW ? `${estimatedTBW}%` : '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Droplets className="w-3.5 h-3.5 text-teal-500"/> Air / TBW (%)</div>
+                                            <p className="text-xl md:text-2xl font-black text-teal-600">{estimatedTBW ? `${estimatedTBW}%` : '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedTBW && setData('total_body_water', estimatedTBW)} disabled={!estimatedTBW} className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedTBW && setData('total_body_water', estimatedTBW)} disabled={!estimatedTBW} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
@@ -228,38 +271,50 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         {/* ------------------------------------------------ */}
                         {activeTool === 'mass' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
-                                <div className="bg-emerald-50/50 p-4 rounded-lg border border-emerald-100 text-xs text-emerald-800 font-medium leading-relaxed">
-                                    Pastikan metrik Body Fat % di form kiri sudah terisi (atau gunakan Tab 1 lalu terapkan) agar sistem dapat memisahkan massa otot dan tulang.
+                                <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
+                                    Pastikan metrik <strong className="font-bold text-teal-900">Body Fat %</strong> di form kiri sudah terisi agar sistem dapat memisahkan massa otot dan tulang secara akurat.
                                 </div>
 
-                                <div className="grid grid-cols-1 gap-4 mt-2">
-                                    <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
+                                <div className="grid grid-cols-1 gap-3 md:gap-4 mt-2">
+                                    <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-slate-400"/> Bone Mass (Kg)</div>
-                                            <p className="text-2xl font-semibold text-slate-700">{estimatedBone || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-slate-400"/> Bone Mass (Kg)</div>
+                                            <p className="text-xl md:text-2xl font-black text-slate-700">{estimatedBone || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBone && setData('bone_mass', estimatedBone)} disabled={!estimatedBone} className="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBone && setData('bone_mass', estimatedBone)} disabled={!estimatedBone} className="px-3 md:px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
 
-                                    <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
+                                    <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><Dumbbell className="w-3.5 h-3.5 text-emerald-500"/> Est. Muscle Mass (Kg)</div>
-                                            <p className="text-2xl font-semibold text-emerald-600">{estimatedMuscle || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Dumbbell className="w-3.5 h-3.5 text-emerald-500"/> Est. Muscle (Kg)</div>
+                                            <p className="text-xl md:text-2xl font-black text-emerald-600">{estimatedMuscle || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedMuscle && setData('muscle_mass', estimatedMuscle)} disabled={!estimatedMuscle} className="px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedMuscle && setData('muscle_mass', estimatedMuscle)} disabled={!estimatedMuscle} className="px-3 md:px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
 
-                                    <div className="bg-white p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
+                                    <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px]  font-bold uppercase text-slate-400 tracking-widest mb-1"><UserCheck className="w-3.5 h-3.5 text-purple-500"/> Metabolic Age (Usia)</div>
-                                            <p className="text-2xl font-semibold text-purple-600">{estimatedMetAge || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><UserCheck className="w-3.5 h-3.5 text-teal-600"/> Metabolic Age</div>
+                                            <p className="text-xl md:text-2xl font-black text-teal-700">{estimatedMetAge || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedMetAge && setData('metabolic_age', estimatedMetAge)} disabled={!estimatedMetAge} className="px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-500 hover:text-white font-bold text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedMetAge && setData('metabolic_age', estimatedMetAge)} disabled={!estimatedMetAge} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
                         )}
 
+                        {/* Tombol Simpan di Mobile (Hanya muncul jika < xl) */}
+                        <div className="xl:hidden mt-auto pt-8">
+                            <button 
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); submit(e); }} 
+                                disabled={processing} 
+                                className="w-full py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm disabled:opacity-70"
+                            >
+                                {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
+                                {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}
+                            </button>
+                        </div>
                     </div>
                 </div>
 

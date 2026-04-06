@@ -19,8 +19,8 @@ export default function Dashboard({ auth }) {
         lists = { recent_activity: [], top_athletes: [], cabor_performance: [] } 
     } = usePage().props;
 
-    // Warna Chart
-    const GENDER_COLORS = ['#3b82f6', '#ec4899']; // Blue, Pink
+    // Warna Chart (Disesuaikan dengan tema #ff4d00)
+    const GENDER_COLORS = ['#ff4d00', '#ec4899']; // Orange, Pink
     
     // Helper untuk Trend
     const getTrend = (idx) => idx % 2 === 0 ? '+2.4%' : '-1.1%';
@@ -33,13 +33,13 @@ export default function Dashboard({ auth }) {
             <div className="space-y-8 pb-10">
                 
                 {/* 1. HEADER SECTION */}
-                <div className="relative rounded-3xl p-8 md:p-10 shadow-xl overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#00488b] via-[#003666] to-[#002444] z-0"></div>
+                <div className="relative rounded-lg p-6 md:p-8 shadow-sm border border-[#e64500]/20 overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#ff4d00] via-[#e64500] to-[#cc3d00] z-0"></div>
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] z-0 pointer-events-none"></div>
                     
                     {/* Glow Effects */}
-                    <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-400/30 rounded-full mix-blend-overlay filter blur-[80px] opacity-40 animate-pulse z-0"></div>
-                    <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] bg-indigo-500/30 rounded-full mix-blend-overlay filter blur-[60px] opacity-30 z-0"></div>
+                    <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-orange-400/30 rounded-full mix-blend-overlay filter blur-[80px] opacity-40 animate-pulse z-0"></div>
+                    <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] bg-rose-500/30 rounded-full mix-blend-overlay filter blur-[60px] opacity-30 z-0"></div>
 
                     {/* Content */}
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
@@ -48,20 +48,20 @@ export default function Dashboard({ auth }) {
                                 <Sparkles size={14} className="text-yellow-300 fill-yellow-300" /> 
                                 <span className="text-xs font-bold text-white tracking-wide">Coach Dashboard</span>
                             </div>
-                            <h1 className="text-3xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3 drop-shadow-sm">
-                                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">{auth.user.name} 👋</span>
+                            <h1 className="text-3xl md:text-3xl lg:text-4xl font-black text-white tracking-tight mb-3 drop-shadow-sm">
+                                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-200 to-white">{auth.user.name} 👋</span>
                             </h1>
-                            <p className="text-blue-100/80 text-xs md:text-sm leading-relaxed font-medium">
+                            <p className="text-orange-100/90 text-xs md:text-sm leading-relaxed font-medium">
                                 Here represents the latest performance summary. You currently have <span className="font-bold text-white border-b border-white/30 pb-0.5">{stats?.total_atlet || 0} active athletes</span> ready to reach their peak potential today.
                             </p>
                         </div>
                         
-                        <div className="w-full md:w-auto flex items-center gap-4 bg-white/5 backdrop-blur-md border border-white/10 p-4 rounded-lg shadow-lg hover:bg-white/10 transition-colors cursor-default">
-                            <div className="w-8 h-8 bg-white rounded-lg shadow-inner flex items-center justify-center text-[#00488b]">
+                        <div className="w-full md:w-auto flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg shadow-lg hover:bg-white/20 transition-colors cursor-default">
+                            <div className="w-8 h-8 bg-white rounded-lg shadow-inner flex items-center justify-center text-[#ff4d00]">
                                 <Calendar size={20} strokeWidth={2.5} />
                             </div>
                             <div className="pr-2">
-                                <p className="text-[10px] text-blue-200 font-bold tracking-wider mb-0.5">Today's Date</p>
+                                <p className="text-[10px] text-orange-200 font-bold tracking-wider mb-0.5 uppercase">Today's Date</p>
                                 <p className="text-sm font-bold text-white leading-none">
                                     {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </p>
@@ -76,7 +76,7 @@ export default function Dashboard({ auth }) {
                         title="Total Athletes" 
                         value={stats?.total_atlet || 0} 
                         icon={Users} 
-                        colorClass="bg-blue-50 text-blue-600"
+                        colorClass="bg-orange-50 text-[#ff4d00]"
                     />
                     <StatCard 
                         title="Sessions This Month" 
@@ -113,7 +113,7 @@ export default function Dashboard({ auth }) {
                     <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         
                         {/* Radar Chart */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
                             <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
                                     <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600"><Target size={16} /></div>
@@ -127,27 +127,27 @@ export default function Dashboard({ auth }) {
                                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={charts.radar}>
                                             <defs>
                                                 <linearGradient id="colorAthlete" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#00488b" stopOpacity={0.7}/>
-                                                    <stop offset="95%" stopColor="#00488b" stopOpacity={0.1}/>
+                                                    <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.7}/>
+                                                    <stop offset="95%" stopColor="#ff4d00" stopOpacity={0.1}/>
                                                 </linearGradient>
                                             </defs>
                                             <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                             <Radar name="Target" dataKey="B" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" fill="transparent" />
-                                            <Radar name="Athlete" dataKey="A" stroke="#00488b" strokeWidth={2} fill="url(#colorAthlete)" fillOpacity={1} />
-                                            <Tooltip contentStyle={{borderRadius:'12px', border:'none'}} itemStyle={{fontSize:'12px', fontWeight:'bold', color: '#1e293b'}} />
+                                            <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="url(#colorAthlete)" fillOpacity={1} />
+                                            <Tooltip contentStyle={{borderRadius:'8px', border:'none'}} itemStyle={{fontSize:'12px', fontWeight:'bold', color: '#1e293b'}} />
                                             <Legend wrapperStyle={{fontSize:'11px', paddingTop:'10px'}} iconType="circle"/>
                                         </RadarChart>
                                     ) : (
-                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm">No benchmark data available</div>
+                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">No benchmark data available</div>
                                     )}
                                 </ResponsiveContainer>
                             </div>
                         </div>
 
                         {/* Pie Chart */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
                             <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
                                     <div className="p-1.5 bg-pink-50 rounded-lg text-pink-500"><Users size={16} /></div>
@@ -163,27 +163,27 @@ export default function Dashboard({ auth }) {
                                                     <Cell key={`cell-${index}`} fill={GENDER_COLORS[index % GENDER_COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip contentStyle={{borderRadius:'12px', border:'none'}} itemStyle={{fontSize:'12px', fontWeight:'bold'}} />
+                                            <Tooltip contentStyle={{borderRadius:'8px', border:'none'}} itemStyle={{fontSize:'12px', fontWeight:'bold'}} />
                                             <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{fontSize: '12px'}}/>
                                         </PieChart>
                                     ) : (
-                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm">No gender data</div>
+                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">No gender data</div>
                                     )}
                                 </ResponsiveContainer>
                                 {charts?.gender?.length > 0 && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
-                                        <span className="text-3xl font-bold text-slate-700">{charts.gender.reduce((a, b) => a + b.value, 0)}</span>
-                                        <span className="text-[10px] text-slate-400 font-bold  tracking-wider">Total</span>
+                                        <span className="text-3xl font-black text-slate-700">{charts.gender.reduce((a, b) => a + b.value, 0)}</span>
+                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total</span>
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Recent Activity */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm md:col-span-2 overflow-hidden">
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm md:col-span-2 overflow-hidden">
                             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <div className="p-1.5 bg-orange-50 rounded-lg text-orange-500"><Activity size={16} /></div>
+                                    <div className="p-1.5 bg-orange-50 rounded-lg text-[#ff4d00]"><Activity size={16} /></div>
                                     Recent Activity
                                 </h3>
                             </div>
@@ -193,14 +193,14 @@ export default function Dashboard({ auth }) {
                                 {(lists?.recent_activity?.length || 0) > 0 ? (
                                     <div className="divide-y divide-slate-50">
                                         {lists.recent_activity.slice(0, 3).map((act, idx) => (
-                                            <div key={idx} className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors group cursor-default">
-                                                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#00488b] font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
+                                            <div key={idx} className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors group cursor-default">
+                                                <div className="w-10 h-10 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-[#ff4d00] font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
                                                     {act.user ? act.user.substring(0,2).toUpperCase() : 'NA'}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between items-center mb-0.5">
                                                         <p className="text-sm font-bold text-slate-800 truncate pr-2">{act.title}</p>
-                                                        <span className="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{act.score}</span>
+                                                        <span className="text-xs font-bold text-[#ff4d00] bg-orange-50 px-2 py-0.5 rounded border border-orange-100">{act.score}</span>
                                                     </div>
                                                     <div className="flex justify-between items-center">
                                                         <p className="text-xs text-slate-500 truncate"><span className="font-medium text-slate-600">{act.user}</span> • {act.sport}</p>
@@ -211,7 +211,7 @@ export default function Dashboard({ auth }) {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="py-8 text-center"><p className="text-sm text-slate-400 italic">No recent activity found.</p></div>
+                                    <div className="py-8 text-center"><p className="text-sm text-slate-400 italic font-medium">No recent activity found.</p></div>
                                 )}
                             </div>
                         </div>
@@ -221,30 +221,30 @@ export default function Dashboard({ auth }) {
                     <div className="space-y-6">
                         
                         {/* Top 5 Elite */}
-                        <div className="bg-[#00488b] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden h-fit">
+                        <div className="bg-[#ff4d00] rounded-lg p-6 text-white shadow-lg relative overflow-hidden h-fit">
                              <Trophy size={140} className="absolute -top-4 -right-6 opacity-10 rotate-12" />
                              <h3 className="font-bold text-xl mb-6 relative z-10 border-b border-white/20 pb-4">🏆 Top 5 Elite</h3>
                              <div className="space-y-4 relative z-10">
                                 {/* 4. SAFE CHECK */}
                                 {(lists?.top_athletes?.length || 0) > 0 ? lists.top_athletes.map((user, idx) => (
-                                    <div key={idx} className="flex items-center bg-white/10 p-3 rounded-xl backdrop-blur-sm hover:bg-white/20 transition cursor-pointer border border-white/5">
-                                        <div className="w-8 h-8 flex items-center justify-center bg-white text-[#00488b] font-bold rounded-full mr-3 text-sm shadow-md">{idx + 1}</div>
+                                    <div key={idx} className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition cursor-pointer border border-white/5">
+                                        <div className="w-8 h-8 flex items-center justify-center bg-white text-[#ff4d00] font-bold rounded-full mr-3 text-sm shadow-md">{idx + 1}</div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-sm truncate">{user.name}</p>
-                                            <p className="text-xs text-blue-200">{user.sport}</p>
+                                            <p className="text-xs text-orange-200">{user.sport}</p>
                                         </div>
                                         <div className="text-right ml-2">
                                             <p className="font-bold text-sm">{user.score}</p>
-                                            <p className={`text-[10px] ${getTrendColor(idx)}`}>{getTrend(idx)}</p>
+                                            <p className={`text-[10px] font-medium ${getTrendColor(idx)}`}>{getTrend(idx)}</p>
                                         </div>
                                     </div>
-                                )) : <p className="text-sm text-blue-200">Not enough data.</p>}
+                                )) : <p className="text-sm text-orange-200 font-medium">Not enough data.</p>}
                              </div>
                         </div>
 
                         {/* Sport Rankings */}
-                        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm  tracking-wider">
+                        <div className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
+                            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
                                 <Zap size={16} className="text-amber-500"/> Sport Rankings
                             </h3>
                             <div className="space-y-3">
@@ -256,10 +256,10 @@ export default function Dashboard({ auth }) {
                                             <span className="text-sm font-bold text-slate-800">{cabor.score}</span>
                                         </div>
                                         <div className="w-full bg-slate-100 rounded-full h-2">
-                                            <div className="bg-slate-800 h-2 rounded-full transition-all duration-500 group-hover:bg-[#00488b]" style={{width: `${cabor.score}%`}}></div>
+                                            <div className="bg-slate-800 h-2 rounded-full transition-all duration-500 group-hover:bg-[#ff4d00]" style={{width: `${cabor.score}%`}}></div>
                                         </div>
                                     </div>
-                                )) : <p className="text-xs text-slate-400">No sport data available.</p>}
+                                )) : <p className="text-xs text-slate-400 font-medium">No sport data available.</p>}
                             </div>
                         </div>
                     </div>
@@ -274,15 +274,15 @@ export default function Dashboard({ auth }) {
 
 function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
     return (
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-slate-500 text-xs font-bold  tracking-wide mb-1">{title}</p>
-                    <h3 className={`font-bold text-slate-800 ${isText ? 'text-xl mt-1' : 'text-3xl'}`}>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">{title}</p>
+                    <h3 className={`font-black text-slate-800 ${isText ? 'text-xl mt-1' : 'text-3xl'}`}>
                         {value}
                     </h3>
                 </div>
-                <div className={`p-3 rounded-xl ${colorClass}`}>
+                <div className={`p-3 rounded-lg ${colorClass}`}>
                     <Icon size={20} />
                 </div>
             </div>
@@ -292,14 +292,14 @@ function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
 
 function MiniStatCard({ label, value, unit, icon: Icon }) {
     return (
-        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:border-blue-200 transition-colors">
-            <div className="p-3 bg-slate-50 text-slate-600 rounded-lg">
+        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4 hover:border-orange-200 transition-colors">
+            <div className="p-3 bg-slate-50 text-slate-600 rounded-lg border border-slate-100">
                 <Icon size={20} />
             </div>
             <div>
-                <p className="text-[10px] text-slate-400 font-bold  tracking-wider">{label}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</p>
                 <div className="flex items-baseline gap-1">
-                    <p className="text-xl font-bold text-slate-800">{value}</p>
+                    <p className="text-xl font-black text-slate-800">{value}</p>
                     <span className="text-xs text-slate-400 font-medium">{unit}</span>
                 </div>
             </div>

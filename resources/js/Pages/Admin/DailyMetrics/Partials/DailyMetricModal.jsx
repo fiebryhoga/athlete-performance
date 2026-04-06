@@ -60,7 +60,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
 
                     <div className="mt-8 flex gap-3">
                         <button type="button" onClick={onClose} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
-                        <button type="submit" disabled={form.processing} className="flex-[2] py-3.5 bg-[#00488b] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
+                        <button type="submit" disabled={form.processing} className="flex-[2] py-3.5 bg-[#ff4d00] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
                             {form.processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
                             Simpan Data
                         </button>

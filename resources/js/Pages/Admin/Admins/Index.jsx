@@ -125,7 +125,7 @@ export default function Index({ admins, filters }) {
                     </div>
                     <button 
                         onClick={openCreateModal}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00488b] text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all active:scale-95"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all active:scale-95"
                     >
                         <Plus className="w-4 h-4" /> Add Admin
                     </button>
@@ -318,7 +318,7 @@ export default function Index({ admins, filters }) {
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="flex-[2] px-4 py-2.5 bg-[#00488b] text-white font-bold text-sm rounded-lg shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="flex-[2] px-4 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                     {processing ? 'Saving...' : (modalMode === 'create' ? 'Create Account' : 'Update Account')}

@@ -22,14 +22,14 @@ const ResultInput = ({ item, value, onChange }) => {
     const isError = value === '' || value === null || value === undefined;
 
     return (
-        <div className={`p-3 md:p-4 rounded-xl border transition-all duration-200 ${isError ? 'bg-amber-50/60 border-amber-200' : 'bg-slate-50/40 border-slate-200 hover:border-blue-200 hover:bg-white'}`}>
+        <div className={`p-3 md:p-4 rounded-lg border transition-all duration-200 ${isError ? 'bg-amber-50/60 border-amber-200' : 'bg-slate-50/40 border-slate-200 hover:border-orange-200 hover:bg-white'}`}>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-1 sm:gap-2">
                 <label className="font-bold text-slate-700 text-sm leading-tight">{item.name}</label>
                 
                 {/* Target Badge */}
-                <div className="self-start sm:self-auto flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-500 whitespace-nowrap">
-                    <Target className="w-3 h-3 text-blue-500" />
-                    {Number(item.target_value)} <span className="text-slate-400 font-normal ml-0.5">{item.unit}</span>
+                <div className="self-start sm:self-auto flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-500 whitespace-nowrap uppercase tracking-widest">
+                    <Target className="w-3 h-3 text-[#ff4d00]" />
+                    {Number(item.target_value)} <span className="text-slate-400 font-medium ml-0.5 lowercase tracking-normal">{item.unit}</span>
                 </div>
             </div>
 
@@ -40,22 +40,22 @@ const ResultInput = ({ item, value, onChange }) => {
                     min="0"
                     value={displayValue}
                     onChange={(e) => onChange(e.target.value)}
-                    className={`block w-full pl-3 pr-10 py-2.5 rounded-lg border font-bold text-slate-800 transition-all shadow-sm text-base md:text-lg ${
+                    className={`block w-full pl-3 pr-12 py-2.5 rounded-lg border font-black text-slate-800 transition-all shadow-sm text-base md:text-lg outline-none ${
                         isError 
                         ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 bg-white' 
-                        : 'border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 bg-white'
+                        : 'border-slate-200 focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 bg-white'
                     }`}
                     placeholder={placeholder}
                     onWheel={(e) => e.target.blur()} 
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-xs font-bold text-slate-400   tracking-wider">{item.unit}</span>
+                    <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{item.unit}</span>
                 </div>
             </div>
             
             {isError && (
-                <p className="text-[10px] text-amber-600 mt-1.5 flex items-center gap-1 font-bold">
-                    <AlertTriangle className="w-3 h-3" /> required
+                <p className="text-[10px] text-amber-600 mt-1.5 flex items-center gap-1 font-bold uppercase tracking-widest">
+                    <AlertTriangle className="w-3 h-3" /> Required
                 </p>
             )}
         </div>
@@ -94,42 +94,43 @@ export default function Edit({ test, categories }) {
             <form onSubmit={submit} className="relative min-h-screen bg-slate-50/50 pb-28 md:pb-12">
                 
                 {/* --- STICKY HEADER (Solid & Full Width) --- */}
-                {/* top-0 atau top-[64px] tergantung tinggi navbar layout Anda. Saya pakai top-0 agar aman di mobile */}
                 <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm w-full">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
                         <div className="flex items-center justify-between gap-4">
                             
                             {/* Left: Info */}
                             <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-                                <Link href={route('admin.performance.index')} className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#00488b] hover:border-blue-200 transition-colors shrink-0">
+                                <Link href={route('admin.performance.index')} className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#ff4d00] hover:border-orange-200 hover:bg-orange-50 transition-colors shrink-0">
                                     <ArrowLeft className="w-5 h-5" />
                                 </Link>
                                 <div className="min-w-0">
-                                    <h1 className="text-base md:text-lg font-bold text-slate-800 truncate leading-tight  ">
+                                    <h1 className="text-base md:text-lg font-bold text-slate-800 truncate leading-tight">
                                         {test.name}
                                     </h1>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5 truncate">
-                                        <span className="flex items-center gap-1 font-medium  "><User className="w-3 h-3" /> {test.athlete.name}</span>
+                                    <div className="flex items-center gap-2 text-[10px] md:text-xs text-slate-500 mt-1 truncate uppercase tracking-widest font-bold">
+                                        <span className="flex items-center gap-1"><User className="w-3 h-3 text-slate-400" /> {test.athlete.name}</span>
                                         <span className="text-slate-300">|</span>
-                                        <span className="hidden sm:flex items-center gap-1  "><Trophy className="w-3 h-3" /> {test.athlete.sport.name}</span>
+                                        <span className="hidden sm:flex items-center gap-1"><Trophy className="w-3 h-3 text-amber-500" /> {test.athlete.sport.name}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Right: Actions (Desktop Only) */}
                             <div className="hidden sm:flex items-center gap-4">
-                                <div className={`text-xs font-bold transition-colors   ${isDirty ? 'text-amber-500' : 'text-emerald-600 flex items-center gap-1'}`}>
-                                    {isDirty ? 'unsaved changes...' : <><CheckCircle2 className="w-3 h-3" /> all saved</>}
+                                <div className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${isDirty ? 'text-amber-500' : 'text-emerald-600 flex items-center gap-1'}`}>
+                                    {isDirty ? 'Unsaved Changes...' : <><CheckCircle2 className="w-3.5 h-3.5" /> All Saved</>}
                                 </div>
                                 <button 
                                     type="submit" disabled={processing}
-                                    className={`px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-sm hover:shadow-md   ${
+                                    className={`px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-sm hover:shadow-md ${
                                         isDirty 
-                                        ? 'bg-[#00488b] text-white hover:bg-[#003666]' 
+                                        ? 'bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-[#ff4d00]/20 hover:-translate-y-0.5' 
                                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     }`}
                                 >
-                                    {processing ? 'saving...' : <><Save className="w-4 h-4" /> save data</>}
+                                    {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
+                                    {!processing && <Save className="w-4 h-4" />}
+                                    {processing ? 'Saving...' : 'Save Data'}
                                 </button>
                             </div>
                         </div>
@@ -137,25 +138,24 @@ export default function Edit({ test, categories }) {
                 </div>
 
                 {/* --- MAIN CONTENT (Wider Container) --- */}
-                {/* Gunakan max-w-7xl dan padding kecil di mobile (px-2) */}
-                <div className="max-w-7xl mx-auto py-4 md:py-8 px-2 sm:px-6 lg:px-8 space-y-4 md:space-y-6">
+                <div className="max-w-7xl mx-auto py-4 md:py-8 px-3 sm:px-6 lg:px-8 space-y-4 md:space-y-6">
                     
                     {categories.map((category) => (
-                        <div key={category.id} className="bg-white rounded-xl md:rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div key={category.id} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden hover:border-orange-100 transition-colors">
                             
                             {/* Category Header */}
                             <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center">
                                 <div className="flex items-center gap-2 md:gap-3">
-                                    <div className="w-1 h-5 md:h-6 bg-[#00488b] rounded-full"></div>
-                                    <h3 className="font-bold text-slate-800 text-sm md:text-lg  ">{category.name}</h3>
+                                    <div className="w-1.5 h-5 md:h-6 bg-[#ff4d00] rounded-full"></div>
+                                    <h3 className="font-bold text-slate-800 text-sm md:text-base uppercase tracking-widest">{category.name}</h3>
                                 </div>
-                                <span className="text-[10px] md:text-xs font-bold bg-white border border-slate-200 text-slate-500 px-2 py-1 rounded-full   tracking-wider">
-                                    {category.test_items.length} items
+                                <span className="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded uppercase tracking-widest shadow-sm">
+                                    {category.test_items.length} Items
                                 </span>
                             </div>
 
-                            {/* Grid Inputs (Responsive: 1 col mobile, 2 tablet, 3 desktop) */}
-                            <div className="p-3 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+                            {/* Grid Inputs */}
+                            <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                                 {category.test_items.map((item) => {
                                     const currentVal = data.scores.find(s => s.test_item_id === item.id)?.result_value;
                                     return (
@@ -172,42 +172,43 @@ export default function Edit({ test, categories }) {
                     ))}
 
                     {/* Notes Section */}
-                    <div className="bg-white rounded-xl md:rounded-2xl border border-slate-200 shadow-sm p-4 md:p-6">
-                        <h3 className="font-bold text-slate-800 mb-3 md:mb-4 flex gap-2 items-center text-sm md:text-base  ">
-                            <div className="p-1.5 bg-blue-50 text-[#00488b] rounded-lg border border-blue-100">
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 md:p-6">
+                        <h3 className="font-bold text-slate-800 mb-4 flex gap-2 items-center text-sm md:text-base uppercase tracking-widest">
+                            <div className="p-1.5 bg-orange-50 text-[#ff4d00] rounded-md border border-orange-100">
                                 <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
-                            coach notes & evaluation
+                            Coach Notes & Evaluation
                         </h3>
                         <div className="relative">
                             <textarea 
                                 value={data.notes}
                                 onChange={(e) => setData('notes', e.target.value)}
-                                className="w-full rounded-xl border-slate-200 bg-slate-50 p-4 text-slate-700 min-h-[120px] focus:ring-2 focus:ring-[#00488b]/20 focus:border-[#00488b] transition-all placeholder:text-slate-400 placeholder:font-normal resize-y text-sm leading-relaxed hover:bg-white lowercase"
-                                placeholder="write detailed evaluation regarding the athlete's performance in this session..."
+                                className="w-full rounded-lg border-slate-200 bg-slate-50 p-4 text-slate-700 min-h-[120px] focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all placeholder:text-slate-400 font-medium resize-y text-sm leading-relaxed hover:bg-white outline-none shadow-sm"
+                                placeholder="Write detailed evaluation regarding the athlete's performance in this session..."
                             ></textarea>
-                            <div className="absolute bottom-3 right-3 text-[10px] font-bold text-slate-300 pointer-events-none">
-                                {data.notes.length} chars
+                            <div className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-400 pointer-events-none uppercase tracking-widest">
+                                {data.notes.length} Chars
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* --- MOBILE FLOATING SAVE BAR --- */}
-                {/* Fixed di bawah layar hanya untuk mobile (< sm) */}
-                <div className="sm:hidden fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-slate-200 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] flex gap-3 items-center">
-                    <div className="flex-1 text-xs font-medium text-slate-500 pl-1  ">
-                        {isDirty ? 'unsaved changes...' : 'all data saved'}
+                <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] flex gap-3 items-center">
+                    <div className="flex-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 pl-1">
+                        {isDirty ? <span className="text-amber-500">Unsaved Changes...</span> : <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> All Saved</span>}
                     </div>
                     <button 
                         type="submit" disabled={processing}
-                        className={`px-6 py-3 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-lg transition-all active:scale-[0.98] w-auto   ${
+                        className={`px-6 py-3 rounded-lg font-bold text-sm flex justify-center items-center gap-2 shadow-lg transition-all active:scale-[0.98] w-auto uppercase tracking-widest ${
                             isDirty 
-                            ? 'bg-[#00488b] text-white hover:bg-[#003666]' 
+                            ? 'bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-[#ff4d00]/20' 
                             : 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                         }`}
                     >
-                        {processing ? 'saving...' : <><Save className="w-4 h-4" /> save</>}
+                        {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
+                        {!processing && <Save className="w-4 h-4" />}
+                        {processing ? 'Saving...' : 'Save'}
                     </button>
                 </div>
 

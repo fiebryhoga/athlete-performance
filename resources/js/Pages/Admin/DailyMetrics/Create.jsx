@@ -143,7 +143,7 @@ export default function Create({ athletes }) {
                             </div>
 
                             <div className="pt-6">
-                                <button type="submit" disabled={processing} className="w-full bg-[#00488b] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
+                                <button type="submit" disabled={processing} className="w-full bg-[#ff4d00] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
                                     <Save className="w-5 h-5" /> {processing ? 'Processing...' : 'Save & Calculate Metrics'}
                                 </button>
                             </div>

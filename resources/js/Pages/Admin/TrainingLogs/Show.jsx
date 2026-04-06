@@ -73,7 +73,7 @@ export default function Show({ session, exercisesList, nextSession, historySessi
                         <ArrowLeft className="w-4 h-4"/> Kembali ke Jadwal
                     </Link>
                     {!is_athlete && (
-                        <button onClick={submit} disabled={processing} className="w-full sm:w-auto bg-[#00488b] text-white px-8 py-3 rounded-md font-medium text-sm flex justify-center items-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] hover:scale-[1.02] transition-all">
+                        <button onClick={submit} disabled={processing} className="w-full sm:w-auto bg-[#ff4d00] text-white px-8 py-3 rounded-md font-medium text-sm flex justify-center items-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] hover:scale-[1.02] transition-all">
                             {processing ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-5 h-5"/>}
                             Simpan Log Latihan
                         </button>

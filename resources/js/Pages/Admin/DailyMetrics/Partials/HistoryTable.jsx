@@ -60,7 +60,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                 <td className="px-4 py-3">
                                     <div className="font-bold text-slate-800 flex items-center gap-2 text-sm">
                                         {formatDateToIndo(item.record_date, 'short')}
-                                        {item.is_today && <span className="text-[9px] bg-[#00488b] text-white px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">Hari Ini</span>}
+                                        {item.is_today && <span className="text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">Hari Ini</span>}
                                     </div>
                                     <div className="text-[11px] text-[#00488b] font-bold mt-0.5">{item.week_label}</div>
                                 </td>
@@ -112,7 +112,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                         {/* Tombol Edit/Isi Data (Hanya Admin/Coach) */}
                                         {!isAthlete && (
                                             <button onClick={() => openModal(item)} className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm transition-all ${
-                                                item.data?.recovery_status === 'KOSONG' ? 'bg-[#00488b] text-white hover:bg-[#003666]' : 'bg-white border border-slate-200 text-slate-500 hover:text-[#00488b] hover:bg-blue-50'
+                                                item.data?.recovery_status === 'KOSONG' ? 'bg-[#ff4d00] text-white hover:bg-[#003666]' : 'bg-white border border-slate-200 text-slate-500 hover:text-[#00488b] hover:bg-blue-50'
                                             }`}>
                                                 {item.data?.recovery_status === 'KOSONG' ? <><Plus className="w-3 h-3" /> Isi Data</> : <><Edit3 className="w-3 h-3" /> Edit</>}
                                             </button>

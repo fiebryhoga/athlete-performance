@@ -11,9 +11,9 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             const ffm = latest.weight - (latest.weight * (latest.body_fat_percentage / 100));
             insights.push({ 
                 icon: Dumbbell, 
-                iconColor: 'text-[#00488b]', 
-                iconBg: 'bg-blue-50', 
-                borderColor: 'border-blue-100',
+                iconColor: 'text-[#ff4d00]', 
+                iconBg: 'bg-[#FFCE99]/30', 
+                borderColor: 'border-[#FFCE99]',
                 title: 'Fat-Free Mass (FFM)', 
                 desc: `Massa tubuh bebas lemak berada di angka ${ffm.toFixed(1)} kg. Fokus pertahankan atau tingkatkan angka ini.` 
             });
@@ -28,18 +28,18 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             if (latest.total_body_water < minTbw) {
                 insights.push({ 
                     icon: Droplets, 
-                    iconColor: 'text-amber-500', 
-                    iconBg: 'bg-amber-50', 
-                    borderColor: 'border-amber-200',
+                    iconColor: 'text-[#FF9644]', 
+                    iconBg: 'bg-[#FFCE99]/30', 
+                    borderColor: 'border-[#FFCE99]',
                     title: 'Indikasi Dehidrasi', 
                     desc: `Kadar air ${latest.total_body_water}% (Di bawah standar ${minTbw}%). Perbanyak asupan cairan harian Anda.` 
                 });
             } else if (latest.total_body_water <= maxTbw) {
                 insights.push({ 
                     icon: Droplets, 
-                    iconColor: 'text-sky-500', 
-                    iconBg: 'bg-sky-50', 
-                    borderColor: 'border-sky-200',
+                    iconColor: 'text-[#ACBFA4]', 
+                    iconBg: 'bg-[#E2E8CE]/50', 
+                    borderColor: 'border-[#ACBFA4]/60',
                     title: 'Hidrasi Optimal', 
                     desc: `Tingkat cairan tubuh (${latest.total_body_water}%) sangat baik. Pertahankan pola minum Anda.` 
                 });
@@ -67,18 +67,18 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             if (latest.muscle_mass > prev.muscle_mass && latest.body_fat_percentage < prev.body_fat_percentage) {
                 insights.push({ 
                     icon: TrendingUp, 
-                    iconColor: 'text-emerald-500', 
-                    iconBg: 'bg-emerald-50', 
-                    borderColor: 'border-emerald-200',
+                    iconColor: 'text-[#ACBFA4]', 
+                    iconBg: 'bg-[#E2E8CE]/50', 
+                    borderColor: 'border-[#ACBFA4]/60',
                     title: 'Rekomposisi Sukses', 
                     desc: `Luar biasa! Otot Anda naik dan lemak menyusut dibandingkan hasil tes sebelumnya.` 
                 });
             } else if (latest.muscle_mass < prev.muscle_mass && latest.body_fat_percentage > prev.body_fat_percentage) {
                 insights.push({ 
                     icon: TrendingDown, 
-                    iconColor: 'text-orange-500', 
-                    iconBg: 'bg-orange-50', 
-                    borderColor: 'border-orange-200',
+                    iconColor: 'text-[#FF9644]', 
+                    iconBg: 'bg-[#FFCE99]/30', 
+                    borderColor: 'border-[#FFCE99]',
                     title: 'Peringatan Penyusutan', 
                     desc: `Massa otot turun & lemak naik. Cek kembali asupan protein dan intensitas latihan beban.` 
                 });
@@ -93,35 +93,40 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
     if (insights.length === 0) return null;
 
     return (
-        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8 animate-in fade-in duration-500">
+        <div className="bg-white rounded-lg border border-[#BFC9D1]/50 shadow-sm p-5 md:p-8 animate-in fade-in duration-500 relative overflow-hidden">
             
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 text-[#00488b]">
-                    <BrainCircuit className="w-5 h-5" />
+            {/* Latar Belakang Subtle Glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#EAEFEF] rounded-full blur-3xl opacity-50 pointer-events-none -mt-10 -mr-10"></div>
+
+            <div className="flex items-center gap-3 mb-5 md:mb-6 relative z-10">
+                <div className="p-2 md:p-2.5 bg-[#EAEFEF] rounded-lg border border-[#BFC9D1]/50 text-[#ff4d00]">
+                    <BrainCircuit className="w-4 h-4 md:w-5 md:h-5" />
                 </div>
                 <div>
-                    <h3 className="text-lg  font-bold text-slate-800 flex items-center gap-1.5 tracking-tight">
-                        Smart Insights <Sparkles className="w-4 h-4 text-amber-400"/>
+                    <h3 className="text-lg md:text-xl font-black text-[#262626] flex items-center gap-1.5 tracking-tight uppercase">
+                        Smart Insights <Sparkles className="w-4 h-4 text-[#FFC300]"/>
                     </h3>
-                    <p className="text-sm font-medium text-slate-500 mt-0.5">Analisis otomatis berdasarkan rekaman komposisi tubuh terakhir.</p>
+                    <p className="text-[10px] md:text-xs font-bold text-slate-400 mt-0.5 uppercase tracking-widest">
+                        Analisis otomatis berbasis data komposisi tubuh terakhir.
+                    </p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5 relative z-10">
                 {insights.map((insight, i) => (
                     <div 
                         key={i} 
-                        className={`p-5 rounded-lg bg-white border ${insight.borderColor} flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow group`}
+                        className={`p-4 md:p-5 rounded-lg bg-white border ${insight.borderColor} flex flex-col gap-3 md:gap-4 shadow-sm hover:shadow-md transition-shadow group`}
                     >
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${insight.iconBg} ${insight.iconColor}`}>
-                                <insight.icon className="w-5 h-5" />
+                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0 ${insight.iconBg} ${insight.iconColor}`}>
+                                <insight.icon className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
-                            <h4 className="text-sm  font-bold text-slate-800 leading-tight">
+                            <h4 className="text-[11px] md:text-xs font-black text-[#262626] uppercase tracking-widest leading-tight">
                                 {insight.title}
                             </h4>
                         </div>
-                        <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                        <p className="text-xs md:text-sm text-slate-500 font-medium leading-relaxed">
                             {insight.desc}
                         </p>
                     </div>

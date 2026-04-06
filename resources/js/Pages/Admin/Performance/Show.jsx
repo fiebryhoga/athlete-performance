@@ -23,17 +23,17 @@ const formatPercent = (val) => {
 
 const GrowthIndicator = ({ value, hasPrevious }) => {
     if (!hasPrevious) return <span className="text-slate-300 text-[10px] font-medium">-</span>;
-    if (value > 0) return <span className="flex items-center text-emerald-600 text-[10px] font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100"><TrendingUp className="w-3 h-3 mr-1" /> +{formatNumber(value)}%</span>;
-    if (value < 0) return <span className="flex items-center text-red-500 text-[10px] font-bold bg-red-50 px-1.5 py-0.5 rounded border border-red-100"><TrendingDown className="w-3 h-3 mr-1" /> {formatNumber(value)}%</span>;
-    return <span className="flex items-center text-slate-400 text-[10px] font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100"><Minus className="w-3 h-3 mr-1" /> 0%</span>;
+    if (value > 0) return <span className="flex items-center text-emerald-600 text-[10px] font-bold"><TrendingUp className="w-3 h-3 mr-1" /> +{formatNumber(value)}%</span>;
+    if (value < 0) return <span className="flex items-center text-rose-500 text-[10px] font-bold"><TrendingDown className="w-3 h-3 mr-1" /> {formatNumber(value)}%</span>;
+    return <span className="flex items-center text-slate-400 text-[10px] font-bold"><Minus className="w-3 h-3 mr-1" /> 0%</span>;
 };
 
 const getScoreColor = (val) => {
-    if (val >= 91) return '#059669'; 
-    if (val >= 81) return '#2563eb'; 
-    if (val >= 71) return '#ca8a04'; 
-    if (val >= 51) return '#f97316'; 
-    return '#ef4444'; 
+    if (val >= 91) return '#059669'; // Emerald
+    if (val >= 81) return '#0d9488'; // Teal (Komplementer Oranye)
+    if (val >= 71) return '#d97706'; // Amber
+    if (val >= 51) return '#ea580c'; // Orange
+    return '#e11d48'; // Rose
 };
 
 // MENERIMA `historical_labels` DARI CONTROLLER
@@ -42,7 +42,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
     const isAthlete = auth.user.role === 'athlete';
     const hasPrevious = history && history.length > 1;
 
-    const appName = app_settings?.name || 'ZK15 Sports Analytics';
+    const appName = app_settings?.name || 'Performance Analytics';
     const appLogo = app_settings?.logo || '/assets/images/zk-logo.png';
 
     const handlePrint = () => {
@@ -53,8 +53,8 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
     const historicalColors = ['#f1f5f9', '#e2e8f0', '#cbd5e1', '#94a3b8'];
 
     return (
-        <AdminLayout title="test result details">
-            <Head title="result details" />
+        <AdminLayout title="Test Result Details">
+            <Head title="Result Details" />
 
             <style>{`
                 @media print {
@@ -88,114 +88,114 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 }
             `}</style>
 
-            {/* ACTION BAR */}
+            {/* --- ACTION BAR --- */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
-                <Link href={route('admin.performance.index')} className="text-slate-500 hover:text-[#00488b] flex items-center gap-2 font-bold text-sm transition-colors group  ">
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> back
+                <Link href={route('admin.performance.index')} className="text-slate-400 hover:text-[#ff4d00] flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-widest transition-colors group">
+                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> Back
                 </Link>
                 <div className="flex w-full sm:w-auto gap-2">
                     {!isAthlete && (
-                        <Link href={route('admin.performance.edit', test.id)} className="flex-1 sm:flex-none justify-center bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-slate-50 transition-colors  ">
-                            <Edit3 className="w-4 h-4" /> edit
+                        <Link href={route('admin.performance.edit', test.id)} className="flex-1 sm:flex-none justify-center bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-orange-50 hover:text-[#ff4d00] hover:border-orange-200 transition-colors shadow-sm">
+                            <Edit3 className="w-4 h-4" /> Edit
                         </Link>
                     )}
-                    <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center bg-[#00488b] text-white px-5 py-2 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-colors  ">
-                        <Printer className="w-4 h-4" /> print pdf
+                    <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center bg-[#ff4d00] text-white px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl transition-all active:scale-95">
+                        <Printer className="w-4 h-4" /> Print PDF
                     </button>
                 </div>
             </div>
 
             {/* --- REPORT CONTAINER --- */}
-            <div id="report-content" className="bg-white w-full max-w-7xl mx-auto rounded-2xl md:rounded-3xl shadow-sm border border-slate-200 p-4 md:p-8 lg:p-12 relative">
+            <div id="report-content" className="bg-white w-full max-w-7xl mx-auto rounded-lg shadow-sm border border-slate-200 p-5 md:p-8 lg:p-12 relative overflow-hidden">
                 
                 {/* 1. HEADER */}
                 <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-200 pb-6 mb-6 gap-4">
                     <div className="flex items-center gap-4">
-                            <img 
-                                src={appLogo}
-                                alt="App Logo" 
-                                className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    e.target.nextSibling.style.display = 'flex';
-                                }}
-                            />
+                        <img 
+                            src={appLogo}
+                            alt="App Logo" 
+                            className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
                         <div>
-                            <h1 className="text-xl md:text-2xl text-blue-900 font-extrabold tracking-tight  ">Performance Report</h1>
-                            <p className="text-xs md:text-sm text-slate-500 font-bold tracking-wide  ">{appName}</p> 
+                            <h1 className="text-xl md:text-2xl text-slate-800 font-black tracking-tight uppercase">Performance Report</h1>
+                            <p className="text-[10px] md:text-xs text-[#ff4d00] font-bold tracking-widest uppercase mt-0.5">{appName}</p> 
                         </div>
                     </div>
                     <div className="text-left md:text-right w-full md:w-auto bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-lg">
-                        <div className="inline-block px-2 py-0.5 bg-white md:bg-slate-50 rounded md:rounded-lg border border-slate-200 md:border-slate-100 mb-1">
-                            <p className="text-[10px] md:text-xs font-bold text-slate-500 tracking-wider  ">official document</p>
+                        <div className="inline-block px-2 py-0.5 bg-white md:bg-orange-50 rounded border border-slate-200 md:border-orange-100 mb-1">
+                            <p className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] tracking-widest uppercase">Official Document</p>
                         </div>
-                        <p className="text-xs md:text-sm text-slate-400 font-mono mt-1 font-medium  ">ref id: {test.name}</p>
+                        <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-1 font-bold uppercase tracking-widest">REF ID: {test.name}</p>
                     </div>
                 </div>
 
                 {/* 2. ATHLETE PROFILE */}
-                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 mb-8">
+                <div className="bg-slate-50 rounded-lg p-5 border border-slate-100 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-6">
                         <div className="space-y-1.5">
-                            <p className="text-xs text-slate-400 font-bold tracking-wider  ">athlete name</p>
-                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base  ">
-                                <User className="w-4 h-4 text-[#00488b]" /> {test.athlete.name}
+                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Athlete Name</p>
+                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
+                                <User className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <p className="text-xs text-slate-400 font-bold tracking-wider  ">sport category</p>
-                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base  ">
-                                <Trophy className="w-4 h-4 text-[#00488b]" /> {test.athlete.sport.name}
+                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Sport Category</p>
+                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
+                                <Trophy className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.sport.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <p className="text-xs text-slate-400 font-bold tracking-wider  ">assessment date</p>
-                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base  ">
-                                <Calendar className="w-4 h-4 text-[#00488b]" /> {test.date}
+                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Assessment Date</p>
+                            <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
+                                <Calendar className="w-4 h-4 text-[#ff4d00]" /> {test.date}
                             </div>
                         </div>
                         <div className="space-y-1.5 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-200 mt-2 sm:mt-0">
-                            <p className="text-xs text-slate-400 font-bold tracking-wider  ">total avg score</p>
-                            <div className="flex items-center gap-2 text-[#00488b]">
-                                <span className="text-2xl md:text-3xl  font-bold tracking-tight">{formatPercent(current_score)}</span>
+                            <p className="text-[10px] text-[#ff4d00] font-bold tracking-widest uppercase">Total Avg Score</p>
+                            <div className="flex items-center gap-2 text-[#ff4d00]">
+                                <span className="text-2xl md:text-3xl font-black tracking-tight">{formatPercent(current_score)}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* 3. GRAPHS */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-6 md:gap-8 mb-10" style={{ pageBreakInside: 'avoid' }}>
-                    <div className="border border-slate-100 rounded-2xl p-4 md:p-6 bg-slate-50/30">
-                        <h3 className="text-xs font-bold text-slate-500 mb-4  ">skill map</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-6 mb-10" style={{ pageBreakInside: 'avoid' }}>
+                    <div className="border border-slate-100 rounded-lg p-5 bg-white shadow-sm">
+                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-widest flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-slate-400"/> Skill Map</h3>
                         <div className="h-64 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radar_data}>
-                                    <PolarGrid stroke="#e2e8f0" />
+                                    <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                                     <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} />
                                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                    <Radar name="target" dataKey="B" stroke="#fbbf24" strokeWidth={2} fill="#fbbf24" fillOpacity={0.1} />
-                                    <Radar name="athlete" dataKey="A" stroke="#00488b" strokeWidth={3} fill="#00488b" fillOpacity={0.4} />
+                                    <Radar name="Target" dataKey="B" stroke="#cbd5e1" strokeWidth={1} fill="#f8fafc" fillOpacity={0.5} strokeDasharray="3 3" />
+                                    <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.3} />
                                     <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                                 </RadarChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
 
-                    <div className="border border-slate-100 rounded-2xl p-4 md:p-6 bg-slate-50/30">
-                        <h3 className="text-xs font-bold text-slate-500 mb-4  ">performance trend</h3>
+                    <div className="border border-slate-100 rounded-lg p-5 bg-white shadow-sm">
+                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-widest flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-400"/> Performance Trend</h3>
                         <div className="h-64 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#00488b" stopOpacity={0.2}/>
-                                            <stop offset="95%" stopColor="#00488b" stopOpacity={0}/>
+                                            <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.4}/>
+                                            <stop offset="95%" stopColor="#ff4d00" stopOpacity={0}/>
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }} axisLine={false} tickLine={false} dy={10} />
+                                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} dy={10} />
                                     <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                    <Area type="monotone" dataKey="score" stroke="#00488b" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+                                    <Area type="monotone" dataKey="score" stroke="#ff4d00" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" activeDot={{r: 5, fill: '#ff4d00', strokeWidth: 0}} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -203,16 +203,16 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 </div>
 
                 {/* 4. BAR CHART (MULTI-COMPARISON) */}
-                <div className="mb-10 border border-slate-100 rounded-2xl p-4 md:p-6 bg-slate-50/30" style={{ pageBreakInside: 'avoid' }}>
-                    <h3 className="text-xs font-bold text-slate-500 mb-4  ">item comparison (last {historical_labels ? historical_labels.length + 1 : 1} tests)</h3>
-                    <div className="h-64 md:h-72 w-full">
+                <div className="mb-10 border border-slate-100 rounded-lg p-5 bg-white shadow-sm" style={{ pageBreakInside: 'avoid' }}>
+                    <h3 className="text-[10px] font-bold text-slate-500 mb-6 uppercase tracking-widest flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-400"/> Item Comparison (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)</h3>
+                    <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={item_analysis} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={2}>
+                            <BarChart data={item_analysis} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#64748b', fontWeight:600 }} axisLine={false} tickLine={false} interval={0} />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} interval={0} />
                                 <YAxis domain={[0, 100]} hide />
-                                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'12px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)', fontSize:'12px'}} />
-                                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
+                                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)', fontSize:'12px'}} />
+                                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
                                 
                                 {/* Loop untuk me-render tes-tes sebelumnya dengan gradasi warna abu */}
                                 {historical_labels && historical_labels.map((label, index) => {
@@ -226,66 +226,80 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                             dataKey={label.key} 
                                             fill={color} 
                                             radius={[4, 4, 0, 0]} 
-                                            barSize={15} 
+                                            barSize={12} 
                                         />
                                     );
                                 })}
 
                                 {/* Bar untuk Tes Saat Ini */}
-                                <Bar name="current test" dataKey="score" fill="#00488b" radius={[4, 4, 0, 0]} barSize={20} />
+                                <Bar name="Current Test" dataKey="score" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={12} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
                 {/* 5. DETAIL TABLE */}
-                <div className="mb-10 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left min-w-[700px]">
-                            <thead className="bg-slate-50 text-xs text-slate-500 font-bold tracking-wider border-b border-slate-200">
+                <div className="mb-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto w-full custom-scrollbar">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-200">
                                 <tr>
-                                    <th className="px-4 md:px-6 py-4  ">test item</th>
-                                    <th className="px-4 md:px-6 py-4 text-center  ">result (raw)</th>
-                                    <th className="px-4 md:px-6 py-4 text-center  ">unit</th>
-                                    <th className="px-4 md:px-6 py-4 text-center  ">benchmark</th>
-                                    <th className="px-4 md:px-6 py-4 text-center bg-slate-100/50 print:bg-transparent  ">prev (%)</th>
-                                    <th className="px-4 md:px-6 py-4 text-right bg-blue-50/30 print:bg-transparent  ">curr (%)</th>
-                                    <th className="px-4 md:px-6 py-4 text-center  ">trend</th>
+                                    <th className="px-4 md:px-6 py-4">Test Item</th>
+                                    <th className="px-4 md:px-6 py-4 text-center">Result (Raw)</th>
+                                    
+                                    {/* Sembunyikan kolom di mobile agar tidak melebar */}
+                                    <th className="px-4 md:px-6 py-4 text-center hidden sm:table-cell">Unit</th>
+                                    <th className="px-4 md:px-6 py-4 text-center hidden md:table-cell">Benchmark</th>
+                                    <th className="px-4 md:px-6 py-4 text-center bg-slate-100/50 print:bg-transparent hidden md:table-cell">Prev (%)</th>
+                                    
+                                    <th className="px-4 md:px-6 py-4 text-center bg-orange-50/50 print:bg-transparent text-slate-500">Score (%)</th>
+                                    <th className="px-4 md:px-6 py-4 text-center hidden sm:table-cell">Trend</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 bg-white">
                                 {item_analysis.map((item, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors" style={{ pageBreakInside: 'avoid' }}>
-                                        <td className="px-4 md:px-6 py-3">
-                                            <div className="font-bold text-slate-700  ">{item.name}</div>
-                                            <div className="text-[10px] text-slate-400 font-bold mt-0.5  ">{item.category}</div>
+                                    <tr key={idx} className="hover:bg-orange-50/30 transition-colors" style={{ pageBreakInside: 'avoid' }}>
+                                        <td className="px-4 md:px-6 py-3 md:py-4">
+                                            <div className="font-bold text-slate-700 text-xs md:text-sm">{item.name}</div>
+                                            <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-widest">{item.category}</div>
                                         </td>
-                                        <td className="px-4 md:px-6 py-3 text-center font-bold text-slate-800 text-base">{formatNumber(item.result_value)}</td>
-                                        <td className="px-4 md:px-6 py-3 text-center text-slate-400 text-xs font-bold  ">{item.unit}</td>
-                                        <td className="px-4 md:px-6 py-3 text-center">
-                                            <div className="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-md text-xs font-bold text-slate-600 border border-slate-200">
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center font-black text-slate-800 text-base whitespace-nowrap">{formatNumber(item.result_value)}</td>
+                                        
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest hidden sm:table-cell">{item.unit}</td>
+                                        
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center hidden md:table-cell">
+                                            <div className="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded text-[10px] font-bold text-slate-500 border border-slate-200">
                                                 <Target className="w-3 h-3 text-slate-400" />
                                                 {formatNumber(item.target_value)}
                                             </div>
                                         </td>
-                                        {/* Untuk tabel, kita tetap membandingkan trend dengan SATU tes yang paling terakhir saja */}
-                                        <td className="px-4 md:px-6 py-3 text-center bg-slate-50/30 text-slate-400 font-medium print:bg-transparent print:text-slate-600">
+                                        
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center bg-slate-50/30 text-slate-400 font-medium text-xs md:text-sm print:bg-transparent print:text-slate-600 hidden md:table-cell">
                                             {hasPrevious ? formatPercent(item.previous_score) : '-'}
                                         </td>
-                                        <td className="px-4 md:px-6 py-3 text-right bg-blue-50/10 print:bg-transparent">
-                                            <span className=" font-bold text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
+                                        
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center bg-orange-50/30 print:bg-transparent">
+                                            <span className="font-black text-sm md:text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
                                         </td>
-                                        <td className="px-4 md:px-6 py-3 text-center flex justify-center">
-                                            <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm print:shadow-none print:border-slate-300">
-                                                <GrowthIndicator value={item.growth} hasPrevious={hasPrevious} />
+                                        
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center hidden sm:table-cell">
+                                            <div className="flex justify-center">
+                                                <div className="bg-white px-2 py-1 rounded border border-slate-100 shadow-sm print:shadow-none print:border-slate-300">
+                                                    <GrowthIndicator value={item.growth} hasPrevious={hasPrevious} />
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="bg-blue-50/50 border-t-2 border-slate-200 print:bg-slate-100" style={{ pageBreakInside: 'avoid' }}>
-                                    <td colSpan="5" className="px-4 md:px-6 py-5 text-right font-bold text-slate-500 text-xs tracking-wider  ">total average score :</td>
-                                    <td className="px-4 md:px-6 py-5 text-right  font-bold text-2xl text-[#00488b]">{formatPercent(current_score)}</td>
-                                    <td></td>
+                                
+                                {/* Baris Total dengan ColSpan Cerdas agar kebal dari kolom yang di-hide */}
+                                <tr className="bg-orange-50/50 border-t-2 border-slate-200 print:bg-slate-100" style={{ pageBreakInside: 'avoid' }}>
+                                    <td colSpan="100%" className="px-4 md:px-6 py-4">
+                                        <div className="flex justify-end items-center gap-4">
+                                            <span className="font-bold text-slate-500 text-[10px] md:text-xs tracking-widest uppercase">Total Average Score :</span>
+                                            <span className="font-black text-2xl md:text-3xl text-[#ff4d00]">{formatPercent(current_score)}</span>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -293,16 +307,16 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 </div>
 
                 {/* 6. NOTES */}
-                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 print:bg-transparent print:border-slate-300" style={{ pageBreakInside: 'avoid' }}>
-                    <h4 className="text-xs font-bold text-[#00488b] mb-2 flex items-center gap-2  ">
-                        <FileText className="w-4 h-4" /> coach notes / evaluation
+                <div className="bg-slate-50 rounded-lg p-5 md:p-6 border border-slate-100 print:bg-transparent print:border-slate-300" style={{ pageBreakInside: 'avoid' }}>
+                    <h4 className="text-[10px] md:text-xs font-bold text-[#ff4d00] mb-3 flex items-center gap-2 uppercase tracking-widest">
+                        <FileText className="w-4 h-4" /> Coach Notes & Evaluation
                     </h4>
-                    <p className="text-sm text-slate-600 italic leading-relaxed whitespace-pre-line text-justify  ">
-                        "{test.notes || "no notes available."}"
+                    <p className="text-xs md:text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-line text-justify">
+                        "{test.notes || "No notes available."}"
                     </p>
                 </div>
                 
-                <div className="text-center pt-8 text-[10px] text-slate-300 font-bold tracking-widest print:text-slate-500  ">
+                <div className="text-center pt-8 text-[9px] md:text-[10px] text-slate-300 font-bold tracking-widest uppercase print:text-slate-500">
                     Generated by {appName} • {new Date().getFullYear()} 
                 </div>
             </div>

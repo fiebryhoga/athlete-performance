@@ -35,139 +35,150 @@ export default function HistoryTable({ history, athlete, benchmarks, is_athlete 
     const getStatusColor = (type, value) => {
         if (!value) return 'text-slate-400';
         const b = benchmarks;
-        if (type === 'bmi') return value < b.bmi.underweight ? 'text-blue-500' : value < b.bmi.normal ? 'text-emerald-500 font-bold' : value < b.bmi.overweight ? 'text-amber-500' : 'text-rose-500  font-bold';
+        // Menggunakan Teal/Emerald untuk hasil positif, Amber/Rose untuk peringatan
+        if (type === 'bmi') return value < b.bmi.underweight ? 'text-teal-600' : value < b.bmi.normal ? 'text-emerald-600 font-bold' : value < b.bmi.overweight ? 'text-amber-500' : 'text-rose-600 font-bold';
         if (type === 'bodyfat') {
             const st = athlete.gender === 'P' ? b.bodyfat_female : b.bodyfat_male;
-            return value < st.athlete ? 'text-blue-600 font-bold' : value < st.fitness ? 'text-emerald-500 font-bold' : value < st.acceptable ? 'text-amber-500' : 'text-rose-500';
+            return value < st.athlete ? 'text-teal-600 font-bold' : value < st.fitness ? 'text-emerald-600 font-bold' : value < st.acceptable ? 'text-amber-500' : 'text-rose-600';
         }
-        if (type === 'visceral') return value < b.visceral_fat.standard ? 'text-emerald-500 font-bold' : value < b.visceral_fat.high ? 'text-amber-500' : 'text-rose-500 font-bold';
+        if (type === 'visceral') return value < b.visceral_fat.standard ? 'text-emerald-600 font-bold' : value < b.visceral_fat.high ? 'text-amber-500' : 'text-rose-600 font-bold';
         return 'text-slate-700';
     };
 
     return (
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden min-w-0 w-full">
-            <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            {/* Header Tabel */}
+            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                 <div className="flex items-center gap-2">
-                    <Scale className="w-5 h-5 text-[#00488b]" />
-                    <h3 className="font-bold text-slate-800 text-sm md:text-base">Tabel Riwayat Komposisi</h3>
+                    <Scale className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]" />
+                    <h3 className="font-bold text-slate-800 text-sm md:text-base uppercase tracking-widest">Riwayat Komposisi</h3>
                 </div>
-                <span className="text-[10px] md:text-xs font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm whitespace-nowrap">
+                <span className="text-[10px] md:text-xs font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-md border border-orange-100 shadow-sm whitespace-nowrap uppercase tracking-widest">
                     {history.length} Rekaman
                 </span>
             </div>
 
+            {/* Tabel - Tidak ada min-w yang memaksa agar muat di HP */}
             <div className="overflow-x-auto custom-scrollbar w-full">
-                <table className="w-full text-sm text-left whitespace-nowrap min-w-[850px]">
-                    <thead className="bg-[#00488b] text-white text-[10px] uppercase font-bold tracking-widest border-b border-slate-200">
+                <table className="w-full text-sm text-left">
+                    <thead className="bg-[#ff4d00] text-white text-[9px] md:text-[10px] uppercase font-bold tracking-widest border-b border-slate-200">
                         <tr>
-                            <th className="px-4 md:px-6 py-4">Tanggal</th>
-                            <th className="px-2 py-4 text-center">Age/Met.</th>
-                            <th className="px-2 py-4 text-center">W / H</th>
-                            <th className="px-2 py-4 text-center bg-blue-800/30">BMI</th>
-                            <th className="px-2 py-4 text-center bg-blue-800/30">Body Fat %</th>
-                            <th className="px-2 py-4 text-center">Muscle (kg)</th>
-                            <th className="px-2 py-4 text-center">Visceral</th>
-                            <th className="px-2 py-4 text-center">TBW %</th>
+                            <th className="px-3 md:px-5 py-3">Tanggal & Info</th>
+                            <th className="px-2 md:px-4 py-3">Fisik Dasar</th>
+                            <th className="px-2 md:px-4 py-3">Detail Komposisi</th>
                             {/* SEMBUNYIKAN HEADER AKSI JIKA ATLET */}
-                            {!is_athlete && <th className="px-4 md:px-6 py-4 text-right">Aksi</th>}
+                            {!is_athlete && <th className="px-3 md:px-5 py-3 text-right">Aksi</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {history.length > 0 ? history.map((test) => {
                             const isEditing = editingId === test.id;
 
+                            // ==========================================
+                            // MODE EDIT (INLINE FORM COMPACT)
+                            // ==========================================
                             if (isEditing && !is_athlete) {
                                 return (
-                                    <tr key={test.id} className="bg-blue-50/50 border-l-4 border-l-blue-500 animate-in fade-in duration-200">
-                                        <td className="px-2 py-3"><input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full min-w-[110px] max-w-[125px] p-1.5 text-xs rounded border-slate-300 focus:ring-blue-500"/></td>
-                                        <td className="px-1 py-3 text-center">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <input type="number" placeholder="Age" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-12 p-1.5 text-xs rounded border-slate-300 text-center"/>
-                                                <span className="text-slate-400">/</span>
-                                                <input type="number" placeholder="Met" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-12 p-1.5 text-xs rounded border-slate-300 text-center font-bold text-purple-600"/>
-                                            </div>
-                                        </td>
-                                        <td className="px-1 py-3 text-center">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <input type="number" step="0.1" placeholder="Kg" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-14 p-1.5 text-xs rounded border-slate-300 text-center font-bold"/>
-                                                <span className="text-slate-400">/</span>
-                                                <input type="number" step="0.01" placeholder="M" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-14 p-1.5 text-xs rounded border-slate-300 text-center"/>
-                                            </div>
-                                        </td>
-                                        <td className="px-2 py-3 text-center text-xs italic text-slate-400 bg-white/50">Auto</td>
-                                        <td className="px-1 py-3 text-center bg-white/50"><input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-16 mx-auto p-1.5 text-xs rounded border-slate-300 text-center font-bold text-red-500"/></td>
-                                        <td className="px-1 py-3 text-center"><input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-16 mx-auto p-1.5 text-xs rounded border-slate-300 text-center font-bold text-emerald-600"/></td>
-                                        <td className="px-1 py-3 text-center"><input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-16 mx-auto p-1.5 text-xs rounded border-slate-300 text-center font-bold text-orange-500"/></td>
-                                        <td className="px-1 py-3 text-center"><input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-16 mx-auto p-1.5 text-xs rounded border-slate-300 text-center font-bold text-blue-500"/></td>
+                                    <tr key={test.id} className="bg-orange-50/50 border-l-4 border-l-[#ff4d00] animate-in fade-in duration-200">
                                         
-                                        <td className="px-4 py-3 text-right">
-                                            <div className="flex justify-end gap-1.5">
-                                                <button onClick={() => saveEdit(test.id)} disabled={processing} className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded shadow-sm transition-colors" title="Simpan">
+                                        {/* Edit Tanggal & Info */}
+                                        <td className="px-2 py-3 align-top min-w-[120px]">
+                                            <input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] mb-1.5 outline-none"/>
+                                            <div className="flex gap-1">
+                                                <input type="number" placeholder="Usia" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-1/2 p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-center outline-none"/>
+                                                <input type="number" placeholder="MetAge" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-1/2 p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-center font-bold text-teal-600 outline-none"/>
+                                            </div>
+                                        </td>
+                                        
+                                        {/* Edit Fisik Dasar */}
+                                        <td className="px-2 py-3 align-top min-w-[110px]">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="flex items-center gap-1">
+                                                    <input type="number" step="0.1" placeholder="Berat (kg)" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none font-bold"/>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <input type="number" step="0.01" placeholder="Tinggi (m)" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none"/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        
+                                        {/* Edit Komposisi */}
+                                        <td className="px-2 py-3 align-top min-w-[140px]">
+                                            <div className="grid grid-cols-2 gap-1.5">
+                                                <input type="number" step="0.1" placeholder="Fat %" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none text-center font-bold text-rose-500"/>
+                                                <input type="number" step="0.1" placeholder="Musc kg" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none text-center font-bold text-emerald-600"/>
+                                                <input type="number" step="0.1" placeholder="Visceral" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none text-center font-bold text-orange-500"/>
+                                                <input type="number" step="0.1" placeholder="TBW %" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full p-1.5 text-[10px] md:text-xs rounded-md border-slate-300 focus:ring-[#ff4d00] focus:border-[#ff4d00] outline-none text-center font-bold text-teal-600"/>
+                                            </div>
+                                        </td>
+                                        
+                                        {/* Aksi Edit */}
+                                        <td className="px-2 py-3 text-right align-top">
+                                            <div className="flex flex-col sm:flex-row justify-end gap-1.5">
+                                                <button onClick={() => saveEdit(test.id)} disabled={processing} className="p-1.5 md:p-2 bg-[#ff4d00] hover:bg-[#e64500] text-white rounded-md shadow-sm transition-colors flex justify-center items-center" title="Simpan">
                                                     {processing ? <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div> : <CheckCircle2 className="w-4 h-4"/>}
                                                 </button>
-                                                <button onClick={cancelEditing} className="p-1.5 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded transition-colors" title="Batal"><X className="w-4 h-4"/></button>
+                                                <button onClick={cancelEditing} className="p-1.5 md:p-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-md transition-colors flex justify-center items-center" title="Batal">
+                                                    <X className="w-4 h-4"/>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
                                 );
                             }
 
+                            // ==========================================
+                            // MODE VIEW (GROUPED COMPACT LAYOUT)
+                            // ==========================================
                             return (
-                                <tr key={test.id} className="hover:bg-slate-50 transition-colors group">
-                                    <td className="px-4 md:px-6 py-4 font-bold text-slate-700">
-                                        <div className="flex items-center gap-2">
-                                            {new Date(test.date).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}
-                                            {test.id === history[0].id && <span className="bg-blue-100 text-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">New</span>}
+                                <tr key={test.id} className="hover:bg-orange-50/30 transition-colors group">
+                                    
+                                    {/* Kolom 1: Tanggal & Info */}
+                                    <td className="px-3 md:px-5 py-3 align-top">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="font-bold text-slate-800 text-xs md:text-sm whitespace-nowrap">
+                                                {new Date(test.date).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}
+                                            </span>
+                                            {test.id === history[0].id && <span className="bg-[#ff4d00] text-white text-[8px] md:text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-widest">New</span>}
+                                        </div>
+                                        <div className="text-[10px] md:text-xs text-slate-500 font-medium">
+                                            Usia: <span className="font-bold text-slate-700">{test.age}</span> | Met: <span className="font-bold text-teal-600">{test.metabolic_age || '-'}</span>
                                         </div>
                                     </td>
                                     
-                                    <td className="px-2 py-4 text-center">
-                                        <div className="flex flex-col items-center justify-center leading-tight">
-                                            <span className="text-slate-500 text-xs font-medium">Usia: {test.age}</span>
-                                            <span className="text-[10px] text-purple-500 font-bold bg-purple-50 px-1.5 rounded mt-0.5">Met: {test.metabolic_age || '-'}</span>
+                                    {/* Kolom 2: Fisik Dasar */}
+                                    <td className="px-2 md:px-4 py-3 align-top">
+                                        <div className="font-black text-slate-800 text-sm md:text-base mb-0.5 whitespace-nowrap">
+                                            {test.weight} <span className="text-[10px] md:text-xs text-slate-400 font-medium">kg</span> <span className="text-slate-300 font-light mx-0.5">/</span> {test.height} <span className="text-[10px] md:text-xs text-slate-400 font-medium">m</span>
+                                        </div>
+                                        <div className="text-[10px] md:text-xs font-medium text-slate-500">
+                                            BMI: <span className={`font-bold ${getStatusColor('bmi', test.bmi)}`}>{test.bmi}</span>
                                         </div>
                                     </td>
                                     
-                                    <td className="px-2 py-4 text-center">
-                                        <div className="flex flex-col items-center justify-center leading-tight">
-                                            <span className="text-slate-800 font-bold">{test.weight} <span className="text-[9px] text-slate-400 font-normal">kg</span></span>
-                                            <span className="text-slate-400 text-xs">{test.height} m</span>
+                                    {/* Kolom 3: Komposisi */}
+                                    <td className="px-2 md:px-4 py-3 align-top">
+                                        <div className="flex flex-col gap-0.5">
+                                            <div className="flex items-center gap-3 text-[10px] md:text-xs whitespace-nowrap">
+                                                <span className="w-16 text-slate-500 font-medium">Fat: <span className={`${getStatusColor('bodyfat', test.body_fat_percentage)}`}>{test.body_fat_percentage || '-'}%</span></span>
+                                                <span className="text-slate-500 font-medium">Musc: <span className="font-bold text-slate-800">{test.muscle_mass || '-'}kg</span></span>
+                                            </div>
+                                            <div className="flex items-center gap-3 text-[10px] md:text-xs whitespace-nowrap">
+                                                <span className="w-16 text-slate-500 font-medium">Visc: <span className={`${getStatusColor('visceral', test.visceral_fat)}`}>{test.visceral_fat || '-'}</span></span>
+                                                <span className="text-slate-500 font-medium">TBW: <span className="font-bold text-slate-800">{test.total_body_water || '-'}%</span></span>
+                                            </div>
                                         </div>
                                     </td>
                                     
-                                    <td className="px-2 py-4 text-center bg-blue-50/30">
-                                        <div className={`inline-flex items-center justify-center text-slate-800 font-bold ${getStatusColor('bmi', test.bmi)}`}>
-                                            {test.bmi}
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-2 py-4 text-center bg-blue-50/30">
-                                        <div className={`inline-flex items-center justify-center text-slate-800 font-bold ${getStatusColor('bodyfat', test.body_fat_percentage)}`}>
-                                            {test.body_fat_percentage || '-'} <span className="text-xs ml-0.5">%</span>
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-2 py-4 text-center">
-                                        <span className="text-slate-800 font-bold">{test.muscle_mass || '-'}</span>
-                                    </td>
-                                    
-                                    <td className="px-2 py-4 text-center">
-                                        <span className={`text-slate-800 font-bold ${getStatusColor('visceral', test.visceral_fat)}`}>{test.visceral_fat || '-'}</span>
-                                    </td>
-                                    
-                                    <td className="px-2 py-4 text-slate-800 font-bold">
-                                        {test.total_body_water || '-'} <span className="text-xs">%</span>
-                                    </td>
-                                    
-                                    {/* SEMBUNYIKAN KOLOM AKSI JIKA ATLET */}
+                                    {/* Kolom 4: Aksi (Sembunyi jika Atlet) */}
                                     {!is_athlete && (
-                                        <td className="px-4 md:px-6 py-4 text-right">
+                                        <td className="px-3 md:px-5 py-3 text-right align-top">
                                             <div className="flex items-center justify-end gap-1">
-                                                <button onClick={() => startEditing(test)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit Baris">
-                                                    <Edit3 className="w-4 h-4" />
+                                                <button onClick={() => startEditing(test)} className="p-1.5 md:p-2 text-slate-400 hover:text-[#ff4d00] hover:bg-orange-50 rounded-lg transition-colors" title="Edit Baris">
+                                                    <Edit3 className="w-4 h-4 md:w-4 md:h-4" />
                                                 </button>
-                                                <button onClick={() => { if(confirm('Hapus permanen data ini?')) router.delete(route('admin.composition-tests.destroy', test.id), {preserveScroll:true}) }} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
-                                                    <Trash2 className="w-4 h-4" />
+                                                <button onClick={() => { if(confirm('Hapus permanen data ini?')) router.delete(route('admin.composition-tests.destroy', test.id), {preserveScroll:true}) }} className="p-1.5 md:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
+                                                    <Trash2 className="w-4 h-4 md:w-4 md:h-4" />
                                                 </button>
                                             </div>
                                         </td>
@@ -176,10 +187,9 @@ export default function HistoryTable({ history, athlete, benchmarks, is_athlete 
                             );
                         }) : (
                             <tr>
-                                {/* SESUAIKAN COLSPAN JIKA KOLOM AKSI DIHILANGKAN */}
-                                <td colSpan={is_athlete ? "8" : "9"} className="px-6 py-16 text-center text-slate-400 font-medium">
+                                <td colSpan={is_athlete ? "3" : "4"} className="px-4 md:px-6 py-16 text-center text-slate-400 font-medium text-xs md:text-sm">
                                     Belum ada data rekaman tes untuk atlet ini.
-                                    {!is_athlete && <><br/><span className="text-xs font-normal">Klik tombol "INPUT TES BARU" di atas untuk memulai.</span></>}
+                                    {!is_athlete && <><br/><span className="text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2 inline-block">Klik tombol "Input Tes Baru" di atas untuk memulai.</span></>}
                                 </td>
                             </tr>
                         )}

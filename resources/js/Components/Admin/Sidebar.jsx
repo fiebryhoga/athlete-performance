@@ -48,20 +48,17 @@ export default function Sidebar({ className }) {
             icon: Users,
             roles: ['admin', 'coach'] 
         },
-        // 1. PERBAIKAN PHYSICAL TEST
         { 
             name: 'Physical Test', 
             route: 'admin.performance.index', 
-            checkPath: '/performance', // <--- UBAH DI SINI (Hapus /admin/)
+            checkPath: '/performance', 
             icon: ClipboardList,
             roles: ['admin', 'coach', 'athlete'] 
         },
-        
-        // 2. PERBAIKAN BODY COMPOSITION
         { 
             name: 'Body Composition', 
             route: 'admin.composition-tests.index',
-            checkPath: '/admin/composition', // <--- UBAH DI SINI (Hapus -tests)
+            checkPath: '/admin/composition', 
             icon: Scale, 
             roles: ['admin', 'coach', 'athlete'] 
         },
@@ -79,8 +76,6 @@ export default function Sidebar({ className }) {
             icon: HeartPulse,
             roles: ['admin', 'coach', 'athlete'] 
         },
-
-        // --- MENU BARU: TRAINING LOGS ---
         { 
             name: 'Training Logs', 
             route: 'admin.training-logs.index', 
@@ -96,14 +91,12 @@ export default function Sidebar({ className }) {
             icon: Shield,
             roles: ['admin'] 
         },
-
-        // --- CONFIGURATION ---
         { 
             name: 'configuration', 
             route: 'admin.settings.index', 
             checkPath: '/admin/settings', 
             icon: Settings,
-            roles: ['admin'] // Hanya Admin
+            roles: ['admin'] 
         },
     ];
 
@@ -120,21 +113,21 @@ export default function Sidebar({ className }) {
                         <img 
                             src={appSettings.logo} 
                             alt="App Logo" 
-                            className="h-8 w-8 object-contain rounded-lg"
+                            className="h-8 w-8 object-contain rounded-lg shadow-sm"
                         />
                     ) : (
                         // Fallback jika belum ada logo
-                        <div className="h-8 w-8 bg-[#00488b] text-white flex items-center justify-center rounded-lg font-bold">
-                            {appSettings.name ? appSettings.name.charAt(0) : 'A'}
+                        <div className="h-8 w-8 bg-[#ff4d00] text-white flex items-center justify-center rounded-lg font-black shadow-md shadow-[#ff4d00]/20">
+                            {appSettings.name ? appSettings.name.charAt(0).toUpperCase() : 'P'}
                         </div>
                     )}
                     
                     <div className="overflow-hidden">
                         {/* Nama Aplikasi Dinamis */}
-                        <h1 className="text-sm font-extrabold text-blue-900 tracking-tight truncate max-w-[140px] leading-tight">
+                        <h1 className="text-sm font-black text-slate-800 tracking-tight truncate max-w-[140px] leading-tight">
                             {appSettings.name || 'Performance'}
                         </h1>
-                        <p className="text-[10px] text-slate-500 font-medium truncate">Analytics Dashboard</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest truncate">Dashboard</p>
                     </div>
                 </Link>
             </div>
@@ -143,10 +136,10 @@ export default function Sidebar({ className }) {
             <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
                 
                 <div className="mb-8">
-                    <p className="px-3 text-sm font-bold text-slate-400 mb-2 opacity-70  ">
+                    <p className="px-3 text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-widest">
                         Main Menu
                     </p>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1.5">
                         {visibleMenuItems.map((item) => {
                             const active = isActive(item.checkPath);
                             
@@ -154,22 +147,23 @@ export default function Sidebar({ className }) {
                                 <li key={item.name}>
                                     <Link
                                         href={route(item.route)}
-                                        className={`group relative flex items-center rounded-xl px-3.5 py-3 text-sm font-bold transition-all duration-200 ${
+                                        className={`group relative flex items-center rounded-lg px-3.5 py-3 text-sm font-bold transition-all duration-200 ${
                                             active
-                                                ? 'bg-[#00488b] text-white shadow-md shadow-blue-900/20'
-                                                : 'text-slate-500 hover:bg-slate-50 hover:text-[#00488b]'
+                                                ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20'
+                                                : 'text-slate-500 hover:bg-orange-50 hover:text-[#ff4d00]'
                                         }`}
                                     >
                                         <item.icon
-                                            strokeWidth={2.5}
+                                            strokeWidth={active ? 2.5 : 2}
                                             className={`mr-3 h-5 w-5 flex-shrink-0 transition-colors ${
-                                                active ? 'text-white' : 'text-slate-400 group-hover:text-[#00488b]'
+                                                active ? 'text-white' : 'text-slate-400 group-hover:text-[#ff4d00]'
                                             }`}
                                         />
                                         <span className="capitalize">{item.name}</span>
                                         
+                                        {/* Dot Indikator Aktif */}
                                         {active && (
-                                            <span className="absolute right-3 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse"></span>
+                                            <span className="absolute right-4 w-1.5 h-1.5 bg-white/50 rounded-full animate-pulse"></span>
                                         )}
                                     </Link>
                                 </li>
@@ -186,10 +180,10 @@ export default function Sidebar({ className }) {
                     href={route('logout')}
                     method="post"
                     as="button"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all shadow-sm group"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all shadow-sm group"
                 >
                     <LogOut className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                    <span className="capitalize">sign out system</span>
+                    <span className="capitalize">Sign Out System</span>
                 </Link>
             </div>
         </aside>

@@ -51,7 +51,7 @@ export default function HistorySection({ historySessions, userName }) {
                                                 e.stopPropagation(); 
                                                 toggleHistory(hist.id);
                                             }}
-                                            className="text-xs font-bold text-white bg-slate-400 hover:bg-[#00488b] px-4 py-2 rounded-lg transition-colors flex items-center gap-1 ml-auto"
+                                            className="text-xs font-bold text-white bg-slate-400 hover:bg-[#ff4d00] px-4 py-2 rounded-lg transition-colors flex items-center gap-1 ml-auto"
                                         >
                                             {openHistoryId === hist.id ? (
                                                 <><ChevronUp className="w-3.5 h-3.5"/> Tutup Log</>

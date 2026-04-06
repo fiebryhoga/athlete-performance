@@ -162,7 +162,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button onClick={goToToday} className="flex-1 sm:flex-none px-4 py-3 bg-white text-slate-600 font-bold text-sm border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-sm text-center">Bulan Ini</button>
                             {!is_athlete && (
-                                <button onClick={() => openModal()} className="flex-1 sm:flex-none bg-[#00488b] text-white px-5 py-3 rounded-lg  font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all">
+                                <button onClick={() => openModal()} className="flex-1 sm:flex-none bg-[#ff4d00] text-white px-5 py-3 rounded-lg  font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all">
                                     <Plus className="w-4 h-4"/> Jadwal Baru
                                 </button>
                             )}
@@ -194,7 +194,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                                     <div className="border-2 border-dashed border-slate-100 rounded-lg bg-slate-50/50 p-3 flex justify-between items-center group-hover:border-blue-200 group-hover:bg-blue-50/30 transition-all">
                                                         <span className="text-slate-400 font-medium text-xs italic ml-2">-- Kosong --</span>
                                                         {!is_athlete && (
-                                                            <button onClick={() => openModal(item.date)} className="text-[#00488b] bg-white border border-blue-100 shadow-sm px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:bg-[#00488b] hover:text-white transition-all"><Plus className="w-3.5 h-3.5"/> Jadwalkan</button>
+                                                            <button onClick={() => openModal(item.date)} className="text-[#00488b] bg-white border border-blue-100 shadow-sm px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:bg-[#ff4d00] hover:text-white transition-all"><Plus className="w-3.5 h-3.5"/> Jadwalkan</button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -208,7 +208,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                                 <td className="px-6 py-5 align-middle">
                                                     <div className={`font-bold flex flex-col gap-1 ${isToday ? 'text-[#00488b]' : 'text-slate-700'}`}>
                                                         <span>{formatDate(item.date)}</span>
-                                                        {isToday && <span className="text-[9px] bg-[#00488b] text-white px-2 py-0.5 rounded-full uppercase tracking-wider w-fit">Hari Ini</span>}
+                                                        {isToday && <span className="text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full uppercase tracking-wider w-fit">Hari Ini</span>}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5 align-middle">
@@ -233,7 +233,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                                         <button onClick={(e) => { e.stopPropagation(); toggleRow(item.session.id); }} className="px-3 py-2 text-xs font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1.5">
                                                             {expandedRow === item.session.id ? <><ChevronUp className="w-4 h-4"/> Tutup</> : <><ChevronDown className="w-4 h-4"/> Detail</>}
                                                         </button>
-                                                        <Link href={route('admin.training-logs.show', item.session.id)} onClick={(e) => e.stopPropagation()} className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#00488b] shadow-md shadow-blue-900/20 hover:bg-[#003666] px-5 py-2.5 rounded-lg transition-all">
+                                                        <Link href={route('admin.training-logs.show', item.session.id)} onClick={(e) => e.stopPropagation()} className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#ff4d00] shadow-md shadow-blue-900/20 hover:bg-[#003666] px-5 py-2.5 rounded-lg transition-all">
                                                             <Edit3 className="w-3.5 h-3.5"/> Buka Log
                                                         </Link>
                                                     </div>
@@ -337,7 +337,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                             </div>
                             
                             <div className="pt-3">
-                                <button type="submit" disabled={form.processing || !form.data.user_id} className="w-full py-4 bg-[#00488b] text-white  font-bold text-sm rounded-lg shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                                <button type="submit" disabled={form.processing || !form.data.user_id} className="w-full py-4 bg-[#ff4d00] text-white  font-bold text-sm rounded-lg shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
                                     {form.processing ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : editMode ? 'Simpan Pembaruan Jadwal' : 'Buat Sesi & Isi Log Training'}
                                 </button>
                             </div>

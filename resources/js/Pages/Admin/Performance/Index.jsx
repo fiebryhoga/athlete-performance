@@ -37,7 +37,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
     const selectedSportLabel = sports.find(s => s.id.toString() === selectedSport.toString())?.name || "All Sports";
 
-    // --- PERFORMANCE STATUS LOGIC ---
+    // --- PERFORMANCE STATUS LOGIC (Warna disesuaikan agar Harmonis) ---
     const getPerformanceStatus = (val) => {
         const score = parseFloat(val);
         
@@ -46,10 +46,11 @@ export default function Index({ tests, sports, filters = {} }) {
             badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', 
             bar: 'bg-emerald-500' 
         };
+        // Menggunakan TEAL sebagai warna komplementer Oranye
         if (score >= 80) return { 
             label: 'Good', 
-            badge: 'bg-blue-50 text-blue-700 border-blue-200', 
-            bar: 'bg-blue-500' 
+            badge: 'bg-teal-50 text-teal-700 border-teal-200', 
+            bar: 'bg-teal-500' 
         };
         if (score >= 70) return { 
             label: 'Average', 
@@ -79,13 +80,13 @@ export default function Index({ tests, sports, filters = {} }) {
         <AdminLayout title="Performance History">
             <Head title="Performance History" />
 
-            {/* --- HEADER UTAMA (Selaras Tema Baru) --- */}
+            {/* --- HEADER UTAMA (Selaras Tema Oranye) --- */}
             <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-50 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                 <div className="relative z-10 w-full md:w-auto">
-                    <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Evaluation</span>
+                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block border border-orange-100/50">Evaluation</span>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        Performance History
+                        <Target className="w-8 h-8 text-[#ff4d00]" /> Performance History
                     </h2>
                     <p className="text-slate-500 font-medium mt-1 text-sm">Monitor athlete scores and physical progress over time.</p>
                 </div>
@@ -94,7 +95,7 @@ export default function Index({ tests, sports, filters = {} }) {
                     <div className="relative z-10 w-full md:w-auto flex justify-end">
                         <Link 
                             href={route('admin.performance.create')} 
-                            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#00488b] text-white px-6 py-3 rounded-lg text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all active:scale-95"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-6 py-3 rounded-lg text-sm font-bold shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95"
                         >
                             <Plus className="w-4 h-4" /> New Test Entry
                         </Link>
@@ -113,7 +114,7 @@ export default function Index({ tests, sports, filters = {} }) {
                         placeholder="Search athlete name..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="block w-full pl-9 pr-3 py-2.5 border border-slate-100 hover:border-slate-200 rounded-lg bg-slate-50 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#00488b]/20 text-sm font-medium text-slate-700 transition-colors outline-none"
+                        className="block w-full pl-9 pr-3 py-2.5 border border-slate-100 hover:border-slate-200 rounded-lg bg-slate-50 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm font-medium text-slate-700 transition-colors outline-none shadow-sm"
                     />
                 </div>
 
@@ -125,11 +126,11 @@ export default function Index({ tests, sports, filters = {} }) {
                     )}
                     <button 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-lg transition-colors text-sm font-medium text-slate-700 group"
+                        className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-lg transition-colors text-sm font-medium text-slate-700 group shadow-sm"
                     >
                         <div className="flex items-center gap-2 truncate">
-                            <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#00488b]' : 'text-slate-400'}`} />
-                            <span className={`truncate ${selectedSport ? 'text-[#00488b] font-bold' : ''}`}>
+                            <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#ff4d00]' : 'text-slate-400'}`} />
+                            <span className={`truncate ${selectedSport ? 'text-[#ff4d00] font-bold' : ''}`}>
                                 {selectedSportLabel}
                             </span>
                         </div>
@@ -139,21 +140,21 @@ export default function Index({ tests, sports, filters = {} }) {
                     {isDropdownOpen && (
                         <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-lg shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto">
                             <div 
-                                className={`px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport === '' ? 'bg-blue-50/50' : ''}`}
+                                className={`px-4 py-2 hover:bg-orange-50 cursor-pointer flex items-center justify-between group ${selectedSport === '' ? 'bg-orange-50/50' : ''}`}
                                 onClick={() => { setSelectedSport(''); setIsDropdownOpen(false); }}
                             >
-                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#00488b]' : 'text-slate-600 font-medium'}`}>All Sports</span>
-                                {selectedSport === '' && <Check className="w-4 h-4 text-[#00488b]" />}
+                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>All Sports</span>
+                                {selectedSport === '' && <Check className="w-4 h-4 text-[#ff4d00]" />}
                             </div>
                             <div className="h-px bg-slate-100 my-1"></div>
                             {sports.map((sport) => (
                                 <div 
                                     key={sport.id}
-                                    className={`px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between group ${selectedSport == sport.id ? 'bg-blue-50/50' : ''}`}
+                                    className={`px-4 py-2 hover:bg-orange-50 cursor-pointer flex items-center justify-between group ${selectedSport == sport.id ? 'bg-orange-50/50' : ''}`}
                                     onClick={() => { setSelectedSport(sport.id); setIsDropdownOpen(false); }}
                                 >
-                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#00488b]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
-                                    {selectedSport == sport.id && <Check className="w-4 h-4 text-[#00488b]" />}
+                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
+                                    {selectedSport == sport.id && <Check className="w-4 h-4 text-[#ff4d00]" />}
                                 </div>
                             ))}
                         </div>
@@ -178,7 +179,7 @@ export default function Index({ tests, sports, filters = {} }) {
                         const status = getPerformanceStatus(test.average_score);
 
                         return (
-                            <div key={test.id} className="group bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col overflow-hidden">
+                            <div key={test.id} className="group bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 flex flex-col overflow-hidden">
                                 
                                 {/* Card Header */}
                                 <div className="px-5 py-4 border-b border-slate-50 bg-white">
@@ -191,7 +192,7 @@ export default function Index({ tests, sports, filters = {} }) {
                                         </span>
                                     </div>
                                     
-                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-[#00488b] transition-colors mt-1">
+                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-[#ff4d00] transition-colors mt-1">
                                         {test.athlete?.name || 'Unknown Athlete'}
                                     </h3>
                                     <div className="flex items-center gap-1.5 mt-1.5">
@@ -278,7 +279,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                     <Link 
                                         href={route('admin.performance.show', test.id)}
-                                        className="py-3 text-xs font-bold text-[#00488b] hover:text-white hover:bg-[#00488b] transition-colors flex items-center justify-center gap-1.5 group/btn"
+                                        className="py-3 text-xs font-bold text-[#ff4d00] hover:text-white hover:bg-[#ff4d00] transition-colors flex items-center justify-center gap-1.5 group/btn"
                                     >
                                         Details <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                                     </Link>

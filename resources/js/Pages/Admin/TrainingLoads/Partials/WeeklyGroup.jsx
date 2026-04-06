@@ -160,7 +160,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             </div>
 
             {/* FOOTER 1: SUMMARY MINGGUAN (SPORTS SCIENCE METRICS) */}
-            <div className="bg-[#00488b] p-6 text-white border-b border-blue-800">
+            <div className="bg-[#ff4d00] p-6 text-white border-b border-blue-800">
                 <div className="flex items-center gap-2 mb-4 opacity-80">
                     <TrendingUp className="w-4 h-4" />
                     <h4 className="text-xs font-bold uppercase tracking-widest">Load Metrics & Monitoring</h4>

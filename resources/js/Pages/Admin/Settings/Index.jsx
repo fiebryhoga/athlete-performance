@@ -123,7 +123,7 @@ export default function Index({ app_name, app_logo }) {
                                     
                                     {progress && (
                                         <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden border border-slate-200">
-                                            <div className="bg-[#00488b] h-full rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
+                                            <div className="bg-[#ff4d00] h-full rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
                                         </div>
                                     )}
                                 </div>
@@ -135,7 +135,7 @@ export default function Index({ app_name, app_logo }) {
                             <button 
                                 type="submit" 
                                 disabled={processing}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#00488b] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#003666] transition-all shadow-lg shadow-blue-900/20 active:scale-95 disabled:opacity-70 text-sm"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#003666] transition-all shadow-lg shadow-blue-900/20 active:scale-95 disabled:opacity-70 text-sm"
                             >
                                 {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                 {!processing && <Save className="w-4 h-4" />}
