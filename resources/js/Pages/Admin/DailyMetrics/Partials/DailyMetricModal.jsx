@@ -10,57 +10,62 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                 <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                     <div>
                         <h3 className="font-bold text-lg text-slate-800">Input Data Harian</h3>
-                        <p className="text-xs text-[#00488b] font-bold mt-0.5">
+                        
+                        <p className="text-xs text-[#ff4d00] font-bold mt-0.5">
                             {selectedDateLabel} • {formatDateToIndo(form.data.record_date, 'full')}
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 rounded-full transition-all">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:bg-orange-50 hover:text-[#ff4d00] rounded-full transition-all">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
                 
-                <form onSubmit={submit} className="p-6">
-                    <div className="grid grid-cols-2 gap-5">
+                <form onSubmit={submit} className="p-4 md:p-6">
+                    <div className="grid grid-cols-2 gap-4 md:gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">RHR <span className="text-red-500">*</span></label>
-                            <input type="number" step="0.1" required value={form.data.rhr} onChange={e => form.setData('rhr', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all" placeholder="Contoh: 65"/>
+                            <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">RHR <span className="text-rose-500">*</span></label>
+                            
+                            <input type="number" step="0.1" required value={form.data.rhr} onChange={e => form.setData('rhr', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all" placeholder="Contoh: 65"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">SpO2 (%) <span className="text-red-500">*</span></label>
-                            <input type="number" step="0.1" required value={form.data.spo2} onChange={e => form.setData('spo2', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all" placeholder="Contoh: 98"/>
+                            <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">SpO2 (%) <span className="text-rose-500">*</span></label>
+                            <input type="number" step="0.1" required value={form.data.spo2} onChange={e => form.setData('spo2', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all" placeholder="Contoh: 98"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Weight / BB (Kg) <span className="text-red-500">*</span></label>
-                            <input type="number" step="0.1" required value={form.data.weight} onChange={e => form.setData('weight', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all"/>
+                            <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Weight / BB (Kg) <span className="text-rose-500">*</span></label>
+                            <input type="number" step="0.1" required value={form.data.weight} onChange={e => form.setData('weight', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all"/>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Vertical Jump (VJ) <span className="text-red-500">*</span></label>
-                            <input type="number" step="0.01" required value={form.data.vj} onChange={e => form.setData('vj', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all"/>
+                            <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Vertical Jump (VJ) <span className="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" required value={form.data.vj} onChange={e => form.setData('vj', e.target.value)} className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all"/>
                         </div>
                         
-                        {/* INPUT CATATAN (NOTES) */}
+                        
                         <div className="col-span-2 space-y-1.5 mt-1">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
+                            <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
                             <textarea 
                                 rows="2" 
                                 value={form.data.notes} 
                                 onChange={e => form.setData('notes', e.target.value)} 
-                                className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#00488b] transition-all resize-none" 
+                                className="w-full text-sm rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all resize-none" 
                                 placeholder="Cth: Tidur larut malam, otot agak pegal..."
                             ></textarea>
                         </div>
                     </div>
                     
-                    <div className="bg-blue-50/70 p-4 rounded-2xl border border-blue-100 mt-6">
-                        <p className="text-xs text-[#00488b] font-medium leading-relaxed">
-                            <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
+                    
+                    <div className="bg-orange-50/80 p-4 rounded-2xl border border-orange-100 mt-6">
+                        <p className="text-xs text-orange-700 font-medium leading-relaxed">
+                            <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5 text-[#ff4d00]"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
                             Sistem otomatis menghitung <b>VO2Max</b>, <b>Peak Power</b>, dan <b>Status Recovery</b>.
                         </p>
                     </div>
 
-                    <div className="mt-8 flex gap-3">
-                        <button type="button" onClick={onClose} className="flex-1 py-3.5 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
-                        <button type="submit" disabled={form.processing} className="flex-[2] py-3.5 bg-[#ff4d00] text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#003666] transition-all flex justify-center items-center gap-2">
+                    <div className="mt-6 md:mt-8 flex gap-3">
+                        <button type="button" onClick={onClose} className="flex-1 py-3 md:py-3.5 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-colors">Batal</button>
+                        
+                        
+                        <button type="submit" disabled={form.processing} className="flex-[2] py-3 md:py-3.5 bg-[#ff4d00] text-white font-bold text-sm rounded-xl shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all flex justify-center items-center gap-2">
                             {form.processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
                             Simpan Data
                         </button>

@@ -12,20 +12,20 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->date('record_date');
-            $table->string('week'); // misal: "Week 17"
+            $table->string('week'); 
             
-            // Input Manual
+            
             $table->float('rhr');
             $table->float('spo2');
-            $table->float('weight'); // BB saat tes (karena bisa berubah)
-            $table->float('vj'); // Vertical Jump
-            $table->float('quick_recovery_score'); // Persentase recovery (0-100)
+            $table->float('weight'); 
+            $table->float('vj'); 
+            $table->float('quick_recovery_score'); 
             
-            // Kolom Hasil Kalkulasi Otomatis
+            
             $table->float('hr_max');
             $table->float('hr_ratio');
             $table->float('vo2_max');
-            $table->string('recovery_status'); // BAIK, CUKUP, KURANG
+            $table->string('recovery_status'); 
             
             $table->timestamps();
         });

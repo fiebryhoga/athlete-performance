@@ -9,7 +9,7 @@ import HistoryTable from './Partials/HistoryTable';
 import CompositionModal from './Partials/CompositionModal';
 
 export default function Show({ athlete, history, benchmarks }) {
-    // CEK ROLE USER YANG SEDANG LOGIN
+    
     const { auth } = usePage().props;
     const is_athlete = auth.user.role === 'athlete';
 
@@ -42,27 +42,27 @@ export default function Show({ athlete, history, benchmarks }) {
         <AdminLayout title={`Composition Analysis - ${athlete.name}`}>
             <Head title={`Analysis - ${athlete.name}`} />
             
-            {/* Menggunakan max-w-7xl agar konsisten dengan halaman profil lainnya */}
-            <div className="max-w-7xl mx-auto py-6 md:py-8 px-4 sm:px-6 lg:px-8 animate-in fade-in duration-700">
+            
+            <div className="max-w-7xl mx-auto animate-in fade-in duration-700">
                 
-                {/* 1. HEADER PROFIL */}
+                
                 <ProfileHeader 
                     athlete={athlete} 
                     onOpenModal={() => setIsModalOpen(true)} 
                     is_athlete={is_athlete} 
                 />
 
-                {/* 2. AREA ANALISIS & SMART INSIGHTS */}
+                
                 {history.length > 0 ? (
                     <div className="mb-8 space-y-6 md:space-y-8">
-                        {/* Wawasan Pintar berbasis AI/Logika Algoritma */}
+                        
                         <SmartInsights 
                             history={history} 
                             athlete={athlete} 
                             benchmarks={benchmarks} 
                         />
                         
-                        {/* Dashboard Grafik Tren & Gauge */}
+                        
                         <AnalyticsDashboard 
                             history={history} 
                             athlete={athlete} 
@@ -80,7 +80,7 @@ export default function Show({ athlete, history, benchmarks }) {
                     </div>
                 )}
 
-                {/* 3. TABEL RIWAYAT (Sudah Dioptimasi Mobile) */}
+                
                 <HistoryTable 
                     history={history} 
                     athlete={athlete} 
@@ -90,7 +90,7 @@ export default function Show({ athlete, history, benchmarks }) {
 
             </div>
 
-            {/* 4. MODAL INPUT DATA (Proteksi Ganda Role) */}
+            
             {!is_athlete && (
                 <CompositionModal 
                     isOpen={isModalOpen} 

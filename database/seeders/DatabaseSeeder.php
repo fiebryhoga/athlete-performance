@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             AthleteSeeder::class,
             SportSeeder::class,
-            Volleyballseeder::class,
             SettingSeeder::class,
         ]);
     }

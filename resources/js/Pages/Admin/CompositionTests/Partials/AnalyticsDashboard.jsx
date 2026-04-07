@@ -10,9 +10,9 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
 
     const prevDateStr = prev ? new Date(prev.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
 
-    // ==========================================
-    // 1. CUSTOM TOOLTIP UNTUK GRAFIK (UI MODERN)
-    // ==========================================
+    
+    
+    
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
@@ -35,9 +35,9 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
         return null;
     };
 
-    // ==========================================
-    // 2. FUNGSI KESIMPULAN CEPAT (PERBANDINGAN)
-    // ==========================================
+    
+    
+    
     const renderDiff = (current, previous, isReversedGood = false, unit = '') => {
         if (!previous) return <span className="text-slate-400 text-[9px] md:text-[10px] font-bold bg-slate-100 px-2 py-1 rounded-md uppercase tracking-widest">Data Perdana</span>;
         
@@ -57,9 +57,9 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
         );
     };
 
-    // ==========================================
-    // 3. KOMPONEN SPIDOMETER (GAUGE) ELEGAN
-    // ==========================================
+    
+    
+    
     const getPointerPosition = (val, thresholds) => {
         if (!val) return 0;
         if (val < thresholds[0]) {
@@ -78,7 +78,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
     const LinearGauge = ({ title, value, unit, thresholds, labels, isReverseColor = false }) => {
         const pos = getPointerPosition(parseFloat(value || 0), thresholds);
         
-        // Menggunakan TEAL sebagai warna positif (menggantikan biru)
+        
         const colors = isReverseColor 
             ? ['bg-rose-400', 'bg-amber-400', 'bg-emerald-400', 'bg-teal-400'] 
             : ['bg-teal-400', 'bg-emerald-400', 'bg-amber-400', 'bg-rose-400'];
@@ -97,7 +97,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                         <div className={`h-full ${colors[2]}`} style={{ width: '25%' }}></div>
                         <div className={`h-full ${colors[3]}`} style={{ width: '25%' }}></div>
                     </div>
-                    {/* Jarum Indikator Premium */}
+                    
                     {value && (
                         <div 
                             className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 md:w-2 h-5 md:h-7 bg-slate-800 border-[1.5px] border-white rounded-full shadow-md transition-all duration-1000 ease-out" 
@@ -120,7 +120,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
         );
     };
 
-    // SETUP STANDAR BENCHMARK
+    
     const b = benchmarks;
     const fatStandars = athlete.gender === 'P' ? b.bodyfat_female : b.bodyfat_male;
     const fatThresholds = [fatStandars.athlete, fatStandars.fitness, fatStandars.acceptable];
@@ -139,12 +139,12 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
     return (
         <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500 max-w-full overflow-hidden">
             
-            {/* ========================================== */}
-            {/* BAGIAN 1: KESIMPULAN CEPAT (CARDS) */}
-            {/* ========================================== */}
+            
+            
+            
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
                 
-                {/* Card Berat Badan */}
+                
                 <div className="bg-white p-4 md:p-6 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden group hover:border-orange-200 hover:shadow-md transition-all">
                     <div className="absolute -right-4 -top-4 text-slate-50/80 group-hover:text-orange-50 transition-colors pointer-events-none">
                         <Scale className="w-24 h-24 md:w-32 md:h-32" strokeWidth={1} />
@@ -169,7 +169,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                     </div>
                 </div>
 
-                {/* Card Body Fat */}
+                
                 <div className="bg-white p-4 md:p-6 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden group hover:border-teal-200 hover:shadow-md transition-all">
                     <div className="absolute -right-4 -top-4 text-slate-50/80 group-hover:text-teal-50 transition-colors pointer-events-none">
                         <Activity className="w-24 h-24 md:w-32 md:h-32" strokeWidth={1} />
@@ -194,7 +194,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                     </div>
                 </div>
 
-                {/* Card Massa Otot */}
+                
                 <div className="bg-white p-4 md:p-6 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden group hover:border-emerald-200 hover:shadow-md transition-all">
                     <div className="absolute -right-4 -top-4 text-slate-50/80 group-hover:text-emerald-50 transition-colors pointer-events-none">
                         <Dumbbell className="w-24 h-24 md:w-32 md:h-32" strokeWidth={1} />
@@ -219,7 +219,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                     </div>
                 </div>
 
-                {/* Card Visceral Fat */}
+                
                 <div className="bg-white p-4 md:p-6 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden group hover:border-amber-200 hover:shadow-md transition-all">
                     <div className="absolute -right-4 -top-4 text-slate-50/80 group-hover:text-amber-50 transition-colors pointer-events-none">
                         <HeartPulse className="w-24 h-24 md:w-32 md:h-32" strokeWidth={1} />
@@ -244,9 +244,9 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                 </div>
             </div>
 
-            {/* ========================================== */}
-            {/* BAGIAN 2: SNAPSHOT SPIDOMETER (GAUGE) */}
-            {/* ========================================== */}
+            
+            
+            
             <div>
                 <h3 className="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2 mb-4 mt-6 md:mt-8 uppercase tracking-widest">
                     <Gauge className="w-5 h-5 md:w-6 md:h-6 text-[#ff4d00]" /> Kondisi Saat Ini
@@ -258,12 +258,12 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                 </div>
             </div>
 
-            {/* ========================================== */}
-            {/* BAGIAN 3: GRAFIK TREN (RECHARTS) */}
-            {/* ========================================== */}
+            
+            
+            
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 md:gap-6 pt-2 md:pt-4">
                 
-                {/* GRAFIK 1: BODY RECOMPOSITION */}
+                
                 <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col hover:border-orange-200 transition-colors">
                     <div className="flex items-start justify-between mb-6 md:mb-8">
                         <div>
@@ -289,7 +289,7 @@ export default function AnalyticsDashboard({ history, athlete, benchmarks }) {
                     </div>
                 </div>
 
-                {/* GRAFIK 2: HYDRATION & METABOLIC */}
+                
                 <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 md:p-6 flex flex-col hover:border-teal-200 transition-colors">
                     <div className="mb-6 md:mb-8">
                         <h3 className="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-2 uppercase tracking-widest"><Droplets className="w-4 h-4 md:w-5 md:h-5 text-teal-500" /> Tingkat Hidrasi (TBW)</h3>

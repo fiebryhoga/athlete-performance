@@ -2,7 +2,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { Save, User, Trophy, MessageSquare, ArrowLeft, Target, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
-// --- SCORE INPUT COMPONENT (Mobile Optimized) ---
+
 const ResultInput = ({ item, value, onChange }) => {
     
     const decimalTypes = ['second', 'minute', 'meter', 'vo2max'];
@@ -26,7 +26,7 @@ const ResultInput = ({ item, value, onChange }) => {
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-1 sm:gap-2">
                 <label className="font-bold text-slate-700 text-sm leading-tight">{item.name}</label>
                 
-                {/* Target Badge */}
+                
                 <div className="self-start sm:self-auto flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-500 whitespace-nowrap uppercase tracking-widest">
                     <Target className="w-3 h-3 text-[#ff4d00]" />
                     {Number(item.target_value)} <span className="text-slate-400 font-medium ml-0.5 lowercase tracking-normal">{item.unit}</span>
@@ -93,12 +93,12 @@ export default function Edit({ test, categories }) {
 
             <form onSubmit={submit} className="relative min-h-screen bg-slate-50/50 pb-28 md:pb-12">
                 
-                {/* --- STICKY HEADER (Solid & Full Width) --- */}
+                
                 <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm w-full">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
                         <div className="flex items-center justify-between gap-4">
                             
-                            {/* Left: Info */}
+                            
                             <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
                                 <Link href={route('admin.performance.index')} className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#ff4d00] hover:border-orange-200 hover:bg-orange-50 transition-colors shrink-0">
                                     <ArrowLeft className="w-5 h-5" />
@@ -115,7 +115,7 @@ export default function Edit({ test, categories }) {
                                 </div>
                             </div>
 
-                            {/* Right: Actions (Desktop Only) */}
+                            
                             <div className="hidden sm:flex items-center gap-4">
                                 <div className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${isDirty ? 'text-amber-500' : 'text-emerald-600 flex items-center gap-1'}`}>
                                     {isDirty ? 'Unsaved Changes...' : <><CheckCircle2 className="w-3.5 h-3.5" /> All Saved</>}
@@ -137,13 +137,13 @@ export default function Edit({ test, categories }) {
                     </div>
                 </div>
 
-                {/* --- MAIN CONTENT (Wider Container) --- */}
+                
                 <div className="max-w-7xl mx-auto py-4 md:py-8 px-3 sm:px-6 lg:px-8 space-y-4 md:space-y-6">
                     
                     {categories.map((category) => (
                         <div key={category.id} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden hover:border-orange-100 transition-colors">
                             
-                            {/* Category Header */}
+                            
                             <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center">
                                 <div className="flex items-center gap-2 md:gap-3">
                                     <div className="w-1.5 h-5 md:h-6 bg-[#ff4d00] rounded-full"></div>
@@ -154,7 +154,7 @@ export default function Edit({ test, categories }) {
                                 </span>
                             </div>
 
-                            {/* Grid Inputs */}
+                            
                             <div className="p-4 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                                 {category.test_items.map((item) => {
                                     const currentVal = data.scores.find(s => s.test_item_id === item.id)?.result_value;
@@ -171,7 +171,7 @@ export default function Edit({ test, categories }) {
                         </div>
                     ))}
 
-                    {/* Notes Section */}
+                    
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 md:p-6">
                         <h3 className="font-bold text-slate-800 mb-4 flex gap-2 items-center text-sm md:text-base uppercase tracking-widest">
                             <div className="p-1.5 bg-orange-50 text-[#ff4d00] rounded-md border border-orange-100">
@@ -193,7 +193,7 @@ export default function Edit({ test, categories }) {
                     </div>
                 </div>
 
-                {/* --- MOBILE FLOATING SAVE BAR --- */}
+                
                 <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] flex gap-3 items-center">
                     <div className="flex-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 pl-1">
                         {isDirty ? <span className="text-amber-500">Unsaved Changes...</span> : <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> All Saved</span>}

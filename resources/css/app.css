@@ -4,13 +4,13 @@
 
 @layer base {
     body {
-        /* Membuat font terlihat lebih tajam dan tidak bergerigi */
+        
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background-color: #f8fafc; /* Slate-50 background global */
+        background-color: #f8fafc; 
     }
 
-    /* Custom Scrollbar yang modern */
+    
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -25,4 +25,16 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
     }
+
+
+    
 }
+
+@keyframes shine {
+    100% {
+      left: 125%;
+    }
+  }
+  .animate-shine {
+    animation: shine 1.5s infinite;
+  }

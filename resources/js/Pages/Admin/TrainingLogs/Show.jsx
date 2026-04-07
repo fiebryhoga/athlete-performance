@@ -3,10 +3,10 @@ import { Head, Link, useForm, router } from '@inertiajs/react';
 import { ArrowLeft, Save, CalendarDays } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-// === IMPORT PARTIALS ===
+
 import LogHeader from './Partials/LogHeader';
 import ExcelTable from './Partials/ExcelTable';
-import HistorySection from './Partials/HistorySection'; // <-- 1. IMPORT DI SINI
+import HistorySection from './Partials/HistorySection';
 
 export default function Show({ session, exercisesList, nextSession, historySessions, is_athlete }) {
     const [libExercises, setLibExercises] = useState(exercisesList || []);
@@ -20,10 +20,9 @@ export default function Show({ session, exercisesList, nextSession, historySessi
         setData('exercises', newEx);
     };
 
-    // TAMBAHAN: Fungsi untuk menambah baris baru di frontend
     const addNewRow = () => {
         const newRow = {
-            id: null, // ID null menandakan ini data baru (belum ada di DB)
+            id: null,
             exercise_name: '', notes: '',
             set_1_load: '', set_1_reps: '',
             set_2_load: '', set_2_reps: '',
@@ -33,7 +32,6 @@ export default function Show({ session, exercisesList, nextSession, historySessi
         setData('exercises', [...data.exercises, newRow]);
     };
 
-    // TAMBAHAN: Fungsi untuk menghapus baris dari layar frontend
     const removeRow = (index) => {
         const newExercises = [...data.exercises];
         newExercises.splice(index, 1);
@@ -47,10 +45,7 @@ export default function Show({ session, exercisesList, nextSession, historySessi
     };
 
     const handleDeleteExercise = (exerciseName) => {
-        // 1. Update state lokal agar langsung hilang dari dropdown
         setLibExercises(prev => prev.filter(item => item !== exerciseName));
-    
-        // 2. Kirim ke database via Axios
         axios.delete(route('admin.training-logs.exercises.destroy'), {
             data: { name: exerciseName }
         }).catch(err => console.error("Gagal menghapus exercise", err));
@@ -65,59 +60,79 @@ export default function Show({ session, exercisesList, nextSession, historySessi
         <AdminLayout title={`Training Log - ${session.training_type}`}>
             <Head title={`Log Latihan - ${session.user.name}`} />
             
-            <div className="max-w-[1400px] mx-auto">
+            
+            <div className="mx-auto pb-28 md:pb-12 w-full max-w-full">
                 
-                {/* TOMBOL NAVIGASI & SIMPAN */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <Link href={route('admin.training-logs.index')} className="text-slate-500 hover:text-[#00488b] flex items-center gap-2 font-normal text-sm">
-                        <ArrowLeft className="w-4 h-4"/> Kembali ke Jadwal
+                
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 md:mb-4 w-full md:mt-0">
+                    <Link href={route('admin.training-logs.index')} className="text-slate-500 hover:text-[#ff4d00] flex items-center gap-2 font-bold text-xs md:text-sm transition-colors py-2 touch-manipulation">
+                        <ArrowLeft className="w-4 h-4 md:w-5 md:h-5"/> Kembali ke Jadwal
                     </Link>
+                    
+                    
                     {!is_athlete && (
-                        <button onClick={submit} disabled={processing} className="w-full sm:w-auto bg-[#ff4d00] text-white px-8 py-3 rounded-md font-medium text-sm flex justify-center items-center gap-2 shadow-lg shadow-blue-900/20 hover:bg-[#003666] hover:scale-[1.02] transition-all">
+                        <button onClick={submit} disabled={processing} className="hidden md:flex bg-[#ff4d00] text-white px-8 py-3 rounded-xl font-bold text-sm justify-center items-center gap-2 shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:scale-[1.02] transition-all">
                             {processing ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-5 h-5"/>}
                             Simpan Log Latihan
                         </button>
                     )}
                 </div>
 
-                {/* BANNER JADWAL SELANJUTNYA */}
+                
                 {nextSession && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 rounded-2xl mb-6 flex items-center gap-4 shadow-sm">
-                        <div className="bg-white p-2.5 rounded-xl shadow-sm text-blue-500 shrink-0"><CalendarDays className="w-6 h-6" /></div>
-                        <div>
-                            <p className="text-[10px]  font-bold text-blue-500 uppercase tracking-widest mb-0.5">Informasi Jadwal Berikutnya</p>
-                            <p className="text-sm text-slate-700 font-medium">Latihan selanjutnya adalah <span className=" font-bold text-[#00488b]">{nextSession.training_type}</span> pada <span className="font-bold text-[#00488b] underline decoration-blue-200 underline-offset-2">{new Date(nextSession.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>.</p>
+                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 p-4 md:p-5 rounded-xl md:rounded-2xl mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 shadow-sm w-full max-w-full relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/40 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                        <div className="bg-white p-2.5 rounded-xl shadow-sm text-[#ff4d00] shrink-0 relative z-10">
+                            <CalendarDays className="w-5 h-5 md:w-6 md:h-6" />
+                        </div>
+                        <div className="min-w-0 flex-1 w-full relative z-10">
+                            <p className="text-[10px] font-bold text-[#ff4d00] uppercase tracking-widest mb-1">Jadwal Berikutnya</p>
+                            <p className="text-xs md:text-sm text-slate-700 font-medium leading-relaxed break-words">
+                                <span className="font-bold text-[#e64500]">{nextSession.training_type}</span> pada <span className="font-bold text-[#e64500] underline decoration-orange-200 underline-offset-2">{new Date(nextSession.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>.
+                            </p>
                         </div>
                     </div>
                 )}
 
-                {/* HEADER INFO (Menggunakan Komponen) */}
+                
                 <LogHeader session={session} />
 
-                {/* TABEL EXCEL UTAMA (Menggunakan Komponen) */}
-                <div className="mb-12 z-20 relative">
+                
+                <div className="mb-8 md:mb-12 z-20 relative w-full max-w-full">
                     <ExcelTable 
                         data={data} 
                         is_athlete={is_athlete} 
                         handleExChange={handleExChange} 
                         libExercises={libExercises} 
                         handleAddNewExercise={handleAddNewExercise} 
-                        addNewRow={addNewRow} // <--- Lempar fungsi ini
-                        removeRow={removeRow} // <--- Lempar fungsi ini
+                        addNewRow={addNewRow}
+                        removeRow={removeRow}
                         onDeleteExercise={handleDeleteExercise}
                     />
                 </div>
 
-                {/* === TABEL HISTORY (PANGGIL DI SINI) === */}
+                
                 <HistorySection 
                     historySessions={historySessions} 
                     userName={session.user.name} 
                 />
-                
-                {/* Extra space at bottom to allow scrolling dropdowns */}
-                <div className="h-40"></div>
 
             </div>
+
+            
+            
+            {!is_athlete && (
+                <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] z-[80] animate-in slide-in-from-bottom-full duration-300">
+                    <button 
+                        onClick={submit} 
+                        disabled={processing} 
+                        className="w-full bg-[#ff4d00] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex justify-center items-center gap-2 shadow-lg shadow-[#ff4d00]/30 active:scale-[0.98] transition-all touch-manipulation disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {processing ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-5 h-5"/>}
+                        Simpan Semua Perubahan
+                    </button>
+                </div>
+            )}
         </AdminLayout>
     );
 }

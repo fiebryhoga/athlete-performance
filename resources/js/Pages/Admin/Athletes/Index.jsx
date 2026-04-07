@@ -49,7 +49,7 @@ export default function Index({ athletes, sports, filters }) {
         <AdminLayout title="Athlete Management">
             <Head title="Athletes" />
 
-            {/* --- HEADER UTAMA --- */}
+            
             <div className="bg-white p-5 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                 <div className="relative z-10 w-full lg:w-auto">
@@ -57,7 +57,7 @@ export default function Index({ athletes, sports, filters }) {
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                         <Users className="w-7 h-7 md:w-8 md:h-8 text-[#ff4d00]" /> Athletes Data
                     </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Manage athlete profiles, accounts, and physical metrics.</p>
+                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Kelola profil atlet, akun, dan metrik fisik.</p>
                 </div>
 
                 <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
@@ -80,16 +80,16 @@ export default function Index({ athletes, sports, filters }) {
                 </div>
             </div>
 
-            {/* --- TABEL DATA --- */}
+            
             <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden flex flex-col animate-in fade-in duration-300">
                 <div className="overflow-x-auto w-full custom-scrollbar">
                     <table className="min-w-full text-left text-sm whitespace-nowrap">
                         <thead className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase font-bold tracking-widest text-slate-400">
                             <tr>
                                 <th className="px-4 md:px-6 py-4">Athlete Profile</th>
-                                {/* Disembunyikan di Mobile/Tablet kecil, Muncul di ukuran md ke atas */}
+                                
                                 <th className="px-4 md:px-6 py-4 hidden md:table-cell">Sport</th>
-                                {/* Disembunyikan di Mobile/Tablet, Muncul di ukuran lg ke atas */}
+                                
                                 <th className="px-4 md:px-6 py-4 hidden lg:table-cell">Physical (H/W)</th>
                                 <th className="px-4 md:px-6 py-4 hidden lg:table-cell">Age / Gender</th>
                                 <th className="px-4 md:px-6 py-4 text-right">Actions</th>
@@ -115,7 +115,7 @@ export default function Index({ athletes, sports, filters }) {
                                                     <div className="text-sm font-bold text-slate-800 group-hover:text-[#ff4d00] transition-colors truncate max-w-[140px] sm:max-w-xs">{athlete.name}</div>
                                                     <div className="text-[10px] md:text-xs text-slate-500 font-mono mt-0.5">ID: {athlete.athlete_id}</div>
                                                     
-                                                    {/* TAG SPORT HANYA MUNCUL DI MOBILE (Dibawah md) */}
+                                                    
                                                     <div className="md:hidden mt-1.5">
                                                         {athlete.sport ? (
                                                             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
@@ -129,7 +129,7 @@ export default function Index({ athletes, sports, filters }) {
                                             </div>
                                         </td>
 
-                                        {/* SPORT COLUMN: Muncul dari tablet (md) ke atas */}
+                                        
                                         <td className="px-4 md:px-6 py-4 align-middle hidden md:table-cell">
                                             {athlete.sport ? (
                                                 <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
@@ -153,7 +153,7 @@ export default function Index({ athletes, sports, filters }) {
                                         </td>
 
                                         <td className="px-4 md:px-6 py-4 align-middle text-right">
-                                            {/* Action di mobile lebih rapat paddingnya */}
+                                            
                                             <div className="flex items-center justify-end gap-0.5 md:gap-1 md:opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={(e) => { e.stopPropagation(); handleRowClick(athlete.id); }} className="p-1.5 md:p-2 text-slate-400 hover:text-[#ff4d00] hover:bg-orange-50 rounded-lg transition-colors" title="View Detail"><Eye className="w-4 h-4" /></button>
                                                 <button onClick={(e) => openEditModal(e, athlete)} className="p-1.5 md:p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 className="w-4 h-4" /></button>
@@ -179,7 +179,7 @@ export default function Index({ athletes, sports, filters }) {
                     </table>
                 </div>
 
-                {/* --- PAGINATION --- */}
+                
                 <div className="px-4 md:px-6 py-3.5 md:py-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <span className="text-[10px] md:text-xs text-slate-500 font-medium whitespace-nowrap">
                         Showing <strong className="text-slate-700">{athletes.from || 0}</strong> to <strong className="text-slate-700">{athletes.to || 0}</strong> of <strong className="text-slate-700">{athletes.total}</strong>
@@ -203,7 +203,7 @@ export default function Index({ athletes, sports, filters }) {
                 </div>
             </div>
 
-            {/* Render Modal */}
+            
             {isModalOpen && (
                 <AthleteFormModal 
                     athlete={selectedAthlete} 

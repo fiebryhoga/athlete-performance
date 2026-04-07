@@ -21,7 +21,7 @@ class CheckRole
             return redirect('login');
         }
 
-        // Cek apakah role user ada di dalam daftar role yang diizinkan
+        
         if (! in_array($request->user()->role, $roles)) {
             abort(403, 'Akses Ditolak. Anda tidak memiliki izin untuk halaman ini.');
         }

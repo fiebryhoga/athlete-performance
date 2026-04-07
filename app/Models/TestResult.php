@@ -9,16 +9,16 @@ class TestResult extends Model
 {
     use HasFactory;
 
-    // OPSI 1: Izinkan semua kolom (Paling Aman untuk Development)
+    
     protected $guarded = ['id'];
 
-    // ATAU OPSI 2: Daftarkan satu per satu
-    // protected $fillable = [
-    //     'performance_test_id',
-    //     'test_item_id',
-    //     'result', // <--- JANGAN LUPA INI
-    //     'score'
-    // ];
+    
+    
+    
+    
+    
+    
+    
 
     public function performanceTest()
     {

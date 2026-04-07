@@ -85,15 +85,15 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
-            {/* Wrapper Modal Utama - max-height agar bisa di-scroll di HP */}
+            
             <div className="bg-white w-full max-w-6xl rounded-lg shadow-2xl flex flex-col xl:flex-row my-auto max-h-[95vh] xl:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
                 
-                {/* ========================================== */}
-                {/* KIRI: FORMULIR INPUT UTAMA */}
-                {/* ========================================== */}
+                
+                
+                
                 <div className="flex-1 xl:w-7/12 border-b xl:border-b-0 xl:border-r border-slate-200 flex flex-col overflow-y-auto custom-scrollbar">
                     
-                    {/* Header Kiri (Sticky di HP) */}
+                    
                     <div className="sticky top-0 z-20 px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-white shadow-sm">
                         <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
                             <Scale className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/> Record Composition
@@ -103,7 +103,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
 
                     <form onSubmit={submit} className="p-4 md:p-6 sm:p-8 flex-1 flex flex-col bg-white">
                         
-                        {/* Baris 1: Tanggal & Usia */}
+                        
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1">
                                 <label className="text-[10px] font-bold uppercase text-slate-400 mb-1.5 block tracking-widest">Tanggal Tes</label>
@@ -115,7 +115,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         </div>
                         
-                        {/* Baris 2: Berat & Tinggi (Warna Oranye) */}
+                        
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
                                 <label className="text-[10px] font-bold uppercase text-[#ff4d00] mb-1 block tracking-widest">Berat (KG)</label>
@@ -127,7 +127,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         </div>
 
-                        {/* Baris 3: Metrik Detail Grid 2 Kolom (HP) atau 3 Kolom (Tablet/Desktop) */}
+                        
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 border-t border-slate-100 pt-5">
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Bodyfat %</label>
@@ -159,7 +159,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         </div>
 
-                        {/* Tombol Save (Tetap di bawah area Kiri) */}
+                        
                         <div className="pt-6 md:pt-8 mt-auto border-t border-slate-100 hidden xl:block">
                             <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm disabled:opacity-70">
                                 {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
@@ -169,9 +169,9 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                     </form>
                 </div>
 
-                {/* ========================================== */}
-                {/* KANAN: HELPER TOOLS (KALKULATOR ESTIMASI) */}
-                {/* ========================================== */}
+                
+                
+                
                 <div className="xl:w-5/12 bg-slate-50 flex flex-col relative border-t xl:border-t-0 border-slate-200 xl:border-none overflow-y-auto custom-scrollbar">
                     
                     <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-200 bg-slate-50 sticky top-0 z-10 flex justify-between items-center">
@@ -191,9 +191,9 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
 
                     <div className="p-4 md:p-6 flex-1 flex flex-col pb-8">
                         
-                        {/* ------------------------------------------------ */}
-                        {/* TAB 1: BODY FAT NAVY METHOD & VISCERAL */}
-                        {/* ------------------------------------------------ */}
+                        
+                        
+                        
                         {activeTool === 'bodyfat' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
@@ -237,9 +237,9 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         )}
 
-                        {/* ------------------------------------------------ */}
-                        {/* TAB 2: BMR & TOTAL BODY WATER */}
-                        {/* ------------------------------------------------ */}
+                        
+                        
+                        
                         {activeTool === 'bmr' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
@@ -266,9 +266,9 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         )}
 
-                        {/* ------------------------------------------------ */}
-                        {/* TAB 3: OTOT, TULANG & METABOLIC AGE */}
-                        {/* ------------------------------------------------ */}
+                        
+                        
+                        
                         {activeTool === 'mass' && (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="bg-teal-50/50 p-3 md:p-4 rounded-lg border border-teal-100 text-[10px] md:text-xs text-teal-800 font-medium leading-relaxed">
@@ -303,7 +303,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                             </div>
                         )}
 
-                        {/* Tombol Simpan di Mobile (Hanya muncul jika < xl) */}
+                        
                         <div className="xl:hidden mt-auto pt-8">
                             <button 
                                 type="button"

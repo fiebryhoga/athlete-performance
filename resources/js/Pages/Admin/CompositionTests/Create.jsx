@@ -13,7 +13,7 @@ export default function Create({ athletes }) {
         bone_mass: '', visceral_fat: '', bmr: '', total_body_water: ''
     });
 
-    // KETIKA ATLET DIPILIH
+    
     const handleAthleteChange = (e) => {
         const id = e.target.value;
         const athlete = athletes.find(a => String(a.id) === String(id));
@@ -22,13 +22,13 @@ export default function Create({ athletes }) {
         setData(prev => ({
             ...prev,
             user_id: id,
-            age: athlete?.age || '', // Langsung ambil umur dari database
+            age: athlete?.age || '', 
             weight: athlete?.weight || '',
             height: athlete?.height || '' 
         }));
     };
 
-    // KALKULASI OTOMATIS BMI 
+    
     useEffect(() => {
         if (data.weight && data.height && data.height > 0) {
             const bmiValue = (parseFloat(data.weight) / (parseFloat(data.height) * parseFloat(data.height))).toFixed(2);
@@ -38,9 +38,9 @@ export default function Create({ athletes }) {
         }
     }, [data.weight, data.height]);
 
-    // =======================================
-    // LOGIKA RATING
-    // =======================================
+    
+    
+    
     const getBmiRating = (bmi) => {
         if (!bmi) return null;
         if (bmi < 18.5) return { label: 'Underweight', color: 'bg-yellow-100 text-yellow-700' };
@@ -59,7 +59,7 @@ export default function Create({ athletes }) {
 
     const getBodyFatRating = (bf, gender) => {
         if (!bf || !gender) return null;
-        const g = gender.toUpperCase(); // Sesuaikan dengan enum 'L' dan 'P'
+        const g = gender.toUpperCase(); 
         if (g === 'L') {
             if (bf >= 2 && bf <= 5) return { label: 'Esensial', color: 'bg-blue-100 text-blue-700' };
             if (bf <= 13) return { label: 'Atlet', color: 'bg-emerald-100 text-emerald-700' };
@@ -101,7 +101,7 @@ export default function Create({ athletes }) {
                 </div>
 
                 <form onSubmit={submit} className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                    {/* SECTION 1: IDENTITAS */}
+                    
                     <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
                         <div className="flex items-center gap-2 mb-6">
                             <div className="w-8 h-8 rounded-lg bg-blue-100 text-[#00488b] flex items-center justify-center"><UserIcon className="w-4 h-4"/></div>
@@ -145,7 +145,7 @@ export default function Create({ athletes }) {
                         </div>
                     </div>
 
-                    {/* SECTION 2: KOMPOSISI */}
+                    
                     <div className="p-6 md:p-8">
                         <div className="flex items-center gap-2 mb-6">
                             <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"><Activity className="w-4 h-4"/></div>
@@ -153,7 +153,7 @@ export default function Create({ athletes }) {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* BMI Auto Calc */}
+                            
                             <div className="relative">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex justify-between">
                                     <span>BMI (Kg/M2)</span>

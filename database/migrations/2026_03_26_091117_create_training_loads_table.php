@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->date('record_date');
             
-            // -- WELLNESS QUESTIONNAIRE (Skala 1-5) --
+            
             $table->integer('sleep_quality')->nullable();
             $table->integer('fatigue')->nullable();
             $table->integer('muscle_soreness')->nullable();
@@ -22,26 +22,26 @@ return new class extends Migration
             $table->integer('health')->nullable();
             $table->integer('mood')->nullable();
             $table->integer('study_attitude')->nullable();
-            $table->integer('wellness_score')->nullable(); // Total Skor (Maks: 40 per hari)
+            $table->integer('wellness_score')->nullable(); 
 
-            // -- RPE (RATE OF PERCEIVED EXERTION) AM / Pagi --
-            $table->string('am_session_type')->nullable(); // Contoh: Strength UB, Conditioning
-            $table->integer('am_rpe')->nullable(); // Skala 1-10
-            $table->integer('am_duration')->nullable(); // Menit
-            $table->integer('am_load')->nullable(); // RPE x Duration
+            
+            $table->string('am_session_type')->nullable(); 
+            $table->integer('am_rpe')->nullable(); 
+            $table->integer('am_duration')->nullable(); 
+            $table->integer('am_load')->nullable(); 
 
-            // -- RPE (RATE OF PERCEIVED EXERTION) PM / Sore-Malam --
+            
             $table->string('pm_session_type')->nullable();
             $table->integer('pm_rpe')->nullable();
             $table->integer('pm_duration')->nullable();
             $table->integer('pm_load')->nullable();
 
-            // -- TOTAL DAILY LOAD --
-            $table->integer('daily_load')->nullable(); // AM Load + PM Load
+            
+            $table->integer('daily_load')->nullable(); 
 
             $table->timestamps();
 
-            // Memastikan 1 atlet hanya punya 1 data per tanggal
+            
             $table->unique(['user_id', 'record_date']); 
         });
     }

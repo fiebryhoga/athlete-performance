@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Tabel Sports
+        
         Schema::create('sports', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); 
@@ -16,14 +16,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Tabel Categories
+        
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name'); 
             $table->timestamps();
         });
 
-        // 3. Tabel Test Items (LANGSUNG STRUKTUR BARU)
+        
         Schema::create('test_items', function (Blueprint $table) {
             $table->id();
             
@@ -32,20 +32,20 @@ return new class extends Migration
             
             $table->string('name'); 
             
-            // Opsi: reps, points, cm, meter, second, minute, vo2max
+            
             $table->string('parameter_type')->default('points'); 
             
-            $table->string('unit')->nullable(); // Label satuan (misal: "Detik", "Kali")
+            $table->string('unit')->nullable(); 
             
-            // Nilai Benchmark/Target (Decimal agar bisa koma, misal 10.5 detik)
+            
             $table->decimal('target_value', 10, 2)->default(0); 
             
             $table->timestamps();
         });
 
-        // 4. Update Users (Relasi Sport)
+        
         Schema::table('users', function (Blueprint $table) {
-            // Cek dulu agar tidak error jika dijalankan ulang
+            
             if (!Schema::hasColumn('users', 'sport_id')) {
                 $table->foreignId('sport_id')->nullable()->after('role')->constrained('sports')->nullOnDelete();
             }

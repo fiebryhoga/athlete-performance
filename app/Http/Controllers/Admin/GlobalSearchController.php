@@ -16,13 +16,13 @@ class GlobalSearchController extends Controller
             return response()->json([]);
         }
 
-        // Cari Atlet berdasarkan Nama atau ID
+        
         $athletes = User::where('role', 'athlete')
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                   ->orWhere('athlete_id', 'like', "%{$query}%");
             })
-            ->take(5) // Batasi 5 hasil saja biar cepat
+            ->take(5) 
             ->get()
             ->map(function ($athlete) {
                 return [
@@ -30,7 +30,7 @@ class GlobalSearchController extends Controller
                     'title' => $athlete->name,
                     'subtitle' => $athlete->athlete_id . ' • ' . ($athlete->sport->name ?? 'No Sport'),
                     'type' => 'Athlete',
-                    'url' => route('admin.athletes.show', $athlete->id), // Link ke profil
+                    'url' => route('admin.athletes.show', $athlete->id), 
                 ];
             });
 

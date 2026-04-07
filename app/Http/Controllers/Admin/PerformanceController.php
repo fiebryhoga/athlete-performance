@@ -122,7 +122,7 @@ class PerformanceController extends Controller
 
         $performanceTest->load(['athlete.sport', 'results.testItem.category']);
         
-        // PERBAIKAN: Ambil hingga 4 tes sebelumnya
+        
         $previousTests = PerformanceTest::where('user_id', $performanceTest->user_id)
             ->where(function ($query) use ($performanceTest) {
                 $query->where('date', '<', $performanceTest->date)
@@ -134,22 +134,22 @@ class PerformanceController extends Controller
             ->with('results.testItem')
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
-            ->take(4) // Ambil maksimal 4
+            ->take(4) 
             ->get()
-            ->reverse() // Balikkan array agar urutannya dari yang terlama ke yang terbaru
+            ->reverse() 
             ->values();
 
         $currentScore = round($performanceTest->results->avg('score') ?? 0, 2);
 
-        // Buat Label untuk Grafik Bar dari 4 tes sebelumnya
+        
         $historicalLabels = $previousTests->map(function($pt, $index) {
             return [
                 'key' => 'prev_' . $index,
-                'name' => Carbon::parse($pt->date)->format('d M y'), // Label format tanggal
+                'name' => Carbon::parse($pt->date)->format('d M y'), 
             ];
         });
 
-        // Analisis Detail Item
+        
         $itemAnalysis = $performanceTest->results->map(function($res) use ($previousTests) {
             $item = $res->testItem; 
             $rawScore = floatval($res->score);
@@ -165,7 +165,7 @@ class PerformanceController extends Controller
                 'status' => $rawScore >= 80 ? 'Excellent' : ($rawScore >= 60 ? 'Good' : 'Poor')
             ];
 
-            // Masukkan data skor dari maksimal 4 tes sebelumnya ke dalam baris ini
+            
             $prevScoreForGrowth = 0; 
 
             foreach($previousTests as $index => $pt) {
@@ -174,7 +174,7 @@ class PerformanceController extends Controller
                 
                 $data['prev_' . $index] = round($pScore, 2);
                 
-                // Gunakan tes yang Paling Terakhir (index terakhir) untuk perhitungan persentase tabel
+                
                 if ($index === $previousTests->count() - 1) {
                     $prevScoreForGrowth = $pScore;
                 }
@@ -233,7 +233,7 @@ class PerformanceController extends Controller
             'category_analysis' => $categoryAnalysis, 
             'history' => $history ?? [],
             'has_previous' => $previousTests->count() > 0,
-            'historical_labels' => $historicalLabels // Kirim label historical ke React
+            'historical_labels' => $historicalLabels 
         ]);
     }
 

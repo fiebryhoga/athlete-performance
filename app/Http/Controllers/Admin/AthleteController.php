@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Carbon\Carbon; // <-- Pastikan Carbon di-import
+use Carbon\Carbon; 
 
 class AthleteController extends Controller
 {
@@ -130,9 +130,7 @@ class AthleteController extends Controller
         return redirect()->back()->with('message', 'Data atlet berhasil dihapus.');
     }
 
-    /**
-     * Menampilkan detail & statistik atlet (Read Detail)
-     */
+    
     public function show($id)
     {
         $athlete = User::with(['sport', 'performanceTests.results.testItem.category'])->findOrFail($id);
@@ -167,7 +165,7 @@ class AthleteController extends Controller
             
             $latestTest = $tests->last();
             
-            // Ambil hingga 4 tes sebelumnya
+            
             $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
 
             if ($latestTest) {
@@ -178,7 +176,7 @@ class AthleteController extends Controller
                     ? round($previousTests->last()->results->avg('score') ?? 0, 1) 
                     : 0;
 
-                // Label dinamis untuk grafik Bar Chart Multi-Tes
+                
                 if ($previousTests->count() > 0) {
                     $historicalLabels = $previousTests->map(function($pt, $index) {
                         return [
@@ -188,7 +186,7 @@ class AthleteController extends Controller
                     });
                 }
 
-                // Radar & SWOT Logic (Tetap sama)
+                
                 $categoryStats = $allResults->groupBy(function($res) {
                         return $res->testItem->category->name ?? 'Uncategorized';
                     })
@@ -219,7 +217,7 @@ class AthleteController extends Controller
                     return $item['score'] <= 70;
                 })->sortBy('score')->take(3)->values();
 
-                // Comparison Bar Chart (Category Avg)
+                
                 $latestCats = $latestTest->results->groupBy(function($r) {
                     return $r->testItem->category->name ?? 'Uncat';
                 })->map(function($i) { return round($i->avg('score'), 1); });
@@ -241,7 +239,7 @@ class AthleteController extends Controller
                     ];
                 })->values();
 
-                // DETAIL PER ITEM (Multi-Test Bar Chart Data)
+                
                 $itemAnalysis = $latestTest->results->map(function($res) use ($previousTests) {
                     $item = $res->testItem;
                     $rawScore = floatval($res->score);
@@ -265,7 +263,7 @@ class AthleteController extends Controller
                             
                             $data['prev_' . $index] = round($pScore, 1);
                             
-                            // Untuk persentase trend, selalu gunakan tes yang SEBELUM tes terakhir ini
+                            
                             if ($index === $previousTests->count() - 1) {
                                 $prevScoreForGrowth = $pScore;
                             }
@@ -303,7 +301,7 @@ class AthleteController extends Controller
             'strengths' => $strengths,
             'weaknesses' => $weaknesses,
             'has_data' => $hasData,
-            'historical_labels' => $historicalLabels // Kirim label ini ke React
+            'historical_labels' => $historicalLabels 
         ]);
     }
 }

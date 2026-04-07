@@ -103,7 +103,7 @@ class TrainingLogController extends Controller
             'order' => 0
         ]);
 
-        // UBAH MENJADI: Redirect back (kembali ke halaman jadwal) dengan pesan sukses
+        
         return redirect()->back()->with('message', 'Jadwal sesi berhasil ditambahkan!');
     }
 
@@ -142,10 +142,10 @@ class TrainingLogController extends Controller
             ->orderBy('date', 'asc')
             ->first();
 
-        // TAMBAHAN: Gunakan with('exercises') agar log detailnya ikut terambil
+        
         $historySessions = TrainingSession::where('user_id', $trainingSession->user_id)
             ->where('date', '<', $trainingSession->date)
-            ->with('exercises') // <--- BARIS INI DITAMBAHKAN
+            ->with('exercises') 
             ->orderBy('date', 'desc')
             ->take(5)
             ->get();
@@ -163,24 +163,24 @@ class TrainingLogController extends Controller
     {
         $exercises = $request->exercises ?? [];
         
-        // 1. Ambil semua ID gerakan yang dikirim dari Frontend (buang yang null/baru)
+        
         $sentIds = collect($exercises)->pluck('id')->filter()->toArray();
 
-        // 2. Hapus baris di DB yang sudah di-remove oleh user di Frontend
+        
         if (empty($sentIds)) {
-            $trainingSession->exercises()->delete(); // Jika semua baris dihapus
+            $trainingSession->exercises()->delete(); 
         } else {
             $trainingSession->exercises()->whereNotIn('id', $sentIds)->delete();
         }
 
-        // 3. Loop untuk Update baris lama atau Create baris baru
+        
         foreach ($exercises as $index => $exData) {
             $trainingSession->exercises()->updateOrCreate(
-                // Kondisi pencarian (Jika id null, akan otomatis Create)
+                
                 ['id' => $exData['id'] ?? null, 'training_session_id' => $trainingSession->id],
-                // Data yang diisi
+                
                 [
-                    'order' => $index, // Simpan urutannya
+                    'order' => $index, 
                     'exercise_name' => $exData['exercise_name'] ?? null,
                     'set_1_load' => $exData['set_1_load'] ?? null, 'set_1_reps' => $exData['set_1_reps'] ?? null,
                     'set_2_load' => $exData['set_2_load'] ?? null, 'set_2_reps' => $exData['set_2_reps'] ?? null,
@@ -217,7 +217,7 @@ class TrainingLogController extends Controller
         $request->validate(['name' => 'required|string|max:255']);
         Exercise::firstOrCreate(['name' => $request->name]);
 
-        // Kembalikan redirect back agar Inertia tenang
+        
         return redirect()->back();
     }
 
@@ -225,7 +225,7 @@ class TrainingLogController extends Controller
     {
         $request->validate(['name' => 'required|string']);
         
-        // Cari gerakan berdasarkan nama dan hapus
+        
         \App\Models\Exercise::where('name', $request->name)->delete();
 
         return response()->json(['message' => 'Gerakan dihapus dari library']);

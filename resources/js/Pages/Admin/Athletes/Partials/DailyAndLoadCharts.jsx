@@ -11,7 +11,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* TRAINING LOAD CHART */}
+                
                 <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
                     <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-widest">
                         <div className="p-1.5 bg-orange-50 rounded-md text-[#ff4d00]"><Battery className="w-4 h-4" /></div>
@@ -28,7 +28,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                                     <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 'bold' }} iconType="circle" />
                                     
-                                    {/* Bar warna oranye pudar, Garis warna #ff4d00 */}
+                                    
                                     <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="#fed7aa" radius={[4, 4, 0, 0]} barSize={20} />
                                     <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="#ff4d00" strokeWidth={3} dot={{r: 4, fill: '#fff', strokeWidth: 2}} activeDot={{r: 6, strokeWidth: 0, fill: '#ff4d00'}} />
                                 </ComposedChart>
@@ -42,7 +42,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                     </div>
                 </div>
 
-                {/* DAILY METRIC (RECOVERY) CHART */}
+                
                 <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
                     <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-widest">
                         <div className="p-1.5 bg-emerald-50 rounded-md text-emerald-500"><HeartPulse className="w-4 h-4" /></div>

@@ -5,14 +5,14 @@ import { useState } from 'react';
 
 export default function Index({ athletes, filters, benchmarks }) {
     const [search, setSearch] = useState(filters?.search || '');
-    const [activeTab, setActiveTab] = useState('athletes'); // 'athletes' atau 'benchmarks'
+    const [activeTab, setActiveTab] = useState('athletes'); 
 
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.composition-tests.index'), { search }, { preserveState: true, replace: true });
     };
 
-    // Form untuk Benchmark Settings
+    
     const { data: bData, setData: setBData, post, processing } = useForm({
         benchmarks: benchmarks
     });
@@ -37,7 +37,7 @@ export default function Index({ athletes, filters, benchmarks }) {
             <Head title="Body Composition Tests" />
             <div className="max-w-[1200px] mx-auto pb-12">
                 
-                {/* --- HEADER UTAMA --- */}
+                
                 <div className="bg-white p-5 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-5 md:gap-6">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                     <div className="relative z-10">
@@ -56,7 +56,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                     )}
                 </div>
 
-                {/* --- TABS NAVIGATION (Responsif flex-wrap) --- */}
+                
                 <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-6 md:mb-8 bg-slate-100 p-1.5 rounded-lg w-full sm:w-fit">
                     <button onClick={() => setActiveTab('athletes')} className={`flex-1 sm:flex-none justify-center px-4 py-2.5 text-[11px] md:text-xs font-bold uppercase tracking-widest rounded-lg whitespace-nowrap flex items-center gap-2 transition-all ${activeTab === 'athletes' ? 'bg-white text-[#ff4d00] shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>
                         <User className="w-3.5 h-3.5 md:w-4 md:h-4"/> Daftar Klien
@@ -66,9 +66,9 @@ export default function Index({ athletes, filters, benchmarks }) {
                     </button>
                 </div>
 
-                {/* ========================================== */}
-                {/* TAB CONTENT: ATHLETES */}
-                {/* ========================================== */}
+                
+                
+                
                 {activeTab === 'athletes' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 animate-in fade-in duration-300">
                         {athletes.length > 0 ? athletes.map((athlete) => (
@@ -109,9 +109,9 @@ export default function Index({ athletes, filters, benchmarks }) {
                     </div>
                 )}
 
-                {/* ========================================== */}
-                {/* TAB CONTENT: BENCHMARK SETTINGS */}
-                {/* ========================================== */}
+                
+                
+                
                 {activeTab === 'benchmarks' && (
                     <form onSubmit={submitBenchmarks} className="bg-white rounded-lg border border-slate-200 shadow-sm p-4 sm:p-6 md:p-8 animate-in fade-in duration-300">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8 border-b border-slate-100 pb-5 md:pb-6">
@@ -129,9 +129,9 @@ export default function Index({ athletes, filters, benchmarks }) {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                             
-                            {/* KIRI: BMI & VISCERAL */}
+                            
                             <div className="space-y-6">
-                                {/* CARD BMI */}
+                                
                                 <div className="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
                                     <div className="bg-slate-100 px-4 md:px-5 py-3 border-b border-slate-200 flex items-center justify-between">
                                         <h4 className="font-bold text-slate-700 text-xs md:text-sm tracking-wide uppercase">Standar BMI (Kg/M2)</h4>
@@ -157,7 +157,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                     </div>
                                 </div>
 
-                                {/* CARD VISCERAL */}
+                                
                                 <div className="bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
                                     <div className="bg-slate-100 px-4 md:px-5 py-3 border-b border-slate-200 flex items-center justify-between">
                                         <h4 className="font-bold text-slate-700 text-xs md:text-sm tracking-wide uppercase">Visceral Fat Level</h4>
@@ -179,9 +179,9 @@ export default function Index({ athletes, filters, benchmarks }) {
                                 </div>
                             </div>
 
-                            {/* KANAN: BODY FAT MALE & FEMALE */}
+                            
                             <div className="space-y-6">
-                                {/* CARD MALE FAT (Teal) */}
+                                
                                 <div className="bg-teal-50/30 rounded-lg border border-teal-100 overflow-hidden">
                                     <div className="bg-teal-50 px-4 md:px-5 py-3 border-b border-teal-100 flex items-center justify-between">
                                         <h4 className="font-bold text-teal-900 text-xs md:text-sm tracking-wide uppercase">Bodyfat Persentase %</h4>
@@ -207,7 +207,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                     </div>
                                 </div>
 
-                                {/* CARD FEMALE FAT (Rose) */}
+                                
                                 <div className="bg-rose-50/50 rounded-lg border border-rose-100 overflow-hidden">
                                     <div className="bg-rose-100/50 px-4 md:px-5 py-3 border-b border-rose-100 flex items-center justify-between">
                                         <h4 className="font-bold text-rose-900 text-xs md:text-sm tracking-wide uppercase">Bodyfat Persentase %</h4>

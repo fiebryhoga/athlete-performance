@@ -9,7 +9,7 @@ return new class extends Migration
     {
         Schema::create('exercises', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // Nama gerakan harus unik
+            $table->string('name')->unique();
             $table->timestamps();
         });
     }

@@ -9,6 +9,5 @@ class Exercise extends Model
 {
     use HasFactory;
 
-    // Tambahkan baris ini agar nama gerakan bisa disimpan
     protected $guarded = ['id'];
 }

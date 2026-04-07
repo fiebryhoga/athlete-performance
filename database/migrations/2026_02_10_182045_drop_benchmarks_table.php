@@ -13,6 +13,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Kosongkan saja, kita tidak ingin mengembalikan tabel ini
+        
     }
 };

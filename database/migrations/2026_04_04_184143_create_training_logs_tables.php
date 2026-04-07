@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Tabel untuk Sesi Latihan
+        
         Schema::create('training_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Atlet
-            $table->foreignId('coach_id')->nullable()->constrained('users')->onDelete('set null'); // Coach
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('coach_id')->nullable()->constrained('users')->onDelete('set null'); 
             $table->date('date');
-            $table->integer('session_number')->nullable(); // Sesi 1-100
-            $table->string('training_type')->nullable(); // Strength, dll
-            $table->string('location')->nullable(); // Apartemen, Gym
+            $table->integer('session_number')->nullable(); 
+            $table->string('training_type')->nullable(); 
+            $table->string('location')->nullable(); 
             $table->timestamps();
         });
 
-        // Tabel untuk Detail Gerakan (Exercise) di dalam Sesi tersebut
+        
         Schema::create('training_session_exercises', function (Blueprint $table) {
             $table->id();
             $table->foreignId('training_session_id')->constrained()->onDelete('cascade');

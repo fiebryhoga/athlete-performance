@@ -7,7 +7,7 @@ use App\Models\TrainingLoad;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth; // 1. Tambahkan Facade Auth
+use Illuminate\Support\Facades\Auth; 
 
 class TrainingLoadController extends Controller
 {
@@ -18,22 +18,22 @@ class TrainingLoadController extends Controller
     {
         $currentUser = Auth::user();
 
-        // ==========================================================
-        // LOMPATAN KHUSUS ATLET: Langsung ke halamannya sendiri
-        // ==========================================================
+        
+        
+        
         if ($currentUser->role === 'athlete') {
             return redirect()->route('admin.training-loads.show', $currentUser->id);
         }
 
         $query = User::where('role', 'athlete')->with('sport');
 
-        // Tambahan: Fitur Search agar selaras dengan UI terbaru
+        
         if ($request->search) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         $athletes = $query->get()->map(function($user) {
-            // Hitung total hari di mana atlet mengisi Wellness atau RPE
+            
             $user->total_records = TrainingLoad::where('user_id', $user->id)->count();
             return $user;
         });
@@ -51,7 +51,7 @@ class TrainingLoadController extends Controller
     {
         $currentUser = Auth::user();
 
-        // --- PROTEKSI AKSES: Cegah atlet mengintip data atlet lain ---
+        
         if ($currentUser->role === 'athlete' && $user->id !== $currentUser->id) {
             abort(403, 'Akses Ditolak. Anda hanya dapat melihat data Wellness Anda sendiri.');
         }
@@ -75,12 +75,12 @@ class TrainingLoadController extends Controller
     {
         $currentUser = Auth::user();
 
-        // 1. Validasi Input Dasar
+        
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'record_date' => 'required|date',
             
-            // Wellness
+            
             'sleep_quality' => 'nullable|integer|min:0|max:5',
             'fatigue' => 'nullable|integer|min:0|max:5',
             'muscle_soreness' => 'nullable|integer|min:0|max:5',
@@ -90,26 +90,26 @@ class TrainingLoadController extends Controller
             'mood' => 'nullable|integer|min:0|max:5',
             'study_attitude' => 'nullable|integer|min:0|max:5',
             
-            // Sesi AM
+            
             'am_session_type' => 'nullable|string|max:100',
             'am_rpe' => 'nullable|integer|min:0|max:10',
             'am_duration' => 'nullable|integer|min:0',
             
-            // Sesi PM
+            
             'pm_session_type' => 'nullable|string|max:100',
             'pm_rpe' => 'nullable|integer|min:0|max:10',
             'pm_duration' => 'nullable|integer|min:0',
 
-            // Tambahkan validasi notes
+            
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // --- PROTEKSI AKSES: Cegah atlet menginput data atas nama orang lain ---
+        
         if ($currentUser->role === 'athlete' && $validated['user_id'] != $currentUser->id) {
             abort(403, 'Akses Ditolak. Anda hanya dapat mengisi form Wellness untuk diri sendiri.');
         }
 
-        // 2. Kalkulasi Wellness Score
+        
         $wellness_score = 0;
         $wellnessItems = ['sleep_quality', 'fatigue', 'muscle_soreness', 'stress', 'motivation', 'health', 'mood', 'study_attitude'];
         foreach ($wellnessItems as $item) {
@@ -118,7 +118,7 @@ class TrainingLoadController extends Controller
             }
         }
 
-        // 3. Kalkulasi Beban Latihan (Load = RPE x Durasi)
+        
         $am_load = 0;
         if (isset($validated['am_rpe']) && isset($validated['am_duration'])) {
             $am_load = $validated['am_rpe'] * $validated['am_duration'];
@@ -131,7 +131,7 @@ class TrainingLoadController extends Controller
 
         $daily_load = $am_load + $pm_load;
 
-        // 4. Simpan ke Database
+        
         TrainingLoad::updateOrCreate(
             [
                 'user_id' => $validated['user_id'],
@@ -159,7 +159,7 @@ class TrainingLoadController extends Controller
                 'pm_load' => $pm_load,
                 
                 'daily_load' => $daily_load,
-                'notes' => $validated['notes'] ?? null, // <-- Simpan notes di sini
+                'notes' => $validated['notes'] ?? null, 
             ]
         );
 

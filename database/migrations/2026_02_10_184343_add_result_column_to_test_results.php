@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('test_results', function (Blueprint $table) {
-            // Kolom untuk menyimpan nilai asli (detik, meter, reps)
-            // Pakai decimal agar presisi (10 digit total, 2 di belakang koma)
+            
+            
             $table->decimal('result', 10, 2)->nullable()->after('test_item_id');
         });
     }

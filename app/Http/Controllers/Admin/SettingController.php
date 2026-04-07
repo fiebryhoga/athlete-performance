@@ -12,7 +12,7 @@ class SettingController extends Controller
 {
     public function index()
     {
-        // Ambil semua setting dan jadikan key-value array
+        
         $settings = Setting::pluck('value', 'key');
 
         return Inertia::render('Admin/Settings/Index', [
@@ -25,24 +25,24 @@ class SettingController extends Controller
     {
         $request->validate([
             'app_name' => 'required|string|max:50',
-            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048', // Max 2MB
+            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048', 
         ]);
 
-        // 1. Update Nama Aplikasi
+        
         Setting::updateOrCreate(
             ['key' => 'app_name'],
             ['value' => $request->app_name]
         );
 
-        // 2. Update Logo (Jika ada upload baru)
+        
         if ($request->hasFile('app_logo')) {
-            // Hapus logo lama jika ada
+            
             $oldLogo = Setting::where('key', 'app_logo')->value('value');
             if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
                 Storage::disk('public')->delete($oldLogo);
             }
 
-            // Simpan logo baru
+            
             $path = $request->file('app_logo')->store('settings', 'public');
             
             Setting::updateOrCreate(

@@ -13,10 +13,10 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Akun UTAMA (Coach)
+        
         User::create([
             'name' => 'Coach ZK15',
-            'athlete_id' => 'admin', // Login: admin
+            'athlete_id' => 'admin', 
             'role' => 'admin',
             'password' => Hash::make('password'),
             'age' => 35,
@@ -26,7 +26,7 @@ class AdminSeeder extends Seeder
             'sport_category' => 'Head Coach',
         ]);
         
-        // 2. Akun Admin Cadangan (Asisten)
+        
         User::create([
             'name' => 'Asisten Coach',
             'athlete_id' => 'admin2',

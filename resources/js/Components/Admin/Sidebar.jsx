@@ -105,10 +105,10 @@ export default function Sidebar({ className }) {
     return (
         <aside className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white transition-transform duration-300 flex flex-col font-sans ${className}`}>
             
-            {/* --- LOGO AREA (DINAMIS) --- */}
+            
             <div className="flex h-20 items-center border-b border-slate-100 px-6 shrink-0 bg-white">
                 <Link href="/dashboard" className="flex items-center gap-3">
-                    {/* Logo: Cek jika ada di setting, jika tidak pakai default */}
+                    
                     {appSettings.logo ? (
                         <img 
                             src={appSettings.logo} 
@@ -123,7 +123,7 @@ export default function Sidebar({ className }) {
                     )}
                     
                     <div className="overflow-hidden">
-                        {/* Nama Aplikasi Dinamis */}
+                        
                         <h1 className="text-sm font-black text-slate-800 tracking-tight truncate max-w-[140px] leading-tight">
                             {appSettings.name || 'Performance'}
                         </h1>
@@ -132,7 +132,7 @@ export default function Sidebar({ className }) {
                 </Link>
             </div>
 
-            {/* --- MENU ITEMS --- */}
+            
             <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar">
                 
                 <div className="mb-8">
@@ -161,7 +161,7 @@ export default function Sidebar({ className }) {
                                         />
                                         <span className="capitalize">{item.name}</span>
                                         
-                                        {/* Dot Indikator Aktif */}
+                                        
                                         {active && (
                                             <span className="absolute right-4 w-1.5 h-1.5 bg-white/50 rounded-full animate-pulse"></span>
                                         )}
@@ -174,7 +174,7 @@ export default function Sidebar({ className }) {
 
             </div>
 
-            {/* --- BOTTOM SECTION --- */}
+            
             <div className="shrink-0 border-t border-slate-100 p-4 bg-white">
                 <Link
                     href={route('logout')}

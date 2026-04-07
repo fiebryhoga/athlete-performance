@@ -19,24 +19,24 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // ==========================================================
-        // SCENARIO 1: DASHBOARD KHUSUS ATLET
-        // ==========================================================
+        
+        
+        
         if ($user->role === 'athlete') {
             
-            // 1. Load Data User & Tes
+            
             $user->load('sport');
             $tests = PerformanceTest::where('user_id', $user->id)
                 ->with(['results.testItem.category'])
-                ->orderBy('date', 'asc') // Urutkan dari lama ke baru untuk Trend
+                ->orderBy('date', 'asc') 
                 ->get();
 
             $hasData = $tests->count() > 0;
             $latestTest = $tests->last();
 
-            // --- TAMBAHAN BARU: Ambil data Daily Metric & Training Load (30 Hari Terakhir) ---
+            
             $dailyMetrics = \App\Models\DailyMetric::where('user_id', $user->id)
-                ->where('recovery_status', '!=', 'KOSONG') // Hanya ambil hari yang ada datanya
+                ->where('recovery_status', '!=', 'KOSONG') 
                 ->orderBy('record_date', 'asc')
                 ->take(30)
                 ->get()
@@ -58,13 +58,13 @@ class DashboardController extends Controller
                         'wellness' => (float) $load->wellness_score,
                     ];
                 });
-            // -------------------------------------------------------------------
+            
 
-            // 2. Statistik Utama
+            
             $avgScore = $hasData ? round($tests->flatMap(function($test) { return $test->results; })->avg('score'), 1) : 0;
             $maxScore = $hasData ? round($tests->map(function($t) { return $t->results->avg('score'); })->max(), 1) : 0;
             
-            // Cari Kategori Terbaik
+            
             $bestCategory = '-';
             if ($hasData) {
                 $catScores = $tests->flatMap(function ($test) { return $test->results; })
@@ -74,7 +74,7 @@ class DashboardController extends Controller
                 $bestCategory = $catScores->keys()->first() ?? '-';
             }
 
-            // 3. Radar Chart Data
+            
             $radarData = [];
             if ($latestTest) {
                 $radarData = $latestTest->results->groupBy('testItem.category.name')
@@ -83,12 +83,12 @@ class DashboardController extends Controller
                     })->values()->toArray();
             }
 
-            // 4. Trend Data (Grafik Area - 6 Sesi Terakhir)
+            
             $trendData = $tests->take(-6)->map(function ($test) {
                 return [ 'date' => Carbon::parse($test->date)->format('d/m'), 'score' => round($test->results->avg('score'), 1) ?? 0 ];
             })->values();
 
-            // 5. History List (Untuk Tabel)
+            
             $history = $tests->sortByDesc('date')->take(5)->map(function ($test) {
                 $score = $test->results->avg('score') ?? 0;
                 return [
@@ -101,7 +101,7 @@ class DashboardController extends Controller
                 ];
             })->values();
 
-            // Return ke Tampilan Atlet
+            
             return Inertia::render('Athlete/Dashboard', [
                 'user' => $user,
                 'stats' => [
@@ -114,32 +114,32 @@ class DashboardController extends Controller
                 'radarData' => $radarData,
                 'trendData' => $trendData,
                 'history' => $history,
-                // Kirim variabel baru ke React
+                
                 'daily_metrics' => $dailyMetrics, 
                 'training_loads' => $trainingLoads 
             ]);
         }
 
-        // ==========================================================
-        // SCENARIO 2: DASHBOARD ADMIN & COACH (Global Stats)
-        // ==========================================================
         
-        // 1. DATA ATLET
+        
+        
+        
+        
         $athletes = User::where('role', 'athlete')->get();
         
-        // 2. STATISTIK UTAMA
+        
         $totalAtlet = $athletes->count();
         $sesiBulanIni = PerformanceTest::whereMonth('date', Carbon::now()->month)
             ->whereYear('date', Carbon::now()->year)
             ->count();
         $avgSkorGlobal = TestResult::avg('score') ?? 0;
 
-        // 3. STATISTIK FISIK
+        
         $avgAge = $athletes->avg('age') ?? 0;
         $avgHeight = $athletes->avg('height') ?? 0;
         $avgWeight = $athletes->avg('weight') ?? 0;
 
-        // 4. TOP 5 ATHLETES
+        
         $topAthletes = User::where('role', 'athlete')
             ->whereHas('performanceTests.results')
             ->with(['performanceTests.results', 'sport'])
@@ -158,7 +158,7 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
-        // 5. SPORT RANKINGS
+        
         $caborPerformance = Sport::with(['athletes.performanceTests.results'])
             ->get()
             ->map(function ($sport) {
@@ -185,14 +185,14 @@ class DashboardController extends Controller
 
         $caborUnggulan = $caborPerformance->first()['name'] ?? '-';
 
-        // 6. GENDER CHART
+        
         $genderCounts = $athletes->groupBy('gender')->map->count();
         $genderChart = [
             ['name' => 'Male', 'value' => $genderCounts->get('L') ?? 0],
             ['name' => 'Female', 'value' => $genderCounts->get('P') ?? 0]
         ];
 
-        // 7. RECENT ACTIVITY
+        
         $recentActivity = PerformanceTest::with(['athlete.sport', 'results'])
             ->latest('date')
             ->take(5)
@@ -208,8 +208,8 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 8. RADAR GLOBAL (Opsional: Rata-rata global per kategori)
-        // Disini kita hardcode atau hitung query complex jika perlu
+        
+        
         $radarData = [
             ['subject' => 'Strength', 'A' => 70, 'B' => 100],
             ['subject' => 'Speed', 'A' => 65, 'B' => 100],
@@ -217,7 +217,7 @@ class DashboardController extends Controller
             ['subject' => 'Agility', 'A' => 75, 'B' => 100],
         ];
 
-        return Inertia::render('Dashboard', [ // Tampilan Admin
+        return Inertia::render('Dashboard', [ 
             'stats' => [
                 'total_atlet' => $totalAtlet,
                 'sesi_bulan_ini' => $sesiBulanIni,
@@ -239,7 +239,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    // Helper untuk Warna Badge Status
+    
     private function getStatusBadge($score)
     {
         if ($score >= 90) return ['label' => 'Excellent', 'color' => 'bg-emerald-100 text-emerald-700 border-emerald-200'];

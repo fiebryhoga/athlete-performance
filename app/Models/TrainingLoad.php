@@ -33,7 +33,7 @@ class TrainingLoad extends Model
         'notes',
     ];
 
-    // Relasi ke tabel User (Atlet)
+    
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -11,10 +11,7 @@ use Inertia\Inertia;
 
 class AdminManagementController extends Controller
 {
-    /**
-     * Menampilkan daftar admin
-     * INI YANG MENYEBABKAN ERROR JIKA TIDAK ADA
-     */
+    
     public function index(Request $request)
     {
         $admins = User::where('role', 'admin')
@@ -34,9 +31,7 @@ class AdminManagementController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan admin baru
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -55,9 +50,7 @@ class AdminManagementController extends Controller
         return redirect()->back()->with('message', 'Admin baru berhasil ditambahkan.');
     }
 
-    /**
-     * Mengupdate data admin
-     */
+    
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -80,9 +73,7 @@ class AdminManagementController extends Controller
         return redirect()->back()->with('message', 'Data admin diperbarui.');
     }
 
-    /**
-     * Menghapus admin
-     */
+    
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {

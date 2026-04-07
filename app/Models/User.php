@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
-        'profile_photo', // <-- TAMBAHAN BARU
+        'profile_photo', 
         'athlete_id',
         'password',
         'role',
@@ -31,7 +31,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // Mendaftarkan "jalan pintas" URL foto agar selalu terkirim ke React (Inertia)
+    
     protected $appends = [
         'profile_photo_url',
     ];
@@ -44,10 +44,7 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Accessor untuk mendapatkan URL lengkap foto profil.
-     * Jika user belum punya foto, kembalikan nilai null (nanti React akan menampilkan inisial nama).
-     */
+    
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo 

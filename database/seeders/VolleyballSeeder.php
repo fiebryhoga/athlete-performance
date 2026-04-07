@@ -7,8 +7,8 @@ use App\Models\User;
 use App\Models\Sport;
 use App\Models\Category;
 use App\Models\TestItem;
-use App\Models\PerformanceTest; // Tambahan
-use App\Models\TestResult;      // Tambahan
+use App\Models\PerformanceTest; 
+use App\Models\TestResult;      
 use Illuminate\Support\Facades\Hash;
 
 class VolleyballSeeder extends Seeder
@@ -18,9 +18,9 @@ class VolleyballSeeder extends Seeder
      */
     public function run(): void
     {
-        // ==========================================
-        // 1. SETUP CABOR & KATEGORI
-        // ==========================================
+        
+        
+        
         
         $sport = Sport::firstOrCreate(['name' => 'Bola Voli']);
 
@@ -39,9 +39,9 @@ class VolleyballSeeder extends Seeder
             $catIds[$cat] = $created->id; 
         }
 
-        // ==========================================
-        // 2. SEEDING ATLET
-        // ==========================================
+        
+        
+        
         
         $athletes = [
             ['name' => 'Afgan', 'gender' => 'L', 'weight' => 82.95, 'height' => 175],
@@ -70,9 +70,9 @@ class VolleyballSeeder extends Seeder
             );
         }
 
-        // ==========================================
-        // 3. SEEDING ITEM TEST
-        // ==========================================
+        
+        
+        
 
         $tests = [
             ['cat' => 'Strength', 'name' => 'Push Up 60 sec', 'unit' => 'Reps', 'type' => 'reps', 'target' => 55],
@@ -100,12 +100,12 @@ class VolleyballSeeder extends Seeder
             );
         }
 
-        // ==========================================
-        // 4. SEEDING HASIL TEST (DATA RAW)
-        // ==========================================
         
-        // Data diambil manual dari CSV Anda:
-        // Format: [Nama Atlet => [Nama Tes => Nilai Mentah]]
+        
+        
+        
+        
+        
         $resultsData = [
             'Afgan' => [
                 'Push Up 60 sec' => 16,
@@ -172,7 +172,7 @@ class VolleyballSeeder extends Seeder
                 'Vertical Jump' => 43,
                 'Standing Board Jump' => 0
             ],
-            // Untuk Fajar datanya di snippet CSV terpotong, saya isi sebagian yang terlihat
+            
             'Fajar' => [
                 'Push Up 60 sec' => 34,
                 'Sit Up Twist 60 sec' => 33,
@@ -180,7 +180,7 @@ class VolleyballSeeder extends Seeder
                 'Back Up' => 43,
                 'Plank' => 1.25,
                 'VO2MAX' => 0,
-                // Nilai default karena data CSV terpotong di snippet
+                
                 '20 Meter' => 3.19,
                 '30 Meter' => 4.88,
                 'T Test' => 10,
@@ -189,18 +189,18 @@ class VolleyballSeeder extends Seeder
             ],
         ];
 
-        // Loop untuk Simpan Hasil
+        
         foreach ($resultsData as $athleteName => $scores) {
-            // 1. Cari Atlet
+            
             $user = User::where('name', $athleteName)->first();
             
             if (!$user) continue;
 
-            // 2. Buat Sesi Tes (Raport)
+            
             $testSession = PerformanceTest::firstOrCreate(
                 [
                     'user_id' => $user->id,
-                    'date' => '2026-01-10', // Tanggal Tes sesuai data
+                    'date' => '2026-01-10', 
                 ],
                 [
                     'name' => 'Tes Fisik Tahap 1',
@@ -208,14 +208,14 @@ class VolleyballSeeder extends Seeder
                 ]
             );
 
-            // 3. Simpan Nilai per Item
+            
             foreach ($scores as $itemName => $rawResult) {
                 $item = TestItem::where('sport_id', $sport->id)
                                 ->where('name', $itemName)
                                 ->first();
 
                 if ($item) {
-                    // Hitung Score Otomatis menggunakan method di Model
+                    
                     $scorePercent = $item->calculateScore($rawResult);
 
                     TestResult::updateOrCreate(
@@ -224,8 +224,8 @@ class VolleyballSeeder extends Seeder
                             'test_item_id' => $item->id,
                         ],
                         [
-                            'result' => $rawResult,     // Nilai Asli (misal 11)
-                            'score' => $scorePercent,   // Nilai Persen (misal 20.00)
+                            'result' => $rawResult,     
+                            'score' => $scorePercent,   
                         ]
                     );
                 }

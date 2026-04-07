@@ -14,7 +14,7 @@ class DailyMetricVol006Seeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Cari Atlet dengan ID VOL-006
+        
         $athlete = User::where('athlete_id', 'VOL-006')->first();
 
         if (!$athlete) {
@@ -22,7 +22,7 @@ class DailyMetricVol006Seeder extends Seeder
             return;
         }
 
-        // 2. Data 40 hari yang Anda berikan (10 data pertama adalah pengulangan agar pas 40 baris)
+        
         $dataMetrics = [
             ['rhr' => 66, 'spo2' => 98, 'weight' => 70, 'vj' => 35.43],
             ['rhr' => 69, 'spo2' => 98, 'weight' => 70, 'vj' => 44.26],
@@ -34,7 +34,7 @@ class DailyMetricVol006Seeder extends Seeder
             ['rhr' => 79, 'spo2' => 99, 'weight' => 70, 'vj' => 49.05],
             ['rhr' => 82, 'spo2' => 99, 'weight' => 70, 'vj' => 43.58],
             ['rhr' => 89, 'spo2' => 98, 'weight' => 70, 'vj' => 49.05],
-            // Data Asli:
+            
             ['rhr' => 66, 'spo2' => 98, 'weight' => 70, 'vj' => 35.43],
             ['rhr' => 69, 'spo2' => 98, 'weight' => 70, 'vj' => 44.26],
             ['rhr' => 83, 'spo2' => 98, 'weight' => 70, 'vj' => 39.73],
@@ -67,26 +67,26 @@ class DailyMetricVol006Seeder extends Seeder
             ['rhr' => 80, 'spo2' => 99, 'weight' => 70, 'vj' => 64.86],
         ];
 
-        // 3. Set Tanggal Mulai Program (40 Hari yang Lalu)
+        
         $startDate = Carbon::today()->subDays(count($dataMetrics) - 1);
         $athlete->update(['training_start_date' => $startDate->format('Y-m-d')]);
 
-        // Bersihkan data metrik lama untuk VOL-006 (Opsional: agar tidak double/bentrok)
+        
         DailyMetric::where('user_id', $athlete->id)->delete();
 
         $this->command->info("Menanam (seeding) 40 data metrik harian untuk {$athlete->name} (VOL-006)...");
 
-        // 4. Loop & Kalkulasi Data Sama Persis dengan Controller
+        
         foreach ($dataMetrics as $index => $data) {
             $currentDate = clone $startDate;
             $currentDate->addDays($index);
 
-            // Hitung Minggu & Hari ke berapa
+            
             $week = floor($index / 7) + 1;
             $day = ($index % 7) + 1;
             $weekLabel = "Week $week, Day $day";
 
-            // Eksekusi Rumus Matematika
+            
             $age = $athlete->age ?? 20; 
             $hr_max = 208 - (0.7 * $age);
             $hr_ratio = $data['rhr'] > 0 ? ($hr_max / $data['rhr']) : 0;
@@ -104,7 +104,7 @@ class DailyMetricVol006Seeder extends Seeder
                 $recovery_status = 'RECOVERY CUKUP';
             }
 
-            // Simpan Ke Database
+            
             DailyMetric::create([
                 'user_id' => $athlete->id,
                 'record_date' => $currentDate->format('Y-m-d'),

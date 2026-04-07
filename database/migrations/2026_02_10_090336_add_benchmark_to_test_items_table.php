@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
 {
     Schema::table('test_items', function (Blueprint $table) {
-        // Nilai standar/target (0-100)
+        
         $table->integer('benchmark')->default(0)->after('unit');
     });
 }

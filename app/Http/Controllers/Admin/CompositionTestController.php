@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CompositionTestController extends Controller
 {
-    // Data Default Berdasarkan Tabel Standar Excel Anda
+    
     private $defaultBenchmarks = [
         "bmi" => ["underweight" => 18.5, "normal" => 23.0, "overweight" => 25.0, "obesity1" => 30.0],
         "bodyfat_male" => ["essential" => 5, "athlete" => 13, "fitness" => 17, "acceptable" => 24],
@@ -34,7 +34,7 @@ class CompositionTestController extends Controller
     {
         $currentUser = Auth::user();
         
-        // Atlet langsung dilempar ke detail miliknya sendiri
+        
         if ($currentUser->role === 'athlete') {
             return redirect()->route('admin.composition-tests.show', $currentUser->id);
         }
@@ -46,12 +46,12 @@ class CompositionTestController extends Controller
 
         $athletes = $query->get()->map(function($user) {
             $user->total_tests = CompositionTest::where('user_id', $user->id)->count();
-            // Ambil data BMI dan tanggal terakhir tes
+            
             $user->latest_test = CompositionTest::where('user_id', $user->id)->orderBy('date', 'desc')->first();
             return $user;
         });
 
-        // Ambil Data Benchmark dari database (Jika tidak ada, gunakan template default di atas)
+        
         $setting = Setting::where('key', 'composition_benchmarks')->first();
         $benchmarks = $setting ? json_decode($setting->value, true) : $this->defaultBenchmarks;
 
@@ -72,7 +72,7 @@ class CompositionTestController extends Controller
             'benchmarks' => 'required|array'
         ]);
 
-        // Simpan JSON utuh ke dalam tabel Settings
+        
         Setting::updateOrCreate(
             ['key' => 'composition_benchmarks'],
             ['value' => json_encode($request->benchmarks), 'type' => 'json']
@@ -91,12 +91,12 @@ class CompositionTestController extends Controller
 
         $user->load('sport');
         
-        // Ambil riwayat tes
+        
         $history = CompositionTest::where('user_id', $user->id)
             ->orderBy('date', 'desc')
             ->get();
 
-        // Ambil standar benchmark dari settings
+        
         $setting = Setting::where('key', 'composition_benchmarks')->first();
         $benchmarks = $setting ? json_decode($setting->value, true) : $this->defaultBenchmarks;
 
@@ -118,7 +118,7 @@ class CompositionTestController extends Controller
             'age' => 'required|integer',
             'metabolic_age' => 'nullable|integer',
             'weight' => 'required|numeric',
-            'height' => 'required|numeric', // Dalam Meter (misal: 1.75)
+            'height' => 'required|numeric', 
             'body_fat_percentage' => 'nullable|numeric',
             'muscle_mass' => 'nullable|numeric',
             'bone_mass' => 'nullable|numeric',
@@ -127,7 +127,7 @@ class CompositionTestController extends Controller
             'total_body_water' => 'nullable|numeric',
         ]);
 
-        // Kalkulasi BMI Otomatis (Weight / Height^2)
+        
         $height = $validated['height'];
         $weight = $validated['weight'];
         $bmi = ($height > 0) ? round($weight / ($height * $height), 2) : 0;
@@ -160,9 +160,7 @@ class CompositionTestController extends Controller
         return redirect()->back()->with('message', 'Data berhasil diperbarui!');
     }
 
-    /**
-     * Hapus Data Tes
-     */
+    
     public function destroy(CompositionTest $compositionTest)
     {
         $compositionTest->delete();

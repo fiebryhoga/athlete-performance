@@ -11,7 +11,7 @@ class SportSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Definisikan Kategori sesuai "COMPONENT"
+        
         $categories = [
             'Strength',
             'Strength Endurance',
@@ -27,13 +27,13 @@ class SportSeeder extends Seeder
             $catIds[$cat] = $created->id; 
         }
 
-        // 2. Buat Sport (Contoh: Sepak Bola)
+        
         $sport = Sport::firstOrCreate(['name' => 'Sepak Bola']);
 
-        // 3. Masukkan Data Item Test Sesuai Tabel Anda
-        // Format: [Kategori, Nama Tes, Unit, Tipe Parameter, Benchmark/Target]
+        
+        
         $tests = [
-            // --- Strength ---
+            
             [
                 'cat'    => 'Strength',
                 'name'   => 'Push Up 60 sec',
@@ -43,14 +43,14 @@ class SportSeeder extends Seeder
             ],
             [
                 'cat'    => 'Strength',
-                'name'   => 'Sit Up Twist 60 sec', // Typo "Shit up" diperbaiki jadi Sit Up
+                'name'   => 'Sit Up Twist 60 sec', 
                 'unit'   => 'Reps',
                 'type'   => 'reps',
                 'target' => 60
             ],
             [
                 'cat'    => 'Strength',
-                'name'   => 'Squat', // Typo "Squad" diperbaiki jadi Squat
+                'name'   => 'Squat', 
                 'unit'   => 'Reps',
                 'type'   => 'reps',
                 'target' => 50
@@ -63,16 +63,16 @@ class SportSeeder extends Seeder
                 'target' => 60
             ],
 
-            // --- Strength Endurance ---
+            
             [
                 'cat'    => 'Strength Endurance',
                 'name'   => 'Plank',
                 'unit'   => 'Menit',
                 'type'   => 'minute', 
-                'target' => 2.00 // 2 Menit
+                'target' => 2.00 
             ],
 
-            // --- Endurance ---
+            
             [
                 'cat'    => 'Endurance',
                 'name'   => 'VO2MAX',
@@ -81,49 +81,49 @@ class SportSeeder extends Seeder
                 'target' => 52
             ],
 
-            // --- Speed ---
+            
             [
                 'cat'    => 'Speed',
                 'name'   => '20 Meter',
                 'unit'   => 'Sec',
                 'type'   => 'second',
-                'target' => 2.9 // 2.9 Detik
+                'target' => 2.9 
             ],
             [
                 'cat'    => 'Speed',
                 'name'   => '30 Meter',
                 'unit'   => 'Sec',
                 'type'   => 'second',
-                'target' => 4.5 // 4.5 Detik
+                'target' => 4.5 
             ],
 
-            // --- Agility ---
+            
             [
                 'cat'    => 'Agility',
                 'name'   => 'T Test',
                 'unit'   => 'Sec',
                 'type'   => 'second',
-                'target' => 9.5 // 9.5 Detik
+                'target' => 9.5 
             ],
 
-            // --- Power ---
+            
             [
                 'cat'    => 'Power',
                 'name'   => 'Vertical Jump',
                 'unit'   => 'Cm',
                 'type'   => 'cm',
-                'target' => 70 // 70 cm
+                'target' => 70 
             ],
             [
                 'cat'    => 'Power',
                 'name'   => 'Standing Board Jump',
                 'unit'   => 'Cm',
                 'type'   => 'cm',
-                'target' => 245 // 245 cm
+                'target' => 245 
             ],
         ];
 
-        // 4. Loop Insert ke Database
+        
         foreach ($tests as $test) {
             TestItem::create([
                 'sport_id'       => $sport->id,

@@ -13,14 +13,14 @@ class BenchmarkController extends Controller
 {
     public function index()
     {
-        // Ambil Sport beserta nilai benchmark-nya
+        
         $sports = Sport::with(['benchmarks.category'])->get()->map(function ($sport) {
             $avg = $sport->benchmarks->avg('value');
             $sport->overall_benchmark = round($avg ?? 0, 1);
             return $sport;
         });
 
-        // Ambil semua Kategori untuk referensi form di Modal
+        
         $categories = Category::all();
 
         return Inertia::render('Admin/Benchmarks/Index', [
@@ -29,7 +29,7 @@ class BenchmarkController extends Controller
         ]);
     }
 
-    // Method Edit halaman terpisah bisa DIHAPUS karena kita pakai modal
+    
     
     public function update(Request $request, Sport $sport)
     {

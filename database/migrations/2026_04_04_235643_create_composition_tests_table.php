@@ -13,14 +13,14 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             
-            // Metrik Dasar
+            
             $table->integer('age');
             $table->integer('metabolic_age')->nullable();
             $table->decimal('weight', 5, 2)->comment('KG');
             $table->decimal('height', 5, 2)->comment('Meter');
             $table->decimal('bmi', 5, 2)->nullable();
             
-            // Komposisi Detail
+            
             $table->decimal('body_fat_percentage', 5, 2)->nullable();
             $table->decimal('muscle_mass', 5, 2)->nullable();
             $table->decimal('bone_mass', 5, 2)->nullable();

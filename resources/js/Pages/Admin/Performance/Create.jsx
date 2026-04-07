@@ -47,7 +47,7 @@ export default function Create({ athletes }) {
 
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] bg-white">
                 
-                {/* --- LEFT SIDE (THEME ORANGE) --- */}
+                
                 <div className="lg:w-5/12 bg-gradient-to-br from-[#ff4d00] to-[#cc3d00] relative overflow-hidden flex flex-col justify-between p-8 lg:p-12 text-white">
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black/40 to-transparent opacity-50"></div>
@@ -77,7 +77,7 @@ export default function Create({ athletes }) {
                     </div>
                 </div>
 
-                {/* --- RIGHT SIDE (FORM) --- */}
+                
                 <div className="lg:w-7/12 flex flex-col justify-center p-6 lg:p-16 bg-white relative">
                     <div className="max-w-lg mx-auto w-full">
                         
@@ -90,7 +90,7 @@ export default function Create({ athletes }) {
 
                         <form onSubmit={submit} className="space-y-8">
                             
-                            {/* Input Date */}
+                            
                             <div className="space-y-2">
                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Test Date <span className="text-rose-500">*</span></label>
                                 <div className="relative group">
@@ -107,7 +107,7 @@ export default function Create({ athletes }) {
                                 {errors.date && <p className="text-rose-500 text-xs font-bold flex items-center gap-1 mt-1.5 ml-1"><X className="w-3 h-3"/> {errors.date}</p>}
                             </div>
 
-                            {/* Custom Select Athlete */}
+                            
                             <div className="space-y-2 relative" ref={dropdownRef}>
                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Select Athlete <span className="text-rose-500">*</span></label>
                                 
@@ -128,7 +128,7 @@ export default function Create({ athletes }) {
                                     <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                 </div>
 
-                                {/* Dropdown List */}
+                                
                                 {isDropdownOpen && (
                                     <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150 origin-top">
                                         <div className="p-2 border-b border-slate-100 bg-slate-50/50 sticky top-0">
@@ -171,7 +171,7 @@ export default function Create({ athletes }) {
                                 {errors.user_id && <p className="text-rose-500 text-xs font-bold mt-1.5 ml-1 flex items-center gap-1"><X className="w-3 h-3"/> Please select an athlete</p>}
                             </div>
 
-                            {/* Input Session Name */}
+                            
                             <div className="space-y-2 pt-2">
                                 <div className="flex justify-between items-end mb-1.5">
                                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Session Name</label>

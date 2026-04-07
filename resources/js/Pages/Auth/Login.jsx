@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
-    // 1. Get Global Settings (Dynamic Branding)
+    
     const { app_settings } = usePage().props;
     
-    // Default values if settings are missing
+    
     const appName = app_settings?.name || 'Performance Dashboard';
     const appLogo = app_settings?.logo; 
 
@@ -28,27 +28,27 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center font-sans p-6 relative overflow-hidden bg-slate-50">
-            {/* Dynamic Browser Title */}
+            
             <Head title={`Log in - ${appName}`} />
 
-            {/* Background Accent (Soft Blobs) - Menggunakan Tone Orange/Rose */}
+            
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob pointer-events-none"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-rose-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 pointer-events-none"></div>
 
             <div className="w-full max-w-[420px] z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
-                {/* --- HEADER SECTION --- */}
+                
                 <div className="text-center mb-8 flex flex-col justify-center items-center">
                     <div className='flex justify-center items-center mb-5 h-20 w-20'>
                         {appLogo ? (
-                            // Display Uploaded Logo
+                            
                             <img 
                                 src={appLogo} 
                                 alt="App Logo" 
                                 className="w-full h-full object-contain drop-shadow-sm" 
                             />
                         ) : (
-                            // Fallback Initial Logo
+                            
                             <div className="w-16 h-16 bg-[#ff4d00] text-white rounded-lg flex items-center justify-center text-3xl font-black shadow-lg shadow-[#ff4d00]/20">
                                 {appName.charAt(0)}
                             </div>
@@ -62,12 +62,12 @@ export default function Login({ status, canResetPassword }) {
                     </p>
                 </div>
 
-                {/* Main Card */}
+                
                 <div className="bg-white rounded-lg shadow-xl border border-slate-100 p-8 sm:p-10 backdrop-blur-sm relative">
                     
                     <form onSubmit={submit} className="space-y-6">
                         
-                        {/* Input: Athlete ID / Username */}
+                        
                         <div className="space-y-1.5">
                             <label htmlFor="athlete_id" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">
                                 User ID / Athlete
@@ -93,7 +93,7 @@ export default function Login({ status, canResetPassword }) {
                             )}
                         </div>
 
-                        {/* Input: Password */}
+                        
                         <div className="space-y-1.5">
                             <label htmlFor="password" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">
                                 Password
@@ -119,7 +119,7 @@ export default function Login({ status, canResetPassword }) {
                             )}
                         </div>
 
-                        {/* Options */}
+                        
                         <div className="flex items-center justify-between pt-1">
                             <label className="flex items-center cursor-pointer group">
                                 <div className="relative flex items-center">
@@ -135,7 +135,7 @@ export default function Login({ status, canResetPassword }) {
                             </label>
                         </div>
 
-                        {/* Submit Button */}
+                        
                         <button
                             type="submit"
                             disabled={processing}
@@ -152,7 +152,7 @@ export default function Login({ status, canResetPassword }) {
                         </button>
                     </form>
 
-                    {/* Footer Info */}
+                    
                     <div className="mt-8 text-center pt-6 border-t border-slate-100">
                         <p className="text-slate-500 text-xs font-medium leading-relaxed">
                             Contact Admin if you have trouble logging in.
@@ -160,7 +160,7 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </div>
 
-                {/* Footer Branding */}
+                
                 <div className="mt-8 text-center">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-70">
                         {appName} &copy; {new Date().getFullYear()}

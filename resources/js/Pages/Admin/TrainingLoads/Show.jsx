@@ -3,7 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { ActivitySquare } from 'lucide-react';
 
-// Import Partials
+
 import HeaderProfile from './Partials/HeaderProfile';
 import WeeklyGroup from './Partials/WeeklyGroup';
 import TrainingModal from './Partials/TrainingModal';
@@ -70,7 +70,7 @@ export default function Show({ athlete, trainingHistory }) {
         return new Date(dateObj).toLocaleDateString('id-ID', options);
     };
 
-    // Fungsi Pengelompokan Data Mingguan & Kalkulasi ACWR
+    
     const generateWeeklyData = () => {
         if (!activeData || activeData.length === 0) return [];
 
@@ -158,24 +158,24 @@ export default function Show({ athlete, trainingHistory }) {
             currentMonday.setDate(currentMonday.getDate() + 7);
         }
 
-        // =========================================================
-        // KALKULASI ACWR (Acute:Chronic Workload Ratio)
-        // =========================================================
+        
+        
+        
         weeksArray.forEach((week, index) => {
             if (index === 0) {
-                week.metrics.acwr = 0; // Minggu pertama selalu 0
+                week.metrics.acwr = 0; 
             } else {
                 let sumPrevLoad = 0;
                 let countPrevWeeks = 0;
                 
-                // Ambil beban dari maksimal 4 minggu ke belakang
+                
                 for (let j = index - 1; j >= Math.max(0, index - 4); j--) {
                     sumPrevLoad += weeksArray[j].metrics.weeklyLoad;
                     countPrevWeeks++;
                 }
                 
-                // Chronic Load (Rata-rata minggu sebelumnya)
-                // Jika data sudah >= 4 minggu, bagi 4. Jika belum, bagi jumlah minggu yg ada.
+                
+                
                 let chronicLoad = sumPrevLoad / (countPrevWeeks === 4 ? 4 : countPrevWeeks); 
                 
                 week.metrics.acwr = chronicLoad > 0 ? parseFloat((week.metrics.weeklyLoad / chronicLoad).toFixed(2)) : 0;
@@ -187,7 +187,7 @@ export default function Show({ athlete, trainingHistory }) {
 
     const groupedWeeks = generateWeeklyData();
 
-    // Filter Pencarian Tanggal
+    
     const displayedWeeks = searchDate 
         ? groupedWeeks.filter(week => {
             const sDate = new Date(searchDate);
@@ -202,7 +202,7 @@ export default function Show({ athlete, trainingHistory }) {
         <AdminLayout title={`Wellness & Load - ${athlete?.name}`}>
             <Head title={`Wellness & Load - ${athlete?.name}`} />
 
-            <div className="flex flex-col gap-8 mb-12 max-w-7xl mx-auto">
+            <div className="flex flex-col gap-6 md:gap-8 mb-8 md:mb-12 max-w-7xl mx-auto">
                 <HeaderProfile 
                     athlete={athlete} 
                     selectedDate={selectedDate} 
@@ -213,17 +213,20 @@ export default function Show({ athlete, trainingHistory }) {
                 />
 
                 {displayedWeeks.length === 0 ? (
-                    <div className="bg-white p-16 rounded-3xl border border-slate-100 text-center shadow-sm">
-                        <ActivitySquare className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-slate-600">
+                    <div className="bg-white p-8 md:p-16 rounded-3xl border border-slate-100 text-center shadow-sm">
+                        
+                        <div className="p-4 bg-orange-50 rounded-full inline-block mb-4">
+                            <ActivitySquare className="w-12 h-12 text-[#ff4d00]/40" />
+                        </div>
+                        <h3 className="text-lg md:text-xl font-bold text-slate-600">
                             {searchDate ? 'Data Minggu Tidak Ditemukan' : 'Belum Ada Data Load'}
                         </h3>
-                        <p className="text-slate-400 mt-2">
+                        <p className="text-sm md:text-base text-slate-400 mt-2 max-w-md mx-auto">
                             {searchDate ? `Tidak ada aktivitas yang tercatat pada minggu yang mengandung tanggal ${formatDateToIndo(searchDate, 'short')}.` : 'Silakan input data Wellness & RPE pertama Anda.'}
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-10">
+                    <div className="space-y-6 md:space-y-10">
                         {displayedWeeks.map((week, index) => (
                             <WeeklyGroup 
                                 key={index} 
@@ -250,7 +253,8 @@ export default function Show({ athlete, trainingHistory }) {
                 selectedDate={selectedDate} 
                 formatDateToIndo={formatDateToIndo} 
                 sessionTypes={sessionTypes} 
-                rpeOptions={rpeOptions} 
+                rpeOptions={rpeOptions}
+                athleteId={athlete?.id} 
             />
         </AdminLayout>
     );

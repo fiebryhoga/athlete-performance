@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('performance_test_id')->constrained()->cascadeOnDelete();
             $table->foreignId('test_item_id')->constrained()->cascadeOnDelete();
-            $table->integer('score')->default(0); // Nilai 0-100
+            $table->integer('score')->default(0); 
             $table->timestamps();
         });
     }

@@ -6,7 +6,7 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
         const latest = history[0];
         const insights = [];
 
-        // 1. FAT-FREE MASS (FFM)
+        
         if (latest.weight && latest.body_fat_percentage) {
             const ffm = latest.weight - (latest.weight * (latest.body_fat_percentage / 100));
             insights.push({ 
@@ -19,7 +19,7 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             });
         }
 
-        // 2. HYDRATION (Berdasarkan Excel: Pria 50-65, Wanita 45-60)
+        
         if (latest.total_body_water) {
             const isFemale = athlete?.gender === 'P';
             const minTbw = isFemale ? 45 : 50;
@@ -46,7 +46,7 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             }
         }
 
-        // 3. VISCERAL FAT WARNING
+        
         if (latest.visceral_fat) {
             const highLimit = benchmarks?.visceral_fat?.high || 10; 
             if (latest.visceral_fat >= highLimit) {
@@ -61,7 +61,7 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
             }
         }
 
-        // 4. TREND ANALYSIS (Recomposition vs Muscle Loss)
+        
         if (history.length > 1) {
             const prev = history[1];
             if (latest.muscle_mass > prev.muscle_mass && latest.body_fat_percentage < prev.body_fat_percentage) {
@@ -95,7 +95,7 @@ export default function SmartInsights({ history, athlete, benchmarks }) {
     return (
         <div className="bg-white rounded-lg border border-[#BFC9D1]/50 shadow-sm p-5 md:p-8 animate-in fade-in duration-500 relative overflow-hidden">
             
-            {/* Latar Belakang Subtle Glow */}
+            
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#EAEFEF] rounded-full blur-3xl opacity-50 pointer-events-none -mt-10 -mr-10"></div>
 
             <div className="flex items-center gap-3 mb-5 md:mb-6 relative z-10">

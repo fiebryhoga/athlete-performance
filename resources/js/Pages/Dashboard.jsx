@@ -12,17 +12,17 @@ import {
 } from 'recharts';
 
 export default function Dashboard({ auth }) {
-    // 1. SAFE DESTRUCTURING: Beri nilai default kosong {} agar tidak error jika props undefined
+    
     const { 
         stats = {}, 
         charts = { radar: [], gender: [] }, 
         lists = { recent_activity: [], top_athletes: [], cabor_performance: [] } 
     } = usePage().props;
 
-    // Warna Chart (Disesuaikan dengan tema #ff4d00)
-    const GENDER_COLORS = ['#ff4d00', '#ec4899']; // Orange, Pink
     
-    // Helper untuk Trend
+    const GENDER_COLORS = ['#ff4d00', '#ec4899']; 
+    
+    
     const getTrend = (idx) => idx % 2 === 0 ? '+2.4%' : '-1.1%';
     const getTrendColor = (idx) => idx % 2 === 0 ? 'text-emerald-300' : 'text-rose-300';
 
@@ -32,45 +32,61 @@ export default function Dashboard({ auth }) {
 
             <div className="space-y-8 pb-10">
                 
-                {/* 1. HEADER SECTION */}
-                <div className="relative rounded-lg p-6 md:p-8 shadow-sm border border-[#e64500]/20 overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#ff4d00] via-[#e64500] to-[#cc3d00] z-0"></div>
-                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px] z-0 pointer-events-none"></div>
+                
+                <div className="relative rounded-2xl p-8 md:p-10 shadow-xl shadow-[#ff4d00]/10 border border-[#ff4d00]/20 overflow-hidden group">
                     
-                    {/* Glow Effects */}
-                    <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-orange-400/30 rounded-full mix-blend-overlay filter blur-[80px] opacity-40 animate-pulse z-0"></div>
-                    <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] bg-rose-500/30 rounded-full mix-blend-overlay filter blur-[60px] opacity-30 z-0"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#ff4d00] via-[#ff6600] to-[#ff8c00] z-0"></div>
+                    
+                    
+                    <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] z-0 pointer-events-none"></div>
+                    
+                    
+                    <div className="absolute -right-20 -top-20 w-[400px] h-[400px] border-[40px] border-white/5 rounded-full z-0 pointer-events-none"></div>
+                    <div className="absolute right-32 -bottom-24 w-[300px] h-[300px] border-[20px] border-white/5 rounded-full z-0 pointer-events-none"></div>
 
-                    {/* Content */}
+                    
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-400/20 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse z-0 pointer-events-none"></div>
+
+                    
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
                         <div className="max-w-2xl">
-                            <div className="inline-flex items-center gap-2 py-1.5 rounded-full mb-4 shadow-sm">
-                                <Sparkles size={14} className="text-yellow-300 fill-yellow-300" /> 
-                                <span className="text-xs font-bold text-white tracking-wide">Coach Dashboard</span>
+                            
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 mb-5 shadow-sm">
+                                <Sparkles size={14} className="text-yellow-200 fill-yellow-200" /> 
+                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">Coach Area</span>
                             </div>
-                            <h1 className="text-3xl md:text-3xl lg:text-4xl font-black text-white tracking-tight mb-3 drop-shadow-sm">
-                                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-200 to-white">{auth.user.name} 👋</span>
+                            
+                            
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4 drop-shadow-sm leading-tight">
+                                Welcome back, <br className="hidden md:block" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-white">{auth.user.name} 👋</span>
                             </h1>
-                            <p className="text-orange-100/90 text-xs md:text-sm leading-relaxed font-medium">
-                                Here represents the latest performance summary. You currently have <span className="font-bold text-white border-b border-white/30 pb-0.5">{stats?.total_atlet || 0} active athletes</span> ready to reach their peak potential today.
+                            
+                            
+                            <p className="text-orange-100 text-sm leading-relaxed font-medium max-w-lg">
+                                Berikut adalah ringkasan performa terbaru. Anda membina <span className="font-bold text-white border-b border-white/40 pb-0.5">{stats?.total_atlet || 0} atlet aktif</span> yang siap mencapai potensi maksimalnya hari ini.
                             </p>
                         </div>
                         
-                        <div className="w-full md:w-auto flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg shadow-lg hover:bg-white/20 transition-colors cursor-default">
-                            <div className="w-8 h-8 bg-white rounded-lg shadow-inner flex items-center justify-center text-[#ff4d00]">
+                        
+                        <div className="w-full md:w-auto flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-4 rounded-xl shadow-lg hover:bg-white/20 transition-all cursor-default relative overflow-hidden group/date">
+                            
+                            <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-0 group-hover/date:animate-shine"></div>
+                            
+                            <div className="relative z-10 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-[#ff4d00] shrink-0">
                                 <Calendar size={20} strokeWidth={2.5} />
                             </div>
-                            <div className="pr-2">
-                                <p className="text-[10px] text-orange-200 font-bold tracking-wider mb-0.5 uppercase">Today's Date</p>
-                                <p className="text-sm font-bold text-white leading-none">
-                                    {new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            <div className="relative z-10 pr-2">
+                                <p className="text-[10px] text-orange-200 font-bold tracking-wider mb-0.5 uppercase">Tanggal Hari Ini</p>
+                                <p className="text-base font-bold text-white leading-none whitespace-nowrap">
+                                    {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. MAIN STATS */}
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     <StatCard 
                         title="Total Athletes" 
@@ -99,20 +115,20 @@ export default function Dashboard({ auth }) {
                     />
                 </div>
 
-                {/* 3. PHYSICAL STATS */}
+                
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <MiniStatCard label="Average Age" value={stats?.avg_age || 0} unit="Years Old" icon={Timer} />
                     <MiniStatCard label="Average Height" value={stats?.avg_height || 0} unit="Centimeters" icon={Ruler} />
                     <MiniStatCard label="Average Weight" value={stats?.avg_weight || 0} unit="Kilograms" icon={Weight} />
                 </div>
 
-                {/* 4. MIDDLE SECTION: Charts & Lists */}
+                
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    {/* LEFT COLUMN */}
+                    
                     <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                         
-                        {/* Radar Chart */}
+                        
                         <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
                             <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -122,7 +138,7 @@ export default function Dashboard({ auth }) {
                             </div>
                             <div className="p-2 flex-1 min-h-[280px]">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    {/* 2. SAFE CHECK: Pastikan charts.radar ada isinya sebelum render */}
+                                    
                                     {charts?.radar?.length > 0 ? (
                                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={charts.radar}>
                                             <defs>
@@ -146,7 +162,7 @@ export default function Dashboard({ auth }) {
                             </div>
                         </div>
 
-                        {/* Pie Chart */}
+                        
                         <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
                             <div className="p-5 border-b border-slate-100 bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -179,7 +195,7 @@ export default function Dashboard({ auth }) {
                             </div>
                         </div>
 
-                        {/* Recent Activity */}
+                        
                         <div className="bg-white rounded-lg border border-slate-200 shadow-sm md:col-span-2 overflow-hidden">
                             <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -189,7 +205,7 @@ export default function Dashboard({ auth }) {
                             </div>
                             
                             <div className="p-2">
-                                {/* 3. SAFE CHECK: Menggunakan '?.' dan '|| []' untuk mencegah error map */}
+                                
                                 {(lists?.recent_activity?.length || 0) > 0 ? (
                                     <div className="divide-y divide-slate-50">
                                         {lists.recent_activity.slice(0, 3).map((act, idx) => (
@@ -217,15 +233,15 @@ export default function Dashboard({ auth }) {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN */}
+                    
                     <div className="space-y-6">
                         
-                        {/* Top 5 Elite */}
+                        
                         <div className="bg-[#ff4d00] rounded-lg p-6 text-white shadow-lg relative overflow-hidden h-fit">
                              <Trophy size={140} className="absolute -top-4 -right-6 opacity-10 rotate-12" />
                              <h3 className="font-bold text-xl mb-6 relative z-10 border-b border-white/20 pb-4">🏆 Top 5 Elite</h3>
                              <div className="space-y-4 relative z-10">
-                                {/* 4. SAFE CHECK */}
+                                
                                 {(lists?.top_athletes?.length || 0) > 0 ? lists.top_athletes.map((user, idx) => (
                                     <div key={idx} className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition cursor-pointer border border-white/5">
                                         <div className="w-8 h-8 flex items-center justify-center bg-white text-[#ff4d00] font-bold rounded-full mr-3 text-sm shadow-md">{idx + 1}</div>
@@ -242,13 +258,13 @@ export default function Dashboard({ auth }) {
                              </div>
                         </div>
 
-                        {/* Sport Rankings */}
+                        
                         <div className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
                                 <Zap size={16} className="text-amber-500"/> Sport Rankings
                             </h3>
                             <div className="space-y-3">
-                                {/* 5. SAFE CHECK */}
+                                
                                 {(lists?.cabor_performance?.length || 0) > 0 ? lists.cabor_performance.slice(0, 5).map((cabor, idx) => (
                                     <div key={idx} className="group">
                                         <div className="flex justify-between items-end mb-1">
@@ -270,7 +286,7 @@ export default function Dashboard({ auth }) {
     );
 }
 
-// --- HELPER COMPONENTS ---
+
 
 function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
     return (
@@ -278,11 +294,11 @@ function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wide mb-1">{title}</p>
-                    <h3 className={`font-black text-slate-800 ${isText ? 'text-xl mt-1' : 'text-3xl'}`}>
+                    <h3 className={`font-black text-slate-800 ${isText ? 'text-xl mt-1 truncate' : 'text-3xl'}`}>
                         {value}
                     </h3>
                 </div>
-                <div className={`p-3 rounded-lg ${colorClass}`}>
+                <div className={`p-3 rounded-lg ${colorClass} shrink-0`}>
                     <Icon size={20} />
                 </div>
             </div>
@@ -293,14 +309,14 @@ function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
 function MiniStatCard({ label, value, unit, icon: Icon }) {
     return (
         <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4 hover:border-orange-200 transition-colors">
-            <div className="p-3 bg-slate-50 text-slate-600 rounded-lg border border-slate-100">
+            <div className="p-3 bg-slate-50 text-slate-600 rounded-lg border border-slate-100 shrink-0">
                 <Icon size={20} />
             </div>
-            <div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</p>
+            <div className="min-w-0">
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">{label}</p>
                 <div className="flex items-baseline gap-1">
-                    <p className="text-xl font-black text-slate-800">{value}</p>
-                    <span className="text-xs text-slate-400 font-medium">{unit}</span>
+                    <p className="text-xl font-black text-slate-800 truncate">{value}</p>
+                    <span className="text-xs text-slate-400 font-medium truncate">{unit}</span>
                 </div>
             </div>
         </div>

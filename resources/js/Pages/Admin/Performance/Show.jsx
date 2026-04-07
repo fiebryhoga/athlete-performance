@@ -88,10 +88,10 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 }
             `}</style>
 
-            {/* --- ACTION BAR --- */}
+            
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
-                <Link href={route('admin.performance.index')} className="text-slate-400 hover:text-[#ff4d00] flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-widest transition-colors group">
-                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> Back
+                <Link href={route('admin.performance.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors uppercase tracking-widest touch-manipulation py-1">
+                <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" /> Back to History list
                 </Link>
                 <div className="flex w-full sm:w-auto gap-2">
                     {!isAthlete && (
@@ -105,10 +105,10 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 </div>
             </div>
 
-            {/* --- REPORT CONTAINER --- */}
+            
             <div id="report-content" className="bg-white w-full max-w-7xl mx-auto rounded-lg shadow-sm border border-slate-200 p-5 md:p-8 lg:p-12 relative overflow-hidden">
                 
-                {/* 1. HEADER */}
+                
                 <div className="flex flex-col md:flex-row justify-between items-start border-b border-slate-200 pb-6 mb-6 gap-4">
                     <div className="flex items-center gap-4">
                         <img 
@@ -133,7 +133,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
                 </div>
 
-                {/* 2. ATHLETE PROFILE */}
+                
                 <div className="bg-slate-50 rounded-lg p-5 border border-slate-100 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-6">
                         <div className="space-y-1.5">
@@ -163,7 +163,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
                 </div>
 
-                {/* 3. GRAPHS */}
+                
                 <div className="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-6 mb-10" style={{ pageBreakInside: 'avoid' }}>
                     <div className="border border-slate-100 rounded-lg p-5 bg-white shadow-sm">
                         <h3 className="text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-widest flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-slate-400"/> Skill Map</h3>
@@ -202,7 +202,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
                 </div>
 
-                {/* 4. BAR CHART (MULTI-COMPARISON) */}
+                
                 <div className="mb-10 border border-slate-100 rounded-lg p-5 bg-white shadow-sm" style={{ pageBreakInside: 'avoid' }}>
                     <h3 className="text-[10px] font-bold text-slate-500 mb-6 uppercase tracking-widest flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-400"/> Item Comparison (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)</h3>
                     <div className="h-64 w-full">
@@ -214,7 +214,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                 <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
                                 
-                                {/* Loop untuk me-render tes-tes sebelumnya dengan gradasi warna abu */}
+                                
                                 {historical_labels && historical_labels.map((label, index) => {
                                     const colorIndex = 4 - historical_labels.length + index; 
                                     const color = historicalColors[colorIndex] || '#cbd5e1';
@@ -231,14 +231,14 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     );
                                 })}
 
-                                {/* Bar untuk Tes Saat Ini */}
+                                
                                 <Bar name="Current Test" dataKey="score" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={12} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* 5. DETAIL TABLE */}
+                
                 <div className="mb-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full text-sm text-left">
@@ -247,7 +247,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     <th className="px-4 md:px-6 py-4">Test Item</th>
                                     <th className="px-4 md:px-6 py-4 text-center">Result (Raw)</th>
                                     
-                                    {/* Sembunyikan kolom di mobile agar tidak melebar */}
+                                    
                                     <th className="px-4 md:px-6 py-4 text-center hidden sm:table-cell">Unit</th>
                                     <th className="px-4 md:px-6 py-4 text-center hidden md:table-cell">Benchmark</th>
                                     <th className="px-4 md:px-6 py-4 text-center bg-slate-100/50 print:bg-transparent hidden md:table-cell">Prev (%)</th>
@@ -292,7 +292,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     </tr>
                                 ))}
                                 
-                                {/* Baris Total dengan ColSpan Cerdas agar kebal dari kolom yang di-hide */}
+                                
                                 <tr className="bg-orange-50/50 border-t-2 border-slate-200 print:bg-slate-100" style={{ pageBreakInside: 'avoid' }}>
                                     <td colSpan="100%" className="px-4 md:px-6 py-4">
                                         <div className="flex justify-end items-center gap-4">
@@ -306,7 +306,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
                 </div>
 
-                {/* 6. NOTES */}
+                
                 <div className="bg-slate-50 rounded-lg p-5 md:p-6 border border-slate-100 print:bg-transparent print:border-slate-300" style={{ pageBreakInside: 'avoid' }}>
                     <h4 className="text-[10px] md:text-xs font-bold text-[#ff4d00] mb-3 flex items-center gap-2 uppercase tracking-widest">
                         <FileText className="w-4 h-4" /> Coach Notes & Evaluation

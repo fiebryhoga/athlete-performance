@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('performance_tests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Atlet
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); 
             $table->date('date');
-            $table->string('name'); // Nama sesi (e.g. Latihan - 2026-02-10)
-            $table->text('notes')->nullable(); // Catatan Coach
+            $table->string('name'); 
+            $table->text('notes')->nullable(); 
             $table->timestamps();
         });
     }

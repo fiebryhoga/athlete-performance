@@ -21,7 +21,7 @@ export default function Index({ sports }) {
         });
     };
 
-    // --- HANDLE DELETE UPDATE ---
+    
     const handleDelete = (e, sportId, sportName, athleteCount) => {
         e.preventDefault(); 
         e.stopPropagation(); 
@@ -47,9 +47,9 @@ export default function Index({ sports }) {
         <AdminLayout title="Sports Management">
             <Head title="Sports Management" />
 
-            {/* HEADER UTAMA YANG SELARAS DENGAN TEMA BARU */}
+            
             <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                {/* Efek Glow Oranye */}
+                
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                 
                 <div className="relative z-10">
@@ -68,7 +68,7 @@ export default function Index({ sports }) {
                 </button>
             </div>
 
-            {/* KONTEN KARTU CABOR */}
+            
             {sports.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
                     {sports.map((sport) => (
@@ -82,7 +82,7 @@ export default function Index({ sports }) {
                                     <Dumbbell className="w-6 h-6" />
                                 </div>
                                 
-                                {/* ACTION BUTTONS */}
+                                
                                 <div className="flex items-center gap-2">
                                     <button 
                                         onClick={(e) => handleDelete(e, sport.id, sport.name, sport.athletes_count)}
@@ -126,7 +126,7 @@ export default function Index({ sports }) {
                 </div>
             )}
 
-            {/* MODAL TAMBAH CABOR */}
+            
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => { setIsModalOpen(false); reset(); }}></div>

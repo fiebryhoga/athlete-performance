@@ -54,7 +54,7 @@ export default function Create({ athletes }) {
 
                         <form onSubmit={submit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* ATHLETE DROPDOWN */}
+                                
                                 <div className="space-y-2 relative" ref={dropdownRef}>
                                     <label className="block text-sm font-bold text-slate-700">Select Athlete <span className="text-red-500">*</span></label>
                                     <div 
@@ -97,7 +97,7 @@ export default function Create({ athletes }) {
                                     {errors.user_id && <p className="text-red-500 text-xs font-bold">{errors.user_id}</p>}
                                 </div>
 
-                                {/* DATE */}
+                                
                                 <div className="space-y-2">
                                     <label className="block text-sm font-bold text-slate-700">Record Date <span className="text-red-500">*</span></label>
                                     <input 

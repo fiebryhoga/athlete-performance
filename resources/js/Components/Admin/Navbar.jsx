@@ -101,7 +101,7 @@ export default function Navbar({ onMenuClick }) {
                                 
                                 <div className="lg:hidden flex flex-col">
                                     <span className="text-sm font-bold text-slate-800 tracking-tight leading-none">
-                                        {isAthlete ? 'Athlete Panel' : 'Dashboard'}
+                                        {isAthlete ? 'Athlete Panel' : 'Admin Panel'}
                                     </span>
                                     <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 sm:mt-0">Analytics</span>
                                 </div>
@@ -250,9 +250,9 @@ export default function Navbar({ onMenuClick }) {
     );
 }
 
-// ==========================================
-// MODAL EDIT PROFILE (TEMA ORANYE)
-// ==========================================
+
+
+
 function EditProfileModal({ user, isOpen, onClose }) {
     
     const [photoPreview, setPhotoPreview] = useState(user.profile_photo_url || null);
