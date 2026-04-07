@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->date('record_date');
             $table->string('week'); 
-            
-            
+
+            $table->integer('age');
             $table->float('rhr');
             $table->float('spo2');
             $table->float('weight'); 

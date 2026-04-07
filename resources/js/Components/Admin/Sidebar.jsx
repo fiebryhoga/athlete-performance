@@ -42,7 +42,7 @@ export default function Sidebar({ className }) {
         },
         
         { 
-            name: 'athletes data', 
+            name: 'clients data', 
             route: 'admin.athletes.index', 
             checkPath: '/admin/athletes', 
             icon: Users,

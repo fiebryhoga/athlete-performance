@@ -66,4 +66,9 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(TestResult::class, PerformanceTest::class);
     }
+
+    public function galleries()
+    {
+        return $this->hasMany(AthleteGallery::class);
+    }
 }

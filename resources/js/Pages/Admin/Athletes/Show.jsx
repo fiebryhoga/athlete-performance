@@ -1,5 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link } from '@inertiajs/react';
+import AthleteGallery from './Partials/AthleteGallery';
 import { 
     User, Calendar, Activity, Trophy, ArrowLeft, TrendingUp, TrendingDown, 
     Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, Minus, FileText, ChevronRight
@@ -178,6 +179,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                 </div>
 
                 
+
                 {has_data && item_analysis && item_analysis.length > 0 && (
                     <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8 min-w-0 w-full overflow-hidden">
                         <h3 className="text-xs font-bold text-slate-800 mb-4 md:mb-6 flex items-center gap-2 uppercase tracking-widest">
@@ -281,8 +283,12 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     </div>
                 )}
 
-                
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+<AthleteGallery 
+                athlete={athlete} 
+                galleries={athlete.galleries || []} 
+            />
+
+                <div className="bg-white border border-slate-200 mt-6 rounded-2xl overflow-hidden shadow-sm">
                     <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 uppercase tracking-widest">
                             <FileText className="w-4 h-4 text-slate-400" /> 5 Session History Terakhir
@@ -293,6 +299,8 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             </Link>
                         )}
                     </div>
+
+                    
                     
                     
                     <div className="md:hidden flex flex-col gap-0 divide-y divide-slate-100">

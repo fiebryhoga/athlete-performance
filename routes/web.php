@@ -130,6 +130,10 @@ Route::middleware([
         
         Route::post('/admin/composition/benchmarks', [\App\Http\Controllers\Admin\CompositionTestController::class, 'saveBenchmarks'])->name('admin.composition-tests.save-benchmarks');
         Route::get('/admin/composition/{user}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'show'])->name('admin.composition-tests.show');
+
+        Route::post('/admin/athletes/{user}/gallery', [App\Http\Controllers\Admin\AthleteController::class, 'storeGallery'])->name('admin.athletes.gallery.store');
+Route::delete('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'destroyGallery'])->name('admin.athletes.gallery.destroy');
+Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'updateGallery'])->name('admin.athletes.gallery.update');
         
         
     });

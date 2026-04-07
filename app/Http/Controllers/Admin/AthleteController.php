@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Sport;
+use App\Models\AthleteGallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -291,6 +292,10 @@ class AthleteController extends Controller
             ];
         })->values();
 
+        $athlete->load(['galleries' => function($query) {
+            $query->latest(); // Urutkan foto terbaru di atas
+        }]);
+
         return Inertia::render('Admin/Athletes/Show', [
             'athlete' => $athlete,
             'stats' => $stats,
@@ -304,4 +309,52 @@ class AthleteController extends Controller
             'historical_labels' => $historicalLabels 
         ]);
     }
+
+    public function storeGallery(Request $request, User $user)
+    {
+        $request->validate([
+            'photos' => 'required|array',
+            'photos.*.file' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB
+            'photos.*.notes' => 'nullable|string'
+        ]);
+
+        foreach ($request->photos as $photoData) {
+            if (isset($photoData['file'])) {
+                $path = $photoData['file']->store('athlete_galleries', 'public');
+                
+                AthleteGallery::create([
+                    'user_id' => $user->id,
+                    'image_path' => '/storage/' . $path,
+                    'notes' => $photoData['notes'] ?? null
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('message', 'Foto biometrik berhasil ditambahkan!');
+    }
+
+    public function destroyGallery(AthleteGallery $gallery)
+    {
+        // Hapus file fisik dari storage
+        $path = str_replace('/storage/', '', $gallery->image_path);
+        Storage::disk('public')->delete($path);
+        
+        // Hapus dari database
+        $gallery->delete();
+
+        return redirect()->back()->with('message', 'Foto berhasil dihapus.');
+    }
+
+    public function updateGallery(Request $request, \App\Models\AthleteGallery $gallery)
+{
+    $request->validate([
+        'notes' => 'nullable|string'
+    ]);
+
+    $gallery->update([
+        'notes' => $request->notes
+    ]);
+
+    return redirect()->back()->with('message', 'Catatan foto berhasil diperbarui.');
+}
 }

@@ -3,7 +3,6 @@ import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { ActivitySquare } from 'lucide-react';
 
-
 import HeaderProfile from './Partials/HeaderProfile';
 import WeeklyGroup from './Partials/WeeklyGroup';
 import TrainingModal from './Partials/TrainingModal';
@@ -89,13 +88,14 @@ export default function Show({ athlete, trainingHistory }) {
 
         while (currentMonday <= endLimit) {
             const weekDays = [];
-            let weeklyLoad = 0;
-            let weeklyWellnessScore = 0;
             const dailyLoadsForMath = [];
             const frequency = {};
             sessionTypes.forEach(t => frequency[t] = 0);
             
             let totals = { all: 0, physical: 0, skill: 0, matches: 0, travel: 0 };
+            
+            // Variabel penjumlah
+            let weeklyWellnessScore = 0;
 
             for(let i=0; i<7; i++) {
                 const d = new Date(currentMonday);
@@ -107,8 +107,10 @@ export default function Show({ athlete, trainingHistory }) {
                 const dateStr = `${yyyy}-${mm}-${dd}`;
                 
                 const existingRecord = sortedData.find(item => item.record_date === dateStr);
-                const load = existingRecord ? (existingRecord.daily_load || 0) : 0;
-                const wellness = existingRecord ? (existingRecord.wellness_score || 0) : 0;
+                
+                // MENGUBAH STRING MENJADI ANGKA (SOLUSI BUG HOSTING)
+                const load = existingRecord ? Number(existingRecord.daily_load || 0) : 0;
+                const wellness = existingRecord ? Number(existingRecord.wellness_score || 0) : 0;
                 
                 weekDays.push({
                     dateStr, dateObj: d, dayName: d.toLocaleDateString('id-ID', { weekday: 'long' }),
@@ -116,7 +118,6 @@ export default function Show({ athlete, trainingHistory }) {
                 });
                 
                 dailyLoadsForMath.push(load);
-                weeklyLoad += load;
                 weeklyWellnessScore += wellness;
 
                 if (existingRecord) {
@@ -133,6 +134,8 @@ export default function Show({ athlete, trainingHistory }) {
                 }
             }
 
+            // PERHITUNGAN MATEMATIKA YANG SUDAH AMAN (DARI ANGKA)
+            const weeklyLoad = dailyLoadsForMath.reduce((acc, val) => acc + val, 0);
             const meanLoad = weeklyLoad / 7;
             const variance = dailyLoadsForMath.reduce((acc, val) => acc + Math.pow(val - meanLoad, 2), 0) / 6;
             const stdDev = Math.sqrt(variance);
@@ -158,9 +161,7 @@ export default function Show({ athlete, trainingHistory }) {
             currentMonday.setDate(currentMonday.getDate() + 7);
         }
 
-        
-        
-        
+        // Kalkulasi ACWR (Aman karena tipe datanya sudah pasti Number)
         weeksArray.forEach((week, index) => {
             if (index === 0) {
                 week.metrics.acwr = 0; 
@@ -168,16 +169,12 @@ export default function Show({ athlete, trainingHistory }) {
                 let sumPrevLoad = 0;
                 let countPrevWeeks = 0;
                 
-                
                 for (let j = index - 1; j >= Math.max(0, index - 4); j--) {
                     sumPrevLoad += weeksArray[j].metrics.weeklyLoad;
                     countPrevWeeks++;
                 }
                 
-                
-                
                 let chronicLoad = sumPrevLoad / (countPrevWeeks === 4 ? 4 : countPrevWeeks); 
-                
                 week.metrics.acwr = chronicLoad > 0 ? parseFloat((week.metrics.weeklyLoad / chronicLoad).toFixed(2)) : 0;
             }
         });
@@ -187,7 +184,7 @@ export default function Show({ athlete, trainingHistory }) {
 
     const groupedWeeks = generateWeeklyData();
 
-    
+    // Filter pencarian tanggal
     const displayedWeeks = searchDate 
         ? groupedWeeks.filter(week => {
             const sDate = new Date(searchDate);
@@ -213,15 +210,14 @@ export default function Show({ athlete, trainingHistory }) {
                 />
 
                 {displayedWeeks.length === 0 ? (
-                    <div className="bg-white p-8 md:p-16 rounded-3xl border border-slate-100 text-center shadow-sm">
-                        
+                    <div className="bg-white p-8 md:p-16 rounded-lg border border-slate-200 text-center shadow-sm">
                         <div className="p-4 bg-orange-50 rounded-full inline-block mb-4">
-                            <ActivitySquare className="w-12 h-12 text-[#ff4d00]/40" />
+                            <ActivitySquare className="w-12 h-12 text-[#ff4d00]/50" />
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold text-slate-600">
+                        <h3 className="text-lg md:text-xl font-bold text-slate-800 uppercase tracking-widest">
                             {searchDate ? 'Data Minggu Tidak Ditemukan' : 'Belum Ada Data Load'}
                         </h3>
-                        <p className="text-sm md:text-base text-slate-400 mt-2 max-w-md mx-auto">
+                        <p className="text-sm md:text-base text-slate-500 mt-2 max-w-md mx-auto font-medium">
                             {searchDate ? `Tidak ada aktivitas yang tercatat pada minggu yang mengandung tanggal ${formatDateToIndo(searchDate, 'short')}.` : 'Silakan input data Wellness & RPE pertama Anda.'}
                         </p>
                     </div>

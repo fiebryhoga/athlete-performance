@@ -55,9 +55,9 @@ export default function Index({ athletes, sports, filters }) {
                 <div className="relative z-10 w-full lg:w-auto">
                     <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Management</span>
                     <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        <Users className="w-7 h-7 md:w-8 md:h-8 text-[#ff4d00]" /> Athletes Data
+                        <Users className="w-7 h-7 md:w-8 md:h-8 text-[#ff4d00]" /> Clients Data
                     </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Kelola profil atlet, akun, dan metrik fisik.</p>
+                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Kelola profil klien, akun, dan metrik fisik.</p>
                 </div>
 
                 <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
