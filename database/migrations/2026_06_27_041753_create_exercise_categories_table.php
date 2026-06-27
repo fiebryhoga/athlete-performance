@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('training_loads', function (Blueprint $table) {
-            $table->text('notes')->nullable()->after('daily_load');
+        Schema::create('exercise_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('training_loads', function (Blueprint $table) {
-            $table->dropColumn('notes');
-        });
+        Schema::dropIfExists('exercise_categories');
     }
 };

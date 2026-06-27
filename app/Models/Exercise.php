@@ -2,12 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Exercise extends Model
 {
-    use HasFactory;
+    protected $fillable = ['name', 'description', 'images', 'videos', 'exercise_category_id'];
 
-    protected $guarded = ['id'];
+    protected $casts = [
+        'images' => 'array',
+        'videos' => 'array',
+    ];
+
+
+
+    public function category()
+    {
+        return $this->belongsTo(ExerciseCategory::class, 'exercise_category_id');
+    }
+
+    public function packages()
+    {
+        return $this->belongsToMany(ExercisePackage::class);
+    }
 }

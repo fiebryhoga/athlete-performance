@@ -10,7 +10,8 @@ import {
     Activity,
     HeartPulse,
     Dumbbell,
-    Scale
+    Scale,
+    Calendar
 } from 'lucide-react';
 
 export default function Sidebar({ className }) {
@@ -71,18 +72,26 @@ export default function Sidebar({ className }) {
         },
         { 
             name: 'Wellness & Load', 
-            route: 'admin.training-loads.index', 
-            checkPath: '/admin/training-loads', 
+            route: 'admin.wellness-rpe.index', 
+            checkPath: '/admin/wellness-rpe', 
             icon: HeartPulse,
             roles: ['admin', 'coach', 'athlete'] 
         },
         { 
-            name: 'Training Logs', 
-            route: 'admin.training-logs.index', 
-            checkPath: '/admin/training-logs', 
+            name: 'Master Latihan', 
+            route: 'admin.exercises.index', 
+            checkPath: '/admin/exercises', 
             icon: Dumbbell,
+            roles: ['admin', 'coach'] 
+        },
+        { 
+            name: 'Individual Training', 
+            route: 'admin.individual-trainings.index', 
+            checkPath: '/admin/individual-trainings', 
+            icon: Calendar,
             roles: ['admin', 'coach', 'athlete'] 
         },
+
         
         { 
             name: 'admin access', 
