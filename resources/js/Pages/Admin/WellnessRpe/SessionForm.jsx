@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import AdminLayout from "@/Layouts/AdminLayout";
+import AppLayout from "@/Layouts/AppLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
 import {
     ArrowLeft,
@@ -156,18 +156,18 @@ export default function SessionForm({
 
             const baseColor = colors[num];
             if (isSelected) {
-                return `${baseColor} text-white border-transparent shadow-lg transform scale-[1.03] ring-2 ring-offset-2 ring-zinc-400  z-10`;
+                return `${baseColor} text-white border-transparent shadow-lg transform scale-[1.03] ring-2 ring-offset-2 ring-slate-400  z-10`;
             }
             return `${baseColor} text-white/90 border-transparent opacity-70 hover:opacity-100 hover:scale-[1.02]`;
         };
 
         return (
-            <div className="space-y-3 p-5 bg-zinc-50  rounded-xl border border-zinc-100 ">
-                <label className="text-sm font-black text-zinc-900  tracking-tight">
+            <div className="space-y-3 p-5 bg-slate-50  rounded-xl border border-slate-100 ">
+                <label className="text-sm font-black text-slate-900  tracking-tight">
                     {label}
                 </label>
 
-                <div className="flex justify-between text-[11px] font-bold text-zinc-600  mb-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-600  mb-1">
                     <span>{leftLabel}</span>
                     <span>{rightLabel}</span>
                 </div>
@@ -198,7 +198,7 @@ export default function SessionForm({
     };
 
     return (
-        <AdminLayout
+        <AppLayout
             user={auth.user}
             headerTitle="Daily Wellness & RPE"
             headerDescription="Log your daily wellness metrics and session RPE."
@@ -206,7 +206,7 @@ export default function SessionForm({
             <Head title="Daily Wellness & RPE" />
 
             <div className="pb-12 mx-auto space-y-6 relative">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-200  pb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200  pb-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button
                             type="button"
@@ -217,7 +217,7 @@ export default function SessionForm({
                                 }
                                 window.location.href = route("admin.individual-trainings.index");
                             }}
-                            className="flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-zinc-900  transition-colors"
+                            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900  transition-colors"
                         >
                             <ArrowLeft size={16} /> "Back to Programs"
                         </button>
@@ -231,7 +231,7 @@ export default function SessionForm({
                                     }
                                     window.location.href = route("admin.individual-trainings.show", training_id);
                                 }}
-                                className="flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-zinc-900  transition-colors border-l border-zinc-300  pl-4"
+                                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900  transition-colors border-l border-slate-300  pl-4"
                             >
                                 {mode === "wellness" ? (
                                     <>"Program Input" <ArrowRight size={16} /></>
@@ -241,7 +241,7 @@ export default function SessionForm({
                             </button>
                         )}
                     </div>
-                    <div className="text-sm font-black text-zinc-900  bg-white  px-4 py-2 border border-zinc-200  rounded-lg shadow-sm">
+                    <div className="text-sm font-black text-slate-900  bg-white  px-4 py-2 border border-slate-200  rounded-lg shadow-sm">
                         {new Date(date).toLocaleDateString("en-US", {
                             weekday: "long",
                             year: "numeric",
@@ -254,34 +254,34 @@ export default function SessionForm({
                 <form onSubmit={submit} className="space-y-6">
                     {/* WELLNESS SECTION */}
                     {(mode === "all" || mode === "wellness") && (
-                        <div className="bg-white  border border-zinc-200  rounded-2xl shadow-sm overflow-hidden">
+                        <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
                             <div
-                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-zinc-50  hover:bg-zinc-100  transition-colors"
+                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-slate-50  hover:bg-slate-100  transition-colors"
                                 onClick={() =>
                                     setIsWellnessExpanded(!isWellnessExpanded)
                                 }
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-zinc-200  rounded-xl text-zinc-900 ">
+                                    <div className="p-3 bg-slate-200  rounded-xl text-slate-900 ">
                                         <HeartPulse size={24} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-zinc-900  tracking-tight">
+                                        <h2 className="text-xl font-black text-slate-900  tracking-tight">
                                             1. Morning Wellness
                                         </h2>
-                                        <p className="text-sm font-medium text-zinc-500  mt-1">
+                                        <p className="text-sm font-medium text-slate-500  mt-1">
                                             Record your sleep, stress, and
                                             muscle soreness
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-zinc-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-zinc-200  shadow-sm">
+                                <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
                                     {isWellnessExpanded ? "Collapse" : "Expand"}
                                 </div>
                             </div>
 
                             {isWellnessExpanded && (
-                                <div className="p-6 sm:p-8 border-t border-zinc-100  space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                                <div className="p-6 sm:p-8 border-t border-slate-100  space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {renderScaleButtons(
                                             "quality_of_sleep",
@@ -309,21 +309,21 @@ export default function SessionForm({
                                         )}
                                     </div>
 
-                                    <div className="pt-6 border-t border-zinc-100  space-y-6">
-                                        <h3 className="text-lg font-black text-zinc-900 ">
+                                    <div className="pt-6 border-t border-slate-100  space-y-6">
+                                        <h3 className="text-lg font-black text-slate-900 ">
                                             How are you with your Muscle Pain?
                                         </h3>
 
                                         <div className="flex flex-col lg:flex-row gap-8 items-start">
-                                            <div className="w-full lg:w-1/2 rounded-xl overflow-hidden border border-zinc-200  bg-white  p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-center">
+                                            <div className="w-full lg:w-1/2 rounded-xl overflow-hidden border border-slate-200  bg-white  p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-center">
                                                 <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-black text-zinc-400  uppercase tracking-[0.15em] mb-2">"Anterior"</h4>
+                                                    <h4 className="text-[10px] font-black text-slate-400  uppercase tracking-[0.15em] mb-2">"Anterior"</h4>
                                                     <div className="w-full max-w-[180px]">
                                                         <BodyHighlighter type="anterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
                                                     </div>
                                                 </div>
                                                 <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-black text-zinc-400  uppercase tracking-[0.15em] mb-2">"Posterior"</h4>
+                                                    <h4 className="text-[10px] font-black text-slate-400  uppercase tracking-[0.15em] mb-2">"Posterior"</h4>
                                                     <div className="w-full max-w-[180px]">
                                                         <BodyHighlighter type="posterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
                                                     </div>
@@ -331,7 +331,7 @@ export default function SessionForm({
                                             </div>
 
                                             <div className="w-full lg:w-1/2 space-y-4">
-                                                <p className="text-sm font-bold text-zinc-500  mb-2">
+                                                <p className="text-sm font-bold text-slate-500  mb-2">
                                                     Select the specific areas
                                                     where you feel pain or
                                                     discomfort:
@@ -351,8 +351,8 @@ export default function SessionForm({
                                                                     data.muscle_pain_areas.includes(
                                                                         area,
                                                                     )
-                                                                        ? "bg-zinc-900  border-zinc-900  text-white  shadow-sm"
-                                                                        : "bg-zinc-50  border-zinc-200  hover:border-zinc-300  text-zinc-700 "
+                                                                        ? "bg-[#ff4d00] border-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20"
+                                                                        : "bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700"
                                                                 }`}
                                                             >
                                                                 <div
@@ -360,8 +360,8 @@ export default function SessionForm({
                                                                         data.muscle_pain_areas.includes(
                                                                             area,
                                                                         )
-                                                                            ? "bg-white  border-white  text-zinc-900 "
-                                                                            : "bg-white  border-zinc-300 "
+                                                                            ? "bg-white border-white text-[#ff4d00]"
+                                                                            : "bg-white border-slate-300"
                                                                     }`}
                                                                 >
                                                                     {data.muscle_pain_areas.includes(
@@ -386,13 +386,13 @@ export default function SessionForm({
                                                 </div>
 
                                                 <div className="pt-2">
-                                                    <label className="text-xs font-bold text-zinc-700  mb-1 block">
+                                                    <label className="text-xs font-bold text-slate-700  mb-1 block">
                                                         Other Area:
                                                     </label>
                                                     <input
                                                         type="text"
                                                         placeholder="Specify any other pain points..."
-                                                        className="w-full px-4 py-3 bg-zinc-50  border border-zinc-200  rounded-xl text-sm font-medium text-zinc-900  focus:ring-2 focus:ring-zinc-900  outline-none transition-all"
+                                                        className="w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-sm font-medium text-slate-900  focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
                                                         value={data.other_pain}
                                                         onChange={(e) =>
                                                             setData(
@@ -412,38 +412,38 @@ export default function SessionForm({
 
                     {/* RPE SECTION */}
                     {(mode === "all" || mode === "rpe") && (
-                        <div className="bg-white  border border-zinc-200  rounded-2xl shadow-sm overflow-hidden">
+                        <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
                             <div
-                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-zinc-50  hover:bg-zinc-100  transition-colors"
+                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-slate-50  hover:bg-slate-100  transition-colors"
                                 onClick={() => setIsRpeExpanded(!isRpeExpanded)}
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-zinc-200  rounded-xl text-zinc-900 ">
+                                    <div className="p-3 bg-slate-200  rounded-xl text-slate-900 ">
                                         <Activity size={24} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-zinc-900  tracking-tight">
+                                        <h2 className="text-xl font-black text-slate-900  tracking-tight">
                                             2. Training Session RPE
                                         </h2>
-                                        <p className="text-sm font-medium text-zinc-500  mt-1">
+                                        <p className="text-sm font-medium text-slate-500  mt-1">
                                             "Record your training load"
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-zinc-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-zinc-200  shadow-sm">
+                                <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
                                     {isRpeExpanded ? "Collapse" : "Expand"}
                                 </div>
                             </div>
 
                             {isRpeExpanded && (
-                                <div className="p-6 sm:p-8 border-t border-zinc-100  animate-in fade-in slide-in-from-top-4 duration-300">
+                                <div className="p-6 sm:p-8 border-t border-slate-100  animate-in fade-in slide-in-from-top-4 duration-300">
                                     <div className="space-y-6">
                                         {/* Session Type */}
                                         <div className="space-y-3">
-                                            <label className="text-sm font-bold text-zinc-900  uppercase tracking-wider">
+                                            <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
                                                 "Select Training Session"
                                             </label>
-                                            <p className="text-xs font-medium text-zinc-500  mb-3">
+                                            <p className="text-xs font-medium text-slate-500  mb-3">
                                                 Enter your RPE score (0–10) based on how fatigued you feel after the session, then record the training duration in minutes
                                             </p>
                                             <div className="grid grid-cols-2 gap-4">
@@ -452,8 +452,8 @@ export default function SessionForm({
                                                     onClick={() => handleSessionTypeChange("am")}
                                                     className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
                                                         data.session_type === "am"
-                                                            ? "border-zinc-500 bg-zinc-50 text-zinc-700  "
-                                                            : "border-zinc-200  bg-white  text-zinc-500 hover:border-zinc-300 "
+                                                            ? "border-[#ff4d00] bg-orange-50 text-[#ff4d00] "
+                                                            : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
                                                     "AM Session"
@@ -463,8 +463,8 @@ export default function SessionForm({
                                                     onClick={() => handleSessionTypeChange("pm")}
                                                     className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
                                                         data.session_type === "pm"
-                                                            ? "border-zinc-500 bg-zinc-50 text-zinc-700  "
-                                                            : "border-zinc-200  bg-white  text-zinc-500 hover:border-zinc-300 "
+                                                            ? "border-[#ff4d00] bg-orange-50 text-[#ff4d00] "
+                                                            : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
                                                     "PM Session"
@@ -475,14 +475,14 @@ export default function SessionForm({
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             {/* RPE Input */}
                                             <div className="space-y-3">
-                                                <label className="text-sm font-bold text-zinc-900  uppercase tracking-wider">
+                                                <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
                                                     "Session RPE (1-10)"
                                                 </label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                                         <Activity
                                                             size={18}
-                                                            className="text-zinc-400"
+                                                            className="text-slate-400"
                                                         />
                                                     </div>
                                                     <input
@@ -491,23 +491,23 @@ export default function SessionForm({
                                                         max="10"
                                                         value={data.rpe}
                                                         onChange={(e) => setData("rpe", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-zinc-50  border border-zinc-200  rounded-xl text-zinc-900  font-bold focus:ring-2 focus:ring-zinc-900  outline-none transition-all"
+                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
                                                         placeholder="Enter value 1 - 10"
                                                     />
                                                 </div>
-                                                <p className="text-xs font-medium text-zinc-500  mt-2">
+                                                <p className="text-xs font-medium text-slate-500  mt-2">
                                                     "Input the number that best reflects how demanding the entire training session felt to you."
                                                 </p>
 
 
                                                 {/* RPE Scale Information */}
-                                                <div className="mt-4 p-4 bg-zinc-100  border border-zinc-200  rounded-xl space-y-3">
+                                                <div className="mt-4 p-4 bg-slate-100  border border-slate-200  rounded-xl space-y-3">
                                                     <div className="flex items-center justify-between text-xs font-bold">
                                                         <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-zinc-300  text-zinc-800  rounded">
+                                                            <span className="w-12 text-center py-1 bg-slate-300  text-slate-800  rounded">
                                                                 1 - 2
                                                             </span>
-                                                            <span className="text-zinc-600 ">
+                                                            <span className="text-slate-600 ">
                                                                 Very Light
                                                                 Intensity
                                                             </span>
@@ -560,14 +560,14 @@ export default function SessionForm({
 
                                             {/* Duration Input */}
                                             <div className="space-y-3">
-                                                <label className="text-sm font-bold text-zinc-900  uppercase tracking-wider">
+                                                <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
                                                     "Training Duration (Minutes)"
                                                 </label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                                         <Clock
                                                             size={18}
-                                                            className="text-zinc-400"
+                                                            className="text-slate-400"
                                                         />
                                                     </div>
                                                     <input
@@ -575,7 +575,7 @@ export default function SessionForm({
                                                         min="1"
                                                         value={data.duration}
                                                         onChange={(e) => setData("duration", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-zinc-50  border border-zinc-200  rounded-xl text-zinc-900  font-bold focus:ring-2 focus:ring-zinc-900  outline-none transition-all"
+                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
                                                         placeholder="e.g., 60"
                                                     />
                                                 </div>
@@ -601,7 +601,7 @@ export default function SessionForm({
                                 {training_id && (
                                     <Link
                                         href={route("admin.individual-trainings.show", training_id)}
-                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-zinc-900  text-white  hover:bg-zinc-800  hover:scale-105 font-black text-sm transition-all shadow-lg"
+                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105 font-black text-sm transition-all shadow-lg shadow-[#ff4d00]/20"
                                     >
                                         Next: View Program Actuals <ArrowRight size={18} />
                                     </Link>
@@ -616,10 +616,10 @@ export default function SessionForm({
                                         setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
                                     }
                                 }}
-                                className={`rounded-lg flex items-center gap-2 px-8 py-2 rounded-2xl font-black text-sm transition-all shadow-lg ${
+                                className={`w-full py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 ${
                                     isSubmitDisabled 
-                                        ? "bg-zinc-300  text-zinc-500  cursor-not-allowed"
-                                        : "bg-zinc-900  text-white  hover:bg-zinc-800 "
+                                        ? "bg-slate-300  text-slate-500  cursor-not-allowed shadow-none"
+                                        : "bg-[#ff4d00] text-white  hover:bg-[#e64500]"
                                 }`}
                             >
                                 {mode === "rpe" ? (
@@ -648,6 +648,6 @@ export default function SessionForm({
                     background-color: #334155;
                 }
             `}</style>
-        </AdminLayout>
+        </AppLayout>
     );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { User, Activity, Dumbbell, Users, Search, ChevronRight } from 'lucide-react';
 
@@ -7,7 +7,7 @@ export default function Index({ auth, athletes, filters }) {
  const [searchTerm, setSearchTerm] = React.useState(filters.search || '');
 
  return (
- <AdminLayout title="Individual Training">
+ <AppLayout title="Individual Training">
  <Head title="Individual Training" />
  <div className="mb-8">
  <h1 className="text-2xl font-bold text-gray-900 ">Individual Training</h1>
@@ -89,6 +89,6 @@ export default function Index({ auth, athletes, filters }) {
  </div>
  )}
  </div>
- </AdminLayout>
+ </AppLayout>
  );
 }

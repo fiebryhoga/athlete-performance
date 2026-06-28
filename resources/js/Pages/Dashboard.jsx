@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, usePage } from '@inertiajs/react';
 import { 
     Users, Activity, Trophy, TrendingUp, Calendar, 
@@ -27,7 +27,7 @@ export default function Dashboard({ auth }) {
     const getTrendColor = (idx) => idx % 2 === 0 ? 'text-emerald-300' : 'text-rose-300';
 
     return (
-        <AdminLayout title="Dashboard">
+        <AppLayout title="Dashboard">
             <Head title="Performance Overview" />
 
             <div className="space-y-8 pb-10">
@@ -282,7 +282,7 @@ export default function Dashboard({ auth }) {
                 </div>
 
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }
 

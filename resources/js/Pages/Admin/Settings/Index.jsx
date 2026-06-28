@@ -1,7 +1,8 @@
-import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, useForm } from '@inertiajs/react';
-import { Save, Upload, Settings, UploadCloud, MonitorSmartphone } from 'lucide-react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Settings, Save, Upload, UploadCloud, MonitorSmartphone, X, Image as ImageIcon, CheckCircle } from 'lucide-react';
 import { useState, useRef } from 'react';
+import PageHeader from '@/Components/Layout/PageHeader';
 
 export default function Index({ app_name, app_logo }) {
     const { data, setData, post, processing, errors, progress } = useForm({
@@ -29,24 +30,18 @@ export default function Index({ app_name, app_logo }) {
     };
 
     return (
-        <AdminLayout title="Application Settings">
+        <AppLayout title="Application Settings">
             <Head title="Settings" />
 
             
             <div className="w-full max-w-[1400px] mx-auto pb-12">
                 
-                
-                <div className="bg-white p-5 md:p-8 rounded-xl border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
-                    
-                    <div className="relative z-10 w-full">
-                        <span className="text-[9px] md:text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full uppercase tracking-widest mb-2 md:mb-3 inline-block border border-slate-200">System Configuration</span>
-                        <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                            <Settings className="w-6 h-6 md:w-8 md:h-8 text-slate-700" /> Application Settings
-                        </h2>
-                        <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Ubah nama dan logo identitas aplikasi yang akan ditampilkan di seluruh sistem.</p>
-                    </div>
-                </div>
+                <PageHeader 
+                    title="Application Settings"
+                    subtitle="Ubah nama dan logo identitas aplikasi yang akan ditampilkan di seluruh sistem."
+                    badge="System Configuration"
+                    icon={Settings}
+                />
 
                 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-300">
@@ -149,6 +144,6 @@ export default function Index({ app_name, app_logo }) {
                     </form>
                 </div>
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

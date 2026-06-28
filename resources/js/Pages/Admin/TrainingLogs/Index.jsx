@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { Plus, X, MapPin, Edit3, User, Dumbbell, ChevronLeft, ChevronRight, Pencil, Trash2, CalendarDays, ChevronDown, Activity, AlertTriangle, Info } from 'lucide-react';
 import { useState, useEffect, useRef, Fragment } from 'react';
@@ -144,7 +144,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
     const coachOptions = [{ value: '', label: '-- Latihan Mandiri (Tanpa Coach) --' }, ...coaches.map(c => ({ value: c.id, label: c.name }))];
 
     return (
-        <AdminLayout title="Jadwal & Log Latihan">
+        <AppLayout title="Jadwal & Log Latihan">
             <Head title="Jadwal & Log Latihan" />
             
             <div className="w-full max-w-[1400px] mx-auto pb-20">
@@ -506,6 +506,6 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                 </div>
             )}
 
-        </AdminLayout>
+        </AppLayout>
     );
 }

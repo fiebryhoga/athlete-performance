@@ -43,7 +43,7 @@ const STICKY_COLS = {
 export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
     
     const rowStyle =
-        "bg-white  group-hover:bg-zinc-50/80  transition-colors duration-200";
+        "bg-white  group-hover:bg-slate-50/80  transition-colors duration-200";
     const wellnessCols = [
         "quality_of_sleep",
         "fatigue",
@@ -110,14 +110,14 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
         (athlete.baseWeeklyWellness || 0) + dailyWellnessScore;
 
     const getDailyLoadTextClass = (val) => {
-        if (!val || val === 0) return "text-zinc-800 ";
+        if (!val || val === 0) return "text-slate-800 ";
         if (val < 1500) return "text-emerald-600 ";
         if (val <= 3000) return "text-amber-500 ";
         return "text-red-600 ";
     };
 
     const getDailyWellnessTextClass = (val) => {
-        if (!val || val === 0) return "text-zinc-400 ";
+        if (!val || val === 0) return "text-slate-400 ";
         if (val >= 4 && val <= 7) return "text-blue-600 ";
         if (val >= 8 && val <= 10)
             return "text-emerald-600 ";
@@ -128,11 +128,11 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
         if (val >= 20 && val <= 22)
             return "text-orange-500 ";
         if (val >= 23 && val <= 28) return "text-red-600 ";
-        return "text-zinc-900 ";
+        return "text-slate-900 ";
     };
 
     const getWeeklyWellnessTextClass = (val) => {
-        if (!val || val === 0) return "text-zinc-400 ";
+        if (!val || val === 0) return "text-slate-400 ";
         if (val >= 28 && val <= 51) return "text-blue-600 ";
         if (val >= 52 && val <= 75)
             return "text-emerald-600 ";
@@ -144,7 +144,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
         if (val >= 148 && val <= 171)
             return "text-orange-500 ";
         if (val >= 172 && val <= 196) return "text-red-600 ";
-        return "text-zinc-900 ";
+        return "text-slate-900 ";
     };
 
     const getDailyWellnessText = (val) => {
@@ -188,38 +188,38 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
             onDragStart={(e) => actions.handleDragStart(e, athlete.id)}
             onDragOver={actions.handleDragOver}
             onDrop={(e) => actions.handleDrop(e, athlete.id)}
-            className="group cursor-move hover:bg-zinc-50 "
+            className="group cursor-move hover:bg-slate-50 "
         >
             {/* STICKY COLUMNS */}
             <td
                 style={STICKY_COLS.drag}
-                className={`p-1.5 cursor-grab active:cursor-grabbing sticky z-20 border-r border-zinc-100  text-center text-zinc-300  group-hover:text-zinc-500 transition-colors ${rowStyle}`}
+                className={`p-1.5 cursor-grab active:cursor-grabbing sticky z-20 border-r border-slate-100  text-center text-slate-300  group-hover:text-slate-500 transition-colors ${rowStyle}`}
             >
                 <GripVertical size={14} className="mx-auto" />
             </td>
             <td
                 style={STICKY_COLS.c1}
-                className={`p-1.5 font-bold text-[11px] text-zinc-400  border-r border-zinc-100  sticky z-20 text-center ${rowStyle}`}
+                className={`p-1.5 font-bold text-[11px] text-slate-400  border-r border-slate-100  sticky z-20 text-center ${rowStyle}`}
             >
                 {visibleIdx + 1}
             </td>
             <td
                 style={STICKY_COLS.c2}
-                className={`p-1.5 sticky z-20 border-r border-zinc-100  text-center ${rowStyle}`}
+                className={`p-1.5 sticky z-20 border-r border-slate-100  text-center ${rowStyle}`}
             >
-                <span className="px-1.5 py-0.5 rounded border text-[9px] font-black border-zinc-200  text-zinc-500  bg-zinc-50 ">
+                <span className="px-1.5 py-0.5 rounded border text-[9px] font-black border-slate-200  text-slate-500  bg-slate-50 ">
                     {athlete.position}
                 </span>
             </td>
             <td
                 style={STICKY_COLS.c3}
-                className={`p-1.5 font-mono font-bold text-[10px] text-zinc-500 border-r border-zinc-100  sticky z-20 text-center ${rowStyle}`}
+                className={`p-1.5 font-mono font-bold text-[10px] text-slate-500 border-r border-slate-100  sticky z-20 text-center ${rowStyle}`}
             >
                 {String(athlete.position_number || 0).padStart(2, "0")}
             </td>
             <td
                 style={STICKY_COLS.c4}
-                className={`p-1.5 font-bold text-[11px] text-zinc-900  sticky z-20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] border-r border-zinc-200  ${rowStyle}`}
+                className={`p-1.5 font-bold text-[11px] text-slate-900  sticky z-20 shadow-[4px_0_12px_rgba(0,0,0,0.04)] border-r border-slate-200  ${rowStyle}`}
             >
                 <div
                     style={{ width: "164px" }}
@@ -249,7 +249,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                 return (
                     <td
                         key={col}
-                        className={`p-1 border-l border-zinc-100  relative transition-colors ${isError ? "bg-red-50 " : ""}`}
+                        className={`p-1 border-l border-slate-100  relative transition-colors ${isError ? "bg-red-50 " : ""}`}
                     >
                         <input
                             type="text"
@@ -267,7 +267,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                             onPaste={(e) =>
                                 actions.handleLocalPaste(e, visibleIdx, col)
                             }
-                            className={`w-full bg-transparent border-none rounded-md text-[11px] py-1 px-1 text-center font-bold tabular-nums transition-all outline-none focus:ring-1 focus:ring-zinc-500  ${isError ? "text-red-600 " : "text-zinc-900 "}
+                            className={`w-full bg-transparent border-none rounded-md text-[11px] py-1 px-1 text-center font-bold tabular-nums transition-all outline-none focus:ring-1 focus:ring-slate-500  ${isError ? "text-red-600 " : "text-slate-900 "}
  `}
                             placeholder="-"
                         />
@@ -277,7 +277,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
 
             {/* SESI AM */}
             <td
-                className={`p-1 border-l border-zinc-200  transition-colors ${isAmRpeError ? "bg-red-50 " : "bg-zinc-50/50 "}`}
+                className={`p-1 border-l border-slate-200  transition-colors ${isAmRpeError ? "bg-red-50 " : "bg-slate-50/50 "}`}
             >
                 <input
                     type="text"
@@ -295,11 +295,11 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                     onPaste={(e) =>
                         actions.handleLocalPaste(e, visibleIdx, "am_rpe")
                     }
-                    className={`w-full bg-transparent border-none rounded-md text-[11px] py-1 px-1 text-center font-bold outline-none focus:ring-1 focus:ring-zinc-500 transition-colors ${isAmRpeError ? "text-red-600 " : "text-zinc-900 "}`}
+                    className={`w-full bg-transparent border-none rounded-md text-[11px] py-1 px-1 text-center font-bold outline-none focus:ring-1 focus:ring-slate-500 transition-colors ${isAmRpeError ? "text-red-600 " : "text-slate-900 "}`}
                     placeholder="-"
                 />
             </td>
-            <td className="p-1 border-l border-zinc-100  bg-zinc-50/50 ">
+            <td className="p-1 border-l border-slate-100  bg-slate-50/50 ">
                 <input
                     type="text"
                     value={athlete.metrics?.am_duration ?? ""}
@@ -316,19 +316,19 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                     onPaste={(e) =>
                         actions.handleLocalPaste(e, visibleIdx, "am_duration")
                     }
-                    className="w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none text-zinc-900  focus:ring-1 focus:ring-zinc-500"
+                    className="w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none text-slate-900  focus:ring-1 focus:ring-slate-500"
                     placeholder="-"
                 />
             </td>
-            <td className="p-1 border-l border-zinc-100  bg-zinc-100/50 ">
-                <div className="w-full text-[11px] py-1 px-1 text-center font-bold tabular-nums text-zinc-400  cursor-not-allowed">
+            <td className="p-1 border-l border-slate-100  bg-slate-100/50 ">
+                <div className="w-full text-[11px] py-1 px-1 text-center font-bold tabular-nums text-slate-400  cursor-not-allowed">
                     {amLoad > 0 ? amLoad.toFixed(1) : "-"}
                 </div>
             </td>
 
             {/* SESI PM */}
             <td
-                className={`p-1 border-l border-zinc-200  transition-colors ${isPmRpeError ? "bg-red-50 " : "bg-zinc-50/50 "}`}
+                className={`p-1 border-l border-slate-200  transition-colors ${isPmRpeError ? "bg-red-50 " : "bg-slate-50/50 "}`}
             >
                 <input
                     type="text"
@@ -346,11 +346,11 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                     onPaste={(e) =>
                         actions.handleLocalPaste(e, visibleIdx, "pm_rpe")
                     }
-                    className={`w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none focus:ring-1 focus:ring-zinc-500 transition-colors ${isPmRpeError ? "text-red-600 " : "text-zinc-900 "}`}
+                    className={`w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none focus:ring-1 focus:ring-slate-500 transition-colors ${isPmRpeError ? "text-red-600 " : "text-slate-900 "}`}
                     placeholder="-"
                 />
             </td>
-            <td className="p-1 border-l border-zinc-100  bg-zinc-50/50 ">
+            <td className="p-1 border-l border-slate-100  bg-slate-50/50 ">
                 <input
                     type="text"
                     value={athlete.metrics?.pm_duration ?? ""}
@@ -367,18 +367,18 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                     onPaste={(e) =>
                         actions.handleLocalPaste(e, visibleIdx, "pm_duration")
                     }
-                    className="w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none text-zinc-900  focus:ring-1 focus:ring-zinc-500"
+                    className="w-full bg-transparent rounded-md border-none text-[11px] py-1 px-1 text-center font-bold outline-none text-slate-900  focus:ring-1 focus:ring-slate-500"
                     placeholder="-"
                 />
             </td>
-            <td className="p-1 border-l border-zinc-100  bg-zinc-100/50 ">
-                <div className="w-full text-[11px] py-1 px-1 text-center font-bold tabular-nums text-zinc-400  cursor-not-allowed">
+            <td className="p-1 border-l border-slate-100  bg-slate-100/50 ">
+                <div className="w-full text-[11px] py-1 px-1 text-center font-bold tabular-nums text-slate-400  cursor-not-allowed">
                     {pmLoad > 0 ? pmLoad.toFixed(1) : "-"}
                 </div>
             </td>
 
             {/* TOTAL */}
-            <td className="p-1 border-l-2 border-zinc-300  bg-zinc-100/50 ">
+            <td className="p-1 border-l-2 border-slate-300  bg-slate-100/50 ">
                 <div
                     className={`w-full text-[12px] py-1 px-1 text-center font-black tabular-nums ${getDailyLoadTextClass(dailyLoad)}`}
                 >
@@ -386,7 +386,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                 </div>
             </td>
 
-            <td className="p-1 border-l border-zinc-200  bg-zinc-200/50 ">
+            <td className="p-1 border-l border-slate-200  bg-slate-200/50 ">
                 <div className="flex flex-col items-center justify-center py-1">
                     <div
                         className={`w-full text-[12px] px-1 text-center font-black tabular-nums ${getDailyWellnessTextClass(dailyWellnessScore)}`}
@@ -403,7 +403,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                 </div>
             </td>
 
-            <td className="p-1 border-l border-zinc-200  bg-zinc-300/50 ">
+            <td className="p-1 border-l border-slate-200  bg-slate-300/50 ">
                 <div className="flex flex-col items-center justify-center py-1">
                     <div
                         className={`w-full text-[12px] px-1 text-center font-black tabular-nums ${getWeeklyWellnessTextClass(currentWeeklyWellness)}`}
@@ -423,7 +423,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
             </td>
 
             {/* CATATAN */}
-            <td className="p-1 border-l border-zinc-200  bg-white ">
+            <td className="p-1 border-l border-slate-200  bg-white ">
                 <input
                     type="text"
                     value={athlete.metrics?.notes ?? ""}
@@ -437,17 +437,17 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                             e.target.value,
                         )
                     }
-                    className="w-full bg-transparent border-none text-[11px] py-1 px-2 rounded-md font-medium outline-none text-zinc-900  focus:ring-1 focus:ring-zinc-500 placeholder-zinc-300 "
+                    className="w-full bg-transparent border-none text-[11px] py-1 px-2 rounded-md font-medium outline-none text-slate-900  focus:ring-1 focus:ring-slate-500 placeholder-zinc-300 "
                     placeholder="Write notes..."
                 />
             </td>
 
             {/* ACTION RETURN */}
-            <td className="p-1 border-l border-zinc-200  bg-zinc-50 ">
+            <td className="p-1 border-l border-slate-200  bg-slate-50 ">
                 <button
                     type="button"
                     onClick={() => actions.removeAthlete(athlete)}
-                    className="w-full flex justify-center text-zinc-300 hover:text-zinc-800 transition-colors"
+                    className="w-full flex justify-center text-slate-300 hover:text-slate-800 transition-colors"
                     title="Remove from table"
                 >
                     <X size={14} strokeWidth={3} />

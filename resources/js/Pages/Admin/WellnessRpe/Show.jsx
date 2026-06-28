@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { Head, Link, router, useRemember, usePage } from "@inertiajs/react";
-import AdminLayout from "@/Layouts/AdminLayout";
+import AppLayout from "@/Layouts/AppLayout";
 import {
     ArrowLeft,
     Save,
@@ -323,7 +323,7 @@ export default function WellnessRpeShow({
     };
 
     return (
-        <AdminLayout
+        <AppLayout
             user={auth.user}
             headerTitle="Wellness & RPE Detail"
             headerDescription="Log athlete metrics or monitor weekly reports."
@@ -335,18 +335,18 @@ export default function WellnessRpeShow({
                     <div className="flex items-center gap-3">
                         <Link
                             href={route("admin.wellness-rpe.index")}
-                            className="p-2 border border-zinc-200  bg-white  rounded-lg hover:bg-zinc-50  transition-colors"
+                            className="p-2 border border-slate-200  bg-white  rounded-lg hover:bg-slate-50  transition-colors"
                         >
                             <ArrowLeft
                                 size={16}
-                                className="text-zinc-600 "
+                                className="text-slate-600 "
                             />
                         </Link>
                         <div>
-                            <h2 className="text-lg font-black text-zinc-900 ">
+                            <h2 className="text-lg font-black text-slate-900 ">
                                 {formattedDate}
                             </h2>
-                            <p className="text-xs text-zinc-500 font-medium">
+                            <p className="text-xs text-slate-500 font-medium">
                                 {weeklyData ? `Weekly Report: ${weeklyData.start_of_week} to ${weeklyData.end_of_week}` : ""}
                             </p>
                         </div>
@@ -354,26 +354,26 @@ export default function WellnessRpeShow({
 
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <div className="flex items-center gap-2 shrink-0">
-                            <button onClick={() => setExportModal({ isOpen: true, type: 'pdf' })} type="button" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all bg-white  text-zinc-700  hover:bg-zinc-50  border border-zinc-200  shadow-sm">
+                            <button onClick={() => setExportModal({ isOpen: true, type: 'pdf' })} type="button" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all bg-white  text-slate-700  hover:bg-slate-50  border border-slate-200  shadow-sm">
                                 <Download size={14} strokeWidth={2.5} /> "PDF"
                             </button>
-                            <button onClick={() => setExportModal({ isOpen: true, type: 'excel' })} type="button" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all bg-white  text-emerald-700  hover:bg-emerald-50  border border-zinc-200  shadow-sm">
+                            <button onClick={() => setExportModal({ isOpen: true, type: 'excel' })} type="button" className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all bg-white  text-emerald-700  hover:bg-emerald-50  border border-slate-200  shadow-sm">
                                 <FileSpreadsheet size={14} strokeWidth={2.5} /> "Excel"
                             </button>
                         </div>
 
-                        <div className="flex p-1 bg-zinc-100  border border-zinc-200  rounded-lg shrink-0">
+                        <div className="flex p-1 bg-slate-100  border border-slate-200  rounded-lg shrink-0">
                             {canModify && (
                                 <button
                                     onClick={() => setActiveTab("input")}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeTab === "input" ? "bg-white  shadow-sm text-zinc-900 " : "text-zinc-500 hover:text-zinc-700 "}`}
+                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${activeTab === "input" ? "bg-white  shadow-sm text-slate-900 " : "text-slate-500 hover:text-slate-700 "}`}
                                 >
                                     <LayoutGrid size={14} /> "Input Data"
                                 </button>
                             )}
                             <button
                                 onClick={() => setActiveTab("analysis")}
-                                className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${!canModify || activeTab === "analysis" ? "bg-white  shadow-sm text-zinc-900 " : "text-zinc-500 hover:text-zinc-700 "}`}
+                                className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${!canModify || activeTab === "analysis" ? "bg-white  shadow-sm text-slate-900 " : "text-slate-500 hover:text-slate-700 "}`}
                             >
                                 <LineChart size={14} /> "Analysis Data"
                             </button>
@@ -390,35 +390,35 @@ export default function WellnessRpeShow({
                     />
                 ) : (
                     <div className="space-y-4 animate-in fade-in duration-300">
-                        <div className="bg-white  border border-zinc-200  rounded-xl p-4 shadow-sm">
+                        <div className="bg-white  border border-slate-200  rounded-xl p-4 shadow-sm">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                                 <div>
-                                    <h3 className="text-sm font-bold text-zinc-900  capitalize tracking-tight flex items-center gap-2">
-                                        <Users size={16} className="text-zinc-500 " /> "Unrecorded Athletes List"
+                                    <h3 className="text-sm font-bold text-slate-900  capitalize tracking-tight flex items-center gap-2">
+                                        <Users size={16} className="text-slate-500 " /> "Unrecorded Athletes List"
                                     </h3>
-                                    <p className="text-[11px] font-semibold text-zinc-500  mt-0.5">"Click a athlete to add them to today's RPE & Wellness tracking table."</p>
+                                    <p className="text-[11px] font-semibold text-slate-500  mt-0.5">"Click a athlete to add them to today's RPE & Wellness tracking table."</p>
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
                                     <div className="relative">
-                                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+                                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                                         <input
                                             type="text"
                                             placeholder="Search athlete..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="pl-8 pr-3 py-1 h-8 rounded-lg border-zinc-200 text-xs w-[180px] focus:ring-zinc-900 focus:border-zinc-900"
+                                            className="pl-8 pr-3 py-1 h-8 rounded-lg border-slate-200 text-xs w-[180px] focus:ring-slate-900 focus:border-slate-900"
                                         />
                                     </div>
                                     {availableAthletes.length > 0 && (
                                         <>
                                             <button
                                                 onClick={addAllAthletes}
-                                                className="px-2.5 py-1 bg-zinc-900  text-white  hover:bg-zinc-800  rounded border border-transparent text-[11px] font-bold transition-all shadow-sm outline-none capitalize flex items-center gap-1.5"
+                                                className="px-2.5 py-1 bg-[#ff4d00] text-white hover:bg-[#e64500] rounded border border-transparent text-[11px] font-bold transition-all shadow-lg shadow-[#ff4d00]/20 outline-none capitalize flex items-center gap-1.5"
                                             >
                                                 <Plus size={12} strokeWidth={3} />
                                                 "Add All"
                                             </button>
-                                            <div className="text-[10px] font-bold text-zinc-500  bg-zinc-100  px-2 py-1 rounded border border-zinc-200  capitalize shadow-sm">
+                                            <div className="text-[10px] font-bold text-slate-500  bg-slate-100  px-2 py-1 rounded border border-slate-200  capitalize shadow-sm">
                                                 {availableAthletes.length} "Unrated"
                                             </div>
                                         </>
@@ -433,35 +433,35 @@ export default function WellnessRpeShow({
                                             key={p.id}
                                             onClick={() => addAthlete(p)}
                                             type="button"
-                                            className="flex items-center justify-between px-3 h-9 bg-white  border border-zinc-200  hover:border-zinc-900  hover:bg-zinc-100  rounded-lg text-[11px] font-bold transition-all group shadow-sm overflow-hidden"
+                                            className="flex items-center justify-between px-3 h-9 bg-white  border border-slate-200  hover:border-slate-900  hover:bg-slate-100  rounded-lg text-[11px] font-bold transition-all group shadow-sm overflow-hidden"
                                         >
                                             <div className="flex items-center gap-2 truncate">
-                                                <span className="text-[10px] font-black text-zinc-400  group-hover:text-zinc-900  shrink-0">{p.position}</span>
-                                                <span className="text-zinc-700  group-hover:text-zinc-900  truncate">
+                                                <span className="text-[10px] font-black text-slate-400  group-hover:text-slate-900  shrink-0">{p.position}</span>
+                                                <span className="text-slate-700  group-hover:text-slate-900  truncate">
                                                     {p.name}
                                                 </span>
                                             </div>
-                                            <Plus size={12} className="text-zinc-400  group-hover:text-zinc-900  shrink-0 ml-1 transition-colors" strokeWidth={3} />
+                                            <Plus size={12} className="text-slate-400  group-hover:text-slate-900  shrink-0 ml-1 transition-colors" strokeWidth={3} />
                                         </button>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center p-3 text-[11px] font-bold text-zinc-500  border border-dashed border-zinc-300  bg-zinc-50  rounded-lg">
+                                <div className="text-center p-3 text-[11px] font-bold text-slate-500  border border-dashed border-slate-300  bg-slate-50  rounded-lg">
                                     "All athletes have been added to the table."
                                 </div>
                             )}
                         </div>
 
-                        <div className="bg-white  border border-zinc-200  rounded-xl shadow-sm overflow-hidden">
+                        <div className="bg-white  border border-slate-200  rounded-xl shadow-sm overflow-hidden">
                             <div className="overflow-x-auto relative [&::-webkit-scrollbar]:h-2">
                                 <table className="w-max min-w-full text-left whitespace-nowrap text-[10px] border-separate border-spacing-0 tabular-nums">
                                     <WellnessTableHeader actions={actions} />
-                                    <tbody className="[&>tr>td]:border-b [&>tr>td]:border-zinc-100 ">
+                                    <tbody className="[&>tr>td]:border-b [&>tr>td]:border-slate-100 ">
                                         {isLoading ? (
                                             <tr>
                                                 <td
                                                     colSpan="100%"
-                                                    className="p-10 text-center text-zinc-500 font-medium"
+                                                    className="p-10 text-center text-slate-500 font-medium"
                                                 >
                                                     "Loading table..."
                                                 </td>
@@ -470,7 +470,7 @@ export default function WellnessRpeShow({
                                             <tr>
                                                 <td
                                                     colSpan="100%"
-                                                    className="p-10 text-center text-zinc-500 font-medium"
+                                                    className="p-10 text-center text-slate-500 font-medium"
                                                 >
                                                     "No athletes in the table. Please select from the list above."
                                                 </td>
@@ -489,11 +489,11 @@ export default function WellnessRpeShow({
                                 </table>
                             </div>
 
-                            <div className="p-4 border-t border-zinc-200  flex justify-end bg-zinc-50 ">
+                            <div className="p-4 border-t border-slate-200  flex justify-end bg-slate-50 ">
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving || isLoading}
-                                    className="flex items-center gap-2 bg-zinc-900  hover:bg-zinc-800  text-zinc-50  px-6 py-2.5 rounded-lg text-xs font-bold shadow-sm transition-all"
+                                    className="flex items-center gap-2 bg-[#ff4d00] hover:bg-[#e64500] text-white px-6 py-2.5 rounded-lg text-xs font-bold shadow-lg shadow-[#ff4d00]/20 transition-all"
                                 >
                                     {isSaving ? (
                                         <Activity
@@ -515,30 +515,30 @@ export default function WellnessRpeShow({
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-lg font-black text-zinc-900  leading-tight">
+                            <h3 className="text-lg font-black text-slate-900  leading-tight">
                                 "Reported Pain Areas"
                             </h3>
-                            <p className="text-xs font-bold text-zinc-500 mt-1">
+                            <p className="text-xs font-bold text-slate-500 mt-1">
                                 {painModalAthlete?.name} • {formattedDate}
                             </p>
                         </div>
-                        <button onClick={() => setPainModalAthlete(null)} className="p-2 bg-zinc-100  hover:bg-zinc-200  text-zinc-500 rounded-full transition-colors">
+                        <button onClick={() => setPainModalAthlete(null)} className="p-2 bg-slate-100  hover:bg-slate-200  text-slate-500 rounded-full transition-colors">
                             <X size={16} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    <div className="bg-zinc-50  rounded-xl border border-zinc-200  p-4 flex items-center justify-center gap-6 min-h-[350px]">
+                    <div className="bg-slate-50  rounded-xl border border-slate-200  p-4 flex items-center justify-center gap-6 min-h-[350px]">
                         {painModalAthlete && (
                             <>
                                 <div className="w-full h-full max-w-[160px] flex flex-col items-center">
-                                    <span className="text-[10px] font-bold text-zinc-400 mb-2">"FRONT"</span>
+                                    <span className="text-[10px] font-bold text-slate-400 mb-2">"FRONT"</span>
                                     <BodyHighlighter 
                                         type="anterior" 
                                         selectedAreas={painModalAthlete.metrics?.muscle_pain_areas || []} 
                                     />
                                 </div>
                                 <div className="w-full h-full max-w-[160px] flex flex-col items-center">
-                                    <span className="text-[10px] font-bold text-zinc-400 mb-2">"BACK"</span>
+                                    <span className="text-[10px] font-bold text-slate-400 mb-2">"BACK"</span>
                                     <BodyHighlighter 
                                         type="posterior" 
                                         selectedAreas={painModalAthlete.metrics?.muscle_pain_areas || []} 
@@ -606,6 +606,6 @@ export default function WellnessRpeShow({
                     </div>
                 )}
             </ExportModal>
-        </AdminLayout>
+        </AppLayout>
     );
 }

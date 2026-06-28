@@ -55,6 +55,36 @@ class IndividualTrainingController extends Controller
         ]);
     }
 
+    public function createSession(Request $request, User $user)
+    {
+        if ($user->role !== 'athlete') {
+            abort(404);
+        }
+
+        $dateStr = $request->query('date', Carbon::today()->format('Y-m-d'));
+        
+        $trainings = IndividualTraining::where('user_id', $user->id)
+            ->where('date', $dateStr)
+            ->get();
+            
+        $lastSessionNumber = $trainings->count() > 0 
+            ? $trainings->max('session_number') 
+            : 0;
+            
+        $nextSessionNumber = $lastSessionNumber + 1;
+
+        $exercisesList = Exercise::with('category')->orderBy('name', 'asc')->get();
+        $packagesList = \App\Models\ExercisePackage::with('exercises')->orderBy('name', 'asc')->get();
+
+        return Inertia::render('Admin/IndividualTrainings/CreateSession', [
+            'athlete' => $user,
+            'exercises' => $exercisesList,
+            'packages' => $packagesList,
+            'date' => $dateStr,
+            'nextSessionNumber' => $nextSessionNumber,
+        ]);
+    }
+
     public function storeSession(Request $request, User $user)
     {
         $request->validate([
@@ -62,8 +92,8 @@ class IndividualTrainingController extends Controller
             'session_option' => 'required|in:restart,next,custom',
             'custom_session_number' => 'nullable|integer|min:1',
             'training_type' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'programs' => 'array',
+            'location' => 'required|string|max:255',
+            'blocks' => 'array',
         ]);
 
         $session_number = 1;
@@ -97,21 +127,42 @@ class IndividualTrainingController extends Controller
             'location' => $request->location,
         ]);
 
-        if (!empty($request->programs)) {
-            foreach ($request->programs as $index => $prog) {
-                IndividualTrainingProgram::create([
-                    'individual_training_id' => $training->id,
-                    'phase' => $prog['phase'] ?? null,
-                    'logic' => $prog['logic'] ?? null,
-                    'exercise_id' => $prog['exercise_id'] ?? null,
-                    'sets' => $prog['sets'] ?? null,
-                    'reps' => $prog['reps'] ?? null,
-                    'duration' => $prog['duration'] ?? null,
-                    'rest' => $prog['rest'] ?? null,
-                    'intensity' => $prog['intensity'] ?? null,
-                    'notes' => $prog['notes'] ?? null,
-                    'order' => $index,
-                ]);
+        if (!empty($request->blocks)) {
+            $order = 0;
+            foreach ($request->blocks as $block) {
+                if (isset($block['step']) && $block['step'] === 1) {
+                    // Text block
+                    $note = $block['items'][0]['note'] ?? null;
+                    if ($note) {
+                        IndividualTrainingProgram::create([
+                            'individual_training_id' => $training->id,
+                            'phase' => 'TEXT_BLOCK',
+                            'logic' => $block['category'] ?? null,
+                            'exercise_id' => null,
+                            'notes' => $note,
+                            'order' => $order++,
+                        ]);
+                    }
+                } else {
+                    // Phase block
+                    if (!empty($block['items'])) {
+                        foreach ($block['items'] as $item) {
+                            IndividualTrainingProgram::create([
+                                'individual_training_id' => $training->id,
+                                'phase' => $block['title'] ?? null,
+                                'logic' => $block['category'] ?? null,
+                                'exercise_id' => $item['exercise_id'] ?? null,
+                                'sets' => $item['sets'] ?? null,
+                                'reps' => $item['reps'] ?? null,
+                                'duration' => $item['duration'] ?? null,
+                                'rest' => $item['rest'] ?? null,
+                                'intensity' => $item['intensity'] ?? null,
+                                'notes' => $item['notes'] ?? null,
+                                'order' => $order++,
+                            ]);
+                        }
+                    }
+                }
             }
         }
 

@@ -1,7 +1,8 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Activity, Search, ChevronRight, HeartPulse } from 'lucide-react';
+import { Activity, ChevronRight, Search } from 'lucide-react';
 import { useState } from 'react';
+import PageHeader from '@/Components/Layout/PageHeader';
 
 export default function Index({ athletes }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -11,37 +12,19 @@ export default function Index({ athletes }) {
     ) || [];
 
     return (
-        <AdminLayout title="Wellness & Training Load">
+        <AppLayout title="Wellness & Training Load">
             <Head title="Wellness & Training Load" />
 
-            
-            <div className="bg-white p-5 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6">
-                
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
-                
-                <div className="relative z-10 w-full lg:w-auto">
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 border border-orange-100 px-3 py-1 rounded-full uppercase tracking-widest mb-2.5 md:mb-3 inline-block shadow-sm">
-                        Recovery & Load
-                    </span>
-                    <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        Wellness & Load
-                    </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Pantau tingkat kebugaran, RPE, dan akumulasi beban latihan atlet.</p>
-                </div>
-
-                <div className="relative z-10 w-full lg:w-auto flex items-center gap-3">
-                    <div className="relative w-full sm:w-72 md:w-80">
-                        <Search className="absolute left-3.5 top-3 w-4 h-4 md:w-4 md:h-4 text-slate-400" />
-                        <input 
-                            type="text" 
-                            placeholder="Cari nama atlet..." 
-                            value={searchQuery} 
-                            onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" 
-                        />
-                    </div>
-                </div>
-            </div>
+            <div className="pb-12 space-y-6">
+                <PageHeader 
+                    title="Wellness & Load"
+                    subtitle="Pantau tingkat kebugaran, RPE, dan akumulasi beban latihan atlet."
+                    badge="Recovery & Load"
+                    icon={Activity}
+                    searchPlaceholder="Cari nama atlet..."
+                    searchValue={searchQuery}
+                    onSearchChange={(e) => setSearchQuery(e.target.value)}
+                />
 
             
             {filteredAthletes.length > 0 ? (
@@ -76,7 +59,7 @@ export default function Index({ athletes }) {
                                 </div>
                                 <Link 
                                     href={route('admin.training-loads.show', athlete.id)}
-                                    className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-white bg-[#ff4d00] px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-sm hover:bg-[#e64500] hover:-translate-y-0.5 transition-all"
+                                    className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-white bg-[#ff4d00] px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:-translate-y-0.5 transition-all"
                                 >
                                     Detail <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                 </Link>
@@ -85,14 +68,15 @@ export default function Index({ athletes }) {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-16 md:py-20 bg-white rounded-lg border border-dashed border-slate-300 text-center shadow-sm mx-2 md:mx-0">
-                    <div className="p-4 bg-orange-50/50 rounded-full mb-3">
-                        <Search className="w-6 h-6 md:w-8 md:h-8 text-orange-200" />
+                <div className="flex flex-col items-center justify-center py-16 md:py-20 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 text-center shadow-sm mx-2 md:mx-0">
+                    <div className="p-4 bg-white border border-slate-200 rounded-full mb-3 shadow-sm">
+                        <Search className="w-6 h-6 md:w-8 md:h-8 text-[#ff4d00]" />
                     </div>
                     <h3 className="text-slate-800 font-bold text-base md:text-lg">Atlet tidak ditemukan</h3>
                     <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium px-4">Coba gunakan kata kunci pencarian yang lain.</p>
                 </div>
             )}
-        </AdminLayout>
+            </div>
+        </AppLayout>
     );
 }

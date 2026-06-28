@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { KeyRound, User, Loader2 } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
     
     const { app_settings } = usePage().props;
     
-    
-    const appName = app_settings?.name || 'Performance Dashboard';
+    const appName = app_settings?.name || 'Sistem Performa';
     const appLogo = app_settings?.logo; 
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -27,99 +27,93 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center font-sans p-6 relative overflow-hidden bg-slate-50">
+        <div className="min-h-screen flex flex-col justify-center items-center font-sans p-4 sm:p-6 relative overflow-hidden bg-slate-50">
             
-            <Head title={`Log in - ${appName}`} />
+            <Head title={`Masuk - ${appName}`} />
 
-            
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob pointer-events-none"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-rose-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 pointer-events-none"></div>
+            {/* Decorative Background Blobs */}
+            <div className="absolute top-[-5%] left-[-10%] w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-orange-200/60 sm:bg-orange-200/50 rounded-full mix-blend-multiply filter blur-3xl animate-blob pointer-events-none"></div>
+            <div className="absolute bottom-[-5%] right-[-10%] w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] bg-amber-200/60 sm:bg-amber-200/50 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
             <div className="w-full max-w-[420px] z-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
-                
+                {/* Header App */}
                 <div className="text-center mb-8 flex flex-col justify-center items-center">
                     <div className='flex justify-center items-center mb-5 h-20 w-20'>
                         {appLogo ? (
-                            
                             <img 
                                 src={appLogo} 
-                                alt="App Logo" 
+                                alt="Logo Aplikasi" 
                                 className="w-full h-full object-contain drop-shadow-sm" 
                             />
                         ) : (
-                            
-                            <div className="w-16 h-16 bg-[#ff4d00] text-white rounded-lg flex items-center justify-center text-3xl font-black shadow-lg shadow-[#ff4d00]/20">
+                            <div className="w-16 h-16 bg-[#ff4d00] text-white rounded-xl flex items-center justify-center text-3xl font-bold shadow-lg shadow-orange-500/20">
                                 {appName.charAt(0)}
                             </div>
                         )}
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
                         {appName}
                     </h1>
                     <p className="text-sm text-slate-500 font-medium mt-1">
-                        Sports Analytics System
+                        Manajemen Performa & Operasional Olahraga
                     </p>
                 </div>
 
-                
-                <div className="bg-white rounded-lg shadow-xl border border-slate-100 p-8 sm:p-10 backdrop-blur-sm relative">
+                {/* Login Card */}
+                <div className="bg-white/90 sm:bg-white backdrop-blur-xl sm:backdrop-blur-none rounded-3xl sm:rounded-xl shadow-2xl shadow-orange-500/10 sm:shadow-xl sm:shadow-slate-200/50 border border-white/60 sm:border-slate-100 p-6 sm:p-10 relative">
                     
                     <form onSubmit={submit} className="space-y-6">
                         
-                        
-                        <div className="space-y-1.5">
-                            <label htmlFor="athlete_id" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">
-                                User ID / Athlete
+                        {/* ID Pengguna */}
+                        <div className="space-y-2">
+                            <label htmlFor="athlete_id" className="text-sm font-semibold text-slate-700 ml-1">
+                                ID Pengguna
                             </label>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <svg className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
+                                    <User className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
                                 </div>
                                 <input
                                     id="athlete_id"
                                     type="text"
                                     value={data.athlete_id}
                                     onChange={(e) => setData('athlete_id', e.target.value)}
-                                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:bg-white focus:border-[#ff4d00] focus:ring-[#ff4d00]/20 focus:ring-2 transition-all duration-200 outline-none font-medium"
-                                    placeholder="Enter your ID"
+                                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:bg-white focus:border-[#ff4d00] focus:ring-[#ff4d00]/20 focus:ring-4 transition-all duration-200 outline-none font-medium"
+                                    placeholder="Masukkan ID Anda"
                                     autoComplete="username"
                                 />
                             </div>
                             {errors.athlete_id && (
-                                <p className="text-rose-500 text-xs mt-1.5 ml-1 font-bold">{errors.athlete_id}</p>
+                                <p className="text-rose-500 text-sm mt-1.5 ml-1 font-medium">{errors.athlete_id}</p>
                             )}
                         </div>
 
-                        
-                        <div className="space-y-1.5">
-                            <label htmlFor="password" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">
-                                Password
+                        {/* Kata Sandi */}
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-semibold text-slate-700 ml-1">
+                                Kata Sandi
                             </label>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <svg className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
+                                    <KeyRound className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
                                 </div>
                                 <input
                                     id="password"
                                     type="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:bg-white focus:border-[#ff4d00] focus:ring-[#ff4d00]/20 focus:ring-2 transition-all duration-200 outline-none font-medium"
+                                    className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:bg-white focus:border-[#ff4d00] focus:ring-[#ff4d00]/20 focus:ring-4 transition-all duration-200 outline-none font-medium"
                                     placeholder="••••••••"
                                     autoComplete="current-password"
                                 />
                             </div>
                             {errors.password && (
-                                <p className="text-rose-500 text-xs mt-1.5 ml-1 font-bold">{errors.password}</p>
+                                <p className="text-rose-500 text-sm mt-1.5 ml-1 font-medium">{errors.password}</p>
                             )}
                         </div>
 
-                        
+                        {/* Ingat Saya */}
                         <div className="flex items-center justify-between pt-1">
                             <label className="flex items-center cursor-pointer group">
                                 <div className="relative flex items-center">
@@ -130,39 +124,39 @@ export default function Login({ status, canResetPassword }) {
                                         onChange={(e) => setData('remember', e.target.checked)}
                                         className="w-4 h-4 text-[#ff4d00] border-slate-300 rounded focus:ring-[#ff4d00] cursor-pointer"
                                     />
-                                    <span className="ml-2 text-xs sm:text-sm font-bold text-slate-500 group-hover:text-slate-700 transition-colors">Remember me</span>
+                                    <span className="ml-2 text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors">Ingat Saya</span>
                                 </div>
                             </label>
                         </div>
 
-                        
+                        {/* Tombol Masuk */}
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full bg-[#ff4d00] text-white font-bold py-3.5 mt-2 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:shadow-[#ff4d00]/30 hover:bg-[#e64500] transform active:scale-[0.98] transition-all duration-200 flex justify-center items-center text-sm tracking-wide disabled:opacity-70"
+                            className="w-full bg-[#ff4d00] text-white font-bold py-3.5 mt-2 rounded-lg shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 hover:bg-[#e64500] transform active:scale-[0.98] transition-all duration-200 flex justify-center items-center text-sm disabled:opacity-70"
                         >
                             {processing ? (
-                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
+                                <>
+                                    <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                                    <span>Memproses...</span>
+                                </>
                             ) : (
-                                "Sign In to Dashboard"
+                                "Masuk ke Sistem"
                             )}
                         </button>
                     </form>
 
-                    
+                    {/* Bantuan */}
                     <div className="mt-8 text-center pt-6 border-t border-slate-100">
-                        <p className="text-slate-500 text-xs font-medium leading-relaxed">
-                            Contact Admin if you have trouble logging in.
+                        <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                            Hubungi Administrator jika Anda mengalami kesulitan saat masuk.
                         </p>
                     </div>
                 </div>
 
-                
+                {/* Footer */}
                 <div className="mt-8 text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-70">
+                    <p className="text-xs font-medium text-slate-400 opacity-80">
                         {appName} &copy; {new Date().getFullYear()}
                     </p>
                 </div>

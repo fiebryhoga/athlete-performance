@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { ActivitySquare } from 'lucide-react';
@@ -196,7 +196,7 @@ export default function Show({ athlete, trainingHistory }) {
         : groupedWeeks;
 
     return (
-        <AdminLayout title={`Wellness & Load - ${athlete?.name}`}>
+        <AppLayout title={`Wellness & Load - ${athlete?.name}`}>
             <Head title={`Wellness & Load - ${athlete?.name}`} />
 
             <div className="flex flex-col gap-6 md:gap-8 mb-8 md:mb-12 max-w-7xl mx-auto">
@@ -210,14 +210,14 @@ export default function Show({ athlete, trainingHistory }) {
                 />
 
                 {displayedWeeks.length === 0 ? (
-                    <div className="bg-white p-8 md:p-16 rounded-lg border border-slate-200 text-center shadow-sm">
-                        <div className="p-4 bg-orange-50 rounded-full inline-block mb-4">
-                            <ActivitySquare className="w-12 h-12 text-[#ff4d00]/50" />
+                    <div className="flex flex-col items-center justify-center py-24 border border-dashed border-slate-300 rounded-2xl bg-slate-50/50 text-slate-400">
+                        <div className="p-4 bg-white border border-slate-200 rounded-full shadow-sm mb-4">
+                            <ActivitySquare className="w-8 h-8 md:w-10 md:h-10 text-[#ff4d00]" />
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold text-slate-800 uppercase tracking-widest">
-                            {searchDate ? 'Data Minggu Tidak Ditemukan' : 'Belum Ada Data Load'}
+                        <h3 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">
+                            {searchDate ? 'DATA MINGGU TIDAK DITEMUKAN' : 'BELUM ADA DATA LOAD'}
                         </h3>
-                        <p className="text-sm md:text-base text-slate-500 mt-2 max-w-md mx-auto font-medium">
+                        <p className="text-xs md:text-sm font-medium text-slate-500 mt-2 max-w-md mx-auto text-center">
                             {searchDate ? `Tidak ada aktivitas yang tercatat pada minggu yang mengandung tanggal ${formatDateToIndo(searchDate, 'short')}.` : 'Silakan input data Wellness & RPE pertama Anda.'}
                         </p>
                     </div>
@@ -252,6 +252,6 @@ export default function Show({ athlete, trainingHistory }) {
                 rpeOptions={rpeOptions}
                 athleteId={athlete?.id} 
             />
-        </AdminLayout>
+        </AppLayout>
     );
 }

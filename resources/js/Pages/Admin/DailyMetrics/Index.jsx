@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Activity, Search, ChevronRight, CalendarDays } from 'lucide-react';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ export default function Index({ athletes }) {
     ) || [];
 
     return (
-        <AdminLayout title="Daily Monitoring">
+        <AppLayout title="Daily Monitoring">
             <Head title="Daily Monitoring" />
 
             
@@ -93,6 +93,6 @@ export default function Index({ athletes }) {
                     <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium px-4">Coba gunakan kata kunci pencarian yang lain.</p>
                 </div>
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }

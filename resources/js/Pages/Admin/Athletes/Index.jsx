@@ -1,7 +1,8 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Edit2, Trash2, User, X, Eye, ChevronRight, AlertCircle, Camera, UploadCloud, Users, Save } from 'lucide-react';
+import { Plus, Search, Users, Activity, ChevronRight, X, UserX, UserCheck, Trash2, Edit2, Eye, User, Camera, UploadCloud, Save } from 'lucide-react';
+import PageHeader from '@/Components/Layout/PageHeader';
 
 // =================================================================
 // 1. KOMPONEN UTAMA (Tabel & Layout)
@@ -46,39 +47,27 @@ export default function Index({ athletes, sports, filters }) {
     };
 
     return (
-        <AdminLayout title="Athlete Management">
+        <AppLayout title="Athlete Management">
             <Head title="Athletes" />
 
             
-            <div className="bg-white p-5 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
-                <div className="relative z-10 w-full lg:w-auto">
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Management</span>
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        <Users className="w-7 h-7 md:w-8 md:h-8 text-[#ff4d00]" /> Clients Data
-                    </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Kelola profil klien, akun, dan metrik fisik.</p>
-                </div>
-
-                <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-                    <form onSubmit={(e) => e.preventDefault()} className="w-full sm:w-72 relative">
-                        <input 
-                            type="text" 
-                            placeholder="Search name or ID..." 
-                            value={searchTerm} 
-                            onChange={(e) => setSearchTerm(e.target.value)} 
-                            className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 shadow-sm text-sm focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all outline-none" 
-                        />
-                        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                    </form>
+            <PageHeader 
+                title="Clients Data"
+                subtitle="Kelola profil klien, akun, dan metrik fisik."
+                badge="Management"
+                icon={Users}
+                searchPlaceholder="Search name or ID..."
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                actions={
                     <button 
                         onClick={openCreateModal} 
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] hover:bg-[#e64500] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-[#ff4d00]/20 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-lg shadow-[#ff4d00]/20 active:scale-95 w-full sm:w-auto justify-center"
                     >
-                        <Plus className="w-4 h-4" /> Add Athlete
+                        <Plus className="w-4 h-4 md:w-5 md:h-5" /> Add Athlete
                     </button>
-                </div>
-            </div>
+                }
+            />
 
             
             <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden flex flex-col animate-in fade-in duration-300">
@@ -211,7 +200,7 @@ export default function Index({ athletes, sports, filters }) {
                     onClose={() => setIsModalOpen(false)} 
                 />
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }
 

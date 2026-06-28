@@ -3,14 +3,13 @@ import { useForm } from '@inertiajs/react';
 import { X, Save, Wand2, Calculator, Info } from 'lucide-react';
 
 const InfoTooltip = memo(({ text }) => (
- <div className="relative group inline-flex items-center justify-center ml-1.5 cursor-help">
- <Info className="w-3.5 h-3.5 text-zinc-400 hover:text-blue-500 transition-colors" />
- <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-zinc-900  text-zinc-50  text-[11px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] pointer-events-none">
- {text}
- 
- <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-900 "></div>
- </div>
- </div>
+    <div className="relative group inline-flex items-center justify-center ml-1.5 cursor-help">
+        <Info className="w-3.5 h-3.5 text-slate-400 hover:text-blue-500 transition-colors" />
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-slate-900 text-white text-[11px] leading-relaxed rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] pointer-events-none">
+            {text}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-slate-900"></div>
+        </div>
+    </div>
 ));
 
 const InputField = memo(({ label, id, type ="number", step ="0.1", placeholder ="", value, onChange, error, tooltip }) => {
@@ -18,23 +17,23 @@ const InputField = memo(({ label, id, type ="number", step ="0.1", placeholder =
 
  return (
  <div className="space-y-1.5">
- <div className="flex items-center h-5">
- <label htmlFor={id} className="text-xs font-semibold text-zinc-700 ">
- {label}
- </label>
- {tooltip && <InfoTooltip text={tooltip} />}
- </div>
- <input
- id={id}
- type={type}
- step={step}
- placeholder={placeholder}
- value={value ?? ''}
- onChange={handleChange}
- className={`flex h-9 w-full rounded-md border bg-zinc-50/50  px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950   ${
- error ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/50 ' : 'border-zinc-200 '
- }`}
- />
+        <div className="flex items-center h-5">
+            <label htmlFor={id} className="text-xs font-bold text-slate-700">
+                {label}
+            </label>
+            {tooltip && <InfoTooltip text={tooltip} />}
+        </div>
+        <input
+            id={id}
+            type={type}
+            step={step}
+            placeholder={placeholder}
+            value={value ?? ''}
+            onChange={handleChange}
+            className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d00]/20 focus-visible:border-[#ff4d00] ${
+                error ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/50' : 'border-slate-200'
+            }`}
+        />
  {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
  </div>
  );
@@ -184,50 +183,51 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
 
  if (!isOpen) return null;
 
- return (
- <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200">
- <div className="bg-white  border border-zinc-200  rounded-2xl w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
- 
- <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-200  shrink-0 bg-zinc-50/50 ">
- <div>
- <h2 className="text-lg font-bold tracking-tight text-zinc-950 ">
- {isEditing ? 'Edit Body Composition' : 'Add New Record'}
- </h2>
- <p className="text-sm font-medium text-zinc-500  mt-0.5">
- {player?.name} • {player?.position || 'Position not set'}
- </p>
- </div>
- <button onClick={onClose} className="rounded-xl p-2 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900   transition-colors">
- <X className="w-5 h-5" />
- </button>
- </div>
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200">
+            <div className="bg-white border border-slate-200 rounded-2xl w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+                
+                <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
+                    <div>
+                        <h2 className="text-lg font-extrabold tracking-tight text-slate-900">
+                            {isEditing ? 'Edit Body Composition' : 'Add New Record'}
+                        </h2>
+                        <p className="text-sm font-medium text-slate-500 mt-0.5">
+                            {player?.name} • {player?.position || 'Position not set'}
+                        </p>
+                    </div>
+                    <button onClick={onClose} className="rounded-xl p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-900 transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
 
- <div className="px-6 py-4 bg-blue-50/50 border-b border-blue-100   flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
- <div className="flex items-start gap-3 max-w-2xl">
- <div className="p-2 bg-blue-100  rounded-lg text-blue-600  mt-0.5 shrink-0">
- <Calculator className="w-4 h-4" />
- </div>
- <div className="space-y-0.5">
- <p className="text-sm font-bold text-blue-900 ">{"Smart Calculation Engine"}</p>
- <p className="text-xs font-medium text-blue-700/80  leading-relaxed">
- {"Fill in"} <strong>{"Weight, Height, Age"}</strong>. If without BIA tool, fill in <strong>{"Neck & Waist Circumference"}</strong> then click the button to instantly extract 10+ anatomy metrics.
- </p>
- </div>
- </div>
- <button 
- type="button" 
- onClick={handleAutoCalculate}
- className="inline-flex items-center justify-center shrink-0 rounded-xl text-sm font-bold transition-all bg-blue-600 text-white shadow-sm hover:bg-blue-700 h-10 px-5 gap-2 w-full sm:w-auto"
- >
- <Wand2 className="w-4 h-4" /> {"Auto Calculate"}
- </button>
- </div>
+                <div className="px-6 py-4 bg-orange-50/50 border-b border-orange-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4d00] rounded-full blur-3xl opacity-[0.03] -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="flex items-start gap-3 max-w-2xl relative z-10">
+                        <div className="p-2 bg-orange-100 rounded-lg text-[#ff4d00] mt-0.5 shrink-0">
+                            <Calculator className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-0.5">
+                            <p className="text-sm font-extrabold text-orange-950">{"Smart Calculation Engine"}</p>
+                            <p className="text-xs font-medium text-orange-900/80 leading-relaxed">
+                                {"Fill in"} <strong>{"Weight, Height, Age"}</strong>. If without BIA tool, fill in <strong>{"Neck & Waist Circumference"}</strong> then click the button to instantly extract 10+ anatomy metrics.
+                            </p>
+                        </div>
+                    </div>
+                    <button 
+                        type="button" 
+                        onClick={handleAutoCalculate}
+                        className="inline-flex items-center justify-center shrink-0 rounded-xl text-sm font-bold transition-all bg-[#ff4d00] text-white shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] h-10 px-5 gap-2 w-full sm:w-auto relative z-10"
+                    >
+                        <Wand2 className="w-4 h-4" /> {"Auto Calculate"}
+                    </button>
+                </div>
 
  <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
  <form id="composition-form" onSubmit={submit} className="space-y-8">
  
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-zinc-500  flex items-center gap-2 border-b border-zinc-100  pb-2">
+                            <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Basic Patient Data (Required)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -239,7 +239,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  </div>
 
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-zinc-500  flex items-center gap-2 border-b border-zinc-100  pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Circumference Metrics (Optional - For Manual Calc)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -253,7 +253,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
 
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-zinc-500  flex items-center gap-2 border-b border-zinc-100  pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Body Anatomy Distribution"}
  </h3>
  <div className="grid grid-cols-2 gap-4">
@@ -269,7 +269,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  </div>
 
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-zinc-500  flex items-center gap-2 border-b border-zinc-100  pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Metabolism & Cellular Level"}
  </h3>
  <div className="grid grid-cols-2 gap-4">
@@ -288,26 +288,26 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  </form>
  </div>
 
- <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-zinc-200  bg-zinc-50/50  shrink-0">
- <button 
- type="button" 
- onClick={onClose} 
- className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-colors border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 h-10 px-5    "
- >
- {"Cancel"}
- </button>
- <button 
- type="submit" 
- form="composition-form" 
- disabled={processing} 
- className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-50 bg-zinc-900 text-white shadow-sm hover:bg-zinc-800 h-10 px-6    gap-2"
- >
- <Save className="w-4 h-4" />
- {processing ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Analysis')}
- </button>
- </div>
+                <div className="flex items-center justify-end gap-3 px-6 py-5 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                    <button 
+                        type="button" 
+                        onClick={onClose} 
+                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 h-10 px-5"
+                    >
+                        {"Cancel"}
+                    </button>
+                    <button 
+                        type="submit" 
+                        form="composition-form" 
+                        disabled={processing} 
+                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-50 bg-[#ff4d00] text-white shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] h-10 px-6 gap-2"
+                    >
+                        <Save className="w-4 h-4" />
+                        {processing ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Analysis')}
+                    </button>
+                </div>
 
- </div>
- </div>
+            </div>
+        </div>
  );
 }

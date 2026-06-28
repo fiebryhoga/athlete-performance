@@ -49,12 +49,12 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  return (
  <div className="space-y-6 pb-10">
  {/* SEARCH BAR */}
- <div className="flex items-center max-w-xl bg-white  border border-zinc-200  rounded-xl px-4 py-3 shadow-sm transition-colors focus-within:border-zinc-400 ">
- <Search size={18} className="text-zinc-400 mr-3" />
+ <div className="flex items-center max-w-xl bg-white  border border-slate-200  rounded-xl px-4 py-3 shadow-sm transition-colors focus-within:border-slate-400 ">
+ <Search size={18} className="text-slate-400 mr-3" />
  <input
  type="text"
  placeholder="Search by name, position, or jersey number..."
- className="bg-transparent border-none focus:ring-0 p-0 w-full text-sm font-medium text-zinc-900  placeholder:text-zinc-400"
+ className="bg-transparent border-none focus:ring-0 p-0 w-full text-sm font-medium text-slate-900  placeholder:text-slate-400"
  value={searchQuery}
  onChange={e => setSearchQuery(e.target.value)}
  />
@@ -73,7 +73,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  <button
  key={athlete.id}
  onClick={() => onSelectAthlete(athlete.id)}
- className="group w-full bg-white  border border-zinc-200  rounded-xl p-5 hover:border-zinc-400  transition-all duration-200 flex flex-col shadow-sm text-left"
+ className="group w-full bg-white  border border-slate-200  rounded-xl p-5 hover:border-slate-400  transition-all duration-200 flex flex-col shadow-sm text-left"
  >
  {/* BAGIAN ATAS: IDENTITAS PEMAIN */}
  <div className="flex items-start justify-between w-full">
@@ -84,7 +84,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  <img 
  src={validPhotoUrl} 
  alt={athlete.name}
- className="w-12 h-12 rounded-full object-cover border border-zinc-200 "
+ className="w-12 h-12 rounded-full object-cover border border-slate-200 "
  onError={(e) => {
  // Fallback jika path foto ternyata rusak/tidak ditemukan di folder storage
  e.target.onerror = null; 
@@ -96,7 +96,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  
  {/* Inisial cadangan akan tampil jika URL foto kosong, atau jika gambar gagal dimuat (onError) */}
  <div 
- className="w-12 h-12 rounded-full bg-zinc-100  flex items-center justify-center text-zinc-900  font-semibold border border-zinc-200  tracking-tight text-sm"
+ className="w-12 h-12 rounded-full bg-slate-100  flex items-center justify-center text-slate-900  font-semibold border border-slate-200  tracking-tight text-sm"
  style={{ display: validPhotoUrl ? 'none' : 'flex' }}
  >
  {getInitials(athlete.name)}
@@ -105,36 +105,36 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  
  {/* NAMA & POSISI */}
  <div className="overflow-hidden">
- <h4 className="font-semibold text-zinc-900  group-hover:underline decoration-1 underline-offset-2 line-clamp-1 text-sm md:text-base">
+ <h4 className="font-semibold text-slate-900  group-hover:underline decoration-1 underline-offset-2 line-clamp-1 text-sm md:text-base">
  {athlete.name}
  </h4>
- <p className="text-[10px] sm:text-xs text-zinc-500  font-medium mt-0.5">
+ <p className="text-[10px] sm:text-xs text-slate-500  font-medium mt-0.5">
  {athlete.position || 'Athlete'} {np ? `• #${np}` : ''}
  </p>
  </div>
  </div>
  {/* ICON PANAH KANAN */}
- <div className="w-8 h-8 shrink-0 rounded-md bg-transparent flex items-center justify-end text-zinc-400 group-hover:text-zinc-900  transition-colors">
+ <div className="w-8 h-8 shrink-0 rounded-md bg-transparent flex items-center justify-end text-slate-400 group-hover:text-slate-900  transition-colors">
  <ChevronRight size={18} />
  </div>
  </div>
 
  {/* BAGIAN BAWAH: METRIK MINGGUAN */}
- <div className="mt-5 flex items-center justify-between border-t border-zinc-100  pt-4 w-full">
+ <div className="mt-5 flex items-center justify-between border-t border-slate-100  pt-4 w-full">
  <div className="flex flex-col gap-1">
- <span className="text-[10px] text-zinc-500  font-medium flex items-center gap-1.5">
- <Activity size={12} className="text-zinc-400" /> "Weekly Load"
+ <span className="text-[10px] text-slate-500  font-medium flex items-center gap-1.5">
+ <Activity size={12} className="text-slate-400" /> "Weekly Load"
  </span>
- <span className="text-sm font-semibold text-zinc-900 ">
- {pData?.weekly_load || 0} <span className="text-[10px] sm:text-xs font-normal text-zinc-500">"AU"</span>
+ <span className="text-sm font-semibold text-slate-900 ">
+ {pData?.weekly_load || 0} <span className="text-[10px] sm:text-xs font-normal text-slate-500">"AU"</span>
  </span>
  </div>
  <div className="flex flex-col items-end gap-1">
- <span className="text-[10px] text-zinc-500  font-medium flex items-center gap-1.5">
- <HeartPulse size={12} className="text-zinc-400" /> "Wellness"
+ <span className="text-[10px] text-slate-500  font-medium flex items-center gap-1.5">
+ <HeartPulse size={12} className="text-slate-400" /> "Wellness"
  </span>
- <span className="text-sm font-semibold text-zinc-900 ">
- {pData?.weekly_wellness_score || 0} <span className="text-[10px] sm:text-xs font-normal text-zinc-500">/196</span>
+ <span className="text-sm font-semibold text-slate-900 ">
+ {pData?.weekly_wellness_score || 0} <span className="text-[10px] sm:text-xs font-normal text-slate-500">/196</span>
  </span>
  </div>
  </div>
@@ -144,12 +144,12 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
 
  {/* EMPTY STATE PENCARIAN */}
  {filteredAthletes.length === 0 && (
- <div className="col-span-full py-16 text-center border border-dashed border-zinc-300  rounded-xl bg-zinc-50/50  flex flex-col items-center justify-center">
- <div className="p-3 bg-white  border border-zinc-200  rounded-full mb-3 shadow-sm">
- <Search size={24} className="text-zinc-400 " />
+ <div className="col-span-full py-16 text-center border border-dashed border-slate-300  rounded-xl bg-slate-50/50  flex flex-col items-center justify-center">
+ <div className="p-3 bg-white  border border-slate-200  rounded-full mb-3 shadow-sm">
+ <Search size={24} className="text-slate-400 " />
  </div>
- <h4 className="font-semibold text-zinc-900  mb-1">"Athlete Not Found"</h4>
- <p className="text-zinc-500  text-sm">{`Search "${searchQuery}" yielded no results.`}</p>
+ <h4 className="font-semibold text-slate-900  mb-1">"Athlete Not Found"</h4>
+ <p className="text-slate-500  text-sm">{`Search "${searchQuery}" yielded no results.`}</p>
  </div>
  )}
  </div>

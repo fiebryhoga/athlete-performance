@@ -1,5 +1,5 @@
 import React from "react";
-import AdminLayout from "@/Layouts/AdminLayout";
+import AppLayout from "@/Layouts/AppLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { Dumbbell, ChevronLeft, AlignLeft } from "lucide-react";
 
@@ -21,7 +21,7 @@ export default function BulkCreate({ categories = [] }) {
     };
 
     return (
-        <AdminLayout title="Bulk Create Latihan">
+        <AppLayout title="Bulk Create Latihan">
             <Head title="Buat Latihan Massal" />
             <div className="mb-8">
                 <Link href={route('admin.exercises.index')} className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors mb-4">
@@ -88,6 +88,6 @@ export default function BulkCreate({ categories = [] }) {
                     </div>
                 </form>
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

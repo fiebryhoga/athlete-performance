@@ -184,4 +184,18 @@ class CompositionTestController extends Controller
         $compositionTest->delete();
         return redirect()->back()->with('message', 'Data tes berhasil dihapus.');
     }
+
+    public function saveBenchmarks(Request $request)
+    {
+        $validated = $request->validate([
+            'benchmarks' => 'required|array'
+        ]);
+
+        Setting::updateOrCreate(
+            ['key' => 'composition_benchmarks'],
+            ['value' => json_encode($validated['benchmarks'])]
+        );
+
+        return redirect()->back()->with('message', 'Benchmarks saved successfully.');
+    }
 }

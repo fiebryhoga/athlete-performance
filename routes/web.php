@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\SportController;
 use App\Http\Controllers\Admin\AthleteController;
 use App\Http\Controllers\Admin\BenchmarkController;
 use App\Http\Controllers\Admin\PerformanceController;
-use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\DailyMetricController;
 use App\Http\Controllers\Admin\GlobalSearchController;
 use App\Http\Controllers\Admin\SettingController;
@@ -120,6 +120,7 @@ Route::middleware([
 
         Route::get('/admin/individual-trainings', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'index'])->name('admin.individual-trainings.index');
         Route::get('/admin/individual-trainings/{user}/show', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'showAthleteTrainings'])->name('admin.individual-trainings.show');
+        Route::get('/admin/individual-trainings/{user}/session/create', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'createSession'])->name('admin.individual-trainings.session.create');
         Route::post('/admin/individual-trainings/{user}/session', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeSession'])->name('admin.individual-trainings.session.store');
         Route::delete('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'destroySession'])->name('admin.individual-trainings.session.destroy');
 
@@ -144,13 +145,10 @@ Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteContro
     
     
     
-    Route::middleware(['role:admin,coach'])->group(function () {
+    Route::middleware(['role:superadmin,coach'])->group(function () {
         
         
-        Route::resource('/admin/users', UserController::class)->names('admin.users');
-        Route::resource('/admin/manage-admins', AdminManagementController::class)
-            ->parameters(['manage-admins' => 'user'])
-            ->except(['create', 'edit', 'show']);
+        Route::resource('/admin/users', UserManagementController::class)->names('admin.users')->middleware('role:superadmin');
 
         
         Route::get('/admin/sports', [SportController::class, 'index'])->name('admin.sports.index');
@@ -187,8 +185,8 @@ Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteContro
         
 
         
-        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
-        Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
+        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index')->middleware('role:superadmin');
+        Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update')->middleware('role:superadmin');
 
         // Master Exercises
         Route::get('/admin/exercises', [\App\Http\Controllers\Admin\ExerciseController::class, 'index'])->name('admin.exercises.index');

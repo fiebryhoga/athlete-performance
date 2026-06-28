@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { Activity, Save, User as UserIcon, Scale, Droplets, Flame } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -87,7 +87,7 @@ export default function Create({ athletes }) {
     const bodyFatInfo = getBodyFatRating(data.body_fat_percentage, selectedAthlete?.gender || 'L');
 
     return (
-        <AdminLayout title="Input Body Composition">
+        <AppLayout title="Input Body Composition">
             <Head title="Input Body Composition Test" />
             
             <div className="max-w-4xl mx-auto pb-20">
@@ -209,6 +209,6 @@ export default function Create({ athletes }) {
                     </div>
                 </form>
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

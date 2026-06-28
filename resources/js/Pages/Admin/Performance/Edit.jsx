@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { Save, User, Trophy, MessageSquare, ArrowLeft, Target, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
@@ -88,7 +88,7 @@ export default function Edit({ test, categories }) {
     };
 
     return (
-        <AdminLayout title="Input Test Scores" noContainer>
+        <AppLayout title="Input Test Scores" noContainer>
             <Head title="Scoring" />
 
             <form onSubmit={submit} className="relative min-h-screen bg-slate-50/50 pb-28 md:pb-12">
@@ -213,6 +213,6 @@ export default function Edit({ test, categories }) {
                 </div>
 
             </form>
-        </AdminLayout>
+        </AppLayout>
     );
 }

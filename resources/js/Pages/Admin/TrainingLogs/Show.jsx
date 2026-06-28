@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { ArrowLeft, Save, CalendarDays } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -57,7 +57,7 @@ export default function Show({ session, exercisesList, nextSession, historySessi
     };
 
     return (
-        <AdminLayout title={`Training Log - ${session.training_type}`}>
+        <AppLayout title={`Training Log - ${session.training_type}`}>
             <Head title={`Log Latihan - ${session.user.name}`} />
             
             
@@ -133,6 +133,6 @@ export default function Show({ session, exercisesList, nextSession, historySessi
                     </button>
                 </div>
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }

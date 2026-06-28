@@ -1,5 +1,6 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import PageHeader from '@/Components/Layout/PageHeader';
 import { 
     Plus, Calendar, User, Activity, Search, Filter, 
     X, ChevronDown, Check, Edit3, ArrowUpRight, Trash2, Target 
@@ -79,108 +80,83 @@ export default function Index({ tests, sports, filters = {} }) {
     };
 
     return (
-        <AdminLayout title="Performance History">
+        <AppLayout title="Performance History">
             <Head title="Performance History" />
 
             <div className="w-full max-w-[1400px] mx-auto pb-12">
                 
-                <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
-                    <div className="relative z-10 w-full md:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block border border-orange-100/50">Evaluation</span>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                            <Target className="w-6 h-6 md:w-8 md:h-8 text-[#ff4d00]" /> Performance History
-                        </h2>
-                        <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Monitor athlete scores and physical progress over time.</p>
-                    </div>
-
-                    {!isAthlete && (
-                        <div className="relative z-10 w-full md:w-auto flex justify-end">
-                            <Link 
-                                href={route('admin.performance.create')} 
-                                className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-6 py-3.5 md:py-3 rounded-xl md:rounded-lg text-sm font-bold shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95 touch-manipulation"
-                            >
-                                <Plus className="w-4 h-4" /> New Test Entry
-                            </Link>
-                        </div>
-                    )}
-                </div>
-
-                
-                {!isAthlete && (
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-6 md:mb-8 flex flex-col md:flex-row gap-3 items-center relative z-20">
-                        
-                        
-                        <div className="relative w-full md:flex-1">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <Search className="h-4 w-4 text-slate-400" />
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search athlete name..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 border border-slate-200 hover:border-slate-300 rounded-lg bg-slate-50 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm font-medium text-slate-700 transition-colors outline-none shadow-sm touch-manipulation"
-                            />
-                        </div>
-
-                        <div className="h-8 w-px bg-slate-200 hidden md:block"></div>
-
-                        
-                        <div className="relative w-full md:w-64 shrink-0">
-                            {isDropdownOpen && (
-                                <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsDropdownOpen(false)}></div>
-                            )}
-                            <button 
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="w-full flex items-center justify-between px-4 py-3 md:py-2.5 bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-lg transition-colors text-sm font-medium text-slate-700 group shadow-sm touch-manipulation"
-                            >
-                                <div className="flex items-center gap-2 truncate">
-                                    <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#ff4d00]' : 'text-slate-400'}`} />
-                                    <span className={`truncate ${selectedSport ? 'text-[#ff4d00] font-bold' : ''}`}>
-                                        {selectedSportLabel}
-                                    </span>
-                                </div>
-                                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {isDropdownOpen && (
-                                <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto custom-scrollbar">
-                                    <div 
-                                        className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport === '' ? 'bg-orange-50/50' : ''}`}
-                                        onClick={() => { setSelectedSport(''); setIsDropdownOpen(false); }}
+                <PageHeader 
+                    title="Performance History"
+                    subtitle="Monitor athlete scores and physical progress over time."
+                    badge="Evaluation"
+                    icon={Target}
+                    searchPlaceholder={!isAthlete ? "Search athlete name..." : undefined}
+                    searchValue={search}
+                    onSearchChange={setSearch}
+                    actions={
+                        !isAthlete && (
+                            <>
+                                <div className="relative w-full md:w-48 shrink-0">
+                                    {isDropdownOpen && (
+                                        <div className="fixed inset-0 z-10 cursor-default" onClick={() => setIsDropdownOpen(false)}></div>
+                                    )}
+                                    <button 
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg transition-colors text-sm font-medium text-slate-700 group shadow-sm touch-manipulation"
                                     >
-                                        <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>All Sports</span>
-                                        {selectedSport === '' && <Check className="w-4 h-4 text-[#ff4d00]" />}
-                                    </div>
-                                    <div className="h-px bg-slate-100 my-1"></div>
-                                    {sports.map((sport) => (
-                                        <div 
-                                            key={sport.id}
-                                            className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport == sport.id ? 'bg-orange-50/50' : ''}`}
-                                            onClick={() => { setSelectedSport(sport.id); setIsDropdownOpen(false); }}
-                                        >
-                                            <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
-                                            {selectedSport == sport.id && <Check className="w-4 h-4 text-[#ff4d00]" />}
+                                        <div className="flex items-center gap-2 truncate">
+                                            <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#ff4d00]' : 'text-slate-400'}`} />
+                                            <span className={`truncate ${selectedSport ? 'text-[#ff4d00] font-bold' : ''}`}>
+                                                {selectedSportLabel}
+                                            </span>
                                         </div>
-                                    ))}
+                                        <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    
+                                    {isDropdownOpen && (
+                                        <div className="absolute top-full right-0 mt-2 w-full md:w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 max-h-80 overflow-y-auto custom-scrollbar">
+                                            <div 
+                                                className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport === '' ? 'bg-orange-50/50' : ''}`}
+                                                onClick={() => { setSelectedSport(''); setIsDropdownOpen(false); }}
+                                            >
+                                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>All Sports</span>
+                                                {selectedSport === '' && <Check className="w-4 h-4 text-[#ff4d00]" />}
+                                            </div>
+                                            <div className="h-px bg-slate-100 my-1"></div>
+                                            {sports.map((sport) => (
+                                                <div 
+                                                    key={sport.id}
+                                                    className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport == sport.id ? 'bg-orange-50/50' : ''}`}
+                                                    onClick={() => { setSelectedSport(sport.id); setIsDropdownOpen(false); }}
+                                                >
+                                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
+                                                    {selectedSport == sport.id && <Check className="w-4 h-4 text-[#ff4d00]" />}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                                
+                                {(search || selectedSport) && (
+                                    <button 
+                                        onClick={resetFilters}
+                                        className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border border-transparent hover:border-rose-100 flex justify-center items-center shrink-0 touch-manipulation bg-slate-50 md:bg-transparent"
+                                        title="Reset Filters"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                )}
 
-                        
-                        {(search || selectedSport) && (
-                            <button 
-                                onClick={resetFilters}
-                                className="p-3 md:p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border border-transparent hover:border-rose-100 w-full md:w-auto flex justify-center items-center shrink-0 touch-manipulation font-bold text-sm md:text-base bg-slate-50 md:bg-transparent"
-                                title="Reset Filters"
-                            >
-                                <span className="md:hidden mr-2">Reset Filter</span>
-                                <X className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                        )}
-                    </div>
-                )}
+                                <Link 
+                                    href={route('admin.performance.create')} 
+                                    className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95"
+                                >
+                                    <Plus className="w-4 h-4" /> New Test
+                                </Link>
+                            </>
+                        )
+                    }
+                />
 
                 
                 {tests.length > 0 ? (
@@ -323,6 +299,6 @@ export default function Index({ tests, sports, filters = {} }) {
                     </div>
                 )}
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

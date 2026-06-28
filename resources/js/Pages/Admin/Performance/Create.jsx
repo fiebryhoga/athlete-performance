@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
 import { Calendar, User, Search, ArrowRight, ChevronDown, Sparkles, Target, X } from 'lucide-react';
@@ -42,7 +42,7 @@ export default function Create({ athletes }) {
     };
 
     return (
-        <AdminLayout title="New Test Session" noContainer>
+        <AppLayout title="New Test Session" noContainer>
             <Head title="New Session" />
 
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] bg-white">
@@ -205,6 +205,6 @@ export default function Create({ athletes }) {
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

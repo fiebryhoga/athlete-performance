@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { 
     User, Calendar, Activity, Trophy, TrendingUp, TrendingDown, 
@@ -42,7 +42,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
     };
 
     return (
-        <AdminLayout title="My Dashboard">
+        <AppLayout title="My Dashboard">
             <Head title="Dashboard Atlet" />
 
             <div className="w-full max-w-[1400px] mx-auto  pb-12 overflow-x-hidden sm:overflow-visible">
@@ -370,7 +370,7 @@ export default function AthleteDashboard({ user, stats, radarData, history, tren
                 </div>
 
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }
 

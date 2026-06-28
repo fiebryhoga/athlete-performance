@@ -12,6 +12,7 @@ class IndividualTraining extends Model
         'date',
         'day_number',
         'session_number',
+        'name',
         'training_type',
         'location',
     ];

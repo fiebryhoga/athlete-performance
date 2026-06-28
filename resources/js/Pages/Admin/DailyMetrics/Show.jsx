@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Calendar, User, BarChart3, AlertTriangle, Check, X, CalendarDays, Activity } from 'lucide-react';
 import { useState } from 'react';
@@ -72,7 +72,7 @@ export default function Show({ athlete, dailyHistory }) {
     };
 
     return (
-        <AdminLayout title={`Monitoring - ${athlete?.name || 'Athlete'}`}>
+        <AppLayout title={`Monitoring - ${athlete?.name || 'Athlete'}`}>
             <Head title={`Monitoring - ${athlete?.name || 'Athlete'}`} />
 
             <div className="max-w-7xl mx-auto animate-in fade-in duration-500">
@@ -235,6 +235,6 @@ export default function Show({ athlete, dailyHistory }) {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }

@@ -3,7 +3,7 @@ import { Search, Menu, LogOut, User, Lock, X, Settings, ChevronDown, Save, Shiel
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios'; 
 
-export default function Navbar({ onMenuClick }) {
+export default function Navbar({ onMobileMenuClick, isSidebarCollapsed, toggleSidebar }) {
     const { auth } = usePage().props;
     const user = auth.user;
     const isAthlete = user.role === 'athlete';
@@ -94,8 +94,9 @@ export default function Navbar({ onMenuClick }) {
                         </div>
                     ) : (
                         <>
-                            <div className="flex items-center gap-4">
-                                <button onClick={onMenuClick} className="p-2 text-slate-500 hover:bg-slate-100 hover:text-[#ff4d00] rounded-lg lg:hidden transition-all">
+                            <div className="flex items-center gap-2 sm:gap-4">
+                                {/* Mobile Menu Button */}
+                                <button onClick={onMobileMenuClick} className="p-2 text-slate-500 hover:bg-slate-100 hover:text-[#ff4d00] rounded-lg lg:hidden transition-all">
                                     <Menu className="h-6 w-6" />
                                 </button>
                                 
@@ -103,7 +104,7 @@ export default function Navbar({ onMenuClick }) {
                                     <span className="text-sm font-bold text-slate-800 tracking-tight leading-none">
                                         {isAthlete ? 'Athlete Panel' : 'Admin Panel'}
                                     </span>
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 sm:mt-0">Analytics</span>
+                                    <span className="text-xs text-slate-400 font-medium capitalize mt-1 sm:mt-0">Sistem Performa</span>
                                 </div>
                             </div>
 
@@ -124,7 +125,7 @@ export default function Navbar({ onMenuClick }) {
                                             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
                                                 {results.length > 0 ? (
                                                     <ul className="py-2">
-                                                        <li className="px-4 py-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Search Results</li>
+                                                        <li className="px-4 py-2 text-xs font-semibold text-slate-400 capitalize">Hasil Pencarian</li>
                                                         {results.map((result) => (
                                                             <li key={result.id}>
                                                                 <Link href={result.url} onClick={() => { setShowResults(false); setKeyword(''); }} className="flex items-center justify-between px-4 py-3 hover:bg-orange-50 transition-colors group">
@@ -179,7 +180,7 @@ export default function Navbar({ onMenuClick }) {
                                             <p className="text-sm font-bold text-slate-700 leading-none group-hover:text-[#ff4d00] transition-colors truncate max-w-[120px]">
                                                 {user.name}
                                             </p>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                                            <p className="text-xs font-semibold text-slate-400 capitalize mt-0.5">
                                                 {user.role}
                                             </p>
                                         </div>
@@ -190,7 +191,7 @@ export default function Navbar({ onMenuClick }) {
                                         <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-lg shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
                                             <div className="px-5 py-4 border-b border-slate-50 md:hidden bg-slate-50/50 mb-1">
                                                 <p className="text-sm font-bold text-slate-800">{user.name}</p>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5 mt-1">
+                                                <p className="text-xs font-semibold capitalize text-slate-500 flex items-center gap-1.5 mt-1">
                                                     <Shield className="w-3 h-3 text-[#ff4d00]" /> {user.role}
                                                 </p>
                                             </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, usePage } from '@inertiajs/react';
 import { Activity, Plus } from 'lucide-react';
 
@@ -234,7 +234,7 @@ export default function Show({ auth, player, history, benchmarks }) {
     };
 
     return (
-        <AdminLayout
+        <AppLayout
             title={"Body Composition Analytics"}
             description={"Detailed analysis of body composition, muscle mass, fat percentage, and cellular performance."}
         >
@@ -267,20 +267,22 @@ export default function Show({ auth, player, history, benchmarks }) {
                         </div>
                     </>
                 ) : (
-                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300  bg-zinc-50/50  p-12 text-center shadow-sm transition-colors mt-6">
-                        <div className="w-14 h-14 rounded-xl bg-zinc-100  border border-zinc-200  flex items-center justify-center mb-5 shadow-sm">
-                            <Activity size={28} className="text-zinc-400 " />
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-12 text-center shadow-sm transition-colors mt-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl opacity-60 -mr-10 -mt-10 pointer-events-none"></div>
+                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-60 -ml-10 -mb-10 pointer-events-none"></div>
+                        <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-5 shadow-sm relative z-10">
+                            <Activity size={32} className="text-[#ff4d00]" />
                         </div>
-                        <h3 className="text-lg font-bold tracking-tight text-zinc-950  mb-1.5">
+                        <h3 className="text-xl font-extrabold tracking-tight text-slate-900 mb-2 relative z-10">
                             {"No Analytics Data"}
                         </h3>
-                        <p className="text-sm text-zinc-500  max-w-md mx-auto mb-6 leading-relaxed">
+                        <p className="text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed relative z-10">
                             {"This player doesn't have any body composition history records yet. Add the first data to generate the analytics dashboard and smart insights."}
                         </p>
                         {true && (
                             <button
                                 onClick={handleAddRecord}
-                                className="inline-flex items-center justify-center rounded-lg text-sm font-semibold transition-all bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 h-10 px-6    shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 "
+                                className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all bg-[#ff4d00] text-white hover:bg-[#e64500] h-10 px-6 shadow-lg shadow-[#ff4d00]/20 focus:outline-none focus:ring-2 focus:ring-[#ff4d00] focus:ring-offset-2 relative z-10"
                             >
                                 <Plus size={16} className="mr-2" /> 
                                 {"Input Data Now"}
@@ -300,6 +302,6 @@ export default function Show({ auth, player, history, benchmarks }) {
                 player={player}
                 record={editingRecord}
             />
-        </AdminLayout>
+        </AppLayout>
     );
 }

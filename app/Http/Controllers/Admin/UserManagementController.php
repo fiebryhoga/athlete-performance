@@ -9,12 +9,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class AdminManagementController extends Controller
+class UserManagementController extends Controller
 {
-    
+    /**
+     * Display a listing of the users based on role tab.
+     */
     public function index(Request $request)
     {
-        $admins = User::whereIn('role', ['superadmin', 'coach'])
+        $tab = $request->query('tab', 'superadmin'); // default tab
+        
+        $users = User::where('role', $tab)
             ->when($request->search, function($q, $search) {
                 $q->where(function($sub) use ($search) {
                     $sub->where('name', 'like', "%{$search}%")
@@ -25,20 +29,23 @@ class AdminManagementController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return Inertia::render('Admin/Admins/Index', [
-            'admins' => $admins,
-            'filters' => $request->only(['search']),
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'filters' => $request->only(['search', 'tab']),
+            'activeTab' => $tab,
         ]);
     }
 
-    
+    /**
+     * Store a newly created user.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'athlete_id' => 'required|string|max:50|unique:users,athlete_id',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:superadmin,coach',
+            'role' => 'required|in:superadmin,coach,athlete',
         ]);
 
         User::create([
@@ -48,17 +55,19 @@ class AdminManagementController extends Controller
             'role' => $request->role,
         ]);
 
-        return redirect()->back()->with('message', 'Admin baru berhasil ditambahkan.');
+        return redirect()->back()->with('message', 'Pengguna baru berhasil ditambahkan.');
     }
 
-    
+    /**
+     * Update the specified user in storage.
+     */
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'athlete_id' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6',
-            'role' => 'required|in:superadmin,coach',
+            'role' => 'required|in:superadmin,coach,athlete',
         ]);
 
         $data = [
@@ -67,23 +76,26 @@ class AdminManagementController extends Controller
             'role' => $request->role,
         ];
 
+        // Jika password diisi, maka ubah (Reset Password)
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
         $user->update($data);
 
-        return redirect()->back()->with('message', 'Data admin diperbarui.');
+        return redirect()->back()->with('message', 'Data pengguna berhasil diperbarui.');
     }
 
-    
+    /**
+     * Remove the specified user from storage.
+     */
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->withErrors(['error' => 'Anda tidak bisa menghapus akun sendiri.']);
+            return back()->withErrors(['error' => 'Anda tidak bisa menghapus akun Anda sendiri.']);
         }
         
         $user->delete();
-        return redirect()->back()->with('message', 'Staf/Coach berhasil dihapus.');
+        return redirect()->back()->with('message', 'Pengguna berhasil dihapus.');
     }
 }

@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { ArrowLeft, Plus, Trash2, Edit3, Target, Info, Timer, Ruler, Hash, Activity, Scale, X, Save, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -136,7 +136,7 @@ export default function Show({ sport, categories }) {
     const activeConfig = PARAM_CONFIG[data.parameter_type] || PARAM_CONFIG['points'];
 
     return (
-        <AdminLayout title={`Manage: ${sport.name}`}>
+        <AppLayout title={`Manage: ${sport.name}`}>
             <Head title={sport.name} />
 
             <div className="w-full max-w-[1400px] mx-auto pb-12">
@@ -363,6 +363,6 @@ export default function Show({ sport, categories }) {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }

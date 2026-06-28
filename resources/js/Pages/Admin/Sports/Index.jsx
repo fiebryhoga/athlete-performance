@@ -1,7 +1,8 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Plus, Users, Dumbbell, ChevronRight, Activity, X, Save, Trash2, Trophy } from 'lucide-react';
+import { Plus, Users, Dumbbell, ChevronRight, Activity, X, Save, Trash2, Trophy, Search } from 'lucide-react';
 import { useState } from 'react';
+import PageHeader from '@/Components/Layout/PageHeader';
 
 export default function Index({ sports }) {
     const { data, setData, post, processing, reset, errors } = useForm({
@@ -10,6 +11,11 @@ export default function Index({ sports }) {
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredSports = sports.filter(sport => 
+        sport.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const submit = (e) => {
         e.preventDefault();
@@ -44,34 +50,31 @@ export default function Index({ sports }) {
     };
 
     return (
-        <AdminLayout title="Sports Management">
+        <AppLayout title="Sports Management">
             <Head title="Sports Management" />
 
-            
-            <div className="bg-white p-6 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-8 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
-                
-                <div className="relative z-10">
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-3 inline-block">Management</span>
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        Sports Categories
-                    </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-sm">Kelola data cabang olahraga dan spesifikasi parameter tes fisik.</p>
-                </div>
-
-                <button 
-                    onClick={() => setIsModalOpen(true)}
-                    className="relative z-10 flex items-center gap-2 bg-[#ff4d00] text-white px-6 py-3 rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-lg shadow-[#ff4d00]/20 active:scale-95"
-                >
-                    <Plus className="w-4 h-4" /> Add Sport
-                </button>
-            </div>
+            <PageHeader 
+                title="Sports Categories"
+                subtitle="Kelola data cabang olahraga dan spesifikasi parameter tes fisik."
+                badge="Management"
+                icon={Dumbbell}
+                searchPlaceholder="Search sports..."
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                actions={
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-lg shadow-[#ff4d00]/20 active:scale-95 w-full sm:w-auto justify-center"
+                    >
+                        <Plus className="w-4 h-4 md:w-5 md:h-5" /> Add Sport
+                    </button>
+                }
+            />
 
             
-            {sports.length > 0 ? (
+            {filteredSports.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
-                    {sports.map((sport) => (
+                    {filteredSports.map((sport) => (
                         <Link 
                             key={sport.id} 
                             href={route('admin.sports.show', sport.id)}
@@ -186,6 +189,6 @@ export default function Index({ sports }) {
                     </div>
                 </div>
             )}
-        </AdminLayout>
+        </AppLayout>
     );
 }

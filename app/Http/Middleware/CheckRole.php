@@ -21,7 +21,11 @@ class CheckRole
             return redirect('login');
         }
 
-        
+        // Superadmin bypasses all role checks
+        if ($request->user()->role === 'superadmin') {
+            return $next($request);
+        }
+
         if (! in_array($request->user()->role, $roles)) {
             abort(403, 'Akses Ditolak. Anda tidak memiliki izin untuk halaman ini.');
         }

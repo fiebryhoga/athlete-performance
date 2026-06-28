@@ -1,4 +1,4 @@
-import AdminLayout from '@/Layouts/AdminLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import AthleteGallery from './Partials/AthleteGallery';
 import { 
@@ -31,7 +31,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
     const historicalColors = ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1'];
 
     return (
-        <AdminLayout title={`Profile - ${safeAthlete.name}`}>
+        <AppLayout title={`Profile - ${safeAthlete.name}`}>
             <Head title={safeAthlete.name || 'Athlete Profile'} />
 
             
@@ -396,6 +396,6 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     </div>
                 </div>
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

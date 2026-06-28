@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from "react";
-import AdminLayout from "@/Layouts/AdminLayout";
+import AppLayout from "@/Layouts/AppLayout";
 import { Head, useForm, Link, usePage, router } from "@inertiajs/react";
 import {
     Search,
@@ -232,7 +232,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
     }, [currentCategoryId, categories]);
 
     return (
-        <AdminLayout title={headerTitle}>
+        <AppLayout title={headerTitle}>
             <Head title={headerTitle} />
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">{headerTitle}</h1>
@@ -709,6 +709,6 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                 </div>
             )}
 
-            </AdminLayout>
+            </AppLayout>
     );
 }
