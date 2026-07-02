@@ -15,7 +15,7 @@ class TrainingLoadVol006Seeder extends Seeder
     public function run(): void
     {
         
-        $athlete = User::where('athlete_id', 'VOL-006')->first();
+        $athlete = User::where('username', 'VOL-006')->first();
 
         if (!$athlete) {
             $this->command->error("Atlet dengan ID VOL-006 tidak ditemukan! Pastikan atlet sudah ada di database.");

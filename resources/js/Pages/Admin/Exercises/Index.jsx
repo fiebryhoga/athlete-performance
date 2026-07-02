@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from "react";
 import AppLayout from "@/Layouts/AppLayout";
+import PageHeader from "@/Components/Layout/PageHeader";
 import { Head, useForm, Link, usePage, router } from "@inertiajs/react";
 import {
     Search,
@@ -99,6 +100,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
     const handleDeleteExercise = (e, id) => {
         e.preventDefault();
+        e.stopPropagation();
         if (confirm("Yakin ingin menghapus latihan ini?")) {
             router.delete(route("admin.exercises.destroy", id));
         }
@@ -173,6 +175,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
     const handleDeleteCategory = (e, id) => {
         e.preventDefault();
+        e.stopPropagation();
         if (confirm("Yakin ingin menghapus kategori ini? Latihan di dalamnya akan menjadi tanpa kategori.")) {
             destroyCat(route("admin.exercise-categories.destroy", id));
         }
@@ -180,6 +183,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
     const handleDeletePackage = (e, id) => {
         e.preventDefault();
+        e.stopPropagation();
         if (confirm("Yakin ingin menghapus paket latihan ini?")) {
             router.delete(route("admin.exercise-packages.destroy", id));
         }
@@ -234,33 +238,64 @@ export default function Index({ auth, exercises, categories = [], packages = [],
     return (
         <AppLayout title={headerTitle}>
             <Head title={headerTitle} />
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">{headerTitle}</h1>
-                <p className="text-gray-600">Kelola daftar bentuk latihan fisik, kategori, dan paket latihan.</p>
-            </div>
+            <PageHeader 
+                title={headerTitle}
+                subtitle="Kelola daftar bentuk latihan fisik, kategori, dan paket latihan."
+                badge="Master Data"
+                icon={Dumbbell}
+                actions={
+                    canModify ? (
+                        <div className="flex items-center gap-2">
+                            {activeTab === "exercises" && (
+                                <>
+                                    <Link href={route("admin.exercises.bulk-create")} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs md:text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm">
+                                        <AlignLeft size={16} /> Buat Banyak
+                                    </Link>
+                                    <Link href={route("admin.exercises.create")} className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20">
+                                        <Plus size={16} /> Buat Latihan
+                                    </Link>
+                                </>
+                            )}
+                            {activeTab === "categories" && (
+                                <button
+                                    onClick={() => openCategoryModal()}
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20"
+                                >
+                                    <Plus size={16} /> Buat Kategori
+                                </button>
+                            )}
+                            {activeTab === "packages" && (
+                                <Link href={route("admin.exercise-packages.create")} className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20">
+                                    <Plus size={16} /> Buat Paket
+                                </Link>
+                            )}
+                        </div>
+                    ) : null
+                }
+            />
 
             <div className="pb-12 space-y-6 relative">
                 {/* Tabs & Filters */}
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    <div className="flex p-1 bg-zinc-100 border border-zinc-200 rounded-xl w-fit shadow-sm overflow-x-auto max-w-full">
+                    <div className="flex p-1 bg-slate-100 border border-slate-200 rounded-xl w-fit shadow-sm overflow-x-auto max-w-full">
                         <button
                             onClick={() => {
                                 setActiveTab("exercises");
                                 router.get(route('admin.exercises.index'), {}, { preserveState: true });
                             }}
-                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "exercises" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}
+                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "exercises" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                         >
                             <Dumbbell size={16} /> Latihan Satuan
                         </button>
                         <button
                             onClick={() => setActiveTab("categories")}
-                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "categories" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}
+                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "categories" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                         >
                             <Edit size={16} /> Kategori Latihan
                         </button>
                         <button
                             onClick={() => setActiveTab("packages")}
-                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "packages" ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-700"}`}
+                            className={`flex whitespace-nowrap items-center gap-2 px-5 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === "packages" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                         >
                             <Package size={16} /> Paket Latihan
                         </button>
@@ -271,40 +306,40 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                         <div className="relative">
                             <button
                                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                                className="flex items-center justify-between w-64 px-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-900 transition-colors shadow-sm"
+                                className="flex items-center justify-between w-64 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 transition-colors shadow-sm"
                             >
                                 <span className="truncate">
                                     {!currentCategoryId ? "Semua Latihan" : currentCategoryId === 'uncategorized' ? "Tanpa Kategori" : categories.find(c => c.id == currentCategoryId)?.name || "Pilih Kategori"}
                                 </span>
-                                <ChevronDown size={16} className={`text-zinc-500 transition-transform ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
+                                <ChevronDown size={16} className={`text-slate-500 transition-transform ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
                             </button>
                             
                             {isCategoryDropdownOpen && (
                                 <>
                                     <div className="fixed inset-0 z-40" onClick={() => setIsCategoryDropdownOpen(false)}></div>
-                                    <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-zinc-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                                        <div className="p-2 border-b border-zinc-100">
+                                    <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                        <div className="p-2 border-b border-slate-100">
                                             <div className="relative">
-                                                <Search className="absolute left-2.5 top-2.5 text-zinc-400" size={14} />
+                                                <Search className="absolute left-2.5 top-2.5 text-slate-400" size={14} />
                                                 <input 
                                                     type="text" 
                                                     placeholder="Cari kategori..." 
                                                     value={categorySearch}
                                                     onChange={(e) => setCategorySearch(e.target.value)}
-                                                    className="w-full pl-8 pr-3 py-2 bg-zinc-50 border-none rounded-lg text-sm text-zinc-900 focus:ring-0 outline-none"
+                                                    className="w-full pl-8 pr-3 py-2 bg-slate-50 border-none rounded-lg text-sm text-slate-900 focus:ring-0 outline-none"
                                                 />
                                             </div>
                                         </div>
                                         <div className="max-h-60 overflow-y-auto custom-scrollbar p-1">
                                             <button 
                                                 onClick={() => { router.get(route('admin.exercises.index'), {}, { preserveState: true }); setIsCategoryDropdownOpen(false); }}
-                                                className={`w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-zinc-100 transition-colors ${!currentCategoryId ? 'bg-zinc-100 font-bold text-zinc-900' : 'text-zinc-700'}`}
+                                                className={`w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 transition-colors ${!currentCategoryId ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-700'}`}
                                             >
                                                 Semua Latihan
                                             </button>
                                             <button 
                                                 onClick={() => { router.get(route('admin.exercises.index', { category_id: 'uncategorized' }), {}, { preserveState: true }); setIsCategoryDropdownOpen(false); }}
-                                                className={`w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-zinc-100 transition-colors ${currentCategoryId === 'uncategorized' ? 'bg-zinc-100 font-bold text-zinc-900' : 'text-zinc-700'}`}
+                                                className={`w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 transition-colors ${currentCategoryId === 'uncategorized' ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-700'}`}
                                             >
                                                 Tanpa Kategori
                                             </button>
@@ -312,7 +347,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                                 <div key={cat.id} className="flex items-center group">
                                                     <button 
                                                         onClick={() => { router.get(route('admin.exercises.index', { category_id: cat.id }), {}, { preserveState: true }); setIsCategoryDropdownOpen(false); }}
-                                                        className={`flex-1 text-left px-3 py-2 text-sm rounded-lg hover:bg-zinc-100 transition-colors truncate ${currentCategoryId == cat.id ? 'bg-zinc-100 font-bold text-zinc-900' : 'text-zinc-700'}`}
+                                                        className={`flex-1 text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 transition-colors truncate ${currentCategoryId == cat.id ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-700'}`}
                                                     >
                                                         {cat.name}
                                                     </button>
@@ -320,10 +355,10 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                             ))}
                                         </div>
                                         {canModify && (
-                                            <div className="p-2 border-t border-zinc-100 bg-zinc-50">
+                                            <div className="p-2 border-t border-slate-100 bg-slate-50">
                                                 <button 
                                                     onClick={() => { openCategoryModal(); setIsCategoryDropdownOpen(false); }}
-                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 text-zinc-900 transition-colors shadow-sm"
+                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-900 transition-colors shadow-sm"
                                                 >
                                                     <Plus size={14} /> Buat Kategori Baru
                                                 </button>
@@ -340,7 +375,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                         <div className="relative w-full sm:w-80 group">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <Search className="text-zinc-400" size={16} />
+                                <Search className="text-slate-400" size={16} />
                             </div>
                             <input
                                 type="text"
@@ -350,19 +385,19 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                 }
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-9 pr-8 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-900 outline-none shadow-sm"
+                                className="w-full pl-9 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:ring-1 focus:ring-slate-900 outline-none shadow-sm"
                             />
                         </div>
 
                         {activeTab === "exercises" && (
                             <div className="relative w-full sm:w-48">
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <ArrowUpDown className="text-zinc-400" size={16} />
+                                    <ArrowUpDown className="text-slate-400" size={16} />
                                 </div>
                                 <select
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
-                                    className="w-full pl-9 pr-8 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none shadow-sm appearance-none cursor-pointer truncate"
+                                    className="w-full pl-9 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:ring-1 focus:ring-slate-900 outline-none shadow-sm appearance-none cursor-pointer truncate"
                                 >
                                     <option value="name_asc">Nama (A-Z)</option>
                                     <option value="name_desc">Nama (Z-A)</option>
@@ -370,37 +405,19 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                     <option value="created_asc">Terlama Ditambahkan</option>
                                 </select>
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <ChevronDown className="text-zinc-400" size={16} />
+                                    <ChevronDown className="text-slate-400" size={16} />
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {canModify && activeTab === "exercises" && (
-                        <div className="flex items-center gap-2">
-                            <Link href={route("admin.exercises.bulk-create")} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 text-zinc-900 rounded-xl text-sm font-semibold hover:bg-zinc-50 transition-colors shadow-sm">
-                                <AlignLeft size={16} /> Buat Banyak
-                            </Link>
-                            <Link href={route("admin.exercises.create")} className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-xl text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-sm"><Plus size={16} /> Buat Latihan</Link>
-                        </div>
-                    )}
-                    {canModify && activeTab === "categories" && (
-                        <button
-                            onClick={() => openCategoryModal()}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-sm"
-                        >
-                            <Plus size={16} /> Buat Kategori
-                        </button>
-                    )}
-                    {canModify && activeTab === "packages" && (
-                        <Link href={route("admin.exercise-packages.create")} className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-sm"><Plus size={16} /> Buat Paket</Link>
-                    )}
+
                 </div>
 
                 {activeTab === "exercises" && (
                     <>
                         {selectedExercises.length > 0 && (
-                            <div className="flex items-center justify-between p-4 bg-zinc-900 text-white rounded-xl animate-in fade-in slide-in-from-top-2">
+                            <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl animate-in fade-in slide-in-from-top-2">
                                 <span className="text-sm font-bold">
                                     {selectedExercises.length} Latihan Terpilih
                                 </span>
@@ -430,52 +447,54 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             {filteredExercises.map((ex) => (
                                 <div
                                     key={ex.id}
-                                    className={`group bg-white border ${selectedExercises.includes(ex.id) ? 'border-zinc-900 ring-1 ring-zinc-900' : 'border-zinc-200 hover:border-zinc-900'} rounded-xl p-5 transition-all shadow-sm flex flex-col justify-between relative`}
+                                    onClick={() => router.get(route('admin.exercises.edit', ex.id))}
+                                    className={`group cursor-pointer bg-white border ${selectedExercises.includes(ex.id) ? 'border-slate-900 ring-1 ring-slate-900' : 'border-slate-200 hover:border-slate-900 hover:shadow-md'} rounded-xl p-5 transition-all shadow-sm flex flex-col justify-between relative`}
                                 >
                                     {canModify && (
                                         <div className="absolute top-4 right-4 z-10">
                                             <input
                                                 type="checkbox"
-                                                className="w-4 h-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 cursor-pointer"
+                                                className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                                                 checked={selectedExercises.includes(ex.id)}
+                                                onClick={(e) => e.stopPropagation()}
                                                 onChange={() => toggleExerciseMainSelection(ex.id)}
                                             />
                                         </div>
                                     )}
                                     <div>
-                                        <div className="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 border border-zinc-200 mb-4 overflow-hidden relative">
+                                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900 border border-slate-200 mb-4 overflow-hidden relative">
                                             {ex.images && ex.images.length > 0 ? (
                                                 <img src={ex.images[0]} alt={ex.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 <Dumbbell size={18} />
                                             )}
                                         </div>
-                                        <h4 className="font-bold text-zinc-900 pr-6">
+                                        <h4 className="font-bold text-slate-900 pr-6">
                                             {ex.name}
                                         </h4>
-                                        <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-600">
+                                        <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">
                                             {ex.category?.name || "Tanpa Kategori"}
                                         </div>
                                         
-                                        <div className="flex gap-3 mt-3 text-xs text-zinc-500 font-semibold">
+                                        <div className="flex gap-3 mt-3 text-xs text-slate-500 font-semibold">
                                             <span className="flex items-center gap-1"><ImageIcon size={14}/> {Array.isArray(ex.images) ? ex.images.length : 0}</span>
                                             <span className="flex items-center gap-1"><Video size={14}/> {Array.isArray(ex.videos) ? ex.videos.length : 0}</span>
                                         </div>
                                         
                                         {ex.description && (
-                                            <p className="mt-2 text-xs text-zinc-500 line-clamp-2">
+                                            <p className="mt-2 text-xs text-slate-500 line-clamp-2">
                                                 {ex.description}
                                             </p>
                                         )}
                                     </div>
-                                    <div className="mt-6 pt-4 border-t border-zinc-100 flex justify-end items-center">
+                                    <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end items-center">
                                         <div className="flex items-center gap-3">
                                             {canModify && (
                                                 <>
-                                                    <Link href={route("admin.exercises.edit", ex.id)} className="text-zinc-400 hover:text-zinc-900 transition-colors p-1"><Edit size={16} /></Link>
+                                                    <button type="button" onClick={(e) => { e.stopPropagation(); router.get(route("admin.exercises.edit", ex.id)); }} className="text-slate-400 hover:text-slate-900 transition-colors p-1"><Edit size={16} /></button>
                                                     <button
                                                         onClick={(e) => handleDeleteExercise(e, ex.id)}
-                                                        className="text-zinc-400 hover:text-red-500 transition-colors p-1"
+                                                        className="text-slate-400 hover:text-red-500 transition-colors p-1"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -486,7 +505,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                 </div>
                             ))}
                             {filteredExercises.length === 0 && (
-                                <div className="col-span-full py-12 text-center text-zinc-500 text-sm">
+                                <div className="col-span-full py-12 text-center text-slate-500 text-sm">
                                     Belum ada latihan yang didaftarkan.
                                 </div>
                             )}
@@ -499,28 +518,28 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                         {filteredCategories.map((cat) => (
                             <div
                                 key={cat.id}
-                                className="group bg-white border border-zinc-200 rounded-xl p-5 hover:border-zinc-900 transition-all shadow-sm flex flex-col justify-between"
+                                className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-900 transition-all shadow-sm flex flex-col justify-between"
                             >
                                 <div>
-                                    <div className="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 border border-zinc-200 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900 border border-slate-200 mb-4">
                                         <Edit size={18} />
                                     </div>
-                                    <h4 className="font-bold text-zinc-900">
+                                    <h4 className="font-bold text-slate-900">
                                         {cat.name}
                                     </h4>
                                 </div>
-                                <div className="mt-6 pt-4 border-t border-zinc-100 flex justify-end items-center gap-3">
+                                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end items-center gap-3">
                                     {canModify && (
                                         <>
                                             <button
                                                 onClick={() => openCategoryModal(cat)}
-                                                className="text-zinc-400 hover:text-zinc-900 transition-colors p-1"
+                                                className="text-slate-400 hover:text-slate-900 transition-colors p-1"
                                             >
                                                 <Edit size={16} />
                                             </button>
                                             <button
                                                 onClick={(e) => handleDeleteCategory(e, cat.id)}
-                                                className="text-zinc-400 hover:text-red-500 transition-colors p-1"
+                                                className="text-slate-400 hover:text-red-500 transition-colors p-1"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -530,7 +549,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             </div>
                         ))}
                         {filteredCategories.length === 0 && (
-                            <div className="col-span-full py-12 text-center text-zinc-500 text-sm">
+                            <div className="col-span-full py-12 text-center text-slate-500 text-sm">
                                 Belum ada kategori yang dibuat.
                             </div>
                         )}
@@ -542,26 +561,26 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                         {filteredPackages.map((pkg) => (
                             <div
                                 key={pkg.id}
-                                className="group bg-white border border-zinc-200 rounded-xl p-5 hover:border-zinc-900 transition-all shadow-sm flex flex-col justify-between"
+                                className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-900 transition-all shadow-sm flex flex-col justify-between"
                             >
                                 <div>
-                                    <div className="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-900 border border-zinc-200 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-900 border border-slate-200 mb-4">
                                         <Package size={18} />
                                     </div>
-                                    <h4 className="font-bold text-zinc-900">
+                                    <h4 className="font-bold text-slate-900">
                                         {pkg.name}
                                     </h4>
-                                    <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-600">
+                                    <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">
                                         {pkg.exercises?.length || 0} Latihan
                                     </div>
                                 </div>
-                                <div className="mt-6 pt-4 border-t border-zinc-100 flex justify-end items-center gap-3">
+                                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end items-center gap-3">
                                     {canModify && (
                                         <>
-                                            <Link href={route("admin.exercise-packages.edit", pkg.id)} className="text-zinc-400 hover:text-zinc-900 transition-colors p-1"><Edit size={16} /></Link>
+                                            <Link href={route("admin.exercise-packages.edit", pkg.id)} className="text-slate-400 hover:text-slate-900 transition-colors p-1"><Edit size={16} /></Link>
                                             <button
                                                 onClick={(e) => handleDeletePackage(e, pkg.id)}
-                                                className="text-zinc-400 hover:text-red-500 transition-colors p-1"
+                                                className="text-slate-400 hover:text-red-500 transition-colors p-1"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -571,7 +590,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             </div>
                         ))}
                         {filteredPackages.length === 0 && (
-                            <div className="col-span-full py-12 text-center text-zinc-500 text-sm">
+                            <div className="col-span-full py-12 text-center text-slate-500 text-sm">
                                 Belum ada paket latihan yang dibuat.
                             </div>
                         )}
@@ -581,16 +600,16 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
             {/* Bulk Category Modal */}
             {isBulkCategoryModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-zinc-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
-                        <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0">
-                            <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
-                                <ArrowUpDown size={18} className="text-zinc-400" />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <ArrowUpDown size={18} className="text-slate-400" />
                                 Pindahkan Kategori ({selectedExercises.length} Latihan)
                             </h3>
                             <button
                                 onClick={() => setIsBulkCategoryModalOpen(false)}
-                                className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                                className="text-slate-400 hover:text-slate-900 transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -599,11 +618,11 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             <form id="bulkCategoryForm" onSubmit={submitBulkCategory}>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
+                                        <label className="block text-xs font-bold text-slate-500 mb-2">
                                             Pilih Kategori Tujuan
                                         </label>
                                         <select
-                                            className="w-full py-3 px-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none"
+                                            className="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
                                             value={bulkCatData.category_id}
                                             onChange={(e) => setBulkCatData("category_id", e.target.value)}
                                         >
@@ -619,12 +638,12 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
                                     {bulkCatData.category_id === "" && (
                                         <div className="animate-in slide-in-from-top-2 duration-200">
-                                            <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
+                                            <label className="block text-xs font-bold text-slate-500 mb-2">
                                                 Nama Kategori Baru
                                             </label>
                                             <input
                                                 type="text"
-                                                className="w-full py-3 px-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none"
+                                                className="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
                                                 value={bulkCatData.new_category_name}
                                                 onChange={(e) => setBulkCatData("new_category_name", e.target.value)}
                                                 placeholder="e.g., Flexibility & Mobility..."
@@ -636,11 +655,11 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                 </div>
                             </form>
                         </div>
-                        <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3 shrink-0">
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 shrink-0">
                             <button
                                 type="button"
                                 onClick={() => setIsBulkCategoryModalOpen(false)}
-                                className="px-5 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-200 rounded-xl transition-colors"
+                                className="px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200 rounded-xl transition-colors"
                             >
                                 Batal
                             </button>
@@ -648,7 +667,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                 type="submit"
                                 form="bulkCategoryForm"
                                 disabled={processingBulkCat}
-                                className="px-6 py-2.5 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors disabled:opacity-50 shadow-sm shadow-zinc-900/20"
+                                className="px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors disabled:opacity-50 shadow-sm shadow-slate-900/20"
                             >
                                 {processingBulkCat ? "Memproses..." : "Terapkan Kategori"}
                             </button>
@@ -659,15 +678,15 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
             {/* Category Modal */}
             {isCategoryModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-zinc-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-zinc-900">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-slate-900">
                                 {editingCategoryId ? "Edit Kategori" : "Buat Kategori Baru"}
                             </h3>
                             <button
                                 onClick={() => setIsCategoryModalOpen(false)}
-                                className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                                className="text-slate-400 hover:text-slate-900 transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -675,12 +694,12 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
                         <form onSubmit={submitCategory}>
                             <div className="p-6">
-                                <label className="block text-[11px] font-bold text-zinc-500 mb-2 uppercase tracking-wider">
+                                <label className="block text-[11px] font-bold text-slate-500 mb-2">
                                     Nama Kategori
                                 </label>
                                 <input
                                     type="text"
-                                    className="w-full py-2.5 px-3 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none"
+                                    className="w-full py-2.5 px-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:ring-1 focus:ring-slate-900 outline-none"
                                     value={catData.name}
                                     onChange={(e) => setCatData("name", e.target.value)}
                                     placeholder="e.g., Core, Upper Body..."
@@ -688,18 +707,18 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                     autoFocus
                                 />
                             </div>
-                            <div className="px-6 py-4 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
+                            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setIsCategoryModalOpen(false)}
-                                    className="px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-200 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200 rounded-lg transition-colors"
                                 >
                                     Batal
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={processingCat}
-                                    className="px-4 py-2 text-sm font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg transition-colors disabled:opacity-50"
+                                    className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                     {processingCat ? "Menyimpan..." : "Simpan Kategori"}
                                 </button>

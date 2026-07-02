@@ -12,6 +12,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import BodyHighlighter from "@/Components/BodyHighlighter";
+import PageHeader from "@/Components/Layout/PageHeader";
 
 const MUSCLE_PAIN_AREAS = [
     "Neck (L)", "Neck (R)",
@@ -163,7 +164,7 @@ export default function SessionForm({
 
         return (
             <div className="space-y-3 p-5 bg-slate-50  rounded-xl border border-slate-100 ">
-                <label className="text-sm font-black text-slate-900  tracking-tight">
+                <label className="text-sm font-bold text-slate-900  tracking-tight">
                     {label}
                 </label>
 
@@ -200,28 +201,24 @@ export default function SessionForm({
     return (
         <AppLayout
             user={auth.user}
-            headerTitle="Daily Wellness & RPE"
-            headerDescription="Log your daily wellness metrics and session RPE."
+            headerTitle="Wellness & RPE Harian"
+            headerDescription="Catat metrik wellness harian dan RPE sesi latihan Anda."
         >
-            <Head title="Daily Wellness & RPE" />
+            <Head title="Wellness & RPE Harian" />
 
             <div className="pb-12 mx-auto space-y-6 relative">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200  pb-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if ((mode === 'all' || mode === 'rpe') && !isRpeComplete && !isCompleted) {
-                                    setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM) sebelum kembali.');
-                                    return;
-                                }
-                                window.location.href = route("admin.individual-trainings.index");
-                            }}
-                            className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900  transition-colors"
-                        >
-                            <ArrowLeft size={16} /> "Back to Programs"
-                        </button>
-                        {training_id && (
+                <PageHeader 
+                    title="Wellness & RPE Harian"
+                    subtitle="Catat metrik wellness harian dan RPE sesi latihan Anda."
+                    badge={new Date(date).toLocaleDateString("id-ID", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    })}
+                    icon={Activity}
+                    actions={
+                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                             <button
                                 type="button"
                                 onClick={() => {
@@ -229,27 +226,34 @@ export default function SessionForm({
                                         setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM) sebelum kembali.');
                                         return;
                                     }
-                                    window.location.href = route("admin.individual-trainings.show", training_id);
+                                    window.location.href = route("admin.individual-trainings.index");
                                 }}
-                                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900  transition-colors border-l border-slate-300  pl-4"
+                                className="flex justify-center items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm w-full sm:w-auto"
                             >
-                                {mode === "wellness" ? (
-                                    <>"Program Input" <ArrowRight size={16} /></>
-                                ) : (
-                                    <><ArrowLeft size={16} /> "Pengisian Program"</>
-                                )}
+                                <ArrowLeft size={16} /> Kembali
                             </button>
-                        )}
-                    </div>
-                    <div className="text-sm font-black text-slate-900  bg-white  px-4 py-2 border border-slate-200  rounded-lg shadow-sm">
-                        {new Date(date).toLocaleDateString("en-US", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
-                    </div>
-                </div>
+                            {training_id && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if ((mode === 'all' || mode === 'rpe') && !isRpeComplete && !isCompleted) {
+                                            setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM) sebelum kembali.');
+                                            return;
+                                        }
+                                        window.location.href = route("admin.individual-trainings.show", training_id);
+                                    }}
+                                    className="flex justify-center items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-all shadow-md shadow-[#ff4d00]/20 w-full sm:w-auto"
+                                >
+                                    {mode === "wellness" ? (
+                                        <>Ke Program Latihan <ArrowRight size={16} /></>
+                                    ) : (
+                                        <><ArrowLeft size={16} /> Ke Program Latihan</>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    }
+                />
 
                 <form onSubmit={submit} className="space-y-6">
                     {/* WELLNESS SECTION */}
@@ -266,17 +270,16 @@ export default function SessionForm({
                                         <HeartPulse size={24} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-slate-900  tracking-tight">
-                                            1. Morning Wellness
+                                        <h2 className="text-xl font-bold text-slate-900  tracking-tight">
+                                            1. Wellness Harian
                                         </h2>
                                         <p className="text-sm font-medium text-slate-500  mt-1">
-                                            Record your sleep, stress, and
-                                            muscle soreness
+                                            Catat kualitas tidur, stres, dan tingkat kelelahan otot
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
-                                    {isWellnessExpanded ? "Collapse" : "Expand"}
+                                    {isWellnessExpanded ? "Tutup" : "Buka"}
                                 </div>
                             </div>
 
@@ -285,45 +288,45 @@ export default function SessionForm({
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {renderScaleButtons(
                                             "quality_of_sleep",
-                                            "How was your night's sleep?",
-                                            "Very, very good",
-                                            "Very, very bad",
+                                            "Bagaimana kualitas tidur Anda semalam?",
+                                            "Sangat Sangat Baik",
+                                            "Sangat Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "stress",
-                                            "How is your stress level?",
-                                            "Very, very low",
-                                            "Very, very high",
+                                            "Bagaimana tingkat stres Anda?",
+                                            "Sangat Sangat Rendah",
+                                            "Sangat Sangat Tinggi",
                                         )}
                                         {renderScaleButtons(
                                             "fatigue",
-                                            "How fatigued do you feel?",
-                                            "Very, very low",
-                                            "Very, very high",
+                                            "Seberapa lelah yang Anda rasakan?",
+                                            "Sangat Sangat Rendah",
+                                            "Sangat Sangat Tinggi",
                                         )}
                                         {renderScaleButtons(
                                             "muscle_soreness",
-                                            "How are you with your Muscle Soreness?",
-                                            "Very, very low",
-                                            "Very, very high",
+                                            "Bagaimana tingkat kekakuan/nyeri otot Anda?",
+                                            "Sangat Sangat Rendah",
+                                            "Sangat Sangat Tinggi",
                                         )}
                                     </div>
 
                                     <div className="pt-6 border-t border-slate-100  space-y-6">
-                                        <h3 className="text-lg font-black text-slate-900 ">
-                                            How are you with your Muscle Pain?
+                                        <h3 className="text-lg font-bold text-slate-900 ">
+                                            Bagaimana dengan Keluhan Area Nyeri Anda?
                                         </h3>
 
                                         <div className="flex flex-col lg:flex-row gap-8 items-start">
                                             <div className="w-full lg:w-1/2 rounded-xl overflow-hidden border border-slate-200  bg-white  p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-center">
                                                 <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-black text-slate-400  uppercase tracking-[0.15em] mb-2">"Anterior"</h4>
+                                                    <h4 className="text-[10px] font-bold text-slate-400  tracking-[0.15em] mb-2">DEPAN (ANTERIOR)</h4>
                                                     <div className="w-full max-w-[180px]">
                                                         <BodyHighlighter type="anterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
                                                     </div>
                                                 </div>
                                                 <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-black text-slate-400  uppercase tracking-[0.15em] mb-2">"Posterior"</h4>
+                                                    <h4 className="text-[10px] font-bold text-slate-400  tracking-[0.15em] mb-2">BELAKANG (POSTERIOR)</h4>
                                                     <div className="w-full max-w-[180px]">
                                                         <BodyHighlighter type="posterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
                                                     </div>
@@ -332,9 +335,7 @@ export default function SessionForm({
 
                                             <div className="w-full lg:w-1/2 space-y-4">
                                                 <p className="text-sm font-bold text-slate-500  mb-2">
-                                                    Select the specific areas
-                                                    where you feel pain or
-                                                    discomfort:
+                                                    Pilih area spesifik di mana Anda merasakan nyeri atau ketidaknyamanan:
                                                 </p>
 
                                                 <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -387,11 +388,11 @@ export default function SessionForm({
 
                                                 <div className="pt-2">
                                                     <label className="text-xs font-bold text-slate-700  mb-1 block">
-                                                        Other Area:
+                                                        Area Lainnya:
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        placeholder="Specify any other pain points..."
+                                                        placeholder="Sebutkan titik nyeri lainnya..."
                                                         className="w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-sm font-medium text-slate-900  focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
                                                         value={data.other_pain}
                                                         onChange={(e) =>
@@ -422,16 +423,16 @@ export default function SessionForm({
                                         <Activity size={24} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-slate-900  tracking-tight">
-                                            2. Training Session RPE
+                                        <h2 className="text-xl font-bold text-slate-900  tracking-tight">
+                                            2. RPE Sesi Latihan
                                         </h2>
                                         <p className="text-sm font-medium text-slate-500  mt-1">
-                                            "Record your training load"
+                                            Catat intensitas dan durasi latihan Anda
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
-                                    {isRpeExpanded ? "Collapse" : "Expand"}
+                                    {isRpeExpanded ? "Tutup" : "Buka"}
                                 </div>
                             </div>
 
@@ -440,11 +441,11 @@ export default function SessionForm({
                                     <div className="space-y-6">
                                         {/* Session Type */}
                                         <div className="space-y-3">
-                                            <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
-                                                "Select Training Session"
+                                            <label className="text-sm font-bold text-slate-900 ">
+                                                Pilih Sesi Latihan
                                             </label>
                                             <p className="text-xs font-medium text-slate-500  mb-3">
-                                                Enter your RPE score (0–10) based on how fatigued you feel after the session, then record the training duration in minutes
+                                                Masukkan skor RPE (1–10) berdasarkan seberapa berat sesi latihan yang dirasakan, lalu catat durasi latihan dalam menit
                                             </p>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <button
@@ -456,7 +457,7 @@ export default function SessionForm({
                                                             : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
-                                                    "AM Session"
+                                                    Sesi Pagi (AM)
                                                 </button>
                                                 <button
                                                     type="button"
@@ -467,7 +468,7 @@ export default function SessionForm({
                                                             : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
-                                                    "PM Session"
+                                                    Sesi Sore (PM)
                                                 </button>
                                             </div>
                                         </div>
@@ -475,8 +476,8 @@ export default function SessionForm({
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             {/* RPE Input */}
                                             <div className="space-y-3">
-                                                <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
-                                                    "Session RPE (1-10)"
+                                                <label className="text-sm font-bold text-slate-900 ">
+                                                    RPE Sesi (1-10)
                                                 </label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -492,11 +493,11 @@ export default function SessionForm({
                                                         value={data.rpe}
                                                         onChange={(e) => setData("rpe", e.target.value)}
                                                         className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
-                                                        placeholder="Enter value 1 - 10"
+                                                        placeholder="Masukkan angka 1 - 10"
                                                     />
                                                 </div>
                                                 <p className="text-xs font-medium text-slate-500  mt-2">
-                                                    "Input the number that best reflects how demanding the entire training session felt to you."
+                                                    Pilih angka yang paling menggambarkan seberapa berat sesi latihan yang baru saja dilakukan.
                                                 </p>
 
 
@@ -508,8 +509,7 @@ export default function SessionForm({
                                                                 1 - 2
                                                             </span>
                                                             <span className="text-slate-600 ">
-                                                                Very Light
-                                                                Intensity
+                                                                Sangat Ringan
                                                             </span>
                                                         </div>
                                                     </div>
@@ -519,7 +519,7 @@ export default function SessionForm({
                                                                 3 - 4
                                                             </span>
                                                             <span className="text-blue-600 ">
-                                                                "Light Intensity"
+                                                                Ringan
                                                             </span>
                                                         </div>
                                                     </div>
@@ -529,8 +529,7 @@ export default function SessionForm({
                                                                 5 - 6
                                                             </span>
                                                             <span className="text-green-600 ">
-                                                                Moderate
-                                                                Intensity
+                                                                Sedang
                                                             </span>
                                                         </div>
                                                     </div>
@@ -540,7 +539,7 @@ export default function SessionForm({
                                                                 7 - 8
                                                             </span>
                                                             <span className="text-amber-600 ">
-                                                                "Heavy Intensity"
+                                                                Berat
                                                             </span>
                                                         </div>
                                                     </div>
@@ -550,8 +549,7 @@ export default function SessionForm({
                                                                 9 - 10
                                                             </span>
                                                             <span className="text-red-600 ">
-                                                                Maximum
-                                                                Intensity
+                                                                Maksimal
                                                             </span>
                                                         </div>
                                                     </div>
@@ -560,8 +558,8 @@ export default function SessionForm({
 
                                             {/* Duration Input */}
                                             <div className="space-y-3">
-                                                <label className="text-sm font-bold text-slate-900  uppercase tracking-wider">
-                                                    "Training Duration (Minutes)"
+                                                <label className="text-sm font-bold text-slate-900 ">
+                                                    Durasi Latihan (Menit)
                                                 </label>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -576,7 +574,7 @@ export default function SessionForm({
                                                         value={data.duration}
                                                         onChange={(e) => setData("duration", e.target.value)}
                                                         className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
-                                                        placeholder="e.g., 60"
+                                                        placeholder="Misal: 60"
                                                     />
                                                 </div>
                                             </div>
@@ -601,9 +599,9 @@ export default function SessionForm({
                                 {training_id && (
                                     <Link
                                         href={route("admin.individual-trainings.show", training_id)}
-                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105 font-black text-sm transition-all shadow-lg shadow-[#ff4d00]/20"
+                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105 font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20"
                                     >
-                                        Next: View Program Actuals <ArrowRight size={18} />
+                                        Lanjut: Lihat Program Aktual <ArrowRight size={18} />
                                     </Link>
                                 )}
                             </>
@@ -616,17 +614,13 @@ export default function SessionForm({
                                         setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
                                     }
                                 }}
-                                className={`w-full py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 ${
+                                className={`w-full py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 ${
                                     isSubmitDisabled 
                                         ? "bg-slate-300  text-slate-500  cursor-not-allowed shadow-none"
                                         : "bg-[#ff4d00] text-white  hover:bg-[#e64500]"
                                 }`}
                             >
-                                {mode === "rpe" ? (
-                                    <>"Finish" <CheckSquare size={18} /></>
-                                ) : (
-                                    <>"Next" <ArrowRight size={18} /></>
-                                )}
+                                <>Selesai <CheckSquare size={18} /></>
                             </button>
                         )}
                     </div>

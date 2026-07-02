@@ -168,7 +168,7 @@ export default function AthleteGallery({ athlete, galleries = [] }) {
                                     <img src={item.image_path} alt="Biometric" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                                     
                                     {/* Overlay Tanggal Singkat */}
-                                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+                                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded shadow-sm">
                                         {new Date(item.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
                                     </div>
                                     
@@ -279,7 +279,7 @@ export default function AthleteGallery({ athlete, galleries = [] }) {
                                 <div className="w-full h-32 md:h-40 rounded-xl overflow-hidden mb-4 border border-slate-200 bg-slate-100 flex items-center justify-center">
                                     <img src={editModal.photo.image_path} alt="thumbnail" className="h-full object-contain" />
                                 </div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Catatan Analisis</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Catatan Analisis</label>
                                 <textarea 
                                     rows="4" 
                                     value={editForm.data.notes}
@@ -344,7 +344,7 @@ export default function AthleteGallery({ athlete, galleries = [] }) {
                                             </div>
                                             
                                             <div className="flex-1 flex flex-col">
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 mt-2 sm:mt-0">Catatan (Opsional)</label>
+                                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 mt-2 sm:mt-0">Catatan (Opsional)</label>
                                                 <textarea 
                                                     rows="3" 
                                                     value={photo.notes}

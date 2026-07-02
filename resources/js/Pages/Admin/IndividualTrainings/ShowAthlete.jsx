@@ -1,248 +1,281 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, Plus, Calendar, Dumbbell, Trash2, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, X } from 'lucide-react';
 
-export default function ShowAthlete({ auth, athlete, trainings, exercises = [], packages = [] }) {
-    // Generate dates: from today to +7 days buffer
-    const groupedDates = useMemo(() => {
-        const groups = [];
-        let currentGroup = null;
+export default function ShowAthlete({ auth, athlete, trainings }) {
+    const [currentDate, setCurrentDate] = useState(new Date());
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const endDate = new Date(today);
-        endDate.setDate(today.getDate() + 7);
-
-        const startDate = new Date(athlete?.created_at || today);
-        startDate.setHours(0, 0, 0, 0);
-        
-        if (startDate > today) {
-            startDate.setTime(today.getTime());
-        }
-
-        for (let d = new Date(endDate); d >= startDate; d.setDate(d.getDate() - 1)) {
-            const dateStr = d.toISOString().split('T')[0];
-            const monthYear = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-            
-            if (!currentGroup || currentGroup.monthYear !== monthYear) {
-                if (currentGroup) groups.push(currentGroup);
-                currentGroup = {
-                    monthYear,
-                    days: []
-                };
-            }
-            
-            const sessions = trainings.filter(t => t.date === dateStr);
-            const isToday = dateStr === today.toISOString().split('T')[0];
-            const dayName = d.toLocaleString('id-ID', { weekday: 'short' });
-
-            currentGroup.days.push({
-                date: dateStr,
-                dayNum: d.getDate(),
-                dayName: dayName,
-                isToday,
-                isFuture: d > today,
-                sessions: sessions
-            });
-        }
-        
-        if (currentGroup) groups.push(currentGroup);
-        return groups;
-    }, [trainings, athlete]);
-
-    const getProgramIcon = (logic) => {
-        switch (logic) {
-            case 'warm_up': return <div className="w-2 h-2 rounded-full bg-orange-400"></div>;
-            case 'main_exercise': return <div className="w-2 h-2 rounded-full bg-blue-500"></div>;
-            case 'cooling_down': return <div className="w-2 h-2 rounded-full bg-teal-400"></div>;
-            case 'instruction': return <div className="w-2 h-2 rounded-full bg-purple-400"></div>;
-            default: return <div className="w-2 h-2 rounded-full bg-zinc-400"></div>;
-        }
-    };
-
-    const getProgramLabel = (logic) => {
-        switch (logic) {
-            case 'warm_up': return 'Pemanasan';
-            case 'main_exercise': return 'Latihan Inti';
-            case 'cooling_down': return 'Pendinginan';
-            case 'instruction': return 'Instruksi / Catatan';
-            default: return logic || 'Umum';
-        }
-    };
-
-    const deleteSession = (sessionId) => {
+    const deleteSession = (e, sessionId) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (confirm('Yakin ingin menghapus sesi latihan ini?')) {
-            router.delete(route('admin.individual-trainings.session.destroy', sessionId));
+            router.delete(route('admin.individual-trainings.session.destroy', sessionId), { preserveScroll: true });
         }
     };
+
+    const getLocalDateStr = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const todayStr = getLocalDateStr(new Date());
+
+    const calendarDays = useMemo(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const days = [];
+        
+        // Start on Sunday: 0, Google Calendar usually starts on Sunday.
+        const firstDayOfWeek = firstDay.getDay(); 
+        
+        // Prev month padding
+        for (let i = firstDayOfWeek; i > 0; i--) {
+            const d = new Date(year, month, 1 - i);
+            days.push({ date: d, isCurrentMonth: false, dateStr: getLocalDateStr(d) });
+        }
+        
+        // Current month
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            const d = new Date(year, month, i);
+            days.push({ date: d, isCurrentMonth: true, dateStr: getLocalDateStr(d) });
+        }
+        
+        // Next month padding to fill exactly 42 slots (6 weeks)
+        const remaining = 42 - days.length;
+        for (let i = 1; i <= remaining; i++) {
+            const d = new Date(year, month + 1, i);
+            days.push({ date: d, isCurrentMonth: false, dateStr: getLocalDateStr(d) });
+        }
+        
+        // Attach sessions
+        return days.map(day => ({
+            ...day,
+            sessions: trainings.filter(t => t.date === day.dateStr),
+            isToday: day.dateStr === todayStr
+        }));
+    }, [currentDate, trainings, todayStr]);
+
+    const prevMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    };
+
+    const nextMonth = () => {
+        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    };
+    
+    const goToToday = () => {
+        setCurrentDate(new Date());
+    };
+
+    const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
     return (
-        <AppLayout title={`Training Log - ${athlete.name}`}>
-            <Head title={`Training Log - ${athlete.name}`} />
+        <AppLayout title={`Kalender Latihan - ${athlete.name}`}>
+            <Head title={`Kalender Latihan - ${athlete.name}`} />
             
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Training Log Individual</h1>
-                    <p className="text-gray-600">Linimasa sesi latihan atlet.</p>
-                </div>
-                <Link
-                    href={route('admin.individual-trainings.index')}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors"
-                >
-                    <ChevronLeft size={16} /> Kembali ke Daftar
-                </Link>
-            </div>
+            <PageHeader 
+                title={`Program Latihan: ${athlete.name}`}
+                subtitle="Pantau dan kelola jadwal pelatihan individu dalam tampilan kalender."
+                badge="Calendar"
+                icon={CalendarIcon}
+                actions={
+                    <Link
+                        href={route('admin.individual-trainings.index')}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                    >
+                        <ChevronLeft size={16} /> Kembali
+                    </Link>
+                }
+            />
 
-            {/* Athlete Profile Summary */}
-            <div className="bg-white p-6 border border-zinc-200 rounded-xl mb-8 flex items-center gap-6 shadow-sm">
-                <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-400">
-                    <User size={32} />
-                </div>
-                <div>
-                    <h2 className="text-xl font-bold text-zinc-900">{athlete.name}</h2>
-                    <div className="flex items-center gap-4 mt-2">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-600">
-                            {athlete.sport?.name || 'Tidak ada cabang olahraga'}
-                        </span>
-                        <span className="text-sm font-medium text-zinc-500">
-                            Bergabung: {new Date(athlete.created_at).toLocaleDateString('id-ID')}
-                        </span>
+            <div className="pb-12 space-y-6">
+                {/* Athlete Profile Summary */}
+                <div className="bg-white p-4 md:p-6 border border-slate-200 rounded-xl flex items-center gap-4 md:gap-6 shadow-sm">
+                    <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                        {athlete.profile_photo_url ? (
+                            <img src={athlete.profile_photo_url} alt={athlete.name} className="h-full w-full object-cover" />
+                        ) : (
+                            <User className="h-6 w-6 md:h-8 md:w-8 text-slate-400" />
+                        )}
+                    </div>
+                    <div>
+                        <h2 className="text-lg md:text-xl font-bold text-slate-900">{athlete.name}</h2>
+                        <div className="flex flex-wrap items-center gap-3 mt-1.5 md:mt-2">
+                            <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                {athlete.sport?.name || 'UMUM'}
+                            </span>
+                            <span className="text-xs md:text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+                                <Activity size={14} className="text-slate-400" />
+                                {trainings.length > 0 ? trainings[trainings.length - 1].session_number : 0} Total Sesi
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Timeline View */}
-            <div className="space-y-12">
-                {groupedDates.map((group, gIndex) => (
-                    <div key={gIndex} className="relative">
-                        <div className="sticky top-[72px] z-10 bg-[#fafafa] py-3 mb-6">
-                            <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
-                                <Calendar size={16} />
-                                {group.monthYear}
+                {/* Calendar View */}
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                    {/* Calendar Header */}
+                    <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <h3 className="text-xl font-bold text-slate-900 w-48">
+                                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                             </h3>
+                            <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm">
+                                <button 
+                                    onClick={prevMonth}
+                                    className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+                                <div className="w-px h-5 bg-slate-200"></div>
+                                <button 
+                                    onClick={goToToday}
+                                    className="px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                                >
+                                    Hari Ini
+                                </button>
+                                <div className="w-px h-5 bg-slate-200"></div>
+                                <button 
+                                    onClick={nextMonth}
+                                    className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
+                            </div>
                         </div>
-                        
-                        <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[35px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-200 before:to-transparent">
-                            {group.days.map((dayData, dIndex) => (
-                                <div key={dIndex} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                    
-                                    {/* Timeline dot */}
-                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full border-4 border-[#fafafa] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 ${
-                                        dayData.isToday ? 'bg-[#ff4d00]' : 
-                                        dayData.sessions.length > 0 ? 'bg-zinc-800' : 'bg-zinc-200'
-                                    }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${dayData.isToday || dayData.sessions.length > 0 ? 'bg-white' : 'bg-zinc-400'}`}></div>
-                                    </div>
+                    </div>
 
-                                    {/* Content Card */}
-                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-5 rounded-xl border border-zinc-200 shadow-sm transition-all hover:shadow-md hover:border-zinc-300">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div>
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className={`text-2xl font-black ${dayData.isToday ? 'text-[#ff4d00]' : 'text-zinc-900'}`}>{dayData.dayNum}</span>
-                                                    <span className="text-sm font-bold text-zinc-400 uppercase tracking-wide">{dayData.dayName}</span>
-                                                </div>
-                                                {dayData.isToday && <span className="text-[10px] font-bold bg-[#ff4d00]/10 text-[#ff4d00] px-2 py-0.5 rounded-full mt-1 inline-block">HARI INI</span>}
+                    {/* Calendar Grid */}
+                    <div className="flex-1 overflow-x-auto">
+                        <div className="min-w-[800px]">
+                            {/* Day Names Header */}
+                            <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+                                {dayNames.map(day => (
+                                    <div key={day} className="py-2.5 text-center text-[11px] font-bold text-slate-500">
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Calendar Days */}
+                            <div className="grid grid-cols-7 auto-rows-fr bg-slate-200 gap-px border-l border-slate-200">
+                                {calendarDays.map((day, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        className={`min-h-[120px] bg-white p-2 flex flex-col group transition-colors ${!day.isCurrentMonth ? 'bg-slate-50/50' : ''}`}
+                                    >
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold ${
+                                                day.isToday 
+                                                    ? 'bg-[#ff4d00] text-white shadow-sm' 
+                                                    : day.isCurrentMonth 
+                                                        ? 'text-slate-700' 
+                                                        : 'text-slate-400'
+                                            }`}>
+                                                {day.date.getDate()}
                                             </div>
-                                            
-                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Link
-                                                    href={route('admin.individual-trainings.session.create', { user: athlete.id, date: dayData.date })}
-                                                    className="text-zinc-300 hover:text-zinc-900 p-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
+                                            {auth.user.role !== 'athlete' && (
+                                                <Link 
+                                                    href={route('admin.individual-trainings.session.create', { user: athlete.id, date: day.dateStr })}
+                                                    className="w-6 h-6 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-[#ff4d00] hover:text-white transition-all shadow-sm"
                                                     title="Tambah Sesi"
                                                 >
-                                                    <Plus size={16} />
+                                                    <Plus size={14} strokeWidth={2.5} />
                                                 </Link>
-                                            </div>
+                                            )}
                                         </div>
-
-                                        {dayData.sessions.length === 0 ? (
-                                            <div className="text-center py-6 bg-zinc-50 rounded-lg border border-zinc-100 border-dashed">
-                                                <p className="text-xs font-semibold text-zinc-400">Tidak ada sesi latihan</p>
-                                                {!dayData.isFuture && (
-                                                    <p className="text-[10px] text-zinc-300 mt-1">Hari istirahat atau terlewat</p>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-4">
-                                                {dayData.sessions.map((session, sIndex) => (
-                                                    <div key={sIndex} className="bg-zinc-50 rounded-xl p-4 border border-zinc-200">
-                                                        <div className="flex items-center justify-between mb-3 border-b border-zinc-200 pb-3">
-                                                            <div>
-                                                                <span className="text-[10px] font-bold text-zinc-500 bg-white px-2 py-1 rounded-md border border-zinc-200 uppercase tracking-wider">
-                                                                    Sesi {session.session_number}
-                                                                </span>
-                                                                {(session.training_type || session.location) && (
-                                                                    <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-zinc-700">
-                                                                        {session.training_type && <span>{session.training_type}</span>}
-                                                                        {session.training_type && session.location && <span className="text-zinc-300">•</span>}
-                                                                        {session.location && <span>@ {session.location}</span>}
+                                        
+                                        <div className="flex-1 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
+                                            {day.sessions.map(session => (
+                                                <div 
+                                                    key={session.id} 
+                                                    className={`group/session relative p-1.5 rounded-md border text-left flex flex-col gap-1 transition-all shadow-sm ${
+                                                        session.status === 'completed' 
+                                                        ? 'bg-green-50 border-green-200 hover:border-green-400' 
+                                                        : 'bg-orange-50 border-orange-200 hover:border-orange-400'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-start justify-between gap-1">
+                                                        <div className="flex-1 min-w-0">
+                                                                <Link 
+                                                                    href={route('admin.individual-trainings.session.show', session.id)}
+                                                                    className="block"
+                                                                >
+                                                                    <div className={`text-[11px] font-bold leading-tight line-clamp-2 ${
+                                                                        session.status === 'completed' ? 'text-green-800' : 'text-orange-900'
+                                                                    }`}>
+                                                                        {session.name || 'Sesi Latihan'}
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                            <button 
-                                                                onClick={() => deleteSession(session.id)}
-                                                                className="text-red-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded-md transition-colors"
-                                                                title="Hapus Sesi"
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
+                                                                    <div className="mt-1 flex items-center gap-1">
+                                                                        <span className={`text-[8.5px] font-semibold px-1 py-0.5 rounded ${
+                                                                            session.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                                                                        }`}>
+                                                                            Sesi {session.session_number}
+                                                                        </span>
+                                                                        <span className={`text-[8.5px] font-semibold truncate ${
+                                                                            session.status === 'completed' ? 'text-green-600' : 'text-orange-600'
+                                                                        }`}>
+                                                                            • {session.training_type || 'Umum'}
+                                                                        </span>
+                                                                    </div>
+                                                                </Link>
                                                         </div>
-
-                                                        {session.programs && session.programs.length > 0 ? (
-                                                            <div className="space-y-2">
-                                                                {session.programs.map((prog, pIndex) => (
-                                                                    <div key={pIndex} className="flex gap-3 text-sm">
-                                                                        <div className="mt-1.5 shrink-0">
-                                                                            {getProgramIcon(prog.logic)}
-                                                                        </div>
-                                                                        <div className="flex-1">
-                                                                            {prog.phase === 'TEXT_BLOCK' ? (
-                                                                                <div className="bg-white p-3 rounded-lg border border-zinc-100">
-                                                                                    <span className="text-xs font-bold text-purple-600 block mb-1">CATATAN UMUM</span>
-                                                                                    <p className="text-zinc-700 text-sm italic">{prog.notes}</p>
-                                                                                </div>
-                                                                            ) : (
-                                                                                <div>
-                                                                                    <div className="font-semibold text-zinc-900">
-                                                                                        {prog.exercise ? prog.exercise.name : prog.phase}
-                                                                                    </div>
-                                                                                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-zinc-600">
-                                                                                        {prog.sets && prog.reps && (
-                                                                                            <span className="font-medium bg-zinc-200/50 px-1.5 py-0.5 rounded">
-                                                                                                {prog.sets} × {prog.reps}
-                                                                                            </span>
-                                                                                        )}
-                                                                                        {prog.duration && <span><span className="text-zinc-400">Dur:</span> {prog.duration}</span>}
-                                                                                        {prog.rest && <span><span className="text-zinc-400">Rest:</span> {prog.rest}</span>}
-                                                                                        {prog.intensity && <span><span className="text-zinc-400">Int:</span> {prog.intensity}</span>}
-                                                                                    </div>
-                                                                                    {prog.notes && <div className="text-xs text-zinc-500 mt-1 italic opacity-80">Catatan: {prog.notes}</div>}
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="text-center py-4 bg-white rounded-lg border border-zinc-100 border-dashed">
-                                                                <p className="text-xs text-zinc-400">Belum ada konten latihan untuk sesi ini</p>
+                                                        
+                                                        {auth.user.role !== 'athlete' && (
+                                                            <div className="flex flex-col gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
+                                                                <Link
+                                                                    href={route('admin.individual-trainings.session.edit', session.id)}
+                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-green-700' : 'hover:bg-orange-200 text-orange-700'}`}
+                                                                    title="Edit Program"
+                                                                >
+                                                                    <Edit2 size={10} />
+                                                                </Link>
+                                                                <button 
+                                                                    onClick={(e) => deleteSession(e, session.id)}
+                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-red-600' : 'hover:bg-orange-200 text-red-600'}`}
+                                                                    title="Hapus"
+                                                                >
+                                                                    <Trash2 size={10} />
+                                                                </button>
                                                             </div>
                                                         )}
                                                     </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                ))}
+                </div>
             </div>
+            
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 3px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: #cbd5e1;
+                    border-radius: 10px;
+                }
+            `}</style>
         </AppLayout>
     );
 }

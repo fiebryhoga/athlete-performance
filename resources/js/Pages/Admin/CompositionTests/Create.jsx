@@ -110,35 +110,35 @@ export default function Create({ athletes }) {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Pilih Client</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Pilih Client</label>
                                 <select value={data.user_id} onChange={handleAthleteChange} className="w-full rounded-xl border-slate-200 text-sm bg-white focus:ring-[#00488b]" required>
                                     <option value="" disabled>-- Pilih Klien --</option>
                                     {athletes.map(a => <option key={a.id} value={a.id}>{a.name} ({a.gender === 'L' ? 'L' : 'P'})</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Tanggal Test</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Tanggal Test</label>
                                 <input type="date" value={data.date} onChange={e => setData('date', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm bg-white focus:ring-[#00488b]" required/>
                             </div>
                             
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Age</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Age</label>
                                     <input type="number" value={data.age} onChange={e => setData('age', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm font-bold" required/>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Metabolic Age</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Metabolic Age</label>
                                     <input type="number" value={data.metabolic_age} onChange={e => setData('metabolic_age', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm"/>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Weight (KG)</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Weight (KG)</label>
                                     <input type="number" step="0.01" value={data.weight} onChange={e => setData('weight', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm font-bold text-blue-700" required/>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Height (Meter)</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Height (Meter)</label>
                                     <input type="number" step="0.01" placeholder="Cth: 1.75" value={data.height} onChange={e => setData('height', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm font-bold text-blue-700" required/>
                                 </div>
                             </div>
@@ -155,7 +155,7 @@ export default function Create({ athletes }) {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             
                             <div className="relative">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex justify-between">
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 flex justify-between">
                                     <span>BMI (Kg/M2)</span>
                                     {bmiInfo && <span className={`px-2 py-0.5 rounded text-[8px] ${bmiInfo.color}`}>{bmiInfo.label}</span>}
                                 </label>
@@ -163,7 +163,7 @@ export default function Create({ athletes }) {
                             </div>
 
                             <div className="relative">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex justify-between">
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 flex justify-between">
                                     <span>Bodyfat %</span>
                                     {bodyFatInfo && <span className={`px-2 py-0.5 rounded text-[8px] ${bodyFatInfo.color}`}>{bodyFatInfo.label}</span>}
                                 </label>
@@ -171,17 +171,17 @@ export default function Create({ athletes }) {
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Muscle Mass</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Muscle Mass</label>
                                 <input type="number" step="0.01" value={data.muscle_mass} onChange={e => setData('muscle_mass', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm"/>
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Bone Mass</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Bone Mass</label>
                                 <input type="number" step="0.01" value={data.bone_mass} onChange={e => setData('bone_mass', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm"/>
                             </div>
 
                             <div className="relative">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex justify-between">
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 flex justify-between">
                                     <span>Visceral Fat</span>
                                     {visceralInfo && <span className={`px-2 py-0.5 rounded text-[8px] ${visceralInfo.color}`}>{visceralInfo.label}</span>}
                                 </label>
@@ -189,12 +189,12 @@ export default function Create({ athletes }) {
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> BMR (Kcal)</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> BMR (Kcal)</label>
                                 <input type="number" value={data.bmr} onChange={e => setData('bmr', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm"/>
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1"><Droplets className="w-3 h-3 text-blue-500"/> Total Body Water %</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 flex items-center gap-1"><Droplets className="w-3 h-3 text-blue-500"/> Total Body Water %</label>
                                 <input type="number" step="0.01" value={data.total_body_water} onChange={e => setData('total_body_water', e.target.value)} className="w-full rounded-xl border-slate-200 text-sm"/>
                                 <span className="text-[9px] text-slate-400 block mt-1">Ref: L 50-65% | P 45-60%</span>
                             </div>

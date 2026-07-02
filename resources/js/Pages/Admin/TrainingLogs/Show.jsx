@@ -86,7 +86,7 @@ export default function Show({ session, exercisesList, nextSession, historySessi
                             <CalendarDays className="w-5 h-5 md:w-6 md:h-6" />
                         </div>
                         <div className="min-w-0 flex-1 w-full relative z-10">
-                            <p className="text-[10px] font-bold text-[#ff4d00] uppercase tracking-widest mb-1">Jadwal Berikutnya</p>
+                            <p className="text-[10px] font-bold text-[#ff4d00] mb-1">Jadwal Berikutnya</p>
                             <p className="text-xs md:text-sm text-slate-700 font-medium leading-relaxed break-words">
                                 <span className="font-bold text-[#e64500]">{nextSession.training_type}</span> pada <span className="font-bold text-[#e64500] underline decoration-orange-200 underline-offset-2">{new Date(nextSession.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>.
                             </p>

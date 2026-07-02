@@ -58,6 +58,13 @@ class CompositionTestController extends Controller
         }
 
         $query = User::where('role', 'athlete')->orderBy('name', 'asc');
+        
+        if ($currentUser && $currentUser->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id);
+            });
+        }
+        
         if ($request->search) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }

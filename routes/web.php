@@ -27,6 +27,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/run-migration-now', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    return \Illuminate\Support\Facades\Artisan::output();
+});
+
 Route::prefix('setup')->group(function () {
     Route::get('/migrate', function () {
         try {
@@ -87,6 +92,7 @@ Route::middleware([
     
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profiling', [DashboardController::class, 'profiling'])->name('athlete.profiling');
     Route::get('/global-search', GlobalSearchController::class)->name('global.search');
 
     
@@ -111,7 +117,11 @@ Route::middleware([
         Route::post('/admin/wellness-rpe/update-start-date', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'updateStartDate'])->name('admin.wellness-rpe.updateStartDate');
         Route::get('/admin/wellness-rpe/session-form', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'sessionForm'])->name('admin.wellness-rpe.session-form');
         Route::post('/admin/wellness-rpe/session', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'storeSession'])->name('admin.wellness-rpe.store-session');
-        Route::get('/admin/wellness-rpe/{date}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'show'])->name('admin.wellness-rpe.show');
+        
+        // New per-client routes for Wellness RPE
+        Route::get('/admin/wellness-rpe/athlete/{user}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'showAthlete'])->name('admin.wellness-rpe.athlete.show');
+        Route::get('/admin/wellness-rpe/athlete/{user}/date/{date}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'showAthleteDate'])->name('admin.wellness-rpe.athlete.date.show');
+        
         Route::post('/admin/wellness-rpe/weekly-data', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'getWeeklyData'])->name('admin.wellness-rpe.weekly-data');
         Route::post('/admin/wellness-rpe/export-pdf-daily/{date}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'exportDailyPdf'])->name('admin.wellness-rpe.export-pdf-daily');
         Route::post('/admin/wellness-rpe/export-excel/{date}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'exportExcel'])->name('admin.wellness-rpe.export-excel');
@@ -122,7 +132,16 @@ Route::middleware([
         Route::get('/admin/individual-trainings/{user}/show', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'showAthleteTrainings'])->name('admin.individual-trainings.show');
         Route::get('/admin/individual-trainings/{user}/session/create', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'createSession'])->name('admin.individual-trainings.session.create');
         Route::post('/admin/individual-trainings/{user}/session', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeSession'])->name('admin.individual-trainings.session.store');
+        Route::get('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'showSession'])->name('admin.individual-trainings.session.show');
+        Route::get('/admin/individual-trainings/session/{training}/edit', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'editSession'])->name('admin.individual-trainings.session.edit');
+        Route::put('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateSession'])->name('admin.individual-trainings.session.update');
+        Route::post('/admin/individual-trainings/session/{training}/feedback', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateFeedback'])->name('admin.individual-trainings.session.feedback');
         Route::delete('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'destroySession'])->name('admin.individual-trainings.session.destroy');
+        Route::put('/admin/individual-trainings/session/{training}/title', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateTitle'])->name('admin.individual-trainings.session.update-title');
+        
+        // NEW Routes for RPE and Completion
+        Route::post('/admin/individual-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeRpe'])->name('admin.individual-trainings.session.rpe');
+        Route::post('/admin/individual-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'completeTraining'])->name('admin.individual-trainings.session.complete');
 
         Route::get('composition-tests/create', [CompositionTestController::class, 'create'])->name('admin.composition-tests.create');
         Route::post('composition-tests', [CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
@@ -142,18 +161,25 @@ Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteContro
     });
 
 
-    
-    
+    Route::middleware(['role:superadmin'])->group(function () {
+        Route::get('/admin/reports/sessions', [\App\Http\Controllers\Admin\ReportController::class, 'sessionRecap'])->name('admin.reports.sessions');
+        Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
+        Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
+        Route::get('/run-migration-now', function() {
+            \Illuminate\Support\Facades\Artisan::call('migrate');
+            return \Illuminate\Support\Facades\Artisan::output();
+        });
+    });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
         
-        
-        Route::resource('/admin/users', UserManagementController::class)->names('admin.users')->middleware('role:superadmin');
+        Route::resource('/admin/users', UserManagementController::class)->names('admin.users');
 
-        
         Route::get('/admin/sports', [SportController::class, 'index'])->name('admin.sports.index');
         Route::post('/admin/sports', [SportController::class, 'store'])->name('admin.sports.store');
         Route::get('/admin/sports/{sport}', [SportController::class, 'show'])->name('admin.sports.show');
+        Route::put('/admin/sports/{sport}', [SportController::class, 'update'])->name('admin.sports.update');
+        Route::post('/admin/sports/{sport}/duplicate', [SportController::class, 'duplicate'])->name('admin.sports.duplicate');
         Route::delete('/admin/sports/{sport}', [SportController::class, 'destroy'])->name('admin.sports.destroy');
         Route::post('/admin/sports/{sport}/tests', [SportController::class, 'storeTestItem'])->name('admin.sports.tests.store');
         Route::delete('/admin/tests/{testItem}', [SportController::class, 'destroyTestItem'])->name('admin.tests.destroy');

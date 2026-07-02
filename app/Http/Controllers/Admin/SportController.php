@@ -29,6 +29,15 @@ class SportController extends Controller
         return back();
     }
 
+    public function update(Request $request, Sport $sport)
+    {
+        $request->validate([
+            'name' => 'required|string|unique:sports,name,' . $sport->id
+        ]);
+        $sport->update($request->only('name', 'description'));
+        return back()->with('message', 'Cabor berhasil diperbarui.');
+    }
+
     public function show(Sport $sport)
     {
         
@@ -94,6 +103,32 @@ class SportController extends Controller
     {
         $testItem->delete();
         return back()->with('message', 'Item latihan dihapus.');
+    }
+
+    public function duplicate(Request $request, Sport $sport)
+    {
+        $request->validate([
+            'name' => 'required|string|unique:sports,name'
+        ]);
+
+        DB::transaction(function () use ($request, $sport) {
+            $newSport = Sport::create([
+                'name' => $request->name,
+                'description' => $sport->description
+            ]);
+
+            foreach ($sport->testItems as $item) {
+                $newSport->testItems()->create([
+                    'category_id' => $item->category_id,
+                    'name' => $item->name,
+                    'parameter_type' => $item->parameter_type,
+                    'unit' => $item->unit,
+                    'target_value' => $item->target_value
+                ]);
+            }
+        });
+
+        return back()->with('message', 'Cabor berhasil diduplikasi.');
     }
 
     public function destroy(Sport $sport)

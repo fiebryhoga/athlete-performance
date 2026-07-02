@@ -86,7 +86,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                             {athlete.name}
                                         </h4>
                                         <div className="flex items-center gap-1.5 mt-1">
-                                            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md uppercase tracking-wider">
+                                            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">
                                                 Athlete
                                             </span>
                                         </div>
@@ -102,7 +102,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                 {athlete.latest_test ? (
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                            <p className="text-[10px] font-bold text-slate-400">
                                                 Latest Test
                                             </p>
                                             <p className="text-sm font-bold text-slate-800 mt-1">
@@ -110,7 +110,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                            <p className="text-[10px] font-bold text-slate-400">
                                                 Records
                                             </p>
                                             <p className="text-sm font-bold text-[#ff4d00] mt-1 flex items-center justify-end gap-1.5">

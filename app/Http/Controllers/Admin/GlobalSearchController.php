@@ -20,7 +20,7 @@ class GlobalSearchController extends Controller
         $athletes = User::where('role', 'athlete')
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('athlete_id', 'like', "%{$query}%");
+                  ->orWhere('username', 'like', "%{$query}%");
             })
             ->take(5) 
             ->get()
@@ -28,7 +28,7 @@ class GlobalSearchController extends Controller
                 return [
                     'id' => $athlete->id,
                     'title' => $athlete->name,
-                    'subtitle' => $athlete->athlete_id . ' • ' . ($athlete->sport->name ?? 'No Sport'),
+                    'subtitle' => $athlete->username . ' • ' . ($athlete->sport->name ?? 'No Sport'),
                     'type' => 'Athlete',
                     'url' => route('admin.athletes.show', $athlete->id), 
                 ];

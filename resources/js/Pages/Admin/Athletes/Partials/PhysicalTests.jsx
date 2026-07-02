@@ -16,19 +16,19 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Total Sessions</p>
-                    <p className="text-2xl md:text-3xl font-black text-slate-800">{stats?.total_sessions || 0}</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Total Sessions</p>
+                    <p className="text-2xl md:text-3xl font-bold text-slate-800">{stats?.total_sessions || 0}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Avg Score</p>
-                    <p className="text-2xl md:text-3xl font-black text-[#ff4d00]">{formatScore(stats?.average_score)}</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Avg Score</p>
+                    <p className="text-2xl md:text-3xl font-bold text-[#ff4d00]">{formatScore(stats?.average_score)}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors"/> Best Score</p>
-                    <p className="text-2xl md:text-3xl font-black text-emerald-500">{formatScore(stats?.highest_score)}</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors"/> Best Score</p>
+                    <p className="text-2xl md:text-3xl font-bold text-emerald-500">{formatScore(stats?.highest_score)}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Last Activity</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Last Activity</p>
                     <p className="text-xs md:text-sm font-bold text-slate-700 leading-tight mt-2">{stats?.latest_date || '-'}</p>
                 </div>
             </div>
@@ -36,7 +36,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             {has_data ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full mb-8">
                     <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-100 shadow-sm flex flex-col hover:shadow-md transition-shadow">
-                        <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                        <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2">
                             <div className="p-1.5 bg-orange-50 rounded-md text-[#ff4d00]"><Target className="w-4 h-4" /></div>
                             Skill Map (Average)
                         </h3>
@@ -56,7 +56,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                     </div>
                     
                     <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
-                        <h3 className="text-xs font-bold text-slate-700 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                        <h3 className="text-xs font-bold text-slate-700 mb-6 flex items-center gap-2">
                             <div className="p-1.5 bg-rose-50 rounded-md text-rose-500"><Activity className="w-4 h-4" /></div>
                             Comparison: Latest vs Previous
                         </h3>
@@ -78,20 +78,20 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             ) : (
                 <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center h-64 text-slate-400 gap-2 mb-8">
                     <Activity className="w-8 h-8 opacity-20" />
-                    <p className="text-xs font-bold uppercase tracking-widest">No training data available</p>
+                    <p className="text-xs font-bold">No training data available</p>
                 </div>
             )}
 
             {has_data && item_analysis && (
                 <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm mb-8">
                     <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-100 backdrop-blur-sm">
-                        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Latest Test Breakdown</h3>
+                        <h3 className="text-xs font-bold text-slate-700">Latest Test Breakdown</h3>
                     </div>
                     
                     
                     <div className="overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-[10px] text-slate-400 bg-slate-50 border-b border-slate-100 uppercase tracking-widest">
+                            <thead className="text-[10px] text-slate-400 bg-slate-50 border-b border-slate-100">
                                 <tr>
                                     <th className="px-4 md:px-6 py-3 md:py-4 font-bold">Test Item</th>
                                     <th className="px-4 md:px-6 py-3 md:py-4 text-center font-bold">Result</th>
@@ -111,7 +111,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                     <tr key={idx} className="hover:bg-orange-50/30 transition-colors group">
                                         <td className="px-4 md:px-6 py-3 md:py-4">
                                             <div className="font-bold text-slate-800 text-xs md:text-sm group-hover:text-[#ff4d00] transition-colors">{item.name}</div>
-                                            <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wide">{item.category}</div>
+                                            <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5">{item.category}</div>
                                         </td>
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center font-bold text-slate-800 bg-slate-50/30 whitespace-nowrap">
                                             {formatNumber(item.result_value)} <span className="text-[9px] md:text-[10px] font-normal text-slate-400">{item.unit}</span>
@@ -155,7 +155,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                 <div className="bg-white rounded-lg border border-slate-200 shadow-sm mb-8 overflow-hidden">
                     <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
                         <div className="p-5 md:p-8">
-                            <h3 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-widest">
+                            <h3 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
                                 <div className="p-1.5 bg-emerald-100 rounded-md text-emerald-600"><Zap className="w-4 h-4" /></div>
                                 Top Strengths ({'>'}70%)
                             </h3>
@@ -163,14 +163,14 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                 {strengths && strengths.length > 0 ? strengths.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between group p-3 rounded-lg hover:bg-emerald-50/50 transition-colors border border-transparent hover:border-emerald-100">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-xl md:text-2xl font-black text-slate-100 group-hover:text-emerald-200 transition-colors">0{idx + 1}</span>
+                                            <span className="text-xl md:text-2xl font-bold text-slate-100 group-hover:text-emerald-200 transition-colors">0{idx + 1}</span>
                                             <div>
                                                 <p className="font-bold text-sm md:text-base text-slate-700">{item.name}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Physical Category</p>
+                                                <p className="text-[10px] text-slate-400 font-bold">Physical Category</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="block text-lg md:text-xl font-black text-emerald-600">{formatScore(item.score)}</span>
+                                            <span className="block text-lg md:text-xl font-bold text-emerald-600">{formatScore(item.score)}</span>
                                         </div>
                                     </div>
                                 )) : <p className="text-slate-400 font-medium text-xs md:text-sm text-center py-4">No categories above 70% yet.</p>}
@@ -178,7 +178,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                         </div>
 
                         <div className="p-5 md:p-8">
-                            <h3 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-widest">
+                            <h3 className="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
                                 <div className="p-1.5 bg-rose-100 rounded-md text-rose-600"><AlertCircle className="w-4 h-4" /></div>
                                 Areas for Improvement
                             </h3>
@@ -186,14 +186,14 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                 {weaknesses && weaknesses.length > 0 ? weaknesses.map((item, idx) => (
                                     <div key={idx} className="flex items-center justify-between group p-3 rounded-lg hover:bg-rose-50/50 transition-colors border border-transparent hover:border-rose-100">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-xl md:text-2xl font-black text-slate-100 group-hover:text-rose-200 transition-colors">0{idx + 1}</span>
+                                            <span className="text-xl md:text-2xl font-bold text-slate-100 group-hover:text-rose-200 transition-colors">0{idx + 1}</span>
                                             <div>
                                                 <p className="font-bold text-sm md:text-base text-slate-700">{item.name}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Physical Category</p>
+                                                <p className="text-[10px] text-slate-400 font-bold">Physical Category</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="block text-lg md:text-xl font-black text-rose-500">{formatScore(item.score)}</span>
+                                            <span className="block text-lg md:text-xl font-bold text-rose-500">{formatScore(item.score)}</span>
                                         </div>
                                     </div>
                                 )) : <p className="text-slate-400 font-medium text-xs md:text-sm text-center py-4">Great! All categories are above 70%.</p>}
@@ -207,11 +207,11 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             {has_data && (
                 <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm mb-8">
                     <div className="px-5 py-4 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <h3 className="text-xs font-bold text-slate-700 flex items-center gap-2 uppercase tracking-widest">
+                        <h3 className="text-xs font-bold text-slate-700 flex items-center gap-2">
                             <FileText className="w-3.5 h-3.5 text-slate-400" /> Session History
                         </h3>
                         {safeAthlete.name && (
-                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:underline bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm hover:bg-orange-50 transition-colors uppercase tracking-widest">
+                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:underline bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm hover:bg-orange-50 transition-colors">
                                 View All Logs &rarr;
                             </Link>
                         )}
@@ -220,7 +220,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                     
                     <div className="overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-[10px] text-slate-400 bg-slate-50/50 border-b border-slate-100 uppercase tracking-widest">
+                            <thead className="text-[10px] text-slate-400 bg-slate-50/50 border-b border-slate-100">
                                 <tr>
                                     <th className="px-4 md:px-6 py-3 font-bold">Date</th>
                                     <th className="px-4 md:px-6 py-3 text-center font-bold">Score</th>
@@ -240,12 +240,12 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                                 {session.full_date}
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-center">
-                                                <span className="font-black text-[#ff4d00] text-base md:text-lg">{formatScore(session.score)}</span>
+                                                <span className="font-bold text-[#ff4d00] text-base md:text-lg">{formatScore(session.score)}</span>
                                             </td>
                                             
                                             
                                             <td className="px-4 md:px-6 py-4 text-center hidden sm:table-cell">
-                                                <span className={`px-2 py-1 rounded text-[9px] md:text-[10px] font-bold border uppercase tracking-wider ${
+                                                <span className={`px-2 py-1 rounded text-[9px] md:text-[10px] font-bold border ${
                                                     session.score >= 80 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                                                     session.score >= 60 ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                                     'bg-rose-50 text-rose-600 border-rose-100'
@@ -254,7 +254,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                                 </span>
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-right">
-                                                <Link href={route('admin.performance.show', session.id)} className="text-[10px] md:text-xs font-bold text-slate-500 hover:text-[#ff4d00] transition-colors uppercase tracking-widest whitespace-nowrap">
+                                                <Link href={route('admin.performance.show', session.id)} className="text-[10px] md:text-xs font-bold text-slate-500 hover:text-[#ff4d00] transition-colors whitespace-nowrap">
                                                     Details &rarr;
                                                 </Link>
                                             </td>

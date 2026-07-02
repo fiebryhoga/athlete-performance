@@ -90,7 +90,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
 
             
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
-                <Link href={route('admin.performance.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors uppercase tracking-widest touch-manipulation py-1">
+                <Link href={route('admin.performance.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
                 <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" /> Back to History list
                 </Link>
                 <div className="flex w-full sm:w-auto gap-2">
@@ -121,15 +121,15 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                             }}
                         />
                         <div>
-                            <h1 className="text-xl md:text-2xl text-slate-800 font-black tracking-tight uppercase">Performance Report</h1>
-                            <p className="text-[10px] md:text-xs text-[#ff4d00] font-bold tracking-widest uppercase mt-0.5">{appName}</p> 
+                            <h1 className="text-xl md:text-2xl text-slate-800 font-bold tracking-tight">Performance Report</h1>
+                            <p className="text-[10px] md:text-xs text-[#ff4d00] font-bold mt-0.5">{appName}</p> 
                         </div>
                     </div>
                     <div className="text-left md:text-right w-full md:w-auto bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-lg">
                         <div className="inline-block px-2 py-0.5 bg-white md:bg-orange-50 rounded border border-slate-200 md:border-orange-100 mb-1">
-                            <p className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] tracking-widest uppercase">Official Document</p>
+                            <p className="text-[9px] md:text-[10px] font-bold text-[#ff4d00]">Official Document</p>
                         </div>
-                        <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-1 font-bold uppercase tracking-widest">REF ID: {test.name}</p>
+                        <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-1 font-bold">REF ID: {test.name}</p>
                     </div>
                 </div>
 
@@ -137,27 +137,27 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 <div className="bg-slate-50 rounded-lg p-5 border border-slate-100 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-6">
                         <div className="space-y-1.5">
-                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Athlete Name</p>
+                            <p className="text-[10px] text-slate-400 font-bold">Athlete Name</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
                                 <User className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Sport Category</p>
+                            <p className="text-[10px] text-slate-400 font-bold">Sport Category</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
                                 <Trophy className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.sport.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Assessment Date</p>
+                            <p className="text-[10px] text-slate-400 font-bold">Assessment Date</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
                                 <Calendar className="w-4 h-4 text-[#ff4d00]" /> {test.date}
                             </div>
                         </div>
                         <div className="space-y-1.5 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-200 mt-2 sm:mt-0">
-                            <p className="text-[10px] text-[#ff4d00] font-bold tracking-widest uppercase">Total Avg Score</p>
+                            <p className="text-[10px] text-[#ff4d00] font-bold">Total Avg Score</p>
                             <div className="flex items-center gap-2 text-[#ff4d00]">
-                                <span className="text-2xl md:text-3xl font-black tracking-tight">{formatPercent(current_score)}</span>
+                                <span className="text-2xl md:text-3xl font-bold tracking-tight">{formatPercent(current_score)}</span>
                             </div>
                         </div>
                     </div>
@@ -166,7 +166,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-2 gap-6 mb-10" style={{ pageBreakInside: 'avoid' }}>
                     <div className="border border-slate-100 rounded-lg p-5 bg-white shadow-sm">
-                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-widest flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-slate-400"/> Skill Map</h3>
+                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-slate-400"/> Skill Map</h3>
                         <div className="h-64 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radar_data}>
@@ -182,7 +182,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </div>
 
                     <div className="border border-slate-100 rounded-lg p-5 bg-white shadow-sm">
-                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 uppercase tracking-widest flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-400"/> Performance Trend</h3>
+                        <h3 className="text-[10px] font-bold text-slate-500 mb-4 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-400"/> Performance Trend</h3>
                         <div className="h-64 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -204,7 +204,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
 
                 
                 <div className="mb-10 border border-slate-100 rounded-lg p-5 bg-white shadow-sm" style={{ pageBreakInside: 'avoid' }}>
-                    <h3 className="text-[10px] font-bold text-slate-500 mb-6 uppercase tracking-widest flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-400"/> Item Comparison (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)</h3>
+                    <h3 className="text-[10px] font-bold text-slate-500 mb-6 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-400"/> Item Comparison (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)</h3>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={item_analysis} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
@@ -242,7 +242,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                 <div className="mb-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-200">
+                            <thead className="bg-slate-50 text-[10px] text-slate-400 font-bold border-b border-slate-200">
                                 <tr>
                                     <th className="px-4 md:px-6 py-4">Test Item</th>
                                     <th className="px-4 md:px-6 py-4 text-center">Result (Raw)</th>
@@ -261,11 +261,11 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     <tr key={idx} className="hover:bg-orange-50/30 transition-colors" style={{ pageBreakInside: 'avoid' }}>
                                         <td className="px-4 md:px-6 py-3 md:py-4">
                                             <div className="font-bold text-slate-700 text-xs md:text-sm">{item.name}</div>
-                                            <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-widest">{item.category}</div>
+                                            <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5">{item.category}</div>
                                         </td>
-                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center font-black text-slate-800 text-base whitespace-nowrap">{formatNumber(item.result_value)}</td>
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center font-bold text-slate-800 text-base whitespace-nowrap">{formatNumber(item.result_value)}</td>
                                         
-                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest hidden sm:table-cell">{item.unit}</td>
+                                        <td className="px-4 md:px-6 py-3 md:py-4 text-center text-slate-400 text-[10px] font-bold hidden sm:table-cell">{item.unit}</td>
                                         
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center hidden md:table-cell">
                                             <div className="inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded text-[10px] font-bold text-slate-500 border border-slate-200">
@@ -279,7 +279,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                         </td>
                                         
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center bg-orange-50/30 print:bg-transparent">
-                                            <span className="font-black text-sm md:text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
+                                            <span className="font-bold text-sm md:text-base" style={{ color: getScoreColor(item.score) }}>{formatPercent(item.score)}</span>
                                         </td>
                                         
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center hidden sm:table-cell">
@@ -296,8 +296,8 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                 <tr className="bg-orange-50/50 border-t-2 border-slate-200 print:bg-slate-100" style={{ pageBreakInside: 'avoid' }}>
                                     <td colSpan="100%" className="px-4 md:px-6 py-4">
                                         <div className="flex justify-end items-center gap-4">
-                                            <span className="font-bold text-slate-500 text-[10px] md:text-xs tracking-widest uppercase">Total Average Score :</span>
-                                            <span className="font-black text-2xl md:text-3xl text-[#ff4d00]">{formatPercent(current_score)}</span>
+                                            <span className="font-bold text-slate-500 text-[10px] md:text-xs">Total Average Score :</span>
+                                            <span className="font-bold text-2xl md:text-3xl text-[#ff4d00]">{formatPercent(current_score)}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -308,7 +308,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
 
                 
                 <div className="bg-slate-50 rounded-lg p-5 md:p-6 border border-slate-100 print:bg-transparent print:border-slate-300" style={{ pageBreakInside: 'avoid' }}>
-                    <h4 className="text-[10px] md:text-xs font-bold text-[#ff4d00] mb-3 flex items-center gap-2 uppercase tracking-widest">
+                    <h4 className="text-[10px] md:text-xs font-bold text-[#ff4d00] mb-3 flex items-center gap-2">
                         <FileText className="w-4 h-4" /> Coach Notes & Evaluation
                     </h4>
                     <p className="text-xs md:text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-line text-justify">
@@ -316,7 +316,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                     </p>
                 </div>
                 
-                <div className="text-center pt-8 text-[9px] md:text-[10px] text-slate-300 font-bold tracking-widest uppercase print:text-slate-500">
+                <div className="text-center pt-8 text-[9px] md:text-[10px] text-slate-300 font-bold print:text-slate-500">
                     Generated by {appName} • {new Date().getFullYear()} 
                 </div>
             </div>

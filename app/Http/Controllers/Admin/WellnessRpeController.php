@@ -17,24 +17,84 @@ use App\Exports\WellnessRpeDailyExport;
 
 class WellnessRpeController extends Controller
 {
-    /**
-     * Halaman Utama: Menampilkan Kalender per Minggu
-     */
     public function index()
     {
-        // Gunakan tabel WellnessSetting alih-alih Club
-        $setting = Setting::where('key', 'season_start_date')->first();
-        
-        // PENGAMAN: Mencegah error 1970-01-01 jika data kosong atau tidak valid
-        $season_start_date = ($setting && $setting->value && $setting->value != '1970-01-01') 
-            ? Carbon::parse($setting->value)->format('Y-m-d') 
-            : null;
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        if ($user && $user->role === 'athlete') {
+            // Simple 7-day backward looking dates for Athlete
+            $days = [];
+            for ($i = 0; $i < 7; $i++) {
+                $date = Carbon::today()->subDays($i);
+                
+                $log = WellnessRpe::where('user_id', $user->id)
+                    ->where('record_date', $date->format('Y-m-d'))
+                    ->first();
+
+                $days[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'day_name' => $date->locale(app()->getLocale())->translatedFormat('l'),
+                    'formatted_date' => $date->locale(app()->getLocale())->translatedFormat('d M Y'),
+                    'is_today' => $i === 0,
+                    'is_filled' => $log ? true : false,
+                    'wellness_score' => $log ? $log->daily_wellness_score : null,
+                    'daily_load' => $log ? $log->daily_load : null,
+                ];
+            }
+            
+            return Inertia::render('Admin/WellnessRpe/AthleteIndex', [
+                'days' => $days
+            ]);
+        }
+
+        // For Coach / Admin
+        $query = User::where('role', 'athlete')->orderBy('name');
+        if ($user && $user->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($user) {
+                $q->where('coach_id', $user->id);
+            });
+        }
+        $athletes = $query->get();
+
+        // Optionally fetch the latest wellness entry for each athlete
+        $latestLogs = WellnessRpe::whereIn('user_id', $athletes->pluck('id'))
+            ->where('record_date', '>=', Carbon::today()->subDays(7)->format('Y-m-d'))
+            ->orderBy('record_date', 'desc')
+            ->get()
+            ->groupBy('user_id');
+
+        $athletes = $athletes->map(function($athlete) use ($latestLogs) {
+            $athlete->latest_wellness = $latestLogs->get($athlete->id)?->first();
+            return $athlete;
+        });
+
+        return Inertia::render('Admin/WellnessRpe/ClientIndex', [
+            'athletes' => $athletes
+        ]);
+    }
+
+    /**
+     * Halaman Utama Kalender (Untuk spesifik 1 athlete, dilihat oleh Coach)
+     */
+    public function showAthlete(Request $request, $user)
+    {
+        $athlete = User::where('role', 'athlete')->findOrFail($user);
+
+        // Dynamic Start Date based on the athlete's first log (Option 1)
+        $firstLog = WellnessRpe::where('user_id', $athlete->id)
+            ->orderBy('record_date', 'asc')
+            ->first();
+
+        // If there's a log, use its date as start date. Otherwise, default to the start of this week.
+        $season_start_date = $firstLog 
+            ? Carbon::parse($firstLog->record_date)->format('Y-m-d') 
+            : Carbon::today()->startOfWeek()->format('Y-m-d');
 
         $calendarWeeks = [];
 
         if ($season_start_date) {
-            $start = Carbon::parse($season_start_date)->startOfWeek(); // Paksa mulai dari Senin
-            $end = Carbon::today()->endOfWeek(); // Sampai hari Minggu di minggu ini
+            $start = Carbon::parse($season_start_date)->startOfWeek(); 
+            $end = Carbon::today()->endOfWeek(); 
 
             $currentDate = $start->copy();
             $weekNumber = 1;
@@ -63,7 +123,8 @@ class WellnessRpeController extends Controller
             }
         }
 
-        return Inertia::render('Admin/WellnessRpe/Index', [
+        return Inertia::render('Admin/WellnessRpe/AthleteCalendar', [
+            'athlete' => $athlete,
             'season_start_date' => $season_start_date,
             'calendarWeeks' => array_reverse($calendarWeeks), 
         ]);
@@ -104,7 +165,7 @@ class WellnessRpeController extends Controller
         $user = \Illuminate\Support\Facades\Auth::user();
         $isAthlete = $user && $user->role === 'athlete';
         
-        $targetPlayerId = $isAthlete ? $user->user_id : null;
+        $targetPlayerId = $isAthlete ? $user->id : null;
         $isCompleted = false;
 
         if ($request->query('training_id')) {
@@ -146,7 +207,7 @@ class WellnessRpeController extends Controller
     public function storeSession(Request $request)
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-        if (!$user || !$user->user_id) {
+        if (!$user || !$user->id) {
             return redirect()->back()->withErrors(['error' => 'Unauthorized']);
         }
 
@@ -165,7 +226,7 @@ class WellnessRpeController extends Controller
         $date = Carbon::parse($request->date)->format('Y-m-d');
         
         $log = WellnessRpe::firstOrNew([
-            'user_id' => $user->user_id,
+            'user_id' => $user->id,
             'record_date' => $date
         ]);
 
@@ -199,23 +260,24 @@ class WellnessRpeController extends Controller
             return redirect($request->redirect_to)->with('success', 'RPE & Wellness Session berhasil disimpan.');
         }
 
-        return redirect()->route('individual-trainings.index')->with('success', 'RPE & Wellness Session berhasil disimpan.');
+        return redirect()->route('admin.wellness-rpe.index')->with('success', 'RPE & Wellness Session berhasil disimpan.');
     }
 
-    public function show(Request $request, $date)
+    public function showAthleteDate(Request $request, $user, $date)
     {
-        $user = \Illuminate\Support\Facades\Auth::user();
-        $query = User::where('role', 'athlete')->orderBy('name');
-        if ($user && $user->role === 'athlete' && $user->user_id) {
-            $query->where('id', $user->user_id);
-        }
-        $players = $query->get();
+        $athlete = User::where('role', 'athlete')->findOrFail($user);
+        
+        $log = WellnessRpe::where('user_id', $athlete->id)
+            ->where('record_date', $date)
+            ->first();
+            
         $formattedDate = Carbon::parse($date)->locale(app()->getLocale())->translatedFormat('l, d F Y');
 
-        return Inertia::render('Admin/WellnessRpe/Show', [
+        return Inertia::render('Admin/WellnessRpe/ShowDetail', [
+            'athlete' => $athlete,
+            'log' => $log,
             'selectedDate' => $date,
             'formattedDate' => $formattedDate,
-            'athletes' => $players,
             'redirectTo' => $request->query('redirect_to')
         ]);
     }
@@ -237,8 +299,13 @@ class WellnessRpeController extends Controller
 
         $user = \Illuminate\Support\Facades\Auth::user();
         $query = User::where('role', 'athlete')->orderBy('name');
-        if ($user && $user->role === 'athlete' && $user->user_id) {
-            $query->where('id', $user->user_id);
+        if ($user && $user->role === 'athlete' && $user->id) {
+            $query->where('id', $user->id);
+        }
+        if ($user && $user->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($user) {
+                $q->where('coach_id', $user->id);
+            });
         }
         $players = $query->get();
 
@@ -736,7 +803,16 @@ class WellnessRpeController extends Controller
 
         $club = (object) ['name' => 'Athlete Performance', 'logo' => null];
 
-        return Excel::download(new WellnessRpeDailyExport($date, $options, $club, $reportTitle), $filename);
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $query = User::where('role', 'athlete')->orderBy('name');
+        if ($user && $user->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($user) {
+                $q->where('coach_id', $user->id);
+            });
+        }
+        $players = $query->get();
+
+        return Excel::download(new WellnessRpeDailyExport($date, $options, $club, $reportTitle, $players), $filename);
     }
 
     public function exportDailyPdf(Request $request, $date)
@@ -752,7 +828,16 @@ class WellnessRpeController extends Controller
         }
 
         $club = (object) ['name' => 'Athlete Performance', 'logo' => null];
-        $players = User::where('role', 'athlete')->orderBy('name')->get();
+        
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $query = User::where('role', 'athlete')->orderBy('name');
+        if ($user && $user->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($user) {
+                $q->where('coach_id', $user->id);
+            });
+        }
+        $players = $query->get();
+        
         $logs = WellnessRpe::where('record_date', $date)->get()->keyBy('user_id');
         
         $mappedPlayers = $players->map(function($player) use ($logs) {

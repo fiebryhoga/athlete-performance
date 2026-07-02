@@ -24,99 +24,46 @@ class DashboardController extends Controller
         
         if ($user->role === 'athlete') {
             
-            
-            $user->load('sport');
-            $tests = PerformanceTest::where('user_id', $user->id)
-                ->with(['results.testItem.category'])
-                ->orderBy('date', 'asc') 
-                ->get();
-
-            $hasData = $tests->count() > 0;
-            $latestTest = $tests->last();
-
-            
-            $dailyMetrics = \App\Models\DailyMetric::where('user_id', $user->id)
-                ->where('recovery_status', '!=', 'KOSONG') 
-                ->orderBy('record_date', 'asc')
-                ->take(30)
+            // For new dashboard:
+            // 1. Pending trainings (not completed)
+            $pendingTrainings = \App\Models\IndividualTraining::where('user_id', $user->id)
+                ->where('is_completed', false)
+                ->whereDate('date', '<=', Carbon::today())
+                ->orderBy('date', 'asc')
                 ->get()
-                ->map(function($metric) {
+                ->map(function ($training) {
                     return [
-                        'date' => date('d/m', strtotime($metric->record_date)),
-                        'recovery' => (float) $metric->quick_recovery_score,
+                        'id' => $training->id,
+                        'name' => $training->name ?? 'Latihan',
+                        'date' => Carbon::parse($training->date)->format('d M Y'),
+                        'training_type' => $training->training_type,
+                        'status' => $training->status,
+                        'session_number' => $training->session_number,
                     ];
                 });
 
-            $trainingLoads = \App\Models\TrainingLoad::where('user_id', $user->id)
-                ->orderBy('record_date', 'asc')
-                ->take(30)
-                ->get()
-                ->map(function($load) {
-                    return [
-                        'date' => date('d/m', strtotime($load->record_date)),
-                        'daily_load' => (float) $load->daily_load,
-                        'wellness' => (float) $load->wellness_score,
-                    ];
-                });
-            
+            // 2. Wellness Status Today
+            $hasWellnessToday = \App\Models\WellnessRpe::where('user_id', $user->id)
+                ->whereDate('record_date', Carbon::today())
+                ->exists();
 
-            
-            $avgScore = $hasData ? round($tests->flatMap(function($test) { return $test->results; })->avg('score'), 1) : 0;
-            $maxScore = $hasData ? round($tests->map(function($t) { return $t->results->avg('score'); })->max(), 1) : 0;
-            
-            
-            $bestCategory = '-';
-            if ($hasData) {
-                $catScores = $tests->flatMap(function ($test) { return $test->results; })
-                    ->groupBy(function ($result) { return optional(optional($result->testItem)->category)->name; })
-                    ->map(function ($items) { return $items->avg('score'); })
-                    ->sortDesc();
-                $bestCategory = $catScores->keys()->first() ?? '-';
-            }
+            // 3. Daily Metric Status Today
+            $hasDailyMetricToday = \App\Models\DailyMetric::where('user_id', $user->id)
+                ->whereDate('record_date', Carbon::today())
+                ->exists();
 
-            
-            $radarData = [];
-            if ($latestTest) {
-                $radarData = $latestTest->results->groupBy('testItem.category.name')
-                    ->map(function ($results, $categoryName) {
-                        return [ 'subject' => $categoryName, 'A' => round($results->avg('score'), 1), 'B' => 100, 'fullMark' => 100 ];
-                    })->values()->toArray();
-            }
+            // 4. Quick Stats
+            $totalSessions = PerformanceTest::where('user_id', $user->id)->count();
 
-            
-            $trendData = $tests->take(-6)->map(function ($test) {
-                return [ 'date' => Carbon::parse($test->date)->format('d/m'), 'score' => round($test->results->avg('score'), 1) ?? 0 ];
-            })->values();
-
-            
-            $history = $tests->sortByDesc('date')->take(5)->map(function ($test) {
-                $score = $test->results->avg('score') ?? 0;
-                return [
-                    'id' => $test->id,
-                    'date' => Carbon::parse($test->date)->format('d M Y'),
-                    'name' => $test->name ?? 'Sesi Latihan',
-                    'items_count' => $test->results->count(),
-                    'score' => $score,
-                    'status' => $this->getStatusBadge($score)
-                ];
-            })->values();
-
-            
             return Inertia::render('Athlete/Dashboard', [
                 'user' => $user,
+                'pending_trainings' => $pendingTrainings,
+                'has_wellness_today' => $hasWellnessToday,
+                'has_daily_metric_today' => $hasDailyMetricToday,
                 'stats' => [
                     'sport' => $user->sport->name ?? '-',
-                    'sessions' => $tests->count(),
-                    'avg_score' => $avgScore,
-                    'max_score' => $maxScore,
-                    'best_category' => $bestCategory
+                    'total_sessions' => $totalSessions,
                 ],
-                'radarData' => $radarData,
-                'trendData' => $trendData,
-                'history' => $history,
-                
-                'daily_metrics' => $dailyMetrics, 
-                'training_loads' => $trainingLoads 
             ]);
         }
 
@@ -242,9 +189,103 @@ class DashboardController extends Controller
     
     private function getStatusBadge($score)
     {
-        if ($score >= 90) return ['label' => 'Excellent', 'color' => 'bg-emerald-100 text-emerald-700 border-emerald-200'];
-        if ($score >= 80) return ['label' => 'Good', 'color' => 'bg-blue-100 text-blue-700 border-blue-200'];
-        if ($score >= 60) return ['label' => 'Fair', 'color' => 'bg-yellow-100 text-yellow-700 border-yellow-200'];
-        return ['label' => 'Poor', 'color' => 'bg-red-100 text-red-700 border-red-200'];
+        if ($score >= 80) return ['label' => 'Sangat Baik', 'color' => 'bg-emerald-50 text-emerald-600 border-emerald-200'];
+        if ($score >= 60) return ['label' => 'Baik', 'color' => 'bg-blue-50 text-blue-600 border-blue-200'];
+        if ($score >= 40) return ['label' => 'Cukup', 'color' => 'bg-amber-50 text-amber-600 border-amber-200'];
+        return ['label' => 'Kurang', 'color' => 'bg-red-50 text-red-600 border-red-200'];
+    }
+
+    public function profiling()
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'athlete') {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $user->load('sport');
+        $tests = PerformanceTest::where('user_id', $user->id)
+            ->with(['results.testItem.category'])
+            ->orderBy('date', 'asc') 
+            ->get();
+
+        $hasData = $tests->count() > 0;
+        $latestTest = $tests->last();
+
+        $dailyMetrics = \App\Models\DailyMetric::where('user_id', $user->id)
+            ->where('recovery_status', '!=', 'KOSONG') 
+            ->orderBy('record_date', 'asc')
+            ->take(30)
+            ->get()
+            ->map(function($metric) {
+                return [
+                    'date' => date('d/m', strtotime($metric->record_date)),
+                    'recovery' => (float) $metric->quick_recovery_score,
+                ];
+            });
+
+        $trainingLoads = \App\Models\WellnessRpe::where('user_id', $user->id)
+            ->orderBy('record_date', 'asc')
+            ->take(30)
+            ->get()
+            ->map(function($load) {
+                return [
+                    'date' => date('d/m', strtotime($load->record_date)),
+                    'daily_load' => (float) $load->daily_load,
+                    'wellness' => (float) $load->daily_wellness_score,
+                ];
+            });
+
+        $avgScore = $hasData ? round($tests->flatMap(function($test) { return $test->results; })->avg('score'), 1) : 0;
+        $maxScore = $hasData ? round($tests->map(function($t) { return $t->results->avg('score'); })->max(), 1) : 0;
+        
+        $bestCategory = '-';
+        if ($hasData) {
+            $catScores = $tests->flatMap(function ($test) { return $test->results; })
+                ->groupBy(function ($result) { return optional(optional($result->testItem)->category)->name; })
+                ->map(function ($items) { return $items->avg('score'); })
+                ->sortDesc();
+            $bestCategory = $catScores->keys()->first() ?? '-';
+        }
+
+        $radarData = [];
+        if ($latestTest) {
+            $radarData = $latestTest->results->groupBy('testItem.category.name')
+                ->map(function ($results, $categoryName) {
+                    return [ 'subject' => $categoryName, 'A' => round($results->avg('score'), 1), 'B' => 100, 'fullMark' => 100 ];
+                })->values()->toArray();
+        }
+
+        $trendData = $tests->take(-6)->map(function ($test) {
+            return [ 'date' => Carbon::parse($test->date)->format('d/m'), 'score' => round($test->results->avg('score'), 1) ?? 0 ];
+        })->values();
+
+        $history = $tests->sortByDesc('date')->take(5)->map(function ($test) {
+            $score = $test->results->avg('score') ?? 0;
+            return [
+                'id' => $test->id,
+                'date' => Carbon::parse($test->date)->format('d M Y'),
+                'name' => $test->name ?? 'Sesi Latihan',
+                'items_count' => $test->results->count(),
+                'score' => $score,
+                'status' => $this->getStatusBadge($score)
+            ];
+        })->values();
+
+        return Inertia::render('Athlete/Profiling', [
+            'user' => $user,
+            'stats' => [
+                'sport' => $user->sport->name ?? '-',
+                'sessions' => $tests->count(),
+                'avg_score' => $avgScore,
+                'max_score' => $maxScore,
+                'best_category' => $bestCategory
+            ],
+            'radarData' => $radarData,
+            'trendData' => $trendData,
+            'history' => $history,
+            'daily_metrics' => $dailyMetrics, 
+            'training_loads' => $trainingLoads 
+        ]);
     }
 }

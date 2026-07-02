@@ -1,25 +1,30 @@
 import React, { useRef } from "react";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
-import { Dumbbell, X, ChevronLeft, UploadCloud, Trash2, Video } from "lucide-react";
+import {
+    ArrowLeft,
+    Plus,
+    Trash2,
+    Save,
+    Image as ImageIcon,
+    Video,
+    CheckCircle,
+} from "lucide-react";
 
 export default function Create({ categories = [] }) {
-    const fileInputRef = useRef(null);
-
     const {
         data,
         setData,
         post,
         processing,
+        recentlySuccessful,
         errors,
     } = useForm({
         name: "",
         description: "",
         exercise_category_id: "",
         images: [],
-        existing_images: [],
         videos: [""],
-        _method: "post"
     });
 
     const submit = (e) => {
@@ -45,12 +50,14 @@ export default function Create({ categories = [] }) {
     };
 
     const addVideoRow = () => setData('videos', [...data.videos, ""]);
+    
     const removeVideoRow = (index) => {
         const newVids = [...data.videos];
         newVids.splice(index, 1);
         if (newVids.length === 0) newVids.push("");
         setData('videos', newVids);
     };
+    
     const updateVideoRow = (index, val) => {
         const newVids = [...data.videos];
         newVids[index] = val;
@@ -58,156 +65,175 @@ export default function Create({ categories = [] }) {
     };
 
     return (
-        <AppLayout title="Buat Latihan Baru">
+        <AppLayout title="Buat Latihan">
             <Head title="Buat Latihan Baru" />
-            <div className="mb-8">
-                <Link href={route('admin.exercises.index')} className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors mb-4">
-                    <ChevronLeft size={16} /> Kembali ke Master Latihan
-                </Link>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                    <div className="p-2 bg-white border border-zinc-200 rounded-xl shadow-sm"><Dumbbell size={24} className="text-zinc-900"/></div>
-                    Buat Latihan Baru
-                </h1>
-                <p className="text-gray-600 mt-2">Tambahkan master latihan baru ke dalam database beserta gambar dan tautan videonya.</p>
-            </div>
 
-            <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm overflow-hidden max-w-4xl">
-                <form onSubmit={submit}>
-                    <div className="p-8 space-y-8">
-                        {/* Basic Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
-                                    Nama Latihan
-                                </label>
-                                <input
-                                    type="text"
-                                    className={`w-full py-3 px-4 bg-zinc-50 border rounded-xl text-sm font-semibold text-zinc-900 outline-none ${errors.name ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'border-zinc-200 focus:ring-1 focus:ring-zinc-900'}`}
-                                    value={data.name}
-                                    onChange={(e) => setData("name", e.target.value)}
-                                    placeholder="e.g., Barbell Squat..."
-                                    required
-                                    autoFocus
-                                />
-                                {errors.name && <p className="mt-2 text-xs text-red-500 font-medium">{errors.name}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
-                                    Kategori (Opsional)
-                                </label>
-                                <select
-                                    className="w-full py-3 px-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none"
-                                    value={data.exercise_category_id}
-                                    onChange={(e) => setData("exercise_category_id", e.target.value)}
-                                >
-                                    <option value="">Tanpa Kategori</option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+            <div className="pb-12 space-y-8">
+                {/* Back Link */}
+                <div className="flex items-center justify-between">
+                    <Link
+                        href={route("admin.exercises.index")}
+                        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors"
+                    >
+                        <ArrowLeft size={16} /> Kembali ke Master Latihan
+                    </Link>
+                </div>
 
-                        {/* Media */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-zinc-100">
-                            <div>
-                                <label className="block text-xs font-bold text-zinc-500 mb-3 uppercase tracking-wider">
-                                    Gambar Pendukung
-                                </label>
-                                <input 
-                                    type="file" 
-                                    multiple 
-                                    accept="image/*" 
-                                    className="hidden" 
-                                    ref={fileInputRef} 
-                                    onChange={handleImageUpload} 
-                                />
-                                <button 
-                                    type="button" 
-                                    onClick={() => fileInputRef.current.click()}
-                                    className="w-full py-8 border-2 border-dashed border-zinc-300 rounded-2xl flex flex-col items-center justify-center text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* KOLOM KIRI: Form Edit */}
+                    <div className="lg:col-span-1 space-y-6">
+                        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm sticky top-6">
+                            <label className="block text-[10px] font-bold text-slate-500 mb-4">
+                                Informasi Latihan
+                            </label>
+                            <form onSubmit={submit} className="space-y-4">
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold mb-1 block">
+                                        Nama
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.name}
+                                        onChange={(e) => setData("name", e.target.value)}
+                                        className={`w-full bg-slate-50 border rounded-lg text-sm py-2 px-3 outline-none ${errors.name ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-slate-200 focus:ring-1 focus:ring-slate-900"}`}
+                                        required
+                                    />
+                                    {errors.name && (
+                                        <p className="mt-1 text-xs text-red-500">
+                                            {errors.name}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold mb-1 block">
+                                        Kategori (Opsional)
+                                    </label>
+                                    <select
+                                        value={data.exercise_category_id}
+                                        onChange={(e) => setData("exercise_category_id", e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-slate-900 outline-none"
+                                    >
+                                        <option value="">Tanpa Kategori</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.id}>
+                                                {cat.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold mb-1 block">
+                                        Deskripsi
+                                    </label>
+                                    <textarea
+                                        value={data.description}
+                                        onChange={(e) => setData("description", e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-slate-900 outline-none resize-y min-h-[100px]"
+                                        placeholder="Instruksi pelaksanaan latihan..."
+                                    />
+                                </div>
+
+                                <div className="pt-4 border-t border-slate-100">
+                                    <label className="flex items-center gap-2 text-[10px] font-bold text-slate-500 mb-3">
+                                        <Video size={12} /> Tautan Video (URL)
+                                    </label>
+                                    <div className="space-y-2">
+                                        {data.videos.map((v, i) => (
+                                            <div key={i} className="flex items-center gap-2">
+                                                <input
+                                                    type="url"
+                                                    value={v}
+                                                    onChange={(e) => updateVideoRow(i, e.target.value)}
+                                                    placeholder="Tautan (YouTube, dll)..."
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs py-2 px-3 outline-none focus:ring-1 focus:ring-slate-900"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeVideoRow(i)}
+                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors bg-white border border-slate-200 rounded-lg shadow-sm"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={addVideoRow}
+                                            className="text-[10px] font-bold text-slate-400 hover:text-slate-900 mt-2 inline-flex items-center gap-1 bg-slate-100 px-2 py-1 rounded"
+                                        >
+                                            <Plus size={10} /> Tambah Tautan
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button
+                                    disabled={processing}
+                                    className="w-full mt-6 bg-slate-900 text-white py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:bg-slate-800 transition-colors disabled:opacity-50"
                                 >
-                                    <UploadCloud size={28} className="mb-3" />
-                                    <span className="text-sm font-bold">Pilih File Gambar</span>
-                                    <span className="text-xs font-medium text-zinc-400 mt-1">Bisa pilih lebih dari satu (Max 5MB/file)</span>
+                                    {recentlySuccessful ? (
+                                        <CheckCircle size={16} className="text-emerald-400" />
+                                    ) : (
+                                        <Save size={16} />
+                                    )}
+                                    {recentlySuccessful ? "Berhasil Disimpan!" : "Simpan Latihan"}
                                 </button>
-                                
-                                {data.images.length > 0 && (
-                                    <div className="flex flex-wrap gap-3 mt-4">
+                            </form>
+                        </div>
+                    </div>
+
+                    {/* KOLOM KANAN: Galeri & Media */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* AREA GALERI GAMBAR */}
+                        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-bold flex items-center gap-2">
+                                    <ImageIcon size={18} /> Galeri Gambar
+                                </h3>
+
+                                <label className="cursor-pointer bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors border border-slate-200 shadow-sm flex items-center gap-2">
+                                    <Plus size={14} /> Pilih Gambar...
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
+                                </label>
+                            </div>
+
+                            {/* PREVIEW BARU */}
+                            {data.images.length > 0 ? (
+                                <div className="mb-8 p-5 border border-slate-200 bg-slate-50/50 rounded-xl">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                                            <ImageIcon size={14} /> Pratinjau Gambar Baru
+                                        </h4>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {data.images.map((file, idx) => (
-                                            <div key={`new-${idx}`} className="relative w-20 h-20 rounded-xl border border-zinc-200 overflow-hidden group shadow-sm">
+                                            <div key={`new-${idx}`} className="relative aspect-square rounded-lg overflow-hidden border-2 border-dashed border-slate-300 group">
                                                 <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
-                                                <button type="button" onClick={() => removeNewImage(idx)} className="absolute inset-0 bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                                                    <Trash2 size={18} />
+                                                <button
+                                                    onClick={() => removeNewImage(idx)}
+                                                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                                                >
+                                                    <Trash2 size={14} />
                                                 </button>
                                             </div>
                                         ))}
                                     </div>
-                                )}
-                                {errors['images.*'] && <p className="mt-2 text-xs text-red-500 font-medium">{errors['images.*']}</p>}
-                            </div>
-
-                            <div>
-                                <label className="flex text-xs font-bold text-zinc-500 mb-3 uppercase tracking-wider justify-between items-center">
-                                    Tautan Video
-                                    <button type="button" onClick={addVideoRow} className="text-xs text-zinc-900 font-bold bg-zinc-100 px-3 py-1.5 rounded-lg hover:bg-zinc-200 transition-colors">
-                                        + Tambah Link
-                                    </button>
-                                </label>
-                                <div className="space-y-3">
-                                    {data.videos.map((vid, idx) => (
-                                        <div key={idx} className="flex gap-2 items-center">
-                                            <div className="flex-1 relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <Video size={16} className="text-zinc-400" />
-                                                </div>
-                                                <input
-                                                    type="url"
-                                                    value={vid}
-                                                    onChange={(e) => updateVideoRow(idx, e.target.value)}
-                                                    placeholder="https://youtube.com/watch..."
-                                                    className="w-full py-2.5 pl-10 pr-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium outline-none focus:ring-1 focus:ring-zinc-900"
-                                                />
-                                            </div>
-                                            <button type="button" onClick={() => removeVideoRow(idx)} className="p-2.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors">
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    ))}
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="pt-6 border-t border-zinc-100">
-                            <label className="block text-xs font-bold text-zinc-500 mb-3 uppercase tracking-wider">
-                                Deskripsi / Instruksi (Opsional)
-                            </label>
-                            <textarea
-                                className="w-full py-3 px-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium text-zinc-900 focus:ring-1 focus:ring-zinc-900 outline-none resize-y min-h-[120px]"
-                                value={data.description}
-                                onChange={(e) => setData("description", e.target.value)}
-                                placeholder="Masukkan detail instruksi pelaksanaan latihan ini secara lengkap..."
-                            />
+                            ) : (
+                                <div className="py-12 text-center border border-dashed border-slate-200 rounded-xl text-slate-400 text-sm bg-slate-50/50">
+                                    Pilih gambar untuk melihat pratinjau di sini.
+                                </div>
+                            )}
                         </div>
                     </div>
-                    
-                    <div className="px-8 py-5 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
-                        <Link
-                            href={route('admin.exercises.index')}
-                            className="px-6 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-200 rounded-xl transition-colors"
-                        >
-                            Batal
-                        </Link>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-6 py-2.5 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors disabled:opacity-50 shadow-sm shadow-zinc-900/20"
-                        >
-                            {processing ? "Menyimpan..." : "Simpan Latihan"}
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </AppLayout>
     );

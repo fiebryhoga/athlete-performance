@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight
+    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -30,7 +30,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             roles: ['superadmin', 'coach'] 
         },
         { 
-            name: 'Data Klien', 
+            name: 'Profilling', 
             route: 'admin.athletes.index', 
             checkPath: '/admin/athletes', 
             icon: Users,
@@ -65,7 +65,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             roles: ['superadmin', 'coach', 'athlete'] 
         },
         { 
-            name: 'Master Latihan', 
+            name: 'Master Exercise', 
             route: 'admin.exercises.index', 
             checkPath: '/admin/exercises', 
             icon: Dumbbell,
@@ -79,11 +79,25 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             roles: ['superadmin', 'coach', 'athlete'] 
         },
         { 
-            name: 'Manajemen Pengguna', 
+            name: 'Profil Fisik', 
+            route: 'athlete.profiling', 
+            checkPath: '/profiling', 
+            icon: Target,
+            roles: ['athlete'] 
+        },
+        { 
+            name: 'Rekap Sesi', 
+            route: 'admin.reports.sessions', 
+            checkPath: '/admin/reports/sessions', 
+            icon: BarChart3,
+            roles: ['superadmin'] 
+        },
+        { 
+            name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', 
             route: 'admin.users.index', 
             checkPath: '/admin/users', 
             icon: Shield,
-            roles: ['superadmin'] 
+            roles: ['superadmin', 'coach'] 
         },
         { 
             name: 'Pengaturan Sistem', 

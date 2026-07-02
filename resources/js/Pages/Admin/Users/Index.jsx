@@ -1,11 +1,11 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users
+    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-export default function Index({ users, filters, activeTab }) {
+export default function Index({ auth, users, filters, activeTab, sports, coachesList }) {
     const [search, setSearch] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); 
@@ -17,10 +17,16 @@ export default function Index({ users, filters, activeTab }) {
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         name: '',
-        athlete_id: '', 
+        username: '', 
         password: '',
         profile_photo: null,
         role: activeTab,
+        sport_id: '',
+        gender: 'L',
+        age: '',
+        height: '',
+        weight: '',
+        coach_ids: [],
         _method: 'POST',     
     });
 
@@ -45,7 +51,26 @@ export default function Index({ users, filters, activeTab }) {
     };
 
     const handleTabChange = (tab) => {
-        router.get(route('admin.users.index'), { tab, search: '' });
+        router.get(route('admin.users.index'), { tab }, { preserveState: true, replace: true });
+    };
+
+    const handleSort = (field) => {
+        let newDirection = 'asc';
+        if (filters.sort_field === field) {
+            newDirection = filters.sort_direction === 'asc' ? 'desc' : 'asc';
+        }
+        router.get(route('admin.users.index'), {
+            tab: activeTab,
+            search: search,
+            sort_field: field,
+            sort_direction: newDirection,
+        }, { preserveState: true, replace: true });
+    };
+
+    const SortIcon = ({ field }) => {
+        if (filters.sort_field !== field) return <ArrowUpDown className="w-3 h-3 text-slate-300 ml-1 inline-block" />;
+        if (filters.sort_direction === 'asc') return <ArrowUp className="w-3 h-3 text-[#ff4d00] ml-1 inline-block" />;
+        return <ArrowDown className="w-3 h-3 text-[#ff4d00] ml-1 inline-block" />;
     };
 
     const openCreateModal = () => {
@@ -56,10 +81,16 @@ export default function Index({ users, filters, activeTab }) {
         clearErrors();
         setData({
             name: '',
-            athlete_id: '',
+            username: '',
             password: '',
             profile_photo: null,
             role: activeTab,
+            sport_id: '',
+            gender: 'L',
+            age: '',
+            height: '',
+            weight: '',
+            coach_ids: [],
             _method: 'POST',
         });
         setIsModalOpen(true);
@@ -72,10 +103,16 @@ export default function Index({ users, filters, activeTab }) {
         clearErrors();
         setData({
             name: user.name,
-            athlete_id: user.athlete_id,
+            username: user.username,
             password: '', 
             profile_photo: null,
             role: user.role,
+            sport_id: user.sport_id || '',
+            gender: user.gender || 'L',
+            age: user.age || '',
+            height: user.height || '',
+            weight: user.weight || '',
+            coach_ids: user.coaches?.map(c => c.id) || [],
             _method: 'PUT', 
         });
         setIsModalOpen(true);
@@ -103,6 +140,20 @@ export default function Index({ users, filters, activeTab }) {
         }
     };
 
+    const handleCoachToggle = (coachId) => {
+        let newCoachIds = [...data.coach_ids];
+        if (newCoachIds.includes(coachId)) {
+            newCoachIds = newCoachIds.filter(id => id !== coachId);
+        } else {
+            if (newCoachIds.length >= 2) {
+                alert("Maksimal hanya 2 pelatih (coach) yang dapat dipilih.");
+                return;
+            }
+            newCoachIds.push(coachId);
+        }
+        setData('coach_ids', newCoachIds);
+    };
+
     const handleDelete = (id) => {
         if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
             router.delete(route('admin.users.destroy', id));
@@ -116,8 +167,8 @@ export default function Index({ users, filters, activeTab }) {
     ];
 
     return (
-        <AppLayout title="Manajemen Pengguna">
-            <Head title="Manajemen Pengguna" />
+        <AppLayout title={auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}>
+            <Head title={auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'} />
 
             <div className="w-full max-w-[1400px] mx-auto pb-12">
                 
@@ -126,11 +177,13 @@ export default function Index({ users, filters, activeTab }) {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                     
                     <div className="relative z-10 w-full lg:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-2 md:mb-3 inline-block">System & Security</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
                         <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                            Manajemen Pengguna
+                            {auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}
                         </h2>
-                        <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Kelola akun dan hak akses pengguna secara terpusat.</p>
+                        <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">
+                            {auth.user.role === 'superadmin' ? 'Kelola akun dan hak akses pengguna secara terpusat.' : 'Kelola data fisik klien yang berada di bawah pantauan Anda.'}
+                        </p>
                     </div>
 
                     <div className="relative z-10 w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -144,41 +197,51 @@ export default function Index({ users, filters, activeTab }) {
                                 className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm touch-manipulation" 
                             />
                         </div>
-                        <button 
-                            onClick={openCreateModal}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95 touch-manipulation shrink-0"
-                        >
-                            <Plus className="w-4 h-4 md:w-5 md:h-5" /> Tambah Akun
-                        </button>
+                        {auth.user.role === 'superadmin' && (
+                            <button 
+                                onClick={openCreateModal}
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95 touch-manipulation shrink-0"
+                            >
+                                <Plus className="w-4 h-4 md:w-5 md:h-5" /> Tambah Akun
+                            </button>
+                        )}
                     </div>
                 </div>
 
                 {/* Tabs Section */}
-                <div className="flex border-b border-slate-200 mb-6 overflow-x-auto custom-scrollbar pb-1">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
-                            className={`px-6 py-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
-                                activeTab === tab.id 
-                                ? 'border-[#ff4d00] text-[#ff4d00]' 
-                                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                            }`}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                {auth.user.role === 'superadmin' && (
+                    <div className="flex border-b border-slate-200 mb-6 overflow-x-auto custom-scrollbar pb-1">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`px-6 py-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
+                                    activeTab === tab.id 
+                                    ? 'border-[#ff4d00] text-[#ff4d00]' 
+                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                }`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* Table Section Desktop */}
                 <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    <th className="px-6 py-4 w-[40%]">Nama Lengkap</th>
-                                    <th className="px-6 py-4 w-[25%]">Login ID</th>
-                                    <th className="px-6 py-4 text-center w-[20%]">Role</th>
+                                <tr className="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500">
+                                    <th className="px-6 py-4 w-[40%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('name')}>
+                                        Nama Lengkap <SortIcon field="name" />
+                                    </th>
+                                    <th className="px-6 py-4 w-[25%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('username')}>
+                                        Login ID <SortIcon field="username" />
+                                    </th>
+                                    <th className="px-6 py-4 text-center w-[20%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('role')}>
+                                        Role <SortIcon field="role" />
+                                    </th>
                                     <th className="px-6 py-4 text-right w-[15%]">Aksi</th>
                                 </tr>
                             </thead>
@@ -198,11 +261,11 @@ export default function Index({ users, filters, activeTab }) {
                                                     <span className="font-bold text-slate-800 text-sm group-hover:text-[#ff4d00] transition-colors">{user.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 align-middle font-mono text-slate-500 text-xs font-medium">
-                                                {user.athlete_id}
+                                            <td className="px-6 py-4 align-middle text-slate-500 text-xs font-medium">
+                                                {user.username}
                                             </td>
                                             <td className="px-6 py-4 align-middle text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border ${
                                                     user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                                                     user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                                                     'bg-orange-50 text-[#ff4d00] border-orange-100'
@@ -219,13 +282,15 @@ export default function Index({ users, filters, activeTab }) {
                                                     >
                                                         <Edit3 className="w-4 h-4" />
                                                     </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(user.id)} 
-                                                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                                                        title="Hapus Pengguna"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    {auth.user.role === 'superadmin' && (
+                                                        <button 
+                                                            onClick={() => handleDelete(user.id)} 
+                                                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                            title="Hapus Pengguna"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -264,11 +329,11 @@ export default function Index({ users, filters, activeTab }) {
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-slate-800 text-sm">{user.name}</h3>
-                                            <p className="font-mono text-slate-500 text-xs mt-0.5">{user.athlete_id}</p>
+                                            <p className="text-slate-500 text-xs mt-0.5">{user.username}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${
+                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold border ${
                                             user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                                             user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                                             'bg-orange-50 text-[#ff4d00] border-orange-100'
@@ -285,12 +350,14 @@ export default function Index({ users, filters, activeTab }) {
                                     >
                                         <Edit3 className="w-3.5 h-3.5" /> Edit
                                     </button>
-                                    <button 
-                                        onClick={() => handleDelete(user.id)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors border border-slate-200 hover:border-rose-200"
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" /> Hapus
-                                    </button>
+                                    {auth.user.role === 'superadmin' && (
+                                        <button 
+                                            onClick={() => handleDelete(user.id)}
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors border border-slate-200 hover:border-rose-200"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" /> Hapus
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))
@@ -333,9 +400,9 @@ export default function Index({ users, filters, activeTab }) {
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto">
                     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="relative bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+                    <div className={`relative bg-white w-full ${data.role === 'athlete' ? 'max-w-3xl' : 'max-w-md'} rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto flex flex-col`}>
                         
-                        <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10">
                             <div>
                                 <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
                                     <UserCog className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]" />
@@ -350,12 +417,12 @@ export default function Index({ users, filters, activeTab }) {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-5 md:p-6 space-y-4 md:space-y-5 max-h-[75vh] overflow-y-auto custom-scrollbar">
-                            
-                            <div className="flex flex-col items-center mb-2">
+                        <form onSubmit={handleSubmit} className="flex flex-col max-h-[75vh] overflow-y-auto custom-scrollbar">
+                            <div className="p-5 md:p-6 lg:p-8">
+                                <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div 
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed border-slate-300 hover:border-[#ff4d00] bg-slate-50 hover:bg-orange-50/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all group shadow-sm touch-manipulation"
+                                    onClick={() => auth.user.role === 'superadmin' && fileInputRef.current?.click()}
+                                    className={`w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-slate-50 overflow-hidden relative group transition-all ${auth.user.role === 'superadmin' ? 'border-slate-300 cursor-pointer hover:border-[#ff4d00] hover:bg-orange-50' : 'border-slate-200 cursor-not-allowed opacity-70'}`}
                                 >
                                     {photoPreview ? (
                                         <>
@@ -367,7 +434,7 @@ export default function Index({ users, filters, activeTab }) {
                                     ) : (
                                         <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
                                             <UploadCloud className="w-5 h-5 md:w-6 md:h-6 mb-1" />
-                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-0.5 md:mt-1">Photo</span>
+                                            <span className="text-[9px] md:text-[10px] font-bold mt-0.5 md:mt-1">Photo</span>
                                         </div>
                                     )}
                                 </div>
@@ -375,81 +442,195 @@ export default function Index({ users, filters, activeTab }) {
                                 {errors.profile_photo && <p className="text-rose-500 text-[10px] md:text-xs mt-2 font-bold">{errors.profile_photo}</p>}
                             </div>
 
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Role / Jabatan</label>
-                                <select
-                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm"
-                                    value={data.role}
-                                    onChange={e => setData('role', e.target.value)}
-                                >
-                                    <option value="superadmin">Superadmin</option>
-                                    <option value="coach">Coach (Pelatih)</option>
-                                    <option value="athlete">Athlete / Klien</option>
-                                </select>
-                                {errors.role && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.role}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                            <div className={data.role === 'athlete' ? 'grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8' : 'space-y-4 md:space-y-5'}>
+                                {/* Account Information Column */}
+                                <div className="space-y-4 md:space-y-5">
+                                    {data.role === 'athlete' && <h4 className="text-[10px] font-bold text-[#ff4d00] mb-2 border-b border-orange-100 pb-2">Account Information</h4>}
+                                    
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Role / Jabatan</label>
+                                        <select
+                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                            value={data.role}
+                                            onChange={e => setData('role', e.target.value)}
+                                            disabled={auth.user.role !== 'superadmin'}
+                                        >
+                                            <option value="superadmin">Superadmin</option>
+                                            <option value="coach">Coach (Pelatih)</option>
+                                            <option value="athlete">Athlete / Klien</option>
+                                        </select>
+                                        {errors.role && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.role}</p>}
                                     </div>
-                                    <input 
-                                        type="text" 
-                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
-                                        value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
-                                        placeholder="e.g. John Doe"
-                                    />
-                                </div>
-                                {errors.name && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.name}</p>}
-                            </div>
 
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Login ID (Username)</label>
-                                <input 
-                                    type="text" 
-                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-xs md:text-sm font-mono text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation"
-                                    value={data.athlete_id}
-                                    onChange={e => setData('athlete_id', e.target.value)}
-                                    placeholder="e.g. admin_01"
-                                />
-                                {errors.athlete_id && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.athlete_id}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 flex justify-between items-end">
-                                    Password
-                                    {modalMode === 'edit' && <span className="text-slate-400 font-medium normal-case tracking-normal text-[9px]">(Kosongkan jika tidak diganti)</span>}
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Nama Lengkap</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
+                                                value={data.name}
+                                                onChange={e => setData('name', e.target.value)}
+                                                placeholder="e.g. John Doe"
+                                                disabled={auth.user.role !== 'superadmin'}
+                                            />
+                                        </div>
+                                        {errors.name && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.name}</p>}
                                     </div>
-                                    <input 
-                                        type="password" 
-                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
-                                        value={data.password}
-                                        onChange={e => setData('password', e.target.value)}
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                                {errors.password && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.password}</p>}
-                            </div>
 
-                            <div className="flex gap-2 md:gap-3 pt-4 md:pt-6 mt-2 md:mt-4 border-t border-slate-100">
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Login ID (Username)</label>
+                                        <input 
+                                            type="text" 
+                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-xs md:text-sm text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation disabled:cursor-not-allowed"
+                                            value={data.username}
+                                            onChange={e => setData('username', e.target.value)}
+                                            placeholder="e.g. admin_01"
+                                            disabled={auth.user.role !== 'superadmin'}
+                                        />
+                                        {errors.username && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.username}</p>}
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1 flex justify-between items-end">
+                                            Password
+                                            {modalMode === 'edit' && <span className="text-slate-400 font-medium normal-case tracking-normal text-[9px]">(Kosongkan jika tidak diganti)</span>}
+                                        </label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                                <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                            </div>
+                                            <input 
+                                                type="password" 
+                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
+                                                value={data.password}
+                                                onChange={e => setData('password', e.target.value)}
+                                                placeholder="••••••••"
+                                                disabled={auth.user.role !== 'superadmin'}
+                                            />
+                                        </div>
+                                        {errors.password && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.password}</p>}
+                                    </div>
+
+                                    {data.role === 'athlete' && (
+                                        <>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Sport Category</label>
+                                                <div className="relative">
+                                                    <select 
+                                                        value={data.sport_id} 
+                                                        onChange={e => setData('sport_id', e.target.value)} 
+                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        disabled={auth.user.role !== 'superadmin'}
+                                                    >
+                                                        <option value="">-- Select Sport --</option>
+                                                        {sports && sports.map(sport => <option key={sport.id} value={sport.id}>{sport.name}</option>)}
+                                                    </select>
+                                                    <ChevronRight className="absolute right-3 top-3.5 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Assign Coaches (Max 2)</label>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {coachesList && coachesList.map((coach) => (
+                                                        <label key={coach.id} onClick={() => auth.user.role === 'superadmin' && handleCoachToggle(coach.id)} className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs md:text-sm font-medium select-none ${auth.user.role === 'superadmin' ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed opacity-60'} ${data.coach_ids.includes(coach.id) ? 'border-[#ff4d00] bg-orange-50 text-[#ff4d00]' : 'border-slate-200 text-slate-700'}`}>
+                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${data.coach_ids.includes(coach.id) ? 'bg-[#ff4d00] border-[#ff4d00]' : 'border-slate-300'}`}>
+                                                                {data.coach_ids.includes(coach.id) && <UserCheck className="w-3 h-3 text-white" />}
+                                                            </div>
+                                                            {coach.name}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                                {errors.coach_ids && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.coach_ids}</p>}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Physical Metrics Column (Only for Athlete) */}
+                                {data.role === 'athlete' && (
+                                    <div className="space-y-4 md:space-y-5 border-t border-slate-100 pt-5 md:pt-0 md:border-t-0 md:border-l md:pl-6 lg:pl-8">
+                                        <h4 className="text-[10px] font-bold text-[#ff4d00] mb-2 border-b border-orange-100 pb-2">Physical Metrics</h4>
+                                        
+                                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Gender</label>
+                                                <div className="relative">
+                                                    <select 
+                                                        value={data.gender} 
+                                                        onChange={e => setData('gender', e.target.value)} 
+                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium"
+                                                    >
+                                                        <option value="L">Male</option>
+                                                        <option value="P">Female</option>
+                                                    </select>
+                                                    <ChevronRight className="absolute right-3 top-3.5 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Age</label>
+                                                <input 
+                                                    type="number" 
+                                                    value={data.age} 
+                                                    onChange={e => setData('age', e.target.value)} 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    placeholder="e.g. 25" 
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Height (cm)</label>
+                                                <input 
+                                                    type="number" 
+                                                    step="0.01" 
+                                                    value={data.height} 
+                                                    onChange={e => setData('height', e.target.value)} 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    placeholder="e.g. 175" 
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Weight (kg)</label>
+                                                <input 
+                                                    type="number" 
+                                                    step="0.01" 
+                                                    value={data.weight} 
+                                                    onChange={e => setData('weight', e.target.value)} 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    placeholder="e.g. 70" 
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-100 flex gap-2.5 md:gap-3 mt-4">
+                                            <Shield className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                                            <p className="text-[10px] md:text-xs text-slate-500 font-medium leading-relaxed">
+                                                Physical data is used for performance baselines and body composition algorithms.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            </div>
+                            
+                            {/* Submit Area */}
+                            <div className="p-5 md:p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 md:gap-3 sticky bottom-0 z-10">
                                 <button 
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-4 py-3 md:py-2.5 text-slate-500 bg-slate-100 hover:bg-slate-200 font-bold text-xs md:text-sm rounded-lg transition-colors touch-manipulation"
+                                    className="px-5 py-2.5 text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 font-bold text-sm rounded-lg transition-colors touch-manipulation"
                                 >
                                     Batal
                                 </button>
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="flex-[2] px-4 py-3 md:py-2.5 bg-[#ff4d00] text-white font-bold text-xs md:text-sm rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
+                                    className="px-6 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                                 >
                                     {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                     {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Buat Akun' : 'Simpan Perubahan')}

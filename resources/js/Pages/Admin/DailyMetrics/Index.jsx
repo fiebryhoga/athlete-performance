@@ -20,7 +20,7 @@ export default function Index({ athletes }) {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                 
                 <div className="relative z-10 w-full lg:w-auto">
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 border border-orange-100 px-3 py-1 rounded-full uppercase tracking-widest mb-2.5 md:mb-3 inline-block shadow-sm">
+                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 border border-orange-100 px-3 py-1 rounded-full mb-2.5 md:mb-3 inline-block shadow-sm">
                         Wellness & Readiness
                     </span>
                     <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">

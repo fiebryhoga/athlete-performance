@@ -55,7 +55,7 @@ export default function Index({ app_name, app_logo }) {
                         
                         
                         <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Nama Aplikasi</label>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-2">Nama Aplikasi</label>
                             <input 
                                 type="text" 
                                 value={data.app_name}
@@ -69,7 +69,7 @@ export default function Index({ app_name, app_logo }) {
 
                         
                         <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Logo Aplikasi</label>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-3">Logo Aplikasi</label>
                             
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 md:gap-6">
                                 
@@ -88,7 +88,7 @@ export default function Index({ app_name, app_logo }) {
                                     ) : (
                                         <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
                                             <UploadCloud className="w-6 h-6 md:w-8 md:h-8 mb-1" />
-                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest">Upload</span>
+                                            <span className="text-[9px] md:text-[10px] font-bold">Upload</span>
                                         </div>
                                     )}
                                 </div>

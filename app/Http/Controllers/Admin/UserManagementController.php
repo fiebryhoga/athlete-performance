@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Models\Sport;
 
 class UserManagementController extends Controller
 {
@@ -17,22 +18,51 @@ class UserManagementController extends Controller
     public function index(Request $request)
     {
         $tab = $request->query('tab', 'superadmin'); // default tab
+        if (auth()->user()->role === 'coach') {
+            $tab = 'athlete';
+        }
         
+        $sortField = $request->query('sort_field', 'name');
+        $sortDirection = $request->query('sort_direction', 'asc');
+        
+        // Ensure valid sort direction
+        $sortDirection = in_array(strtolower($sortDirection), ['asc', 'desc']) ? $sortDirection : 'asc';
+        
+        // Ensure valid sort field
+        $validSortFields = ['name', 'username', 'created_at', 'role'];
+        $sortField = in_array($sortField, $validSortFields) ? $sortField : 'name';
+
         $users = User::where('role', $tab)
+            ->with(['coaches', 'sport'])
+            ->when(auth()->user()->role === 'coach', function($q) {
+                $q->whereHas('coaches', function($subQ) {
+                    $subQ->where('coach_id', auth()->id());
+                });
+            })
             ->when($request->search, function($q, $search) {
                 $q->where(function($sub) use ($search) {
                     $sub->where('name', 'like', "%{$search}%")
-                        ->orWhere('athlete_id', 'like', "%{$search}%");
+                        ->orWhere('username', 'like', "%{$search}%");
                 });
             })
-            ->latest()
+            ->orderBy($sortField, $sortDirection)
             ->paginate(10)
             ->withQueryString();
 
+        $sports = Sport::all();
+        $coachesList = User::where('role', 'coach')->get();
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['search', 'tab']),
+            'filters' => [
+                'search' => $request->search,
+                'tab' => $tab,
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+            ],
             'activeTab' => $tab,
+            'sports' => $sports,
+            'coachesList' => $coachesList,
         ]);
     }
 
@@ -41,19 +71,46 @@ class UserManagementController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        abort_if(auth()->user()->role !== 'superadmin', 403, 'Akses Ditolak.');
+        $rules = [
             'name' => 'required|string|max:255',
-            'athlete_id' => 'required|string|max:50|unique:users,athlete_id',
+            'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string|min:6',
             'role' => 'required|in:superadmin,coach,athlete',
-        ]);
+        ];
 
-        User::create([
+        if ($request->role === 'athlete') {
+            $rules['sport_id'] = 'nullable|exists:sports,id';
+            $rules['gender'] = 'nullable|in:L,P';
+            $rules['age'] = 'nullable|integer';
+            $rules['height'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable|numeric';
+            $rules['coach_ids'] = 'nullable|array|max:2';
+            $rules['coach_ids.*'] = 'exists:users,id';
+        }
+
+        $request->validate($rules);
+
+        $data = [
             'name' => $request->name,
-            'athlete_id' => $request->athlete_id,
+            'username' => $request->username,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-        ]);
+        ];
+
+        if ($request->role === 'athlete') {
+            $data['sport_id'] = $request->sport_id;
+            $data['gender'] = $request->gender ?? 'L';
+            $data['age'] = $request->age;
+            $data['height'] = $request->height;
+            $data['weight'] = $request->weight;
+        }
+
+        $user = User::create($data);
+
+        if ($request->role === 'athlete' && $request->has('coach_ids')) {
+            $user->coaches()->sync($request->coach_ids);
+        }
 
         return redirect()->back()->with('message', 'Pengguna baru berhasil ditambahkan.');
     }
@@ -63,18 +120,57 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        if (auth()->user()->role === 'coach') {
+            // Coach only allowed to update physical metrics
+            $request->validate([
+                'gender' => 'nullable|in:L,P',
+                'age' => 'nullable|integer',
+                'height' => 'nullable|numeric',
+                'weight' => 'nullable|numeric',
+            ]);
+
+            $user->update([
+                'gender' => $request->gender ?? 'L',
+                'age' => $request->age,
+                'height' => $request->height,
+                'weight' => $request->weight,
+            ]);
+
+            return redirect()->back()->with('message', 'Data fisik klien berhasil diperbarui.');
+        }
+
+        $rules = [
             'name' => 'required|string|max:255',
-            'athlete_id' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
+            'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6',
             'role' => 'required|in:superadmin,coach,athlete',
-        ]);
+        ];
+
+        if ($request->role === 'athlete') {
+            $rules['sport_id'] = 'nullable|exists:sports,id';
+            $rules['gender'] = 'nullable|in:L,P';
+            $rules['age'] = 'nullable|integer';
+            $rules['height'] = 'nullable|numeric';
+            $rules['weight'] = 'nullable|numeric';
+            $rules['coach_ids'] = 'nullable|array|max:2';
+            $rules['coach_ids.*'] = 'exists:users,id';
+        }
+
+        $request->validate($rules);
 
         $data = [
             'name' => $request->name,
-            'athlete_id' => $request->athlete_id,
+            'username' => $request->username,
             'role' => $request->role,
         ];
+
+        if ($request->role === 'athlete') {
+            $data['sport_id'] = $request->sport_id;
+            $data['gender'] = $request->gender ?? 'L';
+            $data['age'] = $request->age;
+            $data['height'] = $request->height;
+            $data['weight'] = $request->weight;
+        }
 
         // Jika password diisi, maka ubah (Reset Password)
         if ($request->filled('password')) {
@@ -82,6 +178,12 @@ class UserManagementController extends Controller
         }
 
         $user->update($data);
+
+        if ($request->role === 'athlete' && $request->has('coach_ids')) {
+            $user->coaches()->sync($request->coach_ids);
+        } else if ($request->role === 'athlete') {
+            $user->coaches()->detach();
+        }
 
         return redirect()->back()->with('message', 'Data pengguna berhasil diperbarui.');
     }
@@ -91,6 +193,7 @@ class UserManagementController extends Controller
      */
     public function destroy(User $user)
     {
+        abort_if(auth()->user()->role !== 'superadmin', 403, 'Akses Ditolak.');
         if ($user->id === auth()->id()) {
             return back()->withErrors(['error' => 'Anda tidak bisa menghapus akun Anda sendiri.']);
         }

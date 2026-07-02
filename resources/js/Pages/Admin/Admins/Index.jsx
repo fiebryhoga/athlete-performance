@@ -17,7 +17,7 @@ export default function Index({ admins, filters }) {
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         name: '',
-        athlete_id: '', 
+        username: '', 
         password: '',
         profile_photo: null,
         role: 'coach',
@@ -52,7 +52,7 @@ export default function Index({ admins, filters }) {
         clearErrors();
         setData({
             name: '',
-            athlete_id: '',
+            username: '',
             password: '',
             profile_photo: null,
             role: 'coach',
@@ -68,7 +68,7 @@ export default function Index({ admins, filters }) {
         clearErrors();
         setData({
             name: user.name,
-            athlete_id: user.athlete_id,
+            username: user.username,
             password: '', 
             profile_photo: null,
             role: user.role,
@@ -116,7 +116,7 @@ export default function Index({ admins, filters }) {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                     
                     <div className="relative z-10 w-full lg:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-2 md:mb-3 inline-block">System & Security</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
                         <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                             Admin Management
                         </h2>
@@ -152,7 +152,7 @@ export default function Index({ admins, filters }) {
                                 <div className="absolute top-0 right-0 w-16 h-16 bg-[#ff4d00] blur-2xl opacity-5 rounded-full pointer-events-none"></div>
                                 
                                 <div className="flex justify-between items-start mb-3">
-                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100 uppercase tracking-widest">
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
                                         <Shield className="w-3 h-3"/> Administrator
                                     </span>
                                 </div>
@@ -167,7 +167,7 @@ export default function Index({ admins, filters }) {
                                     </div>
                                     <div className="flex flex-col min-w-0">
                                         <span className="font-bold text-slate-800 text-base truncate">{user.name}</span>
-                                        <span className="font-mono text-slate-500 text-[10px] truncate">ID: {user.athlete_id}</span>
+                                        <span className="font-mono text-slate-500 text-[10px] truncate">ID: {user.username}</span>
                                     </div>
                                 </div>
 
@@ -203,7 +203,7 @@ export default function Index({ admins, filters }) {
                 <div className="hidden md:flex bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-col w-full">
                     <div className="overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full min-w-[800px] text-left text-sm text-slate-600 whitespace-nowrap">
-                            <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-bold tracking-widest text-slate-400">
+                            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-400">
                                 <tr>
                                     <th className="px-6 py-4 w-[40%]">Admin Profile</th>
                                     <th className="px-6 py-4 w-[25%]">Login ID (Username)</th>
@@ -228,10 +228,10 @@ export default function Index({ admins, filters }) {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 align-middle font-mono text-slate-500 text-xs font-medium">
-                                                {user.athlete_id}
+                                                {user.username}
                                             </td>
                                             <td className="px-6 py-4 align-middle text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border ${user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
                                                     <Shield className="w-3 h-3"/> {user.role === 'superadmin' ? 'Superadmin' : 'Coach'}
                                                 </span>
                                             </td>
@@ -314,7 +314,7 @@ export default function Index({ admins, filters }) {
                                     ) : (
                                         <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
                                             <UploadCloud className="w-5 h-5 md:w-6 md:h-6 mb-1" />
-                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-0.5 md:mt-1">Photo</span>
+                                            <span className="text-[9px] md:text-[10px] font-bold mt-0.5 md:mt-1">Photo</span>
                                         </div>
                                     )}
                                 </div>
@@ -324,7 +324,7 @@ export default function Index({ admins, filters }) {
 
                             
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Full Name</label>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Full Name</label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                         <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
@@ -342,21 +342,21 @@ export default function Index({ admins, filters }) {
 
                             
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Login ID (Username)</label>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Login ID (Username)</label>
                                 <input 
                                     type="text" 
                                     className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-xs md:text-sm font-mono text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation"
-                                    value={data.athlete_id}
-                                    onChange={e => setData('athlete_id', e.target.value)}
+                                    value={data.username}
+                                    onChange={e => setData('username', e.target.value)}
                                     placeholder="e.g. admin_01"
                                     disabled={modalMode === 'edit'}
                                 />
-                                {errors.athlete_id && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.athlete_id}</p>}
+                                {errors.username && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold">{errors.username}</p>}
                             </div>
 
                             
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 flex justify-between items-end">
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 flex justify-between items-end">
                                     Password
                                     {modalMode === 'edit' && <span className="text-slate-400 font-medium normal-case tracking-normal text-[9px]">(Kosongkan jika tidak diganti)</span>}
                                 </label>
@@ -376,7 +376,7 @@ export default function Index({ admins, filters }) {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Role / Jabatan</label>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Role / Jabatan</label>
                                 <select
                                     className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm"
                                     value={data.role}

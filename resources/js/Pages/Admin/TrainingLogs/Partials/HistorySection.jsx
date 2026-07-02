@@ -41,13 +41,13 @@ export default function HistorySection({ historySessions, userName }) {
                                     <div className="flex items-center gap-1.5 font-bold text-slate-700 text-xs">
                                         <Calendar className="w-3.5 h-3.5 text-slate-400"/> {formatDate(hist.date)}
                                     </div>
-                                    <span className="text-[9px] font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded-md uppercase border border-orange-100 tracking-widest">
+                                    <span className="text-[9px] font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded-md border border-orange-100">
                                         Sesi {hist.session_number}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div className="flex flex-col gap-0.5">
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
                                             <Activity className="w-3 h-3"/> Program
                                         </span>
                                         <span className="font-bold text-slate-800 text-sm truncate max-w-[200px]">{hist.training_type}</span>
@@ -62,7 +62,7 @@ export default function HistorySection({ historySessions, userName }) {
                             {isOpen && (
                                 <div className="border-t border-slate-100 bg-slate-50 overflow-hidden">
                                     <div className="p-3">
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Isi Log Sesi {hist.session_number}:</span>
+                                        <span className="text-[9px] font-bold text-slate-400 mb-2 block">Isi Log Sesi {hist.session_number}:</span>
                                         
                                         <div className="pointer-events-none opacity-90 overflow-x-auto custom-scrollbar w-full rounded-lg border border-slate-200">
                                             <ExcelTable 
@@ -85,7 +85,7 @@ export default function HistorySection({ historySessions, userName }) {
             <div className="hidden md:block bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm w-full max-w-full">
                 <div className="overflow-x-auto w-full custom-scrollbar max-w-full">
                     <table className="w-full text-left text-sm whitespace-nowrap min-w-[500px]">
-                        <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs uppercase font-bold tracking-wider">
+                        <thead className="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs font-bold">
                             <tr>
                                 <th className="px-6 py-4">Tanggal</th>
                                 <th className="px-6 py-4 text-center">Sesi</th>
@@ -127,7 +127,7 @@ export default function HistorySection({ historySessions, userName }) {
                                             <td colSpan="4" className="p-0 border-b border-slate-200 max-w-0">
                                                 <div className="p-6 bg-slate-50 shadow-inner w-full overflow-hidden">
                                                     <div className="mb-4 flex justify-between items-center min-w-max">
-                                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                        <span className="text-xs font-bold text-slate-500 flex items-center gap-2">
                                                             Detail Log: Sesi {hist.session_number}
                                                         </span>
                                                     </div>

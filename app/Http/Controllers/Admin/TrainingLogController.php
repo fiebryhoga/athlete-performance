@@ -24,6 +24,14 @@ class TrainingLogController extends Controller
     public function athleteList(Request $request)
     {
         $query = User::where('role', 'athlete')->with('sport');
+        
+        $currentUser = Auth::user();
+        if ($currentUser && $currentUser->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id);
+            });
+        }
+        
         if ($request->search) $query->where('name', 'like', '%' . $request->search . '%');
 
         $athletes = $query->get()->map(function($user) {
@@ -53,6 +61,12 @@ class TrainingLogController extends Controller
         
         if ($currentUser->role === 'athlete') {
             $query->where('user_id', $currentUser->id);
+        }
+
+        if ($currentUser->role === 'coach') {
+            $query->whereHas('user.coaches', function($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id);
+            });
         }
         
         $sessionsFromDb = $query->get()->groupBy('date');

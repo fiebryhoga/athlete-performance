@@ -17,14 +17,22 @@ class AthleteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->where('role', 'athlete')->with('sport');
+        $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches']);
+
+        if (auth()->user()->role === 'coach') {
+            $query->whereHas('coaches', function($q) {
+                $q->where('coach_id', auth()->id());
+            });
+        }
 
         if ($request->search) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%')
-                  ->orWhere('athlete_id', 'like', '%'.$request->search.'%');
+                  ->orWhere('username', 'like', '%'.$request->search.'%');
             });
         }
+
+        $coaches = User::where('role', 'coach')->get(['id', 'name']);
 
         return Inertia::render('Admin/Athletes/Index', [
             'athletes' => $query->latest()->paginate(10)->through(function ($athlete) {
@@ -33,6 +41,7 @@ class AthleteController extends Controller
             })->withQueryString(),
             
             'sports' => Sport::all(),
+            'coachesList' => $coaches,
             'filters' => $request->only(['search']),
         ]);
     }
@@ -41,14 +50,16 @@ class AthleteController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'athlete_id' => 'required|string|max:255|unique:users,athlete_id',
+            'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6',
             'sport_id' => 'nullable|exists:sports,id',
             'gender' => 'required|in:L,P',
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', 
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'coach_ids' => 'nullable|array|max:2',
+            'coach_ids.*' => 'exists:users,id'
         ]);
 
         $photoPath = null;
@@ -56,9 +67,9 @@ class AthleteController extends Controller
             $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
         }
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
-            'athlete_id' => $validated['athlete_id'],
+            'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
             'role' => 'athlete', 
             'sport_id' => $validated['sport_id'],
@@ -69,6 +80,10 @@ class AthleteController extends Controller
             'profile_photo' => $photoPath,
         ]);
 
+        if (isset($validated['coach_ids'])) {
+            $user->coaches()->sync($validated['coach_ids']);
+        }
+
         return redirect()->back()->with('message', 'Atlet berhasil ditambahkan.');
     }
 
@@ -77,30 +92,32 @@ class AthleteController extends Controller
         $athlete = User::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'athlete_id' => [
+            'name' => 'sometimes|required|string|max:255',
+            'username' => [
+                'sometimes',
                 'required', 
                 'string',
-                Rule::unique('users', 'athlete_id')->ignore($athlete->id)
+                Rule::unique('users', 'username')->ignore($athlete->id)
             ],
             'password' => 'nullable|string|min:6',
             'sport_id' => 'nullable|exists:sports,id',
-            'gender' => 'required|in:L,P',
+            'gender' => 'sometimes|required|in:L,P',
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'coach_ids' => 'nullable|array|max:2',
+            'coach_ids.*' => 'exists:users,id'
         ]);
 
-        $dataToUpdate = [
-            'name' => $request->name,
-            'athlete_id' => $request->athlete_id,
-            'sport_id' => $request->sport_id,
-            'gender' => $request->gender,
-            'age' => $request->age,
-            'height' => $request->height,
-            'weight' => $request->weight,
-        ];
+        $dataToUpdate = [];
+        if ($request->has('name')) $dataToUpdate['name'] = $request->name;
+        if ($request->has('username')) $dataToUpdate['username'] = $request->username;
+        if ($request->has('sport_id')) $dataToUpdate['sport_id'] = $request->sport_id;
+        if ($request->has('gender')) $dataToUpdate['gender'] = $request->gender;
+        if ($request->has('age')) $dataToUpdate['age'] = $request->age;
+        if ($request->has('height')) $dataToUpdate['height'] = $request->height;
+        if ($request->has('weight')) $dataToUpdate['weight'] = $request->weight;
 
         if ($request->filled('password')) {
             $dataToUpdate['password'] = Hash::make($request->password);
@@ -114,6 +131,10 @@ class AthleteController extends Controller
         }
 
         $athlete->update($dataToUpdate);
+
+        if ($request->has('coach_ids')) {
+            $athlete->coaches()->sync($request->coach_ids ?? []);
+        }
 
         return redirect()->back()->with('message', 'Data atlet diperbarui.');
     }

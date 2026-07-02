@@ -106,11 +106,11 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1">
-                                <label className="text-[10px] font-bold uppercase text-slate-400 mb-1.5 block tracking-widest">Tanggal Tes</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Tanggal Tes</label>
                                 <input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
                             </div>
                             <div className="col-span-1">
-                                <label className="text-[10px] font-bold uppercase text-slate-400 mb-1.5 block tracking-widest">Usia Biologis</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Usia Biologis</label>
                                 <input type="number" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
                             </div>
                         </div>
@@ -118,11 +118,11 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
-                                <label className="text-[10px] font-bold uppercase text-[#ff4d00] mb-1 block tracking-widest">Berat (KG)</label>
+                                <label className="text-[10px] font-bold text-[#ff4d00] mb-1 block">Berat (KG)</label>
                                 <input type="number" step="0.01" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="0.00"/>
                             </div>
                             <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
-                                <label className="text-[10px] font-bold uppercase text-[#ff4d00] mb-1 block tracking-widest">Tinggi (Meter)</label>
+                                <label className="text-[10px] font-bold text-[#ff4d00] mb-1 block">Tinggi (Meter)</label>
                                 <input type="number" step="0.01" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="1.70"/>
                             </div>
                         </div>
@@ -130,38 +130,38 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 border-t border-slate-100 pt-5">
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Bodyfat %</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Bodyfat %</label>
                                 <input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Muscle Mass</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Muscle Mass</label>
                                 <input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Bone Mass</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Bone Mass</label>
                                 <input type="number" step="0.1" value={data.bone_mass} onChange={e=>setData('bone_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Visceral Fat</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Visceral Fat</label>
                                 <input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">BMR (Kcal)</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">BMR (Kcal)</label>
                                 <input type="number" value={data.bmr} onChange={e=>setData('bmr', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">TBW % (Air)</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">TBW % (Air)</label>
                                 <input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5 block tracking-widest">Metabolic Age</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Metabolic Age</label>
                                 <input type="number" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm" placeholder="Opsional"/>
                             </div>
                         </div>
 
                         
                         <div className="pt-6 md:pt-8 mt-auto border-t border-slate-100 hidden xl:block">
-                            <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm disabled:opacity-70">
+                            <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70">
                                 {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
                                 {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}
                             </button>
@@ -184,9 +184,9 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                     </div>
 
                     <div className="flex px-3 md:px-4 pt-3 border-b border-slate-200 overflow-x-auto custom-scrollbar bg-slate-100 sticky top-[60px] md:top-[70px] z-10">
-                        <button onClick={() => setActiveTool('bodyfat')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'bodyfat' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>1. Lemak & Visc</button>
-                        <button onClick={() => setActiveTool('bmr')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'bmr' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>2. BMR & Air</button>
-                        <button onClick={() => setActiveTool('mass')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all uppercase tracking-widest ${activeTool === 'mass' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>3. Otot & Tulang</button>
+                        <button onClick={() => setActiveTool('bodyfat')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'bodyfat' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>1. Lemak & Visc</button>
+                        <button onClick={() => setActiveTool('bmr')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'bmr' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>2. BMR & Air</button>
+                        <button onClick={() => setActiveTool('mass')} className={`pb-2.5 px-3 text-[10px] md:text-xs font-bold border-b-2 whitespace-nowrap transition-all ${activeTool === 'mass' ? 'border-teal-500 text-teal-700 bg-slate-50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>3. Otot & Tulang</button>
                     </div>
 
                     <div className="p-4 md:p-6 flex-1 flex flex-col pb-8">
@@ -202,16 +202,16 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 
                                 <div className="grid grid-cols-2 gap-3 md:gap-4 mb-2">
                                     <div className="col-span-2 sm:col-span-1">
-                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Leher (cm)</label>
+                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block">Lingkar Leher (cm)</label>
                                         <input type="number" step="0.1" value={neck} onChange={e=>setNeck(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Cth: 38" />
                                     </div>
                                     <div className="col-span-2 sm:col-span-1">
-                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Perut (cm)</label>
+                                        <label className="text-[10px] font-bold text-slate-500 mb-1.5 block">Lingkar Perut (cm)</label>
                                         <input type="number" step="0.1" value={waist} onChange={e=>setWaist(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Pada pusar" />
                                     </div>
                                     {athlete.gender === 'P' && (
                                         <div className="col-span-2">
-                                            <label className="text-[10px] font-bold text-slate-500 mb-1.5 block uppercase tracking-widest">Lingkar Pinggul (cm) - Wanita</label>
+                                            <label className="text-[10px] font-bold text-slate-500 mb-1.5 block">Lingkar Pinggul (cm) - Wanita</label>
                                             <input type="number" step="0.1" value={hip} onChange={e=>setHip(e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all outline-none shadow-sm" placeholder="Bagian terlebar" />
                                         </div>
                                     )}
@@ -220,18 +220,18 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex flex-col gap-3 shadow-sm">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-teal-500"/> Body Fat %</div>
-                                            <p className="text-xl md:text-2xl font-black text-teal-600">{estimatedBF ? `${estimatedBF}%` : '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><Activity className="w-3.5 h-3.5 text-teal-500"/> Body Fat %</div>
+                                            <p className="text-xl md:text-2xl font-bold text-teal-600">{estimatedBF ? `${estimatedBF}%` : '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBF && setData('body_fat_percentage', estimatedBF)} disabled={!estimatedBF} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBF && setData('body_fat_percentage', estimatedBF)} disabled={!estimatedBF} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
                                     <div className="h-px bg-slate-100 w-full"></div>
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><HeartPulse className="w-3.5 h-3.5 text-rose-500"/> Visceral Rating</div>
-                                            <p className="text-xl md:text-2xl font-black text-rose-600">{estimatedVisceral || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><HeartPulse className="w-3.5 h-3.5 text-rose-500"/> Visceral Rating</div>
+                                            <p className="text-xl md:text-2xl font-bold text-rose-600">{estimatedVisceral || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedVisceral && setData('visceral_fat', estimatedVisceral)} disabled={!estimatedVisceral} className="px-3 md:px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedVisceral && setData('visceral_fat', estimatedVisceral)} disabled={!estimatedVisceral} className="px-3 md:px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
@@ -249,18 +249,18 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 <div className="grid grid-cols-1 gap-3 md:gap-4 mt-2">
                                     <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Zap className="w-3.5 h-3.5 text-amber-500"/> BMR (Kcal)</div>
-                                            <p className="text-xl md:text-2xl font-black text-amber-600">{estimatedBMR || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><Zap className="w-3.5 h-3.5 text-amber-500"/> BMR (Kcal)</div>
+                                            <p className="text-xl md:text-2xl font-bold text-amber-600">{estimatedBMR || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBMR && setData('bmr', estimatedBMR)} disabled={!estimatedBMR} className="px-3 md:px-4 py-2 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBMR && setData('bmr', estimatedBMR)} disabled={!estimatedBMR} className="px-3 md:px-4 py-2 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
 
                                     <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Droplets className="w-3.5 h-3.5 text-teal-500"/> Air / TBW (%)</div>
-                                            <p className="text-xl md:text-2xl font-black text-teal-600">{estimatedTBW ? `${estimatedTBW}%` : '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><Droplets className="w-3.5 h-3.5 text-teal-500"/> Air / TBW (%)</div>
+                                            <p className="text-xl md:text-2xl font-bold text-teal-600">{estimatedTBW ? `${estimatedTBW}%` : '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedTBW && setData('total_body_water', estimatedTBW)} disabled={!estimatedTBW} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedTBW && setData('total_body_water', estimatedTBW)} disabled={!estimatedTBW} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
@@ -278,26 +278,26 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 <div className="grid grid-cols-1 gap-3 md:gap-4 mt-2">
                                     <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Activity className="w-3.5 h-3.5 text-slate-400"/> Bone Mass (Kg)</div>
-                                            <p className="text-xl md:text-2xl font-black text-slate-700">{estimatedBone || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><Activity className="w-3.5 h-3.5 text-slate-400"/> Bone Mass (Kg)</div>
+                                            <p className="text-xl md:text-2xl font-bold text-slate-700">{estimatedBone || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedBone && setData('bone_mass', estimatedBone)} disabled={!estimatedBone} className="px-3 md:px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedBone && setData('bone_mass', estimatedBone)} disabled={!estimatedBone} className="px-3 md:px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
 
                                     <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><Dumbbell className="w-3.5 h-3.5 text-emerald-500"/> Est. Muscle (Kg)</div>
-                                            <p className="text-xl md:text-2xl font-black text-emerald-600">{estimatedMuscle || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><Dumbbell className="w-3.5 h-3.5 text-emerald-500"/> Est. Muscle (Kg)</div>
+                                            <p className="text-xl md:text-2xl font-bold text-emerald-600">{estimatedMuscle || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedMuscle && setData('muscle_mass', estimatedMuscle)} disabled={!estimatedMuscle} className="px-3 md:px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedMuscle && setData('muscle_mass', estimatedMuscle)} disabled={!estimatedMuscle} className="px-3 md:px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
 
                                     <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-200 flex items-center justify-between shadow-sm">
                                         <div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1"><UserCheck className="w-3.5 h-3.5 text-teal-600"/> Metabolic Age</div>
-                                            <p className="text-xl md:text-2xl font-black text-teal-700">{estimatedMetAge || '-'}</p>
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 mb-1"><UserCheck className="w-3.5 h-3.5 text-teal-600"/> Metabolic Age</div>
+                                            <p className="text-xl md:text-2xl font-bold text-teal-700">{estimatedMetAge || '-'}</p>
                                         </div>
-                                        <button type="button" onClick={() => estimatedMetAge && setData('metabolic_age', estimatedMetAge)} disabled={!estimatedMetAge} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50 uppercase tracking-widest">Terapkan</button>
+                                        <button type="button" onClick={() => estimatedMetAge && setData('metabolic_age', estimatedMetAge)} disabled={!estimatedMetAge} className="px-3 md:px-4 py-2 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white font-bold text-[10px] md:text-xs rounded-lg transition-all disabled:opacity-50">Terapkan</button>
                                     </div>
                                 </div>
                             </div>
@@ -309,7 +309,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 type="button"
                                 onClick={(e) => { e.preventDefault(); submit(e); }} 
                                 disabled={processing} 
-                                className="w-full py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm disabled:opacity-70"
+                                className="w-full py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70"
                             >
                                 {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
                                 {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}

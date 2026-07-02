@@ -40,7 +40,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                 
                 <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="w-full md:w-auto">
-                        <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors uppercase tracking-widest touch-manipulation py-1">
+                        <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
                             <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" />
                             Back to Athletes
                         </Link>
@@ -71,33 +71,33 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     className="w-full h-full rounded-2xl object-cover shadow-sm border-2 border-slate-50"
                                 />
                             ) : (
-                                <div className="w-full h-full bg-orange-50 rounded-2xl flex items-center justify-center text-[#ff4d00] text-3xl font-black shadow-sm border-2 border-orange-100">
+                                <div className="w-full h-full bg-orange-50 rounded-2xl flex items-center justify-center text-[#ff4d00] text-3xl font-bold shadow-sm border-2 border-orange-100">
                                     {initial}
                                 </div>
                             )}
                         </div>
                         
                         <h2 className="text-lg md:text-xl font-bold text-slate-800 relative z-10">{safeAthlete.name || 'Unknown Name'}</h2>
-                        <p className="text-[10px] md:text-xs text-slate-500 font-mono mb-3 mt-0.5 relative z-10">{safeAthlete.athlete_id || '-'}</p>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-widest border border-orange-100 mb-5 relative z-10">
+                        <p className="text-[10px] md:text-xs text-slate-500 font-mono mb-3 mt-0.5 relative z-10">{safeAthlete.username || '-'}</p>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[9px] md:text-[10px] font-bold border border-orange-100 mb-5 relative z-10">
                             <Trophy className="w-3.5 h-3.5" /> {safeAthlete.sport?.name || 'No Sport'}
                         </span>
 
                         <div className="grid grid-cols-2 gap-3 w-full border-t border-slate-100 pt-5 relative z-10">
                             <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 flex items-center justify-center gap-1"><Ruler className="w-3 h-3"/> Height</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1 flex items-center justify-center gap-1"><Ruler className="w-3 h-3"/> Height</p>
                                 <p className="font-bold text-slate-800 text-sm md:text-base">{safeAthlete.height || '-'} <span className="text-[9px] font-medium text-slate-400">cm</span></p>
                             </div>
                             <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 flex items-center justify-center gap-1"><Weight className="w-3 h-3"/> Weight</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1 flex items-center justify-center gap-1"><Weight className="w-3 h-3"/> Weight</p>
                                 <p className="font-bold text-slate-800 text-sm md:text-base">{safeAthlete.weight || '-'} <span className="text-[9px] font-medium text-slate-400">kg</span></p>
                             </div>
                             <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 flex items-center justify-center gap-1"><Clock className="w-3 h-3"/> Age</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1 flex items-center justify-center gap-1"><Clock className="w-3 h-3"/> Age</p>
                                 <p className="font-bold text-slate-800 text-sm md:text-base">{safeAthlete.age || '-'} <span className="text-[9px] font-medium text-slate-400">yrs</span></p>
                             </div>
                             <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 flex items-center justify-center gap-1"><Scale className="w-3 h-3"/> BMI</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1 flex items-center justify-center gap-1"><Scale className="w-3 h-3"/> BMI</p>
                                 <p className="font-bold text-[#ff4d00] text-sm md:text-base">{bmi}</p>
                             </div>
                         </div>
@@ -108,19 +108,19 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Total Sessions</p>
-                                <p className="text-xl md:text-3xl font-black text-slate-800 truncate">{stats?.total_sessions || 0}</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Total Sessions</p>
+                                <p className="text-xl md:text-3xl font-bold text-slate-800 truncate">{stats?.total_sessions || 0}</p>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Avg Score</p>
-                                <p className="text-xl md:text-3xl font-black text-[#ff4d00] truncate">{formatScore(stats?.average_score)}</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Avg Score</p>
+                                <p className="text-xl md:text-3xl font-bold text-[#ff4d00] truncate">{formatScore(stats?.average_score)}</p>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Best Score</p>
-                                <p className="text-xl md:text-3xl font-black text-emerald-500 truncate">{formatScore(stats?.highest_score)}</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Best Score</p>
+                                <p className="text-xl md:text-3xl font-bold text-emerald-500 truncate">{formatScore(stats?.highest_score)}</p>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">Last Activity</p>
+                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Last Activity</p>
                                 <p className="text-sm md:text-base font-bold text-slate-700 mt-1 truncate">{stats?.latest_date || '-'}</p>
                             </div>
                         </div>
@@ -129,7 +129,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 h-full min-w-0">
                                 
                                 <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-widest">
+                                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
                                         <Target className="w-4 h-4 text-[#ff4d00]" />
                                         Skill Map (Average)
                                     </h3>
@@ -150,7 +150,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
 
                                 
                                 <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-widest">
+                                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
                                         <Activity className="w-4 h-4 text-[#ff4d00]" />
                                         Latest vs Previous
                                     </h3>
@@ -172,7 +172,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                         ) : (
                             <div className="bg-white border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center h-[300px] text-slate-400 gap-3 shadow-sm">
                                 <Activity className="w-8 h-8 opacity-30" />
-                                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest">No training data available.</p>
+                                <p className="text-[10px] md:text-xs font-bold">No training data available.</p>
                             </div>
                         )}
                     </div>
@@ -182,7 +182,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
 
                 {has_data && item_analysis && item_analysis.length > 0 && (
                     <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8 min-w-0 w-full overflow-hidden">
-                        <h3 className="text-xs font-bold text-slate-800 mb-4 md:mb-6 flex items-center gap-2 uppercase tracking-widest">
+                        <h3 className="text-xs font-bold text-slate-800 mb-4 md:mb-6 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-[#ff4d00]" />
                             Detailed Progress (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)
                         </h3>
@@ -238,7 +238,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
                             
                             <div className="p-5 md:p-8">
-                                <h3 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-widest">
+                                <h3 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2">
                                     <Zap className="w-4 h-4 text-emerald-500" />
                                     Top Strengths ({'>'}70%)
                                 </h3>
@@ -246,13 +246,13 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     {strengths && strengths.length > 0 ? strengths.map((item, idx) => (
                                         <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-emerald-200 hover:bg-emerald-50/30 transition-colors">
                                             <div className="flex items-center gap-3 md:gap-4">
-                                                <span className="text-xl md:text-2xl font-black text-slate-200 w-6 md:w-8 text-center">0{idx + 1}</span>
+                                                <span className="text-xl md:text-2xl font-bold text-slate-200 w-6 md:w-8 text-center">0{idx + 1}</span>
                                                 <div>
                                                     <p className="font-bold text-sm md:text-base text-slate-700 leading-tight">{item.name}</p>
-                                                    <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">Physical Category</p>
+                                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mt-0.5">Physical Category</p>
                                                 </div>
                                             </div>
-                                            <span className="block text-lg md:text-xl font-black text-emerald-500">{formatScore(item.score)}</span>
+                                            <span className="block text-lg md:text-xl font-bold text-emerald-500">{formatScore(item.score)}</span>
                                         </div>
                                     )) : <p className="text-slate-400 font-medium text-xs text-center py-6">No categories above 70% yet.</p>}
                                 </div>
@@ -260,7 +260,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
 
                             
                             <div className="p-5 md:p-8">
-                                <h3 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2 uppercase tracking-widest">
+                                <h3 className="text-xs font-bold text-slate-800 mb-5 flex items-center gap-2">
                                     <AlertCircle className="w-4 h-4 text-rose-500" />
                                     Areas for Improvement
                                 </h3>
@@ -268,13 +268,13 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     {weaknesses && weaknesses.length > 0 ? weaknesses.map((item, idx) => (
                                         <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-rose-200 hover:bg-rose-50/30 transition-colors">
                                             <div className="flex items-center gap-3 md:gap-4">
-                                                <span className="text-xl md:text-2xl font-black text-slate-200 w-6 md:w-8 text-center">0{idx + 1}</span>
+                                                <span className="text-xl md:text-2xl font-bold text-slate-200 w-6 md:w-8 text-center">0{idx + 1}</span>
                                                 <div>
                                                     <p className="font-bold text-sm md:text-base text-slate-700 leading-tight">{item.name}</p>
-                                                    <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">Physical Category</p>
+                                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mt-0.5">Physical Category</p>
                                                 </div>
                                             </div>
-                                            <span className="block text-lg md:text-xl font-black text-rose-500">{formatScore(item.score)}</span>
+                                            <span className="block text-lg md:text-xl font-bold text-rose-500">{formatScore(item.score)}</span>
                                         </div>
                                     )) : <p className="text-slate-400 font-medium text-xs text-center py-6">Great! All categories are above 70%.</p>}
                                 </div>
@@ -290,11 +290,11 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
 
                 <div className="bg-white border border-slate-200 mt-6 rounded-2xl overflow-hidden shadow-sm">
                     <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2 uppercase tracking-widest">
+                        <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2">
                             <FileText className="w-4 h-4 text-slate-400" /> 5 Session History Terakhir
                         </h3>
                         {safeAthlete.name && (
-                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:text-white bg-white hover:bg-[#ff4d00] px-3.5 py-2 rounded-lg border border-slate-200 hover:border-[#ff4d00] shadow-sm transition-all uppercase tracking-widest flex items-center gap-1 touch-manipulation">
+                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:text-white bg-white hover:bg-[#ff4d00] px-3.5 py-2 rounded-lg border border-slate-200 hover:border-[#ff4d00] shadow-sm transition-all flex items-center gap-1 touch-manipulation">
                                 View All Logs <ChevronRight className="w-3.5 h-3.5" />
                             </Link>
                         )}
@@ -312,7 +312,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                             <Calendar className="w-3.5 h-3.5 text-[#ff4d00]" />
                                             {session.full_date}
                                         </div>
-                                        <span className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${
+                                        <span className={`px-2 py-1 rounded text-[9px] font-bold border ${
                                             session.score >= 80 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                                             session.score >= 60 ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                             'bg-rose-50 text-rose-600 border-rose-100'
@@ -322,12 +322,12 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     </div>
                                     <div className="flex justify-between items-end border-t border-slate-50 pt-2">
                                         <div>
-                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Final Score</p>
-                                            <p className="font-black text-[#ff4d00] text-xl">{formatScore(session.score)}</p>
+                                            <p className="text-[10px] text-slate-400 font-bold mb-0.5">Final Score</p>
+                                            <p className="font-bold text-[#ff4d00] text-xl">{formatScore(session.score)}</p>
                                         </div>
                                         <Link 
                                             href={route('admin.performance.show', session.id)} 
-                                            className="px-4 py-2 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all uppercase tracking-widest touch-manipulation"
+                                            className="px-4 py-2 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all touch-manipulation"
                                         >
                                             Details
                                         </Link>
@@ -344,7 +344,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     
                     <div className="hidden md:block overflow-x-auto w-full custom-scrollbar">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-[10px] text-slate-400 bg-white border-b border-slate-100 uppercase tracking-widest">
+                            <thead className="text-[10px] text-slate-400 bg-white border-b border-slate-100">
                                 <tr>
                                     <th className="px-6 py-4 font-bold">Date</th>
                                     <th className="px-6 py-4 text-center font-bold">Score</th>
@@ -363,10 +363,10 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                                 {session.full_date}
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className="font-black text-[#ff4d00] text-lg">{formatScore(session.score)}</span>
+                                                <span className="font-bold text-[#ff4d00] text-lg">{formatScore(session.score)}</span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
+                                                <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold border ${
                                                     session.score >= 80 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                                                     session.score >= 60 ? 'bg-amber-50 text-amber-600 border-amber-100' : 
                                                     'bg-rose-50 text-rose-600 border-rose-100'
@@ -377,7 +377,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                             <td className="px-6 py-4 text-right pr-6">
                                                 <Link 
                                                     href={route('admin.performance.show', session.id)} 
-                                                    className="inline-flex items-center justify-center px-4 py-2 text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all uppercase tracking-widest"
+                                                    className="inline-flex items-center justify-center px-4 py-2 text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all"
                                                 >
                                                     Details
                                                 </Link>

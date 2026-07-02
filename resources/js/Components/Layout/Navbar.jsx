@@ -339,7 +339,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
                             ) : (
                                 <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
                                     <UploadCloud className="w-6 h-6 mb-1" />
-                                    <span className="text-[10px] font-bold uppercase tracking-widest mt-1">Photo</span>
+                                    <span className="text-[10px] font-bold mt-1">Photo</span>
                                 </div>
                             )}
                         </div>
@@ -348,7 +348,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                        <label className="text-[10px] font-bold text-slate-500 ml-1">Full Name</label>
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
@@ -367,7 +367,7 @@ function EditProfileModal({ user, isOpen, onClose }) {
                     <div className="space-y-4 pt-2">
                         <div className="flex items-center gap-2 mb-2">
                             <div className="h-px bg-slate-100 flex-1"></div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
                                 <Lock className="w-3 h-3" /> Change Password
                             </span>
                             <div className="h-px bg-slate-100 flex-1"></div>

@@ -55,7 +55,7 @@ export default function Edit({ packageData, exercises = [] }) {
                 <form onSubmit={submit}>
                     <div className="p-8 space-y-8">
                         <div>
-                            <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
+                            <label className="block text-xs font-bold text-zinc-500 mb-2">
                                 Nama Paket
                             </label>
                             <input
@@ -70,7 +70,7 @@ export default function Edit({ packageData, exercises = [] }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">
+                            <label className="block text-xs font-bold text-zinc-500 mb-2">
                                 Deskripsi (Opsional)
                             </label>
                             <textarea
@@ -83,7 +83,7 @@ export default function Edit({ packageData, exercises = [] }) {
 
                         <div className="pt-6 border-t border-zinc-100">
                             <div className="flex justify-between items-center mb-4">
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                <label className="block text-xs font-bold text-zinc-500">
                                     Pilih Master Latihan ({data.exercise_ids.length} dipilih)
                                 </label>
                                 <div className="relative">

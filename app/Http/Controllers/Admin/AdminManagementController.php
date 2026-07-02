@@ -18,7 +18,7 @@ class AdminManagementController extends Controller
             ->when($request->search, function($q, $search) {
                 $q->where(function($sub) use ($search) {
                     $sub->where('name', 'like', "%{$search}%")
-                        ->orWhere('athlete_id', 'like', "%{$search}%");
+                        ->orWhere('username', 'like', "%{$search}%");
                 });
             })
             ->latest()
@@ -36,14 +36,14 @@ class AdminManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'athlete_id' => 'required|string|max:50|unique:users,athlete_id',
+            'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string|min:6',
             'role' => 'required|in:superadmin,coach',
         ]);
 
         User::create([
             'name' => $request->name,
-            'athlete_id' => $request->athlete_id,
+            'username' => $request->username,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
@@ -56,14 +56,14 @@ class AdminManagementController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'athlete_id' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
+            'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6',
             'role' => 'required|in:superadmin,coach',
         ]);
 
         $data = [
             'name' => $request->name,
-            'athlete_id' => $request->athlete_id,
+            'username' => $request->username,
             'role' => $request->role,
         ];
 

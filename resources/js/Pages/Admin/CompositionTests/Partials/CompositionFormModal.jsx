@@ -227,7 +227,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  <form id="composition-form" onSubmit={submit} className="space-y-8">
  
  <div className="space-y-4">
-                            <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                            <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Basic Patient Data (Required)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -239,7 +239,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  </div>
 
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Circumference Metrics (Optional - For Manual Calc)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -253,7 +253,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
 
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Body Anatomy Distribution"}
  </h3>
  <div className="grid grid-cols-2 gap-4">
@@ -269,7 +269,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  </div>
 
  <div className="space-y-4">
- <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+ <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
  {"Metabolism & Cellular Level"}
  </h3>
  <div className="grid grid-cols-2 gap-4">

@@ -13,28 +13,17 @@ class AthleteSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Dimas Fiebry Prayhoga Putra',
-            'athlete_id' => 'ATL-2026-001',
-            'role' => 'athlete',
-            'password' => Hash::make('password'),
-            'age' => 22,
-            'gender' => 'L',
-            'height' => 175.0,
-            'weight' => 68.0,
-            'sport_category' => 'Teknologi & Esports',
-        ]);
-
-        User::create([
-            'name' => 'Farra Athikasari',
-            'athlete_id' => 'ATL-2026-002',
-            'role' => 'athlete',
-            'password' => Hash::make('password'),
-            'age' => 21,
-            'gender' => 'P',
-            'height' => 160.0,
-            'weight' => 50.0,
-            'sport_category' => 'Renang',
-        ]);
+        for ($i = 1; $i <= 4; $i++) {
+            User::create([
+                'name' => 'Athlete ' . $i,
+                'username' => 'athlete' . $i,
+                'role' => 'athlete',
+                'password' => Hash::make('password'),
+                'age' => 20 + $i,
+                'gender' => $i % 2 == 0 ? 'P' : 'L',
+                'height' => 170.0,
+                'weight' => 60.0,
+            ]);
+        }
     }
 }

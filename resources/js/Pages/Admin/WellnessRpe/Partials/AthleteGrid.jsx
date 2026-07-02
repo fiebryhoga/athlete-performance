@@ -42,7 +42,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  const np = p.jersey_number || p.np || p.nomor_punggung || ''; 
  
  return p.name.toLowerCase().includes(q) ||
- (p.position && p.position.toLowerCase().includes(q)) ||
+ 
  np.toString().includes(q);
  });
 
@@ -53,7 +53,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  <Search size={18} className="text-slate-400 mr-3" />
  <input
  type="text"
- placeholder="Search by name, position, or jersey number..."
+ placeholder="Search by athlete name..."
  className="bg-transparent border-none focus:ring-0 p-0 w-full text-sm font-medium text-slate-900  placeholder:text-slate-400"
  value={searchQuery}
  onChange={e => setSearchQuery(e.target.value)}
@@ -109,7 +109,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  {athlete.name}
  </h4>
  <p className="text-[10px] sm:text-xs text-slate-500  font-medium mt-0.5">
- {athlete.position || 'Athlete'} {np ? `• #${np}` : ''}
+ {np ? `No. ${np}` : 'Athlete'}
  </p>
  </div>
  </div>
@@ -123,16 +123,14 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  <div className="mt-5 flex items-center justify-between border-t border-slate-100  pt-4 w-full">
  <div className="flex flex-col gap-1">
  <span className="text-[10px] text-slate-500  font-medium flex items-center gap-1.5">
- <Activity size={12} className="text-slate-400" /> "Weekly Load"
- </span>
+ <Activity size={12} className="text-slate-400" />Weekly Load</span>
  <span className="text-sm font-semibold text-slate-900 ">
- {pData?.weekly_load || 0} <span className="text-[10px] sm:text-xs font-normal text-slate-500">"AU"</span>
+ {pData?.weekly_load || 0} <span className="text-[10px] sm:text-xs font-normal text-slate-500">AU</span>
  </span>
  </div>
  <div className="flex flex-col items-end gap-1">
  <span className="text-[10px] text-slate-500  font-medium flex items-center gap-1.5">
- <HeartPulse size={12} className="text-slate-400" /> "Wellness"
- </span>
+ <HeartPulse size={12} className="text-slate-400" />Wellness</span>
  <span className="text-sm font-semibold text-slate-900 ">
  {pData?.weekly_wellness_score || 0} <span className="text-[10px] sm:text-xs font-normal text-slate-500">/196</span>
  </span>
@@ -148,7 +146,7 @@ export default function AthleteGrid({ athletes, weeklyData, onSelectAthlete }) {
  <div className="p-3 bg-white  border border-slate-200  rounded-full mb-3 shadow-sm">
  <Search size={24} className="text-slate-400 " />
  </div>
- <h4 className="font-semibold text-slate-900  mb-1">"Athlete Not Found"</h4>
+ <h4 className="font-semibold text-slate-900  mb-1">Athlete Not Found</h4>
  <p className="text-slate-500  text-sm">{`Search "${searchQuery}" yielded no results.`}</p>
  </div>
  )}

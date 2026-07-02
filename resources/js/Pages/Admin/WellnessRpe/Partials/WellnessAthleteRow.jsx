@@ -207,15 +207,15 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                 style={STICKY_COLS.c2}
                 className={`p-1.5 sticky z-20 border-r border-slate-100  text-center ${rowStyle}`}
             >
-                <span className="px-1.5 py-0.5 rounded border text-[9px] font-black border-slate-200  text-slate-500  bg-slate-50 ">
-                    {athlete.position}
+                <span className="px-1.5 py-0.5 rounded border text-[9px] font-bold border-slate-200  text-slate-500  bg-slate-50 ">
+                    {athlete.gender === "P" ? "P" : (athlete.gender === "L" ? "L" : "-")}
                 </span>
             </td>
             <td
                 style={STICKY_COLS.c3}
                 className={`p-1.5 font-mono font-bold text-[10px] text-slate-500 border-r border-slate-100  sticky z-20 text-center ${rowStyle}`}
             >
-                {String(athlete.position_number || 0).padStart(2, "0")}
+                {String(athlete.position_number || visibleIdx + 1).padStart(2, "0")}
             </td>
             <td
                 style={STICKY_COLS.c4}
@@ -380,7 +380,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
             {/* TOTAL */}
             <td className="p-1 border-l-2 border-slate-300  bg-slate-100/50 ">
                 <div
-                    className={`w-full text-[12px] py-1 px-1 text-center font-black tabular-nums ${getDailyLoadTextClass(dailyLoad)}`}
+                    className={`w-full text-[12px] py-1 px-1 text-center font-bold tabular-nums ${getDailyLoadTextClass(dailyLoad)}`}
                 >
                     {dailyLoad > 0 ? dailyLoad.toFixed(1) : "-"}
                 </div>
@@ -389,13 +389,13 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
             <td className="p-1 border-l border-slate-200  bg-slate-200/50 ">
                 <div className="flex flex-col items-center justify-center py-1">
                     <div
-                        className={`w-full text-[12px] px-1 text-center font-black tabular-nums ${getDailyWellnessTextClass(dailyWellnessScore)}`}
+                        className={`w-full text-[12px] px-1 text-center font-bold tabular-nums ${getDailyWellnessTextClass(dailyWellnessScore)}`}
                     >
                         {dailyWellnessScore > 0 ? `${dailyWellnessScore}` : "-"}
                     </div>
                     {dailyWellnessScore > 0 && (
                         <div
-                            className={`text-[8px] font-bold uppercase tracking-wider leading-none mt-0.5 ${getDailyWellnessTextClass(dailyWellnessScore)}`}
+                            className={`text-[8px] font-bold leading-none mt-0.5 ${getDailyWellnessTextClass(dailyWellnessScore)}`}
                         >
                             {getDailyWellnessText(dailyWellnessScore)}
                         </div>
@@ -406,7 +406,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
             <td className="p-1 border-l border-slate-200  bg-slate-300/50 ">
                 <div className="flex flex-col items-center justify-center py-1">
                     <div
-                        className={`w-full text-[12px] px-1 text-center font-black tabular-nums ${getWeeklyWellnessTextClass(currentWeeklyWellness)}`}
+                        className={`w-full text-[12px] px-1 text-center font-bold tabular-nums ${getWeeklyWellnessTextClass(currentWeeklyWellness)}`}
                     >
                         {currentWeeklyWellness > 0
                             ? `${currentWeeklyWellness}/196`
@@ -414,7 +414,7 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
                     </div>
                     {currentWeeklyWellness > 0 && (
                         <div
-                            className={`text-[8px] font-bold uppercase tracking-wider leading-none mt-0.5 ${getWeeklyWellnessTextClass(currentWeeklyWellness)}`}
+                            className={`text-[8px] font-bold leading-none mt-0.5 ${getWeeklyWellnessTextClass(currentWeeklyWellness)}`}
                         >
                             {getWeeklyWellnessText(currentWeeklyWellness)}
                         </div>

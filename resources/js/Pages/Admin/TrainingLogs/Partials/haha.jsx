@@ -17,7 +17,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                     <div key={ex.id || `mob-${i}`} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative">
                         
                         <div className="flex justify-between items-center mb-3">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5">
                                 <Dumbbell className="w-3.5 h-3.5"/> Gerakan {i + 1}
                             </span>
                             {!is_athlete && (
@@ -43,7 +43,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                         <div className="grid grid-cols-2 gap-3 mb-4">
                             
                             <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2 tracking-widest">SET 1</div>
+                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2">SET 1</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
@@ -58,7 +58,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
 
                             
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-slate-500 text-center mb-2 tracking-widest">SET 2</div>
+                                <div className="text-[10px] font-bold text-slate-500 text-center mb-2">SET 2</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
@@ -73,7 +73,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
 
                             
                             <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2 tracking-widest">SET 3</div>
+                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2">SET 3</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
@@ -88,7 +88,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
 
                             
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-slate-500 text-center mb-2 tracking-widest">SET 4</div>
+                                <div className="text-[10px] font-bold text-slate-500 text-center mb-2">SET 4</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
@@ -120,7 +120,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
             <div className="hidden lg:flex bg-white border border-slate-300 rounded-3xl overflow-hidden shadow-sm relative z-20 flex-col w-full max-w-full">
                 <div className="overflow-x-auto w-full custom-scrollbar relative">
                     <table className="w-full min-w-[900px] table-fixed text-sm text-left border-collapse relative">
-                        <thead className="bg-[#ff4d00] text-white text-[11px] font-bold uppercase tracking-wider relative z-30">
+                        <thead className="bg-[#ff4d00] text-white text-[11px] font-bold relative z-30">
                             <tr>
                                 <th rowSpan="2" className="border-r border-b border-orange-700 px-3 py-3 text-center w-[25%] z-40">EXERCISE</th>
                                 <th colSpan="2" className="border-r border-b border-orange-700 px-1 py-2 text-center bg-orange-800/40 w-[12%]">SET 1</th>

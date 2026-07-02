@@ -125,7 +125,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                             <div className="text-4xl font-bold text-slate-800 tracking-tight">
                                 {current.recovery}<span className="text-xl text-slate-400 ml-1">%</span>
                             </div>
-                            <div className={`text-[10px] font-bold mt-1 px-3 py-1 uppercase tracking-wider rounded-full ${
+                            <div className={`text-[10px] font-bold mt-1 px-3 py-1 rounded-full ${
                                 current.recovery >= 75 ? 'bg-emerald-50 text-emerald-600' : 
                                 current.recovery >= 35 ? 'bg-amber-50 text-amber-600' : 
                                 'bg-rose-50 text-rose-600'
@@ -457,27 +457,27 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                                                         <td colSpan={3} className="px-4 py-4">
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">RHR</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">RHR</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{item.rhr}</span>
                                                                 </div>
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">SpO2</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">SpO2</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{item.spo2}%</span>
                                                                 </div>
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">BB (kg)</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">BB (kg)</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{item.weight}</span>
                                                                 </div>
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">VJ (cm)</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">VJ (cm)</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{item.vj}</span>
                                                                 </div>
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">VO2Max</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">VO2Max</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{Number(item.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 1 })}</span>
                                                                 </div>
                                                                 <div className="bg-white p-2 rounded-md border border-slate-200/60 shadow-sm text-center">
-                                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Peak W.</span>
+                                                                    <span className="text-[9px] font-bold text-slate-400 block mb-0.5">Peak W.</span>
                                                                     <span className="font-bold text-slate-700 text-sm">{Number(item.peak_power).toLocaleString('id-ID')}</span>
                                                                 </div>
                                                             </div>
@@ -491,7 +491,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                                     
                                     {periodDays > 1 && (
                                         <tr className="bg-slate-50 border-t-2 border-slate-200">
-                                            <td className="px-4 md:px-6 py-4 font-bold text-slate-700 text-[10px] md:text-xs uppercase tracking-wider">
+                                            <td className="px-4 md:px-6 py-4 font-bold text-slate-700 text-[10px] md:text-xs">
                                                 Rata-rata / Max
                                             </td>
                                             

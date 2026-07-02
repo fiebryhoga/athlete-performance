@@ -123,7 +123,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                                         <Brain className="w-4 h-4 md:w-5 md:h-5 text-slate-400"/>
                                         <h4 className="font-semibold text-slate-800 text-base md:text-lg">Wellness Questionnaire</h4>
                                     </div>
-                                    <span className="text-[10px] md:text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md uppercase tracking-wider">1 Buruk - 5 Baik</span>
+                                    <span className="text-[10px] md:text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">1 Buruk - 5 Baik</span>
                                 </div>
                                 
                                 <ScaleRadio label="Kualitas Tidur" name="sleep_quality" data={data} setData={setData} />
@@ -145,19 +145,19 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
 
                                 
                                 <div className="bg-orange-50/50 p-4 md:p-5 rounded-xl border border-orange-100 relative z-20">
-                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Pagi <span className="text-[10px] bg-[#ff4d00] text-white px-2 py-0.5 rounded tracking-wider">AM</span></h5>
+                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Pagi <span className="text-[10px] bg-[#ff4d00] text-white px-2 py-0.5 rounded">AM</span></h5>
                                     <div className="space-y-4">
                                         <div className="relative z-30">
-                                            <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Tipe Latihan</label>
+                                            <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Tipe Latihan</label>
                                             <CustomSelect options={sessionTypes} value={data.am_session_type} onChange={val => setData('am_session_type', val)} placeholder="Pilih tipe sesi..." iconColorClass="text-[#ff4d00]" activeBgClass="bg-orange-50 text-[#ff4d00]" hoverClass="hover:text-[#ff4d00]"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3 md:gap-4 relative z-20">
                                             <div>
-                                                <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Beban (RPE)</label>
+                                                <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Beban (RPE)</label>
                                                 <CustomSelect options={rpeOptions} value={data.am_rpe} onChange={val => setData('am_rpe', val)} placeholder="Skala 1-10" iconColorClass="text-[#ff4d00]" activeBgClass="bg-orange-50 text-[#ff4d00]" hoverClass="hover:text-[#ff4d00]"/>
                                             </div>
                                             <div>
-                                                <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Durasi (Mnt)</label>
+                                                <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Durasi (Mnt)</label>
                                                 <input type="number" min="0" value={data.am_duration} onChange={e => setData('am_duration', e.target.value)} className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-white px-3 py-2 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none transition-colors" placeholder="0"/>
                                             </div>
                                         </div>
@@ -166,19 +166,19 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
 
                                 
                                 <div className="bg-amber-50/50 p-4 md:p-5 rounded-xl border border-amber-100 relative z-10">
-                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Sore/Malam <span className="text-[10px] bg-amber-600 text-white px-2 py-0.5 rounded tracking-wider">PM</span></h5>
+                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Sore/Malam <span className="text-[10px] bg-amber-600 text-white px-2 py-0.5 rounded">PM</span></h5>
                                     <div className="space-y-4">
                                         <div className="relative z-30">
-                                            <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Tipe Latihan</label>
+                                            <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Tipe Latihan</label>
                                             <CustomSelect options={sessionTypes} value={data.pm_session_type} onChange={val => setData('pm_session_type', val)} placeholder="Pilih tipe sesi..." iconColorClass="text-amber-600" activeBgClass="bg-amber-50 text-amber-700" hoverClass="hover:text-amber-600"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3 md:gap-4 relative z-20">
                                             <div>
-                                                <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Beban (RPE)</label>
+                                                <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Beban (RPE)</label>
                                                 <CustomSelect options={rpeOptions} value={data.pm_rpe} onChange={val => setData('pm_rpe', val)} placeholder="Skala 1-10" iconColorClass="text-amber-600" activeBgClass="bg-amber-50 text-amber-700" hoverClass="hover:text-amber-600"/>
                                             </div>
                                             <div>
-                                                <label className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">Durasi (Mnt)</label>
+                                                <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Durasi (Mnt)</label>
                                                 <input type="number" min="0" value={data.pm_duration} onChange={e => setData('pm_duration', e.target.value)} className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-white px-3 py-2 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors" placeholder="0"/>
                                             </div>
                                         </div>
@@ -186,7 +186,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                                 </div>
 
                                 <div className="space-y-1.5 md:space-y-2 mt-4 md:mt-2 pt-2 md:pt-4 border-t border-slate-100">
-                                    <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
+                                    <label className="text-[10px] md:text-xs font-bold text-slate-500">Catatan Tambahan (Opsional)</label>
                                     <textarea 
                                         rows="2" 
                                         value={data.notes} 

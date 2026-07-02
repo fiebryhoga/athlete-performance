@@ -13,7 +13,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
                 <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
-                    <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                    <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <div className="p-1.5 bg-orange-50 rounded-md text-[#ff4d00]"><Battery className="w-4 h-4" /></div>
                         Training Load Trend (30 Days)
                     </h3>
@@ -36,7 +36,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                         ) : (
                             <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                                 <Activity className="w-8 h-8 opacity-20" />
-                                <p className="text-xs font-bold uppercase tracking-widest">No load data recorded yet</p>
+                                <p className="text-xs font-bold">No load data recorded yet</p>
                             </div>
                         )}
                     </div>
@@ -44,7 +44,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
 
                 
                 <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
-                    <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                    <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <div className="p-1.5 bg-emerald-50 rounded-md text-emerald-500"><HeartPulse className="w-4 h-4" /></div>
                         Physiological Recovery
                     </h3>
@@ -68,7 +68,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                         ) : (
                             <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                                 <HeartPulse className="w-8 h-8 opacity-20" />
-                                <p className="text-xs font-bold uppercase tracking-widest">No physiological data yet</p>
+                                <p className="text-xs font-bold">No physiological data yet</p>
                             </div>
                         )}
                     </div>

@@ -24,15 +24,15 @@ export default function LogHeader({ session }) {
                 
                 <div className="flex-1 min-w-0 relative z-10">
                     <div className="flex flex-wrap items-center gap-2 mb-2 md:mb-2.5">
-                        <span className="bg-[#ff4d00] text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-md uppercase tracking-widest shadow-sm shadow-[#ff4d00]/20">
+                        <span className="bg-[#ff4d00] text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-md shadow-sm shadow-[#ff4d00]/20">
                             Sesi {session.session_number}
                         </span>
-                        <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1 rounded-md">
+                        <span className="text-[10px] md:text-xs font-bold text-slate-400 flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1 rounded-md">
                             <Activity className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#ff4d00]" /> Program Latihan
                         </span>
                     </div>
                     
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight leading-tight break-words whitespace-normal">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-tight leading-tight break-words whitespace-normal">
                         {session.training_type}
                     </h2>
                 </div>
@@ -48,7 +48,7 @@ export default function LogHeader({ session }) {
                         <User className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Klien (Atlet)</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-0.5">Klien (Atlet)</p>
                         <p className="text-xs md:text-sm font-bold text-slate-700 truncate">{session.user?.name || '-'}</p>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ export default function LogHeader({ session }) {
                         <Dumbbell className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Coach Pendamping</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-0.5">Coach Pendamping</p>
                         <p className="text-xs md:text-sm font-bold text-slate-700 truncate">{session.coach?.name || 'Latihan Mandiri'}</p>
                     </div>
                 </div>
@@ -70,7 +70,7 @@ export default function LogHeader({ session }) {
                         <Calendar className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tanggal</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-0.5">Tanggal</p>
                         <p className="text-xs md:text-sm font-bold text-slate-700 truncate">
                             {new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
@@ -83,7 +83,7 @@ export default function LogHeader({ session }) {
                         <MapPin className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Lokasi Latihan</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-0.5">Lokasi Latihan</p>
                         <p className="text-xs md:text-sm font-bold text-slate-700 truncate">{session.location || 'Tidak diatur'}</p>
                     </div>
                 </div>

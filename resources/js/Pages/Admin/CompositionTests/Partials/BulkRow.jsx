@@ -42,7 +42,7 @@ export default function BulkRow({ player, visibleIdx, actions }) {
                     <div className="flex flex-col">
                         <span className="font-bold text-zinc-900  text-xs line-clamp-1">{player.name}</span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[9px] font-black uppercase text-zinc-500 bg-zinc-100  px-1 rounded">{player.position}</span>
+                            <span className="text-[9px] font-bold text-zinc-500 bg-zinc-100  px-1 rounded">{player.position}</span>
                             <span className="text-[10px] text-zinc-400">No. {player.position_number}</span>
                         </div>
                     </div>

@@ -58,17 +58,11 @@ export default function WellnessTableHeader({ actions }) {
  {/* SUPER HEADER */}
  <tr>
  <th colSpan="5" style={STICKY_COLS.superHeader} className="p-2 border-b sticky z-40 bg-slate-50  align-bottom border-r border-slate-200  shadow-[4px_0_12px_rgba(0,0,0,0.03)]">
- <div className="flex font-black text-slate-400  mb-1 ml-1 text-[9px]">"Athlete"</div>
+ <div className="flex font-bold text-slate-400  mb-1 ml-1 text-[9px]">Athlete</div>
  </th>
- <th colSpan="4" className="p-2 border-b-2 border-slate-300  text-center font-black text-[9px] tracking-[0.2em] text-slate-800  bg-slate-100/50 ">
- "Wellness Metrics (1-7)"
- </th>
- <th colSpan="3" className="p-2 border-b-2 border-slate-300  text-center font-black text-[9px] tracking-[0.2em] text-slate-800  bg-slate-200/30  border-l">
- "AM Session"
- </th>
- <th colSpan="3" className="p-2 border-b-2 border-slate-300  text-center font-black text-[9px] tracking-[0.2em] text-slate-800  bg-slate-200/30  border-l">
- "PM Session"
- </th>
+ <th colSpan="4" className="p-2 border-b-2 border-slate-300  text-center font-bold text-[9px] tracking-[0.2em] text-slate-800  bg-slate-100/50 ">Wellness Metrics (1-7)</th>
+ <th colSpan="3" className="p-2 border-b-2 border-slate-300  text-center font-bold text-[9px] tracking-[0.2em] text-slate-800  bg-slate-200/30  border-l">AM Session</th>
+ <th colSpan="3" className="p-2 border-b-2 border-slate-300  text-center font-bold text-[9px] tracking-[0.2em] text-slate-800  bg-slate-200/30  border-l">PM Session</th>
  <th colSpan="3" className="p-2 border-b bg-slate-100/50  border-l border-slate-200 "></th>
  <th className="p-2 border-b border-slate-200 "></th>
  </tr>
@@ -76,10 +70,10 @@ export default function WellnessTableHeader({ actions }) {
  {/* SUB HEADER */}
  <tr className="bg-slate-50  [&>th]:border-b [&>th]:border-slate-200 "> 
  <th style={STICKY_COLS.drag} className="p-2 sticky z-30 bg-slate-50 "></th>
- <th style={STICKY_COLS.c1} className="p-2 font-black text-slate-500 text-[9px] sticky z-30 bg-slate-50  text-center border-r border-slate-200  align-top pt-3">"NO"</th>
- <th style={STICKY_COLS.c2} className="p-2 font-black text-slate-500 text-[9px] sticky z-30 bg-slate-50  text-center border-r border-slate-200  align-top pt-3">"POS"</th>
- <th style={STICKY_COLS.c3} className="p-2 font-black text-slate-500 text-[9px] sticky z-30 bg-slate-50  text-center border-r border-slate-200  align-top pt-3">"NP"</th>
- <th style={STICKY_COLS.c4} className="p-2 font-black text-slate-500 text-[9px] sticky z-30 bg-slate-50  shadow-[4px_0_12px_rgba(0,0,0,0.03)] border-r border-slate-200  align-top pt-3">"PLAYER NAME"</th>
+ <th style={STICKY_COLS.c1} className="p-2 font-bold text-slate-500 text-[9px] sticky z-30 bg-slate-50  text-center border-r border-slate-200  align-top pt-3">NO</th>
+ <th style={STICKY_COLS.c2} className="p-2 font-bold text-slate-500 text-[9px] sticky z-30 bg-slate-50 text-center border-r border-slate-200 align-top pt-3">L/P</th>
+ <th style={STICKY_COLS.c3} className="p-2 font-bold text-slate-500 text-[9px] sticky z-30 bg-slate-50  text-center border-r border-slate-200  align-top pt-3">NP</th>
+ <th style={STICKY_COLS.c4} className="p-2 font-bold text-slate-500 text-[9px] sticky z-30 bg-slate-50  shadow-[4px_0_12px_rgba(0,0,0,0.03)] border-r border-slate-200  align-top pt-3">PLAYER NAME</th>
  
  {/* Wellness Inputs */}
  {wellnessCols.map(col => (
@@ -96,36 +90,36 @@ export default function WellnessTableHeader({ actions }) {
 
  {/* Sesi AM */}
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[65px] text-slate-700  bg-slate-100/30  align-top">
- <div>"RPE (1-10)"</div>
+ <div>RPE (1-10)</div>
  {renderGlobalInput('am_rpe')}
  </th>
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[65px] text-slate-700  bg-slate-100/30  align-top">
- <div>"Duration (Minute)"</div>
+ <div>Duration (Minute)</div>
  {renderGlobalInput('am_duration')}
  </th>
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[60px] text-slate-500  bg-slate-100/30  align-top pt-3">
- <div className="flex items-center justify-center gap-1"><Lock size={10} strokeWidth={3} /> "LOAD"</div>
+ <div className="flex items-center justify-center gap-1"><Lock size={10} strokeWidth={3} />LOAD</div>
  </th>
 
  {/* Sesi PM */}
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[65px] text-slate-700  bg-slate-100/30  align-top">
- <div>"RPE (1-10)"</div>
+ <div>RPE (1-10)</div>
  {renderGlobalInput('pm_rpe')}
  </th>
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[65px] text-slate-700  bg-slate-100/30  align-top">
- <div>"Duration (Minute)"</div>
+ <div>Duration (Minute)</div>
  {renderGlobalInput('pm_duration')}
  </th>
  <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[60px] text-slate-500  bg-slate-100/30  align-top pt-3">
- <div className="flex items-center justify-center gap-1"><Lock size={10} strokeWidth={3} /> "Load"</div>
+ <div className="flex items-center justify-center gap-1"><Lock size={10} strokeWidth={3} />Load</div>
  </th>
 
  {/* Total & Kalkulasi */}
- <th className="p-2 font-black text-[9px] text-center border-l-2 border-slate-300  min-w-[70px] text-slate-800  bg-slate-100  align-top pt-3">"Daily Load"</th>
- <th className="p-2 font-black text-[9px] text-center border-l border-slate-200  min-w-[70px] text-slate-900  bg-slate-200/50  align-top pt-3">"Daily Score"</th>
- <th className="p-2 font-black text-[9px] text-center border-l border-slate-200  min-w-[70px] text-slate-900  bg-slate-300/50  align-top pt-3">"Weekly Score"</th>
- <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[150px] text-slate-700  bg-slate-50  align-top pt-3">"Notes"</th>
- <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  text-slate-500 align-top pt-3">"Actions"</th>
+ <th className="p-2 font-bold text-[9px] text-center border-l-2 border-slate-300  min-w-[70px] text-slate-800  bg-slate-100  align-top pt-3">Daily Load</th>
+ <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[70px] text-slate-900  bg-slate-200/50  align-top pt-3">Daily Score</th>
+ <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[70px] text-slate-900  bg-slate-300/50  align-top pt-3">Weekly Score</th>
+ <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  min-w-[150px] text-slate-700  bg-slate-50  align-top pt-3">Notes</th>
+ <th className="p-2 font-bold text-[9px] text-center border-l border-slate-200  text-slate-500 align-top pt-3">Actions</th>
  </tr>
  </thead>
  );

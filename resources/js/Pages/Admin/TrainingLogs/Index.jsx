@@ -153,7 +153,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 md:gap-6 mb-6 w-full bg-white p-4 sm:p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                     <div className="min-w-0 flex-1 relative z-10 w-full">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Management</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-2 inline-block">Management</span>
                         <h2 className="text-xl md:text-3xl font-bold text-slate-800 flex items-center gap-2 tracking-tight">Jadwal Latihan</h2>
                         <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Atur jadwal sesi klien dan kelola log.</p>
                     </div>
@@ -161,7 +161,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0 relative z-10">
                         <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-1 shadow-inner w-full sm:w-auto justify-between">
                             <button onClick={() => navigateMonth('prev')} className="p-2 text-slate-500 hover:bg-white hover:text-[#ff4d00] hover:shadow-sm rounded-md transition-all touch-manipulation"><ChevronLeft className="w-4 h-4 md:w-5 md:h-5"/></button>
-                            <div className="px-2 md:px-4 font-bold text-slate-700 w-full sm:w-28 md:w-36 text-center uppercase tracking-wider text-xs md:text-sm flex items-center justify-center gap-1.5 truncate"><CalendarDays className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 shrink-0"/> {monthName}</div>
+                            <div className="px-2 md:px-4 font-bold text-slate-700 w-full sm:w-28 md:w-36 text-center text-xs md:text-sm flex items-center justify-center gap-1.5 truncate"><CalendarDays className="w-3.5 h-3.5 md:w-4 md:h-4 text-slate-400 shrink-0"/> {monthName}</div>
                             <button onClick={() => navigateMonth('next')} className="p-2 text-slate-500 hover:bg-white hover:text-[#ff4d00] hover:shadow-sm rounded-md transition-all touch-manipulation"><ChevronRight className="w-4 h-4 md:w-5 md:h-5"/></button>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">
@@ -191,7 +191,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                 <div key={`mob-empty-${item.date}`} className={`bg-white rounded-xl border p-4 shadow-sm ${isToday ? 'border-[#ff4d00]/30 bg-orange-50/10' : 'border-slate-200'}`}>
                                     <div className="flex justify-between items-center mb-3">
                                         <div className={`font-bold text-sm ${isToday ? 'text-[#ff4d00]' : 'text-slate-600'}`}>
-                                            {formatDate(item.date)} {isToday && <span className="ml-2 text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">Hari Ini</span>}
+                                            {formatDate(item.date)} {isToday && <span className="ml-2 text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full">Hari Ini</span>}
                                         </div>
                                     </div>
                                     <div className="border-2 border-dashed border-slate-100 rounded-lg bg-slate-50/50 p-3 flex justify-between items-center">
@@ -213,9 +213,9 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                 
                                 <div className="flex justify-between items-start mb-4">
                                     <div className={`font-bold text-sm ${isToday ? 'text-[#ff4d00]' : 'text-slate-500'}`}>
-                                        {formatDate(item.date)} {isToday && <span className="ml-2 text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">Hari Ini</span>}
+                                        {formatDate(item.date)} {isToday && <span className="ml-2 text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full">Hari Ini</span>}
                                     </div>
-                                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded-md uppercase tracking-widest border border-orange-100">
+                                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded-md border border-orange-100">
                                         Sesi {item.session.session_number}
                                     </span>
                                 </div>
@@ -249,7 +249,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                 
                 <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full relative z-0">
                     <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs uppercase font-bold tracking-widest">
+                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs font-bold">
                             <tr>
                                 <th className="px-6 py-5 w-32">Tanggal</th>
                                 <th className="px-6 py-5">Klien & Sesi</th>
@@ -289,7 +289,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                         <td className="px-6 py-4 align-middle">
                                             <div className={`font-bold flex flex-col gap-1 text-sm ${isToday ? 'text-[#ff4d00]' : 'text-slate-700'}`}>
                                                 <span>{formatDate(item.date)}</span>
-                                                {isToday && <span className="text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full uppercase tracking-wider w-fit">Hari Ini</span>}
+                                                {isToday && <span className="text-[9px] bg-[#ff4d00] text-white px-2 py-0.5 rounded-full w-fit">Hari Ini</span>}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 align-middle">
@@ -299,7 +299,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-slate-800 text-base">{item.session.user?.name || '-'}</span>
-                                                    <span className="text-[10px] font-bold text-[#ff4d00] uppercase tracking-widest mt-1">Sesi {item.session.session_number}</span>
+                                                    <span className="text-[10px] font-bold text-[#ff4d00] mt-1">Sesi {item.session.session_number}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -352,7 +352,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                         <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
                             <div>
                                 <h3 className="font-bold text-lg text-slate-800">Detail Sesi Latihan</h3>
-                                <p className="text-[10px] font-bold text-[#ff4d00] uppercase tracking-widest mt-0.5">{formatDate(detailModal.date)}</p>
+                                <p className="text-[10px] font-bold text-[#ff4d00] mt-0.5">{formatDate(detailModal.date)}</p>
                             </div>
                             <button onClick={() => setDetailModal({ isOpen: false, session: null, date: null })} className="p-2 bg-slate-50 rounded-full hover:bg-slate-100 transition-colors touch-manipulation"><X className="w-5 h-5 text-slate-500"/></button>
                         </div>
@@ -363,22 +363,22 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                                     {detailModal.session.user?.profile_photo_url ? <img src={detailModal.session.user.profile_photo_url} className="w-full h-full rounded-full object-cover" alt="" /> : <User className="w-6 h-6" />}
                                 </div>
                                 <div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Klien</span>
+                                    <span className="text-[10px] font-bold text-slate-400 block mb-0.5">Klien</span>
                                     <span className="font-bold text-slate-800 text-base block leading-none">{detailModal.session.user?.name || '-'}</span>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 flex items-center gap-1"><Activity className="w-3.5 h-3.5"/> Program</span>
+                                    <span className="text-[10px] font-bold text-slate-400 block mb-1.5 flex items-center gap-1"><Activity className="w-3.5 h-3.5"/> Program</span>
                                     <span className="font-bold text-slate-700 text-sm block truncate">{detailModal.session.training_type}</span>
                                 </div>
                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 flex items-center gap-1"><Dumbbell className="w-3.5 h-3.5"/> Coach</span>
+                                    <span className="text-[10px] font-bold text-slate-400 block mb-1.5 flex items-center gap-1"><Dumbbell className="w-3.5 h-3.5"/> Coach</span>
                                     <span className="font-bold text-slate-700 text-sm block truncate">{detailModal.session.coach?.name || 'Tanpa Coach'}</span>
                                 </div>
                                 <div className="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> Lokasi</span>
+                                    <span className="text-[10px] font-bold text-slate-400 block mb-1.5 flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/> Lokasi</span>
                                     <span className="font-bold text-slate-700 text-sm block truncate">{detailModal.session.location || 'Tidak ditentukan'}</span>
                                 </div>
                             </div>
@@ -425,7 +425,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                         <form onSubmit={submit} className="p-5 space-y-4 rounded-b-xl overflow-y-auto max-h-[80vh] custom-scrollbar">
                             
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Pilih Klien (Atlet)</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Pilih Klien (Atlet)</label>
                                 <CustomSelect 
                                     value={form.data.user_id} 
                                     onChange={(val) => form.setData('user_id', val)} 
@@ -438,11 +438,11 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Tanggal</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Tanggal</label>
                                     <input type="date" value={form.data.date} onChange={e => form.setData('date', e.target.value)} className="w-full rounded-lg border border-slate-200 text-sm bg-slate-50 px-3 py-3 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none" required/>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Sesi Ke-</label>
+                                    <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Sesi Ke-</label>
                                     <CustomSelect 
                                         value={form.data.session_number} 
                                         onChange={(val) => form.setData('session_number', val)} 
@@ -453,12 +453,12 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                             </div>
 
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Tipe Latihan</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Tipe Latihan</label>
                                 <input type="text" placeholder="Cth: Strength Training..." value={form.data.training_type} onChange={e => form.setData('training_type', e.target.value)} className="w-full rounded-lg border border-slate-200 text-sm bg-slate-50 px-4 py-3 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none font-medium" required/>
                             </div>
                             
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Coach Pendamping</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Coach Pendamping</label>
                                 <CustomSelect 
                                     value={form.data.coach_id} 
                                     onChange={(val) => form.setData('coach_id', val)} 
@@ -468,7 +468,7 @@ export default function Index({ calendar, athletes, coaches, is_athlete, current
                             </div>
                             
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Lokasi Latihan</label>
+                                <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Lokasi Latihan</label>
                                 <input type="text" placeholder="Cth: Apartemen / Gym Pusat..." value={form.data.location} onChange={e => form.setData('location', e.target.value)} className="w-full rounded-lg border border-slate-200 text-sm bg-slate-50 px-4 py-3 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none font-medium"/>
                             </div>
                             

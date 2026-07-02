@@ -10,7 +10,7 @@ export default function Login({ status, canResetPassword }) {
     const appLogo = app_settings?.logo; 
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        athlete_id: '',
+        username: '',
         password: '',
         remember: false,
     });
@@ -67,7 +67,7 @@ export default function Login({ status, canResetPassword }) {
                         
                         {/* ID Pengguna */}
                         <div className="space-y-2">
-                            <label htmlFor="athlete_id" className="text-sm font-semibold text-slate-700 ml-1">
+                            <label htmlFor="username" className="text-sm font-semibold text-slate-700 ml-1">
                                 ID Pengguna
                             </label>
                             <div className="relative group">
@@ -75,17 +75,17 @@ export default function Login({ status, canResetPassword }) {
                                     <User className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
                                 </div>
                                 <input
-                                    id="athlete_id"
+                                    id="username"
                                     type="text"
-                                    value={data.athlete_id}
-                                    onChange={(e) => setData('athlete_id', e.target.value)}
+                                    value={data.username}
+                                    onChange={(e) => setData('username', e.target.value)}
                                     className="block w-full pl-11 pr-4 py-3 bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg text-sm focus:bg-white focus:border-[#ff4d00] focus:ring-[#ff4d00]/20 focus:ring-4 transition-all duration-200 outline-none font-medium"
                                     placeholder="Masukkan ID Anda"
                                     autoComplete="username"
                                 />
                             </div>
-                            {errors.athlete_id && (
-                                <p className="text-rose-500 text-sm mt-1.5 ml-1 font-medium">{errors.athlete_id}</p>
+                            {errors.username && (
+                                <p className="text-rose-500 text-sm mt-1.5 ml-1 font-medium">{errors.username}</p>
                             )}
                         </div>
 

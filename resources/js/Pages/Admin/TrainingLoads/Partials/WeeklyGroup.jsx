@@ -43,11 +43,11 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     {week.metrics.acwr > 1.5 && (
                         <div className="bg-rose-50 border border-rose-100 px-2 md:px-3 py-1 md:py-1.5 rounded-lg flex items-center gap-1.5 animate-pulse">
                             <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
-                            <span className="text-[9px] md:text-[10px] font-bold text-rose-600 uppercase tracking-widest">Risiko Cedera</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-rose-600">Risiko Cedera</span>
                         </div>
                     )}
                     <div className="bg-slate-50 border border-slate-200 px-3 md:px-4 py-1 md:py-1.5 rounded-lg flex items-center gap-1.5 md:gap-2 w-fit">
-                        <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">Weekly Wellness:</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-slate-500">Weekly Wellness:</span>
                         <span className="font-bold text-slate-600 text-sm md:text-lg">{week.metrics.weeklyWellnessScore} <span className="text-[10px] md:text-xs font-bold text-slate-400">/ 280</span></span>
                     </div>
                 </div>
@@ -56,7 +56,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             
             <div className="p-4 md:p-6 border-b border-slate-100 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-center bg-white">
                 <div className="h-48 md:h-56 w-full">
-                    <h4 className="text-[10px] md:text-xs font-bold text-slate-500 uppercase mb-2 md:mb-4 text-center tracking-widest">Load vs Wellness (Harian)</h4>
+                    <h4 className="text-[10px] md:text-xs font-bold text-slate-500 mb-2 md:mb-4 text-center">Load vs Wellness (Harian)</h4>
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={week.days.map(d => ({ day: d.dayName.substring(0,3), load: d.load, wellness: d.wellness }))} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -75,7 +75,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     
                     <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100 flex items-center justify-between group hover:border-orange-200 transition-colors">
                         <div>
-                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Puncak Beban Latihan</p>
+                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400">Puncak Beban Latihan</p>
                             <p className="font-bold text-slate-800 text-xs md:text-sm mt-0.5">Hari dengan Load Tertinggi</p>
                         </div>
                         
@@ -83,7 +83,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     </div>
                     <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-colors">
                         <div>
-                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kebugaran Minimum</p>
+                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400">Kebugaran Minimum</p>
                             <p className="font-bold text-slate-800 text-xs md:text-sm mt-0.5">Hari dengan Wellness Terendah</p>
                         </div>
                         <span className="font-bold text-xl md:text-2xl text-rose-500 group-hover:scale-110 transition-transform">
@@ -97,7 +97,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             
             <div className="overflow-x-auto w-full">
                 <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-white border-b border-slate-100 text-slate-400 uppercase text-[9px] md:text-[10px] font-extrabold tracking-wider">
+                    <thead className="bg-white border-b border-slate-100 text-slate-400 text-[9px] md:text-[10px] font-extrabold">
                         <tr>
                             <th className="px-4 md:px-6 py-3 md:py-4">Hari</th>
                             
@@ -195,11 +195,11 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                             <td colSpan={3} className="px-4 py-3">
                                                 <div className="grid grid-cols-2 gap-3 mb-3">
                                                     <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Wellness Score</span>
+                                                        <span className="text-[9px] font-bold text-slate-400 block mb-1">Wellness Score</span>
                                                         {day.wellness ? <span className="font-bold text-rose-500 text-sm">{day.wellness}</span> : <span className="text-slate-300">-</span>}
                                                     </div>
                                                     <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
-                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Total Load</span>
+                                                        <span className="text-[9px] font-bold text-slate-400 block mb-1">Total Load</span>
                                                         {day.load ? <span className="font-bold text-[#ff4d00] text-sm">{day.load} AU</span> : <span className="text-slate-300">-</span>}
                                                     </div>
                                                 </div>
@@ -207,7 +207,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                                 <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-3">
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div>
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1 border-b border-slate-50 pb-1">Sesi Pagi (AM)</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 block mb-1 border-b border-slate-50 pb-1">Sesi Pagi (AM)</span>
                                                             {day.data?.am_load ? (
                                                                 <div>
                                                                     <div className="font-bold text-slate-700 text-xs">{day.data.am_load} <span className="text-[9px] text-slate-400 font-normal">AU</span></div>
@@ -216,7 +216,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                                             ) : <span className="text-slate-300 text-xs">-</span>}
                                                         </div>
                                                         <div>
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1 border-b border-slate-50 pb-1">Sesi Sore (PM)</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 block mb-1 border-b border-slate-50 pb-1">Sesi Sore (PM)</span>
                                                             {day.data?.pm_load ? (
                                                                 <div>
                                                                     <div className="font-bold text-slate-700 text-xs">{day.data.pm_load} <span className="text-[9px] text-slate-400 font-normal">AU</span></div>
@@ -252,36 +252,36 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             <div className="bg-[#ff4d00] p-4 md:p-6 text-white border-b border-orange-700">
                 <div className="flex items-center gap-2 mb-3 md:mb-4 opacity-90">
                     <TrendingUp className="w-4 h-4" />
-                    <h4 className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Load Metrics & Monitoring</h4>
+                    <h4 className="text-[10px] md:text-xs font-bold">Load Metrics & Monitoring</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-y-4 gap-x-2 md:gap-4 divide-x divide-orange-400/50">
                     <div className="px-2 md:px-4 first:pl-0 border-none sm:border-solid">
-                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 uppercase mb-0.5 md:mb-1">Weekly Load</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 mb-0.5 md:mb-1">Weekly Load</p>
                         <p className="text-2xl md:text-3xl font-bold">{week.metrics.weeklyLoad}</p>
                     </div>
                     
                     
                     <div className="px-2 md:px-4">
-                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 uppercase mb-0.5 md:mb-1">ACWR Ratio</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 mb-0.5 md:mb-1">ACWR Ratio</p>
                         <p className={`text-2xl md:text-3xl font-bold ${getAcwrColor(week.metrics.acwr)}`}>
                             {week.metrics.acwr ? week.metrics.acwr : <span className="text-orange-300 font-medium text-base md:text-lg italic">N/A</span>}
                         </p>
                     </div>
 
                     <div className="px-2 md:px-4 border-none sm:border-solid">
-                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 uppercase mb-0.5 md:mb-1">Mean Daily Load</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 mb-0.5 md:mb-1">Mean Daily Load</p>
                         <p className="text-xl md:text-2xl font-bold mt-1">{week.metrics.meanLoad}</p>
                     </div>
                     <div className="px-2 md:px-4">
-                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 uppercase mb-0.5 md:mb-1">Std Deviation</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-orange-200 mb-0.5 md:mb-1">Std Deviation</p>
                         <p className="text-xl md:text-2xl font-bold mt-1">{week.metrics.stdDev}</p>
                     </div>
                     <div className="px-2 md:px-4 border-none sm:border-solid">
-                        <p className="text-[9px] md:text-[10px] font-bold text-amber-200 uppercase mb-0.5 md:mb-1">Training Monotony</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-amber-200 mb-0.5 md:mb-1">Training Monotony</p>
                         <p className="text-xl md:text-2xl font-bold mt-1 text-amber-300">{week.metrics.monotony}</p>
                     </div>
                     <div className="px-2 md:px-4">
-                        <p className="text-[9px] md:text-[10px] font-bold text-rose-200 uppercase mb-0.5 md:mb-1">Strain</p>
+                        <p className="text-[9px] md:text-[10px] font-bold text-rose-200 mb-0.5 md:mb-1">Strain</p>
                         <p className="text-xl md:text-2xl font-bold mt-1 text-rose-300">{week.metrics.strain}</p>
                     </div>
                 </div>
@@ -291,7 +291,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             <div className="bg-slate-50 p-4 md:p-6">
                 <div className="flex items-center gap-2 mb-4 md:mb-6 text-slate-500">
                     <Target className="w-4 h-4" />
-                    <h4 className="text-[10px] md:text-xs font-bold uppercase tracking-widest">Training / Match Frequency</h4>
+                    <h4 className="text-[10px] md:text-xs font-bold">Training / Match Frequency</h4>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-12">
                     <div className="space-y-2 md:space-y-2.5">
@@ -312,27 +312,27 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     
                     <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5 md:space-y-3.5 h-fit">
                         <div className="flex justify-between items-center pb-2.5 border-b border-slate-100">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Total (Train/Match/Travel)</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Total (Train/Match/Travel)</span>
                             <span className="text-lg md:text-xl font-bold text-[#ff4d00]">{week.metrics.totals.all}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Total Training Sessions</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Total Training Sessions</span>
                             <span className="text-sm md:text-base font-extrabold text-slate-800">{week.metrics.totals.training}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Num. Physical Prep</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Num. Physical Prep</span>
                             <span className="text-xs md:text-sm font-bold text-slate-600">{week.metrics.totals.physical}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Num. Skill Sessions</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Num. Skill Sessions</span>
                             <span className="text-xs md:text-sm font-bold text-slate-600">{week.metrics.totals.skill}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Matches / Comps</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Matches / Comps</span>
                             <span className="text-xs md:text-sm font-bold text-slate-600">{week.metrics.totals.matches}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase pr-2">Travel</span>
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Travel</span>
                             <span className="text-xs md:text-sm font-bold text-slate-600">{week.metrics.totals.travel}</span>
                         </div>
                     </div>

@@ -156,7 +156,7 @@ class ExerciseController extends Controller
     public function destroy(Exercise $exercise)
     {
         $exercise->delete();
-        return redirect()->route('exercises.index')->with('success', 'Latihan dihapus.');
+        return redirect()->route('admin.exercises.index')->with('success', 'Latihan dihapus.');
     }
 
     public function bulkDestroy(Request $request)

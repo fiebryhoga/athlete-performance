@@ -144,7 +144,7 @@ export default function Show({ sport, categories }) {
                 
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6 mb-6 md:mb-8">
                     <div className="w-full lg:w-auto">
-                        <Link href={route('admin.sports.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] transition-colors mb-2 md:mb-3 group uppercase tracking-widest touch-manipulation py-1">
+                        <Link href={route('admin.sports.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] transition-colors mb-2 md:mb-3 group touch-manipulation py-1">
                             <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1.5 transition-transform group-hover:-translate-x-1" /> 
                             Back to Sports
                         </Link>
@@ -160,7 +160,7 @@ export default function Show({ sport, categories }) {
                             <Info className="w-4 h-4 md:w-5 md:h-5" />
                         </div>
                         <div>
-                            <p className="text-[10px] md:text-xs font-bold text-orange-900 mb-0.5 uppercase tracking-widest">Benchmark Info</p>
+                            <p className="text-[10px] md:text-xs font-bold text-orange-900 mb-0.5">Benchmark Info</p>
                             <p className="text-[11px] md:text-xs text-orange-800/80 font-medium leading-relaxed">
                                 Set the standard target (100% score) for each test. Ensure the unit matches the parameter type.
                             </p>
@@ -174,7 +174,7 @@ export default function Show({ sport, categories }) {
                         <div key={category.id} className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-full hover:shadow-md hover:border-orange-200 transition-all duration-300 overflow-hidden group">
                             
                             <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <h3 className="font-bold text-slate-800 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider">
+                                <h3 className="font-bold text-slate-800 flex items-center gap-2 text-xs md:text-sm">
                                     <div className="w-2 h-2 rounded-full bg-[#ff4d00]"></div>
                                     {category.name}
                                 </h3>
@@ -218,12 +218,12 @@ export default function Show({ sport, categories }) {
 
                                                 
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-widest">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
                                                         {getParamIcon(test.parameter_type)}
                                                         {test.parameter_type}
                                                     </span>
                                                     
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100 uppercase tracking-widest">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
                                                         <Target className="w-3 h-3" />
                                                         Target: {Number(test.target_value)} {test.unit}
                                                     </span>
@@ -236,7 +236,7 @@ export default function Show({ sport, categories }) {
                                         <div className="p-3 bg-white rounded-full shadow-sm border border-slate-100 mb-3">
                                             <Target className="w-5 h-5 md:w-6 md:h-6 text-slate-300" />
                                         </div>
-                                        <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest">No Items Yet</p>
+                                        <p className="text-[10px] md:text-xs font-bold">No Items Yet</p>
                                     </div>
                                 )}
                             </div>
@@ -260,7 +260,7 @@ export default function Show({ sport, categories }) {
                                     {modalMode === 'create' ? 'Add New Item' : 'Edit Test Item'}
                                 </h3>
                                 <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">
-                                    Category: <span className="text-[#ff4d00] font-bold uppercase tracking-wider ml-1">{selectedCategory?.name}</span>
+                                    Category: <span className="text-[#ff4d00] font-bold ml-1">{selectedCategory?.name}</span>
                                 </p>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-rose-500 bg-white border border-slate-200 hover:bg-rose-50 rounded-full transition-all touch-manipulation">
@@ -273,7 +273,7 @@ export default function Show({ sport, categories }) {
                             <form onSubmit={submitForm} className="p-5 md:p-6 space-y-5 md:space-y-6">
                                 
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Item Name</label>
+                                    <label className="block text-[10px] font-bold text-slate-500 ml-1">Item Name</label>
                                     <input 
                                         type="text" 
                                         value={data.name}
@@ -286,7 +286,7 @@ export default function Show({ sport, categories }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Parameter Type</label>
+                                    <label className="block text-[10px] font-bold text-slate-500 ml-1">Parameter Type</label>
                                     <div className="relative">
                                         <select 
                                             value={data.parameter_type}
@@ -301,14 +301,14 @@ export default function Show({ sport, categories }) {
                                             <ArrowLeft className="w-4 h-4 -rotate-90" />
                                         </div>
                                     </div>
-                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 flex items-center gap-1.5 ml-1 mt-1.5 uppercase tracking-widest">
+                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 flex items-center gap-1.5 ml-1 mt-1.5">
                                         <Info className="w-3 h-3" /> 
                                         Auto Unit: <span className="font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">{activeConfig.unit}</span>
                                     </p>
                                 </div>
 
                                 <div className="bg-orange-50/50 p-4 md:p-5 rounded-xl border border-orange-100 space-y-2">
-                                    <label className="block text-[10px] font-bold text-[#ff4d00] uppercase tracking-widest ml-1">
+                                    <label className="block text-[10px] font-bold text-[#ff4d00] ml-1">
                                         Target Benchmark (100%)
                                     </label>
                                     
@@ -325,7 +325,7 @@ export default function Show({ sport, categories }) {
                                             placeholder={activeConfig.placeholder}
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <span className="text-[9px] md:text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-md uppercase">{activeConfig.unit}</span>
+                                            <span className="text-[9px] md:text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-md">{activeConfig.unit}</span>
                                         </div>
                                     </div>
                                     

@@ -14,7 +14,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'profile_photo', 
-        'athlete_id',
+        'username',
         'password',
         'role',
         'sport_id',
@@ -75,5 +75,15 @@ class User extends Authenticatable
     public function individualTrainings()
     {
         return $this->hasMany(IndividualTraining::class);
+    }
+
+    public function coaches()
+    {
+        return $this->belongsToMany(User::class, 'coach_athlete', 'athlete_id', 'coach_id')->withTimestamps();
+    }
+
+    public function athletes()
+    {
+        return $this->belongsToMany(User::class, 'coach_athlete', 'coach_id', 'athlete_id')->withTimestamps();
     }
 }

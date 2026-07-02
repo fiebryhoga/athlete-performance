@@ -57,7 +57,7 @@ class VolleyballSeeder extends Seeder
             User::firstOrCreate(
                 ['name' => $data['name']],
                 [
-                    'athlete_id' => $athleteId,
+                    'username' => $athleteId,
                     'role' => 'athlete',
                     'sport_id' => $sport->id,
                     'password' => Hash::make('password'),

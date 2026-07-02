@@ -16,18 +16,20 @@ class WellnessRpeDailyExport implements FromView, ShouldAutoSize, WithDrawings
     protected $options;
     protected $club;
     protected $reportTitle;
+    protected $athletes;
 
-    public function __construct($date, $options, $club, $reportTitle = null)
+    public function __construct($date, $options, $club, $reportTitle = null, $athletes = null)
     {
         $this->date = $date;
         $this->options = $options;
-        null = $club;
+        null = $club; // not sure why null = $club was here, probably club = null in the original
         $this->reportTitle = $reportTitle;
+        $this->athletes = $athletes;
     }
 
     public function view(): View
     {
-        $athletes = Athlete::orderBy('name')->get();
+        $athletes = $this->athletes ?? Athlete::orderBy('name')->get();
         $logs = WellnessRpe::where('record_date', $this->date)->get()->keyBy('user_id');
 
         $mappedAthletes = $athletes->map(function($athlete) use ($logs) {

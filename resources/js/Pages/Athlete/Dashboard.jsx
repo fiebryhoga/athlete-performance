@@ -1,397 +1,236 @@
+import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { 
-    User, Calendar, Activity, Trophy, TrendingUp, TrendingDown, 
-    Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, ArrowRight, HeartPulse, Battery, History
+    Calendar, CheckCircle, AlertCircle, HeartPulse, Activity, Dumbbell, ArrowRight, Sparkles, Target
 } from 'lucide-react';
-import { 
-    ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
-    ComposedChart, Bar, Line
-} from 'recharts';
 
-export default function AthleteDashboard({ user, stats, radarData, history, trendData, daily_metrics, training_loads }) {
-
+export default function AthleteDashboard({ 
+    user, 
+    pending_trainings, 
+    has_wellness_today, 
+    has_daily_metric_today, 
+    stats 
+}) {
+    const todayStr = new Date().toLocaleDateString('id-ID', { 
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+    });
     
-    const calculateBMI = (h, w) => {
-        if (!h || !w) return '-';
-        const heightInM = h / 100;
-        const bmiVal = w / (heightInM * heightInM);
-        return parseFloat(bmiVal.toFixed(1)); 
-    };
-
-    const bmi = calculateBMI(user.height, user.weight);
-    const initial = user.name ? user.name.charAt(0).toUpperCase() : '-';
-
-    const sortedSkills = [...radarData].sort((a, b) => b.A - a.A);
-    const strengths = sortedSkills.slice(0, 3).filter(s => s.A > 0); 
-    const weaknesses = [...radarData].sort((a, b) => a.A - b.A).slice(0, 3).filter(s => s.A < s.B);
-
-    const getBMIStatus = (val) => {
-        if (val === '-') return { label: '-', color: 'text-slate-500' };
-        if (val < 18.5) return { label: 'Underweight', color: 'text-amber-500' };
-        if (val >= 18.5 && val <= 24.9) return { label: 'Normal', color: 'text-emerald-600' };
-        if (val >= 25 && val <= 29.9) return { label: 'Overweight', color: 'text-orange-500' };
-        return { label: 'Obese', color: 'text-red-600' };
-    };
-    const bmiStatus = getBMIStatus(bmi);
-
-    const customTooltipStyle = {
-        borderRadius: '12px', border: 'none',
-        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '12px'
-    };
+    // Check if everything is done today
+    const allDone = has_wellness_today && has_daily_metric_today && (pending_trainings?.length || 0) === 0;
 
     return (
-        <AppLayout title="My Dashboard">
-            <Head title="Dashboard Atlet" />
+        <AppLayout title="Dashboard Atlet">
+            <Head title="Dashboard Utama" />
 
-            <div className="w-full max-w-[1400px] mx-auto  pb-12 overflow-x-hidden sm:overflow-visible">
+            <div className="w-full pb-12 overflow-x-hidden sm:overflow-visible">
                 
-                
-                <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative">
-                    <div className="relative z-10 w-full md:w-auto">
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Dashboard Profil</h1>
-                        <p className="text-slate-500 text-xs md:text-sm mt-1">Selamat datang, terus tingkatkan performamu hari ini!</p>
+                {/* Header Section with Integrated Tasks */}
+                <div className="relative min-h-[300px] mb-8 group">
+                    
+                    {/* Background Container with overflow hidden */}
+                    <div className="absolute inset-0 rounded-2xl shadow-xl shadow-[#ff4d00]/10 border border-[#ff4d00]/20 overflow-hidden z-0">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#ff4d00] via-[#ff6600] to-[#ff8c00]"></div>
+                        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
+                        <div className="absolute -right-20 -top-20 w-[400px] h-[400px] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
+                        <div className="absolute right-32 -bottom-24 w-[300px] h-[300px] border-[20px] border-white/5 rounded-full pointer-events-none"></div>
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-400/20 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse pointer-events-none"></div>
                     </div>
-                    <div className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl flex items-center gap-3 shadow-sm w-full md:w-auto relative z-10 shrink-0">
-                        <div className="p-2 bg-orange-50 text-[#ff4d00] rounded-lg">
-                            <Calendar className="w-4 h-4 md:w-5 md:h-5" />
+
+                    {/* Model Image - Outside overflow-hidden so it can pop out */}
+                    <div className="absolute right-4 md:right-12 -bottom-0 z-10 h-[350px] md:h-[350px] pointer-events-none hidden md:block opacity-90">
+                        <img
+                            src="/assets/images/model2.png"
+                            alt="Athlete Model"
+                            className="h-full w-auto object-contain object-bottom drop-shadow-2xl"
+                        />
+                    </div>
+
+                    <div className="relative z-20 w-full h-full p-8 md:p-10">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-10">
+                            <div className="max-w-xl xl:max-w-2xl">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 mb-5 shadow-sm">
+                                    <Sparkles size={14} className="text-yellow-200 fill-yellow-200" /> 
+                                    <span className="text-[10px] font-bold text-white">Client Area</span>
+                                </div>
+                                
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4 drop-shadow-sm leading-tight">
+                                    Welcome back, <br className="hidden md:block" />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-white">{user?.name?.split(' ')[0]} 👋</span>
+                                </h1>
+                                
+                                <p className="text-orange-100 text-sm md:text-base leading-relaxed font-medium max-w-lg">
+                                    Selamat datang di profil berlatih Anda. Selesaikan tugas hari ini dengan maksimal dan pantau terus performamu.
+                                </p>
+                            </div>
+                            
+                            <div className="w-fit flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-4 rounded-xl shadow-lg hover:bg-white/20 transition-all cursor-default relative overflow-hidden group/date">
+                                <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-0 group-hover/date:animate-shine"></div>
+                                <div className="relative z-10 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-[#ff4d00] shrink-0">
+                                    <Calendar size={20} strokeWidth={2.5} />
+                                </div>
+                                <div className="relative z-10 pr-2">
+                                    <p className="text-[10px] text-orange-200 font-bold mb-0.5">Tanggal Hari Ini</p>
+                                    <p className="text-base font-bold text-white leading-none whitespace-nowrap">
+                                        {todayStr}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest">Hari Ini</p>
-                            <p className="text-xs md:text-sm font-bold text-slate-700">
-                                {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tasks Section (Moved outside banner) */}
+                <div className="mb-10">
+                    <div className="flex items-center justify-between mb-5 px-1">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <Target className="w-6 h-6 text-[#ff4d00]" />
+                            Tugas Anda Hari Ini
+                        </h2>
+                        <span className="px-3 py-1 bg-orange-100 text-[#ff4d00] rounded-full text-[10px] font-bold">
+                            {(pending_trainings?.length || 0) + (!has_wellness_today ? 1 : 0) + (!has_daily_metric_today ? 1 : 0)} Tugas
+                        </span>
+                    </div>
+
+                    {allDone ? (
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-8 text-center flex flex-col items-center justify-center shadow-sm">
+                            <CheckCircle className="w-10 h-10 text-emerald-500 mb-3" />
+                            <h3 className="text-xl font-bold text-slate-800 mb-1">Kerja Bagus! 🎉</h3>
+                            <p className="text-slate-500 max-w-sm mx-auto text-sm">
+                                Kamu sudah menyelesaikan semua tugas, latihan, dan kuisioner harian. Waktunya beristirahat!
                             </p>
                         </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    
-                    
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center text-center h-full relative overflow-hidden">
-                        <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-orange-500/10 to-transparent"></div>
-                        
-                        <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 bg-[#ff4d00] rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-[#ff4d00]/20 border-4 border-white overflow-hidden shrink-0">
-                            {user.profile_photo_url ? (
-                                <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
-                            ) : (
-                                initial
-                            )}
-                        </div>
-                        
-                        <h2 className="text-lg md:text-xl font-bold text-slate-800">{user.name}</h2>
-                        <p className="text-xs md:text-sm text-slate-500 font-medium mb-3">{user.athlete_id || '-'}</p>
-                        
-                        <div className="flex gap-2 mb-6">
-                            <span className="px-3 py-1 bg-orange-50 text-[#ff4d00] rounded-full text-[10px] md:text-xs font-bold tracking-wider flex items-center gap-1 border border-orange-100 uppercase">
-                                <Trophy className="w-3 h-3" /> {stats.sport}
-                            </span>
-                            <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] md:text-xs font-bold tracking-wider border border-slate-200 uppercase">
-                                Athlete
-                            </span>
-                        </div>
-
-                        
-                        <div className="grid grid-cols-2 gap-3 w-full border-t border-slate-100 pt-6">
-                            <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className="flex justify-center mb-1.5"><Ruler className="w-4 h-4 text-slate-400" /></div>
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tinggi</p>
-                                <p className="font-bold text-slate-800 text-base md:text-lg">{user.height || '-'} <span className="text-[10px] md:text-xs font-normal text-slate-500">cm</span></p>
-                            </div>
-                            <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className="flex justify-center mb-1.5"><Weight className="w-4 h-4 text-slate-400" /></div>
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Berat</p>
-                                <p className="font-bold text-slate-800 text-base md:text-lg">{user.weight || '-'} <span className="text-[10px] md:text-xs font-normal text-slate-500">kg</span></p>
-                            </div>
-                            <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className="flex justify-center mb-1.5"><Clock className="w-4 h-4 text-slate-400" /></div>
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Umur</p>
-                                <p className="font-bold text-slate-800 text-base md:text-lg">{user.age || '-'} <span className="text-[10px] md:text-xs font-normal text-slate-500">thn</span></p>
-                            </div>
-                            <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <div className="flex justify-center mb-1.5"><Scale className="w-4 h-4 text-slate-400" /></div>
-                                <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider">BMI</p>
-                                <p className="font-bold text-slate-800 text-base md:text-lg leading-none mb-1">{bmi}</p>
-                                <p className={`text-[9px] font-bold uppercase tracking-wider ${bmiStatus.color}`}>{bmiStatus.label}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    
-                    <div className="lg:col-span-2 flex flex-col gap-6 min-w-0 w-full">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-                            <StatCard label="Total Sesi" value={stats.sessions} icon={Activity} color="text-slate-800" />
-                            <StatCard label="Rata-rata Skor" value={stats.avg_score} icon={Target} color="text-[#ff4d00]" />
-                            <StatCard label="Skor Tertinggi" value={stats.max_score} icon={TrendingUp} color="text-emerald-600" />
-                            <StatCard label="Terbaik" value={stats.best_category} icon={Zap} color="text-amber-500" isText />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full min-w-0">
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             
-                            <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                                <h3 className="text-xs md:text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-4 bg-[#ff4d00] rounded-full"></span> Peta Kemampuan vs Target
-                                </h3>
-                                <div className="flex-1 w-full min-h-[250px] relative">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
-                                            <PolarGrid stroke="#e2e8f0" />
-                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} />
-                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                            <Radar name="Target Cabor" dataKey="B" stroke="#fbbf24" strokeWidth={2} fill="#fbbf24" fillOpacity={0.15} />
-                                            <Radar name="Performa Saya" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.5} />
-                                            <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                                            <RechartsTooltip contentStyle={{borderRadius:'8px', fontSize: '12px'}} />
-                                        </RadarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-
-                            
-                            <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                                <h3 className="text-xs md:text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-4 bg-emerald-500 rounded-full"></span> Tren Progress (6 Sesi Terakhir)
-                                </h3>
-                                <div className="flex-1 w-full min-h-[250px] relative">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                            <defs>
-                                                <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                            <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
-                                            <Area type="monotone" dataKey="score" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-8 overflow-hidden">
-                    <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                        <div className="p-5 md:p-8">
-                            <h3 className="text-base md:text-lg font-bold text-slate-800 mb-5 md:mb-6 flex items-center gap-2">
-                                <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600"><Zap className="w-4 h-4 md:w-5 md:h-5" /></div> Keunggulan Utama
-                            </h3>
-                            <div className="space-y-4">
-                                {strengths.length > 0 ? strengths.map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between group">
-                                        <div className="flex items-center gap-3 md:gap-4">
-                                            <span className="text-2xl md:text-3xl font-bold text-slate-100 group-hover:text-emerald-100 transition-colors">0{idx + 1}</span>
-                                            <div>
-                                                <p className="font-bold text-sm md:text-base text-slate-700">{item.subject}</p>
-                                                <p className="text-[10px] md:text-xs text-slate-400">Score &gt; Target</p>
-                                            </div>
+                            {/* Wellness Check */}
+                            {!has_wellness_today && (
+                                <div className="group bg-white hover:bg-slate-50 border border-slate-200 hover:border-rose-200 rounded-2xl p-5 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-sm hover:shadow-md">
+                                    <div className="relative z-10 flex items-start justify-between mb-5">
+                                        <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                            <HeartPulse size={24} strokeWidth={2.5} />
                                         </div>
-                                        <div className="text-right">
-                                            <span className="block text-lg md:text-xl font-bold text-emerald-600">{Number(item.A).toFixed(1)}</span>
-                                        </div>
-                                    </div>
-                                )) : <p className="text-slate-400 italic text-xs md:text-sm py-4">Data belum cukup untuk analisis keunggulan.</p>}
-                            </div>
-                        </div>
-
-                        <div className="p-5 md:p-8">
-                            <h3 className="text-base md:text-lg font-bold text-slate-800 mb-5 md:mb-6 flex items-center gap-2">
-                                <div className="p-1.5 bg-rose-100 rounded-lg text-rose-600"><AlertCircle className="w-4 h-4 md:w-5 md:h-5" /></div> Area Peningkatan
-                            </h3>
-                            <div className="space-y-4">
-                                {weaknesses.length > 0 ? weaknesses.map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between group">
-                                        <div className="flex items-center gap-3 md:gap-4">
-                                            <span className="text-2xl md:text-3xl font-bold text-slate-100 group-hover:text-rose-100 transition-colors">0{idx + 1}</span>
-                                            <div>
-                                                <p className="font-bold text-sm md:text-base text-slate-700">{item.subject}</p>
-                                                <p className="text-[10px] md:text-xs text-slate-400">Target: <span className="font-bold">{item.B}</span></p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="block text-lg md:text-xl font-bold text-rose-500">{Number(item.A).toFixed(1)}</span>
-                                        </div>
-                                    </div>
-                                )) : <p className="text-slate-400 italic text-xs md:text-sm py-4">Tidak ada kelemahan signifikan.</p>}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    
-                    
-                    <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                        <h3 className="text-xs md:text-sm font-bold text-slate-700 mb-6 flex items-center gap-2">
-                            <div className="p-1.5 bg-amber-50 rounded-lg text-amber-500"><Battery className="w-4 h-4" /></div>
-                            Tren Beban Latihan (30 Hari)
-                        </h3>
-                        <div className="flex-1 w-full min-h-[300px] relative">
-                            {training_loads && training_loads.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <ComposedChart data={training_loads} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                                        <YAxis yAxisId="left" tick={{ fontSize: 10, fill: '#f59e0b' }} axisLine={false} tickLine={false} />
-                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: '#475569' }} axisLine={false} tickLine={false} domain={[0, 40]}/>
-                                        <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
-                                        <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-                                        
-                                        <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="#ff4d00" fillOpacity={0.6} radius={[4, 4, 0, 0]} barSize={20} />
-                                        <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="#475569" strokeWidth={3} dot={{r: 3}} activeDot={{r: 5}} />
-                                    </ComposedChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                                    <Activity className="w-6 h-6 md:w-8 md:h-8 opacity-20" />
-                                    <p className="text-xs md:text-sm font-medium">Belum ada data Load.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    
-                    <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
-                        <h3 className="text-xs md:text-sm font-bold text-slate-700 mb-6 flex items-center gap-2">
-                            <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-500"><HeartPulse className="w-4 h-4" /></div>
-                            Tren Recovery Fisik
-                        </h3>
-                        <div className="flex-1 w-full min-h-[300px] relative">
-                            {daily_metrics && daily_metrics.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={daily_metrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorRecSmall" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="date" tick={{fontSize: 10, fill: '#64748b'}} axisLine={false} tickLine={false} />
-                                        <YAxis tick={{fontSize: 10, fill: '#94a3b8'}} axisLine={false} tickLine={false} domain={[0, 100]}/>
-                                        <RechartsTooltip contentStyle={customTooltipStyle} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }} />
-                                        <Area type="natural" dataKey="recovery" name="Recovery %" stroke="#10b981" strokeWidth={3} fill="url(#colorRecSmall)" activeDot={{r: 5}} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                                    <HeartPulse className="w-6 h-6 md:w-8 md:h-8 opacity-20" />
-                                    <p className="text-xs md:text-sm font-medium">Belum ada data metrik harian.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                
-                <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-4 px-1">
-                        <History className="w-5 h-5 text-slate-400" /> 
-                        <h3 className="font-bold text-slate-700">Riwayat Tes Performa Terbaru</h3>
-                    </div>
-
-                    
-                    <div className="md:hidden flex flex-col gap-3">
-                        {history && history.length > 0 ? (
-                            history.map((session) => (
-                                <div key={session.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div className="font-bold text-sm text-slate-700">{session.date}</div>
-                                        <span className={`px-2 py-1 rounded text-[9px] font-bold border ${session.status.color}`}>
-                                            {session.status.label}
+                                        <span className="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-lg text-[9px] font-bold">
+                                            Wajib
                                         </span>
                                     </div>
-                                    <div className="mb-3">
-                                        <p className="text-sm font-bold text-slate-800">{session.name}</p>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">{session.items_count} Tes Diselesaikan</p>
-                                    </div>
-                                    <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-1">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Skor Akhir</span>
-                                        <span className="font-bold text-[#ff4d00] text-lg">{Number(session.score).toFixed(1)}</span>
+
+                                    <div className="relative z-10 flex-1 flex flex-col justify-end">
+                                        <h3 className="font-bold text-slate-800 text-base mb-1">Wellness & Beban</h3>
+                                        <p className="text-xs text-slate-500 mb-5 line-clamp-2 leading-relaxed">
+                                            Bagaimana kondisi fisik Anda hari ini? Isi kuisioner pemulihan untuk melacak kesiapan.
+                                        </p>
+                                        
+                                        <Link 
+                                            href={route('admin.wellness-rpe.index')}
+                                            className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-[#ff4d00] text-white py-2.5 rounded-xl text-xs font-bold transition-colors duration-300 group-hover:shadow-lg group-hover:shadow-[#ff4d00]/20"
+                                        >
+                                            Isi Sekarang <ArrowRight size={14} />
+                                        </Link>
                                     </div>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-400 italic text-xs shadow-sm">
-                                Belum ada data latihan yang terekam.
-                            </div>
-                        )}
-                    </div>
+                            )}
 
-                    
-                    <div className="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-sm text-left whitespace-nowrap min-w-[600px]">
-                                <thead className="text-xs text-slate-500 bg-slate-50/50 uppercase tracking-wider font-bold">
-                                    <tr>
-                                        <th className="px-6 py-4 border-b border-slate-100">Tanggal</th>
-                                        <th className="px-6 py-4 border-b border-slate-100">Nama Sesi</th>
-                                        <th className="px-6 py-4 border-b border-slate-100 text-center">Jml Item</th>
-                                        <th className="px-6 py-4 border-b border-slate-100 text-center">Skor</th>
-                                        <th className="px-6 py-4 border-b border-slate-100 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {history && history.length > 0 ? (
-                                        history.map((session) => (
-                                            <tr key={session.id} className="hover:bg-slate-50 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-slate-700">{session.date}</td>
-                                                <td className="px-6 py-4 font-bold text-slate-800">{session.name}</td>
-                                                <td className="px-6 py-4 text-center text-slate-500 text-xs">{session.items_count} Tes</td>
-                                                <td className="px-6 py-4 text-center">
-                                                    
-                                                    <span className="font-bold text-[#ff4d00] text-lg">{Number(session.score).toFixed(1)}</span>
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold border ${session.status.color}`}>
-                                                        {session.status.label}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="px-6 py-10 text-center text-slate-400 italic">
-                                                Belum ada data latihan yang terekam.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            {/* Daily Metric Check */}
+                            {!has_daily_metric_today && (
+                                <div className="group bg-white hover:bg-slate-50 border border-slate-200 hover:border-blue-200 rounded-2xl p-5 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-sm hover:shadow-md">
+                                    <div className="relative z-10 flex items-start justify-between mb-5">
+                                        <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                            <Activity size={24} strokeWidth={2.5} />
+                                        </div>
+                                        <span className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg text-[9px] font-bold">
+                                            Wajib
+                                        </span>
+                                    </div>
+
+                                    <div className="relative z-10 flex-1 flex flex-col justify-end">
+                                        <h3 className="font-bold text-slate-800 text-base mb-1">Pantauan Harian</h3>
+                                        <p className="text-xs text-slate-500 mb-5 line-clamp-2 leading-relaxed">
+                                            Catat metrik fisik harian seperti detak jantung istirahat dan berat badan.
+                                        </p>
+                                        
+                                        <Link 
+                                            href={route('admin.daily-metrics.index')}
+                                            className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-[#ff4d00] text-white py-2.5 rounded-xl text-xs font-bold transition-colors duration-300 group-hover:shadow-lg group-hover:shadow-[#ff4d00]/20"
+                                        >
+                                            Isi Sekarang <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Pending Trainings */}
+                            {pending_trainings?.map((training) => (
+                                <div key={training.id} className="group bg-white hover:bg-orange-50/30 border border-slate-200 hover:border-[#ff4d00]/30 rounded-2xl p-5 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-sm hover:shadow-md">
+                                    <div className="absolute -right-6 -top-6 text-slate-50 group-hover:text-orange-50 transition-colors duration-300 transform group-hover:scale-110 group-hover:rotate-12 z-0">
+                                        <Dumbbell size={100} strokeWidth={1} />
+                                    </div>
+                                    
+                                    <div className="relative z-10 flex items-start justify-between mb-5">
+                                        <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#ff4d00] flex items-center justify-center shrink-0 group-hover:bg-[#ff4d00] group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                                            <Dumbbell size={24} strokeWidth={2.5} />
+                                        </div>
+                                        <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg text-[9px] font-bold group-hover:bg-orange-100 group-hover:text-[#ff4d00] transition-colors">
+                                            Sesi {training.session_number}
+                                        </span>
+                                    </div>
+
+                                    <div className="relative z-10 flex-1 flex flex-col justify-end">
+                                        <h3 className="font-bold text-slate-800 text-base mb-1 line-clamp-1" title={training.name}>
+                                            {training.name}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 mb-5 font-medium flex items-center gap-1.5">
+                                            <Calendar size={14} /> {training.date}
+                                        </p>
+                                        
+                                        <Link 
+                                            href={route('admin.individual-trainings.session.show', training.id)}
+                                            className="w-full flex items-center justify-center gap-2 bg-[#ff4d00] hover:bg-[#e64500] text-white py-2.5 rounded-xl text-xs font-bold transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:shadow-[#ff4d00]/30"
+                                        >
+                                            Mulai Latihan <ArrowRight size={14} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+                    )}
+
+                {/* Quick Stats Below Banner */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <p className="text-xs text-slate-400 font-bold mb-1 flex items-center gap-1.5">
+                            <Dumbbell className="w-3.5 h-3.5" /> Total Sesi
+                        </p>
+                        <p className="font-bold text-2xl text-slate-800">{stats.total_sessions}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <p className="text-xs text-slate-400 font-bold mb-1 flex items-center gap-1.5">
+                            <Activity className="w-3.5 h-3.5" /> Cabang Olahraga
+                        </p>
+                        <p className="font-bold text-lg text-[#ff4d00]">{stats.sport}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                        <p className="text-xs text-slate-400 font-bold mb-1 flex items-center gap-1.5">
+                            <AlertCircle className="w-3.5 h-3.5" /> Tugas Aktif
+                        </p>
+                        <p className="font-bold text-2xl text-slate-800">{(pending_trainings?.length || 0) + (!has_wellness_today ? 1 : 0) + (!has_daily_metric_today ? 1 : 0)}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p className="text-xs text-slate-400 font-bold mb-1 flex items-center gap-1.5">
+                                Profil Lengkap
+                            </p>
+                            <p className="font-bold text-sm text-slate-600">Lihat performa & tren fisikmu.</p>
+                        </div>
+                        <Link href={route('athlete.profiling')} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 transition-colors">
+                            <ArrowRight className="w-5 h-5" />
+                        </Link>
                     </div>
                 </div>
 
-            </div>
+             </div>
         </AppLayout>
-    );
-}
-
-function StatCard({ label, value, icon: Icon, color, isText = false }) {
-    let displayValue = value;
-    if (!isText && typeof value === 'number') {
-        if (!Number.isInteger(value)) displayValue = value.toFixed(1);
-    } else if (!isText && !isNaN(parseFloat(value)) && isFinite(value)) {
-        displayValue = parseFloat(value).toFixed(1);
-    }
-
-    return (
-        <div className="bg-white p-3 md:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full min-w-0">
-            <div>
-                <p className="text-[10px] md:text-xs text-slate-400 font-bold mb-1.5 md:mb-2 flex items-center gap-1.5 truncate">
-                    <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 shrink-0" /> <span className="truncate">{label}</span>
-                </p>
-                <p className={`font-bold ${isText ? 'text-sm md:text-lg leading-tight truncate' : 'text-xl md:text-3xl truncate'} ${color}`}>
-                    {displayValue || '-'}
-                </p>
-            </div>
-        </div>
     );
 }

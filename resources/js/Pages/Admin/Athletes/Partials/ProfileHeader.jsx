@@ -5,7 +5,7 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
     return (
         <>
             <div className="mb-8">
-                <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] font-bold text-slate-400 hover:text-[#ff4d00] mb-4 group transition-colors uppercase tracking-widest">
+                <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] font-bold text-slate-400 hover:text-[#ff4d00] mb-4 group transition-colors">
                     <ArrowLeft className="w-3 h-3 mr-1.5 transition-transform group-hover:-translate-x-1" />
                     Back to Athletes List
                 </Link>
@@ -30,34 +30,34 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
                     {safeAthlete.profile_photo_url ? (
                         <img src={safeAthlete.profile_photo_url} alt={safeAthlete.name} className="w-full h-full rounded-lg object-cover shadow-lg shadow-[#ff4d00]/10 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300" />
                     ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#ff4d00] to-orange-500 rounded-lg flex items-center justify-center text-white text-4xl font-black shadow-lg shadow-[#ff4d00]/20 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <div className="w-full h-full bg-gradient-to-br from-[#ff4d00] to-orange-500 rounded-lg flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-[#ff4d00]/20 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300">
                             {initial}
                         </div>
                     )}
                 </div>
                 
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight group-hover:text-[#ff4d00] transition-colors">{safeAthlete.name || 'Unknown Name'}</h2>
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1 mb-3">{safeAthlete.athlete_id || '-'}</p>
+                <p className="text-[10px] text-slate-400 font-bold mt-1 mb-3">{safeAthlete.username || '-'}</p>
                 
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[10px] font-bold uppercase tracking-widest border border-orange-100 mb-6">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[10px] font-bold border border-orange-100 mb-6">
                     <Trophy className="w-3.5 h-3.5" /> {safeAthlete.sport?.name || 'No Sport'}
                 </span>
 
                 <div className="grid grid-cols-2 gap-3 w-full mt-auto pt-6 border-t border-slate-100">
                     <div className="text-center p-3 bg-slate-50 rounded-lg border border-slate-100/50 transition-colors hover:bg-orange-50 hover:border-orange-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Height</p>
+                        <p className="text-[10px] text-slate-400 font-bold mb-1">Height</p>
                         <p className="font-bold text-slate-700">{safeAthlete.height || '-'} <span className="text-[10px] font-bold text-slate-400">cm</span></p>
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-lg border border-slate-100/50 transition-colors hover:bg-orange-50 hover:border-orange-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Weight</p>
+                        <p className="text-[10px] text-slate-400 font-bold mb-1">Weight</p>
                         <p className="font-bold text-slate-700">{safeAthlete.weight || '-'} <span className="text-[10px] font-bold text-slate-400">kg</span></p>
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-lg border border-slate-100/50 transition-colors hover:bg-orange-50 hover:border-orange-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Age</p>
+                        <p className="text-[10px] text-slate-400 font-bold mb-1">Age</p>
                         <p className="font-bold text-slate-700">{safeAthlete.age || '-'} <span className="text-[10px] font-bold text-slate-400">yrs</span></p>
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-lg border border-slate-100/50 transition-colors hover:bg-orange-50 hover:border-orange-100">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">BMI</p>
+                        <p className="text-[10px] text-slate-400 font-bold mb-1">BMI</p>
                         <p className="font-bold text-[#ff4d00]">{bmi}</p>
                     </div>
                 </div>

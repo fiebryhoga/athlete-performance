@@ -29,6 +29,12 @@ class PerformanceController extends Controller
             $query->where('user_id', $user->id);
         }
 
+        if ($user->role === 'coach') {
+            $query->whereHas('athlete.coaches', function($q) use ($user) {
+                $q->where('coach_id', $user->id);
+            });
+        }
+
         if ($request->search) {
             $query->whereHas('athlete', function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%');

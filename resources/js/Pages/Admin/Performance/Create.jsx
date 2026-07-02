@@ -53,10 +53,10 @@ export default function Create({ athletes }) {
                     <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black/40 to-transparent opacity-50"></div>
                     
                     <div className="relative z-10">
-                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/20 mb-6 uppercase tracking-widest">
+                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/20 mb-6">
                             <Sparkles className="w-4 h-4 text-orange-200" /> New Session Wizard
                         </div>
-                        <h1 className="text-3xl lg:text-4xl font-black tracking-tight leading-tight capitalize">
+                        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight leading-tight capitalize">
                             Initiate Performance Testing
                         </h1>
                         <p className="text-orange-100 mt-4 text-sm md:text-base font-medium max-w-md leading-relaxed">
@@ -67,12 +67,12 @@ export default function Create({ athletes }) {
                     <div className="relative z-10 mt-12 lg:mt-0 hidden lg:block">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-10 h-10 rounded-full bg-white text-[#ff4d00] flex items-center justify-center font-bold shadow-lg shadow-black/20">1</div>
-                            <span className="font-bold text-lg uppercase tracking-wider">Session Setup</span>
+                            <span className="font-bold text-lg">Session Setup</span>
                         </div>
                         <div className="h-10 border-l-2 border-white/20 ml-5 my-1"></div>
                         <div className="flex items-center gap-4 opacity-50">
                             <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center font-bold">2</div>
-                            <span className="font-bold text-lg uppercase tracking-wider">Input Scores</span>
+                            <span className="font-bold text-lg">Input Scores</span>
                         </div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@ export default function Create({ athletes }) {
                             
                             
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Test Date <span className="text-rose-500">*</span></label>
+                                <label className="block text-[10px] font-bold text-slate-500 ml-1">Test Date <span className="text-rose-500">*</span></label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                         <Calendar className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
@@ -109,7 +109,7 @@ export default function Create({ athletes }) {
 
                             
                             <div className="space-y-2 relative" ref={dropdownRef}>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Select Athlete <span className="text-rose-500">*</span></label>
+                                <label className="block text-[10px] font-bold text-slate-500 ml-1">Select Athlete <span className="text-rose-500">*</span></label>
                                 
                                 <div 
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -154,13 +154,13 @@ export default function Create({ athletes }) {
                                                         }`}
                                                     >
                                                         <span className={`font-bold text-sm ${data.user_id === athlete.id ? 'text-teal-700' : 'group-hover:text-[#ff4d00]'}`}>{athlete.name}</span>
-                                                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${data.user_id === athlete.id ? 'bg-white border-teal-200 text-teal-600' : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:border-orange-200 group-hover:text-[#ff4d00] group-hover:bg-white'}`}>
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border transition-colors ${data.user_id === athlete.id ? 'bg-white border-teal-200 text-teal-600' : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:border-orange-200 group-hover:text-[#ff4d00] group-hover:bg-white'}`}>
                                                             {athlete.sport_name}
                                                         </span>
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="py-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest flex flex-col items-center gap-2">
+                                                <div className="py-8 text-center text-slate-400 text-xs font-bold flex flex-col items-center gap-2">
                                                     <Search className="w-8 h-8 opacity-20 mb-1" />
                                                     No Athlete Found
                                                 </div>
@@ -174,8 +174,8 @@ export default function Create({ athletes }) {
                             
                             <div className="space-y-2 pt-2">
                                 <div className="flex justify-between items-end mb-1.5">
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Session Name</label>
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Optional</span>
+                                    <label className="block text-[10px] font-bold text-slate-500 ml-1">Session Name</label>
+                                    <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Optional</span>
                                 </div>
                                 <input 
                                     type="text"
@@ -191,7 +191,7 @@ export default function Create({ athletes }) {
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="w-full bg-[#ff4d00] text-white font-bold py-3.5 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm uppercase tracking-widest group disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="w-full bg-[#ff4d00] text-white font-bold py-3.5 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm group disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
                                     {processing ? (
                                         <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Processing...</span>

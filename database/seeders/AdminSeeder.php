@@ -13,25 +13,20 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        
         User::create([
-            'name' => 'Coach ZK15',
-            'athlete_id' => 'admin', 
-            'role' => 'admin',
-            'password' => Hash::make('password'),
-            'age' => 35,
-            'gender' => 'L',
-            'height' => 170,
-            'weight' => 70,
-            'sport_category' => 'Head Coach',
-        ]);
-        
-        
-        User::create([
-            'name' => 'Asisten Coach',
-            'athlete_id' => 'admin2',
-            'role' => 'admin',
+            'name' => 'Superadmin',
+            'username' => 'superadmin', 
+            'role' => 'superadmin',
             'password' => Hash::make('password'),
         ]);
+
+        for ($i = 1; $i <= 4; $i++) {
+            User::create([
+                'name' => 'Coach ' . $i,
+                'username' => 'coach' . $i,
+                'role' => 'coach',
+                'password' => Hash::make('password'),
+            ]);
+        }
     }
 }

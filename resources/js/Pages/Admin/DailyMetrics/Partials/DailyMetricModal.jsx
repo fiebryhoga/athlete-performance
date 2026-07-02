@@ -30,7 +30,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                             
                             {/* BARIS 1: Usia & BB */}
                             <div className="space-y-1.5">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">
                                     Usia (Thn) <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
@@ -45,7 +45,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">
                                     Weight / BB (Kg) <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
@@ -61,7 +61,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
 
                             {/* BARIS 2: RHR & SpO2 */}
                             <div className="space-y-1.5">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">
                                     RHR <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
@@ -75,7 +75,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">
                                     SpO2 (%) <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
@@ -91,7 +91,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                             
                             {/* BARIS 3: VJ (Full Width) */}
                             <div className="col-span-2 space-y-1.5">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">
                                     Vertical Jump (VJ) <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
@@ -107,7 +107,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                             
                             {/* BARIS 4: Notes (Full Width) */}
                             <div className="col-span-2 space-y-1.5 mt-1">
-                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
+                                <label className="text-[9px] md:text-[10px] font-bold text-slate-500">Catatan Tambahan (Opsional)</label>
                                 <textarea 
                                     rows="2" 
                                     value={form.data.notes} 
@@ -121,7 +121,7 @@ export default function DailyMetricModal({ isOpen, onClose, form, submit, select
                         {/* INFO AUTO CALCULATE */}
                         <div className="bg-orange-50/80 p-3 md:p-4 rounded-xl md:rounded-2xl border border-orange-100 mt-5 md:mt-6">
                             <p className="text-[10px] md:text-xs text-orange-700 font-medium leading-relaxed">
-                                <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5 text-[#ff4d00]"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
+                                <span className="font-bold flex items-center gap-1.5 mb-1.5 text-[#ff4d00]"><Zap className="w-3.5 h-3.5 fill-current"/> Auto-Calculate</span>
                                 Sistem otomatis menghitung <b>VO2Max</b> (menggunakan Usia), <b>Peak Power</b>, dan <b>Status Recovery</b>.
                             </p>
                         </div>
