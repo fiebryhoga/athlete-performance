@@ -265,7 +265,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                                     </div>
                                                                     <div className="mt-1 flex items-center gap-1">
                                                                         <span className={`text-[8.5px] font-semibold px-1 py-0.5 rounded ${badgeBgColor} ${badgeTextColor}`}>
-                                                                            Sesi {session.session_number}
+                                                                            Sesi {session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
                                                                         </span>
                                                                         {!isGroup && (
                                                                         <span className={`text-[8.5px] font-semibold truncate ${subtitleColor}`}>

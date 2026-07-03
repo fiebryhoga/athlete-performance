@@ -94,7 +94,7 @@ class IndividualTrainingController extends Controller
         // Get group trainings where this athlete is a member of the group
         $groupIds = $user->groups()->pluck('training_groups.id');
         $groupTrainings = \App\Models\GroupTraining::whereIn('training_group_id', $groupIds)
-            ->with(['coach', 'group'])
+            ->with(['coach', 'group.package'])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();

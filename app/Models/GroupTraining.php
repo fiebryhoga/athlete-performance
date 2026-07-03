@@ -29,7 +29,7 @@ class GroupTraining extends Model
         'coach_ids' => 'array',
         'is_group_paid' => 'boolean',
         'is_coach_paid' => 'boolean',
-        'date' => 'date',
+        'date' => 'date:Y-m-d',
     ];
 
     public function group()

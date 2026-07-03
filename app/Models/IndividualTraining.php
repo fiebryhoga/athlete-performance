@@ -30,6 +30,7 @@ class IndividualTraining extends Model
         'is_completed' => 'boolean',
         'completed_at' => 'datetime',
         'coach_ids' => 'array',
+        'date' => 'date:Y-m-d',
     ];
 
     public function user()

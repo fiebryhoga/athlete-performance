@@ -168,6 +168,7 @@ Route::middleware([
         Route::get('/admin/reports/sessions', [\App\Http\Controllers\Admin\ReportController::class, 'sessionRecap'])->name('admin.reports.sessions');
         Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
         Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
+        Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
