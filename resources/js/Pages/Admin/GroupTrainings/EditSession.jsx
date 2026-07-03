@@ -3,9 +3,9 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ChevronLeft, Dumbbell, Activity, Type } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import PhaseBlock from './Partials/PhaseBlock';
-import TextBlock from './Partials/TextBlock';
-import ExerciseQuickModal from './Partials/ExerciseQuickModal';
+import PhaseBlock from '../IndividualTrainings/Partials/PhaseBlock';
+import TextBlock from '../IndividualTrainings/Partials/TextBlock';
+import ExerciseQuickModal from '../IndividualTrainings/Partials/ExerciseQuickModal';
 
 export default function EditSession({
     training,
@@ -27,7 +27,7 @@ export default function EditSession({
 
     const submit = (e) => {
         e.preventDefault();
-        put(route("admin.individual-trainings.session.update", training.id));
+        put(route("admin.group-trainings.session.update", training.id));
     };
 
  const onDragEnd = (result) => {
@@ -102,8 +102,8 @@ export default function EditSession({
  };
 
  return (
- <AppLayout title={`Edit Sesi - ${user.name}`}>
- <Head title={`Edit Sesi - ${user.name}`} />
+ <AppLayout title={`Edit Sesi - ${group.name}`}>
+ <Head title={`Edit Sesi - ${group.name}`} />
  
  <div className="mb-8 flex items-center justify-between">
  <div>
@@ -112,11 +112,11 @@ export default function EditSession({
                                 </h2>
                                 <p className="text-sm text-zinc-500 mt-1">
                                     Perbarui sesi program latihan untuk{" "}
-                                    <span className="text-slate-900 font-bold">{training.athlete?.name}</span>
+                                    <span className="text-slate-900 font-bold">{training.group?.name}</span>
                                 </p>
  </div>
  <Link
- href={route('admin.individual-trainings.show', user.id)}
+ href={route('admin.group-trainings.show', group.id)}
  className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors"
  >
  <ChevronLeft size={16} /> Batal & Kembali

@@ -4,8 +4,9 @@ import {
     Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import GroupList from './Components/GroupList';
 
-export default function Index({ auth, users, filters, activeTab, sports, coachesList }) {
+export default function Index({ auth, users, filters, activeTab, sports, coachesList, packagesList, groupsList, allAthletes }) {
     const [search, setSearch] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); 
@@ -26,6 +27,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         age: '',
         height: '',
         weight: '',
+        training_exp_date: '',
+        subscription_package_id: '',
         coach_ids: [],
         _method: 'POST',     
     });
@@ -90,6 +93,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             age: '',
             height: '',
             weight: '',
+            training_exp_date: '',
+            subscription_package_id: '',
             coach_ids: [],
             _method: 'POST',
         });
@@ -112,6 +117,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             age: user.age || '',
             height: user.height || '',
             weight: user.weight || '',
+            training_exp_date: user.training_exp_date || '',
+            subscription_package_id: user.subscription_package_id || '',
             coach_ids: user.coaches?.map(c => c.id) || [],
             _method: 'PUT', 
         });
@@ -163,7 +170,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
     const tabs = [
         { id: 'superadmin', label: 'Superadmin' },
         { id: 'coach', label: 'Coach' },
-        { id: 'athlete', label: 'Athlete / Klien' }
+        { id: 'athlete', label: 'Athlete / Klien' },
+        { id: 'group', label: 'Grup' }
     ];
 
     return (
@@ -228,6 +236,15 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                 )}
 
                 {/* Table Section Desktop */}
+                {activeTab === 'group' ? (
+                    <GroupList 
+                        groups={groupsList} 
+                        packages={packagesList} 
+                        allAthletes={allAthletes} 
+                        coaches={coachesList}
+                    />
+                ) : (
+                <>
                 <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -393,6 +410,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                             ))}
                         </div>
                     </div>
+                )}
+                </>
                 )}
             </div>
 
@@ -605,6 +624,31 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     placeholder="e.g. 70" 
                                                 />
                                             </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Masa Aktif Latihan (Opsional)</label>
+                                                <input 
+                                                    type="date" 
+                                                    value={data.training_exp_date} 
+                                                    onChange={e => setData('training_exp_date', e.target.value)} 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4">
+                                            <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Paket Latihan (Opsional)</label>
+                                            <select 
+                                                value={data.subscription_package_id} 
+                                                onChange={e => setData('subscription_package_id', e.target.value)} 
+                                                className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm"
+                                            >
+                                                <option value="">-- Pilih Paket Latihan --</option>
+                                                {packagesList?.map(pkg => (
+                                                    <option key={pkg.id} value={pkg.id}>
+                                                        {pkg.name} ({pkg.session_count} Sesi)
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
 
                                         <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-100 flex gap-2.5 md:gap-3 mt-4">

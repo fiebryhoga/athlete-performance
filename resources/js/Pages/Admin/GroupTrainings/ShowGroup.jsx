@@ -4,14 +4,14 @@ import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, X, Target, Package } from 'lucide-react';
 
-export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }) {
+export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const deleteSession = (e, sessionId) => {
         e.preventDefault();
         e.stopPropagation();
         if (confirm('Yakin ingin menghapus sesi latihan ini?')) {
-            router.delete(route('admin.individual-trainings.session.destroy', sessionId), { preserveScroll: true });
+            router.delete(route('admin.group-trainings.session.destroy', sessionId), { preserveScroll: true });
         }
     };
 
@@ -56,16 +56,12 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
         }
         
         // Attach sessions
-        return days.map(day => {
-            const indTrainings = trainings.filter(t => (t.date || '').substring(0, 10) === day.dateStr).map(t => ({...t, type: 'individual'}));
-            const grpTrainings = (groupTrainings || []).filter(t => (t.date || '').substring(0, 10) === day.dateStr).map(t => ({...t, type: 'group'}));
-            return {
-                ...day,
-                sessions: [...indTrainings, ...grpTrainings].sort((a, b) => a.id - b.id),
-                isToday: day.dateStr === todayStr
-            };
-        });
-    }, [currentDate, trainings, groupTrainings, todayStr]);
+        return days.map(day => ({
+            ...day,
+            sessions: trainings.filter(t => (t.date || '').substring(0, 10) === day.dateStr),
+            isToday: day.dateStr === todayStr
+        }));
+    }, [currentDate, trainings, todayStr]);
 
     const prevMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
@@ -87,11 +83,11 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
     const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
     return (
-        <AppLayout title={`Kalender Latihan - ${athlete.name}`}>
-            <Head title={`Kalender Latihan - ${athlete.name}`} />
+        <AppLayout title={`Kalender Latihan - ${group.name}`}>
+            <Head title={`Kalender Latihan - ${group.name}`} />
             
             <PageHeader 
-                title={`Program Latihan: ${athlete.name}`}
+                title={`Program Latihan: ${group.name}`}
                 subtitle="Pantau dan kelola jadwal program latihan dalam tampilan kalender."
                 badge="Program Latihan"
                 icon={CalendarIcon}
@@ -109,32 +105,32 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                 {/* Athlete Profile Summary */}
                 <div className="bg-white p-4 md:p-6 border border-slate-200 rounded-xl flex items-center gap-4 md:gap-6 shadow-sm">
                     <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                        {athlete.profile_photo_url ? (
-                            <img src={athlete.profile_photo_url} alt={athlete.name} className="h-full w-full object-cover" />
+                        {group.profile_photo_url ? (
+                            <img src={group.profile_photo_url} alt={group.name} className="h-full w-full object-cover" />
                         ) : (
                             <User className="h-6 w-6 md:h-8 md:w-8 text-slate-400" />
                         )}
                     </div>
                     <div>
-                        <h2 className="text-lg md:text-xl font-bold text-slate-900">{athlete.name}</h2>
+                        <h2 className="text-lg md:text-xl font-bold text-slate-900">{group.name}</h2>
                         <div className="flex flex-wrap items-center gap-3 mt-1.5 md:mt-2">
                             <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
-                                {athlete.sport?.name || 'UMUM'}
+                                {group.sport?.name || 'UMUM'}
                             </span>
                             <span className="text-xs md:text-sm font-semibold text-slate-600 flex items-center gap-1.5">
                                 <Activity size={14} className="text-slate-400" />
                                 {trainings.length > 0 ? trainings[trainings.length - 1].session_number : 0} Total Sesi
                             </span>
-                            {athlete.package && (
+                            {group.package && (
                                 <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-md flex items-center gap-1.5">
                                     <Package size={12} className="text-emerald-500" />
-                                    {athlete.package.name}
+                                    {group.package.name}
                                 </span>
                             )}
-                            {athlete.training_exp_date && (
+                            {group.training_exp_date && (
                                 <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-[#ff4d00]/10 text-[#ff4d00] rounded-md flex items-center gap-1.5">
                                     <Target size={12} className="text-[#ff4d00]" />
-                                    Masa Aktif: {new Date(athlete.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    Masa Aktif: {new Date(group.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                                 </span>
                             )}
                         </div>
@@ -203,9 +199,9 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                             }`}>
                                                 {day.date.getDate()}
                                             </div>
-                                            {auth.user.role !== 'athlete' && (
+                                            {auth.user.role !== 'group' && (
                                                 <Link 
-                                                    href={route('admin.individual-trainings.session.create', { user: athlete.id, date: day.dateStr })}
+                                                    href={route('admin.group-trainings.session.create', { group: group.id, date: day.dateStr })}
                                                     className="w-6 h-6 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-[#ff4d00] hover:text-white transition-all shadow-sm"
                                                     title="Tambah Sesi"
                                                 >
@@ -216,78 +212,62 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                         
                                         <div className="flex-1 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
                                             {day.sessions.map(session => {
-                                                const isGroup = session.type === 'group';
-                                                
-                                                // Base colors
-                                                let bgColor = '';
-                                                let borderColor = '';
-                                                let hoverBorderColor = '';
-                                                let titleColor = '';
-                                                let badgeBgColor = '';
-                                                let badgeTextColor = '';
-                                                let subtitleColor = '';
+                                                // Group styling
+                                                let bgColor = 'bg-indigo-50';
+                                                let borderColor = 'border-indigo-200';
+                                                let hoverBorderColor = 'hover:border-indigo-400';
+                                                let titleColor = 'text-indigo-900';
+                                                let badgeBgColor = 'bg-indigo-100';
+                                                let badgeTextColor = 'text-indigo-700';
+                                                let subtitleColor = 'text-indigo-600';
 
-                                                if (isGroup) {
-                                                    // Group styling (e.g. Purple/Indigo)
-                                                    bgColor = session.is_group_paid ? 'bg-purple-50' : 'bg-indigo-50';
-                                                    borderColor = session.is_group_paid ? 'border-purple-200' : 'border-indigo-200';
-                                                    hoverBorderColor = session.is_group_paid ? 'hover:border-purple-400' : 'hover:border-indigo-400';
-                                                    titleColor = session.is_group_paid ? 'text-purple-800' : 'text-indigo-900';
-                                                    badgeBgColor = session.is_group_paid ? 'bg-purple-100' : 'bg-indigo-100';
-                                                    badgeTextColor = session.is_group_paid ? 'text-purple-700' : 'text-indigo-700';
-                                                    subtitleColor = session.is_group_paid ? 'text-purple-600' : 'text-indigo-600';
-                                                } else {
-                                                    // Individual styling
-                                                    bgColor = session.status === 'completed' ? 'bg-green-50' : 'bg-orange-50';
-                                                    borderColor = session.status === 'completed' ? 'border-green-200' : 'border-orange-200';
-                                                    hoverBorderColor = session.status === 'completed' ? 'hover:border-green-400' : 'hover:border-orange-400';
-                                                    titleColor = session.status === 'completed' ? 'text-green-800' : 'text-orange-900';
-                                                    badgeBgColor = session.status === 'completed' ? 'bg-green-100' : 'bg-orange-100';
-                                                    badgeTextColor = session.status === 'completed' ? 'text-green-700' : 'text-orange-700';
-                                                    subtitleColor = session.status === 'completed' ? 'text-green-600' : 'text-orange-600';
+                                                if (session.status === 'completed') {
+                                                    bgColor = 'bg-purple-50';
+                                                    borderColor = 'border-purple-200';
+                                                    hoverBorderColor = 'hover:border-purple-400';
+                                                    titleColor = 'text-purple-800';
+                                                    badgeBgColor = 'bg-purple-100';
+                                                    badgeTextColor = 'text-purple-700';
+                                                    subtitleColor = 'text-purple-600';
                                                 }
 
                                                 return (
                                                 <div 
-                                                    key={`${session.type}-${session.id}`} 
+                                                    key={`group-${session.id}`} 
                                                     className={`group/session relative p-1.5 rounded-md border text-left flex flex-col gap-1 transition-all shadow-sm ${bgColor} ${borderColor} ${hoverBorderColor}`}
                                                 >
                                                     <div className="flex items-start justify-between gap-1">
                                                         <div className="flex-1 min-w-0">
                                                                 <Link 
-                                                                    href={isGroup 
-                                                                        ? route('admin.group-trainings.session.show', session.id) 
-                                                                        : route('admin.individual-trainings.session.show', session.id)}
+                                                                    href={route('admin.group-trainings.session.show', session.id)}
                                                                     className="block"
                                                                 >
                                                                     <div className={`text-[11px] font-bold leading-tight line-clamp-2 ${titleColor}`}>
-                                                                        {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
+                                                                        {session.name || 'Sesi Grup'}
                                                                     </div>
                                                                     <div className="mt-1 flex items-center gap-1">
                                                                         <span className={`text-[8.5px] font-semibold px-1 py-0.5 rounded ${badgeBgColor} ${badgeTextColor}`}>
                                                                             Sesi {session.session_number}
                                                                         </span>
-                                                                        {!isGroup && (
                                                                         <span className={`text-[8.5px] font-semibold truncate ${subtitleColor}`}>
                                                                             • {session.training_type || 'Umum'}
                                                                         </span>
-                                                                        )}
                                                                     </div>
                                                                 </Link>
                                                         </div>
                                                         
-                                                        {auth.user.role !== 'athlete' && !isGroup && (
+                                                        {auth.user.role !== 'athlete' && (
                                                             <div className="flex flex-col gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
                                                                 <Link
-                                                                    href={route('admin.individual-trainings.session.edit', session.id)}
-                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-green-700' : 'hover:bg-orange-200 text-orange-700'}`}
+                                                                    href={route('admin.group-trainings.session.edit', session.id)}
+                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-purple-700' : 'hover:bg-indigo-200 text-indigo-700'}`}
                                                                     title="Edit Program"
                                                                 >
                                                                     <Edit2 size={10} />
                                                                 </Link>
                                                                 <button 
                                                                     onClick={(e) => deleteSession(e, session.id)}
-                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-red-600' : 'hover:bg-orange-200 text-red-600'}`}
+                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-red-600' : 'hover:bg-indigo-200 text-red-600'}`}
                                                                     title="Hapus"
                                                                 >
                                                                     <Trash2 size={10} />

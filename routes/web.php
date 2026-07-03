@@ -28,7 +28,12 @@ Route::get('/', function () {
 });
 
 Route::get('/run-migration-now', function() {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json(['success' => true, 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
+    }
     return \Illuminate\Support\Facades\Artisan::output();
 });
 
@@ -154,21 +159,15 @@ Route::middleware([
         Route::get('/admin/composition/{user}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'show'])->name('admin.composition-tests.show');
 
         Route::post('/admin/athletes/{user}/gallery', [App\Http\Controllers\Admin\AthleteController::class, 'storeGallery'])->name('admin.athletes.gallery.store');
-Route::delete('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'destroyGallery'])->name('admin.athletes.gallery.destroy');
-Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'updateGallery'])->name('admin.athletes.gallery.update');
-        
+        Route::delete('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'destroyGallery'])->name('admin.athletes.gallery.destroy');
+        Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'updateGallery'])->name('admin.athletes.gallery.update');
         
     });
-
-
+    
     Route::middleware(['role:superadmin'])->group(function () {
         Route::get('/admin/reports/sessions', [\App\Http\Controllers\Admin\ReportController::class, 'sessionRecap'])->name('admin.reports.sessions');
         Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
         Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
-        Route::get('/run-migration-now', function() {
-            \Illuminate\Support\Facades\Artisan::call('migrate');
-            return \Illuminate\Support\Facades\Artisan::output();
-        });
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
@@ -230,11 +229,27 @@ Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteContro
         Route::put('/admin/exercise-categories/{exerciseCategory}', [\App\Http\Controllers\Admin\ExerciseController::class, 'updateCategory'])->name('admin.exercise-categories.update');
         Route::delete('/admin/exercise-categories/{exerciseCategory}', [\App\Http\Controllers\Admin\ExerciseController::class, 'destroyCategory'])->name('admin.exercise-categories.destroy');
 
-        Route::get('/admin/exercise-packages/create', [\App\Http\Controllers\Admin\ExercisePackageController::class, 'create'])->name('admin.exercise-packages.create');
-        Route::post('/admin/exercise-packages', [\App\Http\Controllers\Admin\ExercisePackageController::class, 'store'])->name('admin.exercise-packages.store');
-        Route::get('/admin/exercise-packages/{exercisePackage}/edit', [\App\Http\Controllers\Admin\ExercisePackageController::class, 'edit'])->name('admin.exercise-packages.edit');
-        Route::put('/admin/exercise-packages/{exercisePackage}', [\App\Http\Controllers\Admin\ExercisePackageController::class, 'update'])->name('admin.exercise-packages.update');
-        Route::delete('/admin/exercise-packages/{exercisePackage}', [\App\Http\Controllers\Admin\ExercisePackageController::class, 'destroy'])->name('admin.exercise-packages.destroy');
+        Route::resource('/admin/exercise-packages', \App\Http\Controllers\Admin\ExercisePackageController::class)->names('admin.exercise-packages')->except(['show']);
+
+        // --- RESTORED ROUTES ---
+        // Packages
+        Route::resource('/admin/packages', \App\Http\Controllers\Admin\SubscriptionPackageController::class)->names('admin.packages');
+        
+        // Group Trainings
+        Route::resource('/admin/groups', \App\Http\Controllers\Admin\GroupController::class)->names('admin.groups');
+        
+        // Group Sessions
+        Route::get('/admin/group-trainings/{group}/show', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showGroup'])->name('admin.group-trainings.show');
+        Route::get('/admin/group-trainings/{group}/session/create', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'createSession'])->name('admin.group-trainings.session.create');
+        Route::post('/admin/group-trainings/{group}/session', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeSession'])->name('admin.group-trainings.session.store');
+        
+        Route::get('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showSession'])->name('admin.group-trainings.session.show');
+        Route::post('/admin/group-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeRpe'])->name('admin.group-trainings.session.rpe');
+        Route::get('/admin/group-trainings/session/{training}/edit', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'editSession'])->name('admin.group-trainings.session.edit');
+        Route::put('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'updateSession'])->name('admin.group-trainings.session.update');
+        Route::post('/admin/group-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'completeTraining'])->name('admin.group-trainings.session.complete');
+        Route::delete('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'destroySession'])->name('admin.group-trainings.session.destroy');
+        // -----------------------
     });
 });
 

@@ -24,7 +24,19 @@ class User extends Authenticatable
         'weight',
         'sport_category',
         'training_start_date',
+        'training_exp_date',
+        'subscription_package_id',
     ];
+
+    public function package()
+    {
+        return $this->belongsTo(SubscriptionPackage::class, 'subscription_package_id');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(TrainingGroup::class, 'training_group_user');
+    }
 
     protected $hidden = [
         'password',

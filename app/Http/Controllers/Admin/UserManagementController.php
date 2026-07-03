@@ -51,6 +51,9 @@ class UserManagementController extends Controller
 
         $sports = Sport::all();
         $coachesList = User::where('role', 'coach')->get();
+        $packages = \App\Models\SubscriptionPackage::all();
+        $groupsList = \App\Models\TrainingGroup::with(['members', 'coaches', 'package'])->get();
+        $allAthletes = User::where('role', 'athlete')->with('sport')->orderBy('name')->get();
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
@@ -63,6 +66,9 @@ class UserManagementController extends Controller
             'activeTab' => $tab,
             'sports' => $sports,
             'coachesList' => $coachesList,
+            'packagesList' => $packages,
+            'groupsList' => $groupsList,
+            'allAthletes' => $allAthletes,
         ]);
     }
 
@@ -85,6 +91,8 @@ class UserManagementController extends Controller
             $rules['age'] = 'nullable|integer';
             $rules['height'] = 'nullable|numeric';
             $rules['weight'] = 'nullable|numeric';
+            $rules['training_exp_date'] = 'nullable|date';
+            $rules['subscription_package_id'] = 'nullable|exists:subscription_packages,id';
             $rules['coach_ids'] = 'nullable|array|max:2';
             $rules['coach_ids.*'] = 'exists:users,id';
         }
@@ -104,6 +112,8 @@ class UserManagementController extends Controller
             $data['age'] = $request->age;
             $data['height'] = $request->height;
             $data['weight'] = $request->weight;
+            $data['training_exp_date'] = $request->training_exp_date;
+            $data['subscription_package_id'] = $request->subscription_package_id;
         }
 
         $user = User::create($data);
@@ -127,6 +137,7 @@ class UserManagementController extends Controller
                 'age' => 'nullable|integer',
                 'height' => 'nullable|numeric',
                 'weight' => 'nullable|numeric',
+                'training_exp_date' => 'nullable|date',
             ]);
 
             $user->update([
@@ -134,6 +145,7 @@ class UserManagementController extends Controller
                 'age' => $request->age,
                 'height' => $request->height,
                 'weight' => $request->weight,
+                'training_exp_date' => $request->training_exp_date,
             ]);
 
             return redirect()->back()->with('message', 'Data fisik klien berhasil diperbarui.');
@@ -152,6 +164,8 @@ class UserManagementController extends Controller
             $rules['age'] = 'nullable|integer';
             $rules['height'] = 'nullable|numeric';
             $rules['weight'] = 'nullable|numeric';
+            $rules['training_exp_date'] = 'nullable|date';
+            $rules['subscription_package_id'] = 'nullable|exists:subscription_packages,id';
             $rules['coach_ids'] = 'nullable|array|max:2';
             $rules['coach_ids.*'] = 'exists:users,id';
         }
@@ -170,6 +184,8 @@ class UserManagementController extends Controller
             $data['age'] = $request->age;
             $data['height'] = $request->height;
             $data['weight'] = $request->weight;
+            $data['training_exp_date'] = $request->training_exp_date;
+            $data['subscription_package_id'] = $request->subscription_package_id;
         }
 
         // Jika password diisi, maka ubah (Reset Password)

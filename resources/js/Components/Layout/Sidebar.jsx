@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3
+    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3, Package
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -90,6 +90,13 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             route: 'admin.reports.sessions', 
             checkPath: '/admin/reports/sessions', 
             icon: BarChart3,
+            roles: ['superadmin'] 
+        },
+        { 
+            name: 'Manajemen Paket', 
+            route: 'admin.packages.index', 
+            checkPath: '/admin/packages', 
+            icon: Package,
             roles: ['superadmin'] 
         },
         { 

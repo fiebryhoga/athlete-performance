@@ -46,8 +46,30 @@ class IndividualTrainingController extends Controller
             return $user;
         });
 
+        $groupsQuery = \App\Models\TrainingGroup::with(['package', 'members']);
+        
+        if (Auth::user()->role === 'coach') {
+            $groupsQuery->whereHas('coaches', function($q) {
+                $q->where('coach_id', Auth::id());
+            });
+        }
+
+        if ($request->search) {
+            $groupsQuery->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $groups = $groupsQuery->get()->map(function($group) {
+            $latestTraining = \App\Models\GroupTraining::where('training_group_id', $group->id)
+                ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+            $group->total_records = $latestTraining ? $latestTraining->session_number : 0;
+            return $group;
+        });
+
         return Inertia::render('Admin/IndividualTrainings/Index', [
             'athletes' => $athletes,
+            'groups' => $groups,
             'filters' => $request->only(['search'])
         ]);
     }
@@ -61,8 +83,18 @@ class IndividualTrainingController extends Controller
             abort(404);
         }
 
+        $user->load(['sport', 'package']);
+
         $trainings = IndividualTraining::where('user_id', $user->id)
             ->with(['coach', 'blocks.items.exercise', 'rpeRecords'])
+            ->orderBy('date', 'asc')
+            ->orderBy('session_number', 'asc')
+            ->get();
+
+        // Get group trainings where this athlete is a member of the group
+        $groupIds = $user->groups()->pluck('training_groups.id');
+        $groupTrainings = \App\Models\GroupTraining::whereIn('training_group_id', $groupIds)
+            ->with(['coach', 'group'])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();
@@ -73,6 +105,7 @@ class IndividualTrainingController extends Controller
         return Inertia::render('Admin/IndividualTrainings/ShowAthlete', [
             'athlete' => $user,
             'trainings' => $trainings,
+            'groupTrainings' => $groupTrainings,
             'exercises' => $exercisesList,
             'packages' => $packagesList
         ]);

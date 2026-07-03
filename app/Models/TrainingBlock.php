@@ -8,6 +8,7 @@ class TrainingBlock extends Model
 {
     protected $fillable = [
         'individual_training_id',
+        'group_training_id',
         'step',
         'category',
         'target_filled_by',

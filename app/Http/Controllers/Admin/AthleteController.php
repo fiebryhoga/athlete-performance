@@ -57,6 +57,8 @@ class AthleteController extends Controller
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
+            'training_exp_date' => 'nullable|date',
+            'subscription_package_id' => 'nullable|exists:subscription_packages,id',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'coach_ids' => 'nullable|array|max:2',
             'coach_ids.*' => 'exists:users,id'
@@ -77,6 +79,8 @@ class AthleteController extends Controller
             'age' => $validated['age'],
             'height' => $validated['height'],
             'weight' => $validated['weight'],
+            'training_exp_date' => $validated['training_exp_date'] ?? null,
+            'subscription_package_id' => $validated['subscription_package_id'] ?? null,
             'profile_photo' => $photoPath,
         ]);
 
@@ -105,6 +109,8 @@ class AthleteController extends Controller
             'age' => 'nullable|integer',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
+            'training_exp_date' => 'nullable|date',
+            'subscription_package_id' => 'nullable|exists:subscription_packages,id',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'coach_ids' => 'nullable|array|max:2',
             'coach_ids.*' => 'exists:users,id'
@@ -118,6 +124,8 @@ class AthleteController extends Controller
         if ($request->has('age')) $dataToUpdate['age'] = $request->age;
         if ($request->has('height')) $dataToUpdate['height'] = $request->height;
         if ($request->has('weight')) $dataToUpdate['weight'] = $request->weight;
+        if ($request->has('training_exp_date')) $dataToUpdate['training_exp_date'] = $request->training_exp_date;
+        if ($request->has('subscription_package_id')) $dataToUpdate['subscription_package_id'] = $request->subscription_package_id;
 
         if ($request->filled('password')) {
             $dataToUpdate['password'] = Hash::make($request->password);
