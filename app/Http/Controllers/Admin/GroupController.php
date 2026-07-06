@@ -16,6 +16,7 @@ class GroupController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'subscription_package_id' => 'nullable|exists:subscription_packages,id',
+            'expiration_date' => 'nullable|date',
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'exists:users,id',
             'coach_ids' => 'nullable|array',
@@ -26,6 +27,7 @@ class GroupController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'subscription_package_id' => $validated['subscription_package_id'] ?? null,
+            'expiration_date' => $validated['expiration_date'] ?? null,
         ]);
 
         if (!empty($validated['member_ids'])) {
@@ -47,6 +49,7 @@ class GroupController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'subscription_package_id' => 'nullable|exists:subscription_packages,id',
+            'expiration_date' => 'nullable|date',
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'exists:users,id',
             'coach_ids' => 'nullable|array',
@@ -57,6 +60,7 @@ class GroupController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'subscription_package_id' => $validated['subscription_package_id'] ?? null,
+            'expiration_date' => $validated['expiration_date'] ?? null,
         ]);
 
         if (isset($validated['member_ids'])) {

@@ -2,10 +2,14 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy } from 'lucide-react';
 
 export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [sessionFilter, setSessionFilter] = useState('all'); // 'all', 'individual', 'group'
+    const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+    const [sessionToDuplicate, setSessionToDuplicate] = useState(null);
+    const [duplicateDate, setDuplicateDate] = useState('');
 
     const deleteSession = (e, sessionId) => {
         e.preventDefault();
@@ -59,13 +63,21 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
         return days.map(day => {
             const indTrainings = trainings.filter(t => (t.date || '').substring(0, 10) === day.dateStr).map(t => ({...t, type: 'individual'}));
             const grpTrainings = (groupTrainings || []).filter(t => (t.date || '').substring(0, 10) === day.dateStr).map(t => ({...t, type: 'group'}));
+            
+            let allSessions = [...indTrainings, ...grpTrainings];
+            if (sessionFilter === 'individual') {
+                allSessions = indTrainings;
+            } else if (sessionFilter === 'group') {
+                allSessions = grpTrainings;
+            }
+            
             return {
                 ...day,
-                sessions: [...indTrainings, ...grpTrainings].sort((a, b) => a.id - b.id),
+                sessions: allSessions.sort((a, b) => a.id - b.id),
                 isToday: day.dateStr === todayStr
             };
         });
-    }, [currentDate, trainings, groupTrainings, todayStr]);
+    }, [currentDate, trainings, groupTrainings, todayStr, sessionFilter]);
 
     const prevMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
@@ -150,6 +162,29 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                 </button>
                             </div>
                         </div>
+                        
+                        <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm">
+                            <button
+                                onClick={() => setSessionFilter('all')}
+                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'all' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                            >
+                                Semua
+                            </button>
+                            <div className="w-px h-5 bg-slate-200"></div>
+                            <button
+                                onClick={() => setSessionFilter('individual')}
+                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'individual' ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                            >
+                                Privat
+                            </button>
+                            <div className="w-px h-5 bg-slate-200"></div>
+                            <button
+                                onClick={() => setSessionFilter('group')}
+                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'group' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                            >
+                                Grup
+                            </button>
+                        </div>
                     </div>
 
                     {/* Calendar Grid */}
@@ -195,41 +230,38 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                         <div className="flex-1 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
                                             {day.sessions.map(session => {
                                                 const isGroup = session.type === 'group';
+                                                let isCompleted = session.status === 'completed' || session.is_completed;
+                                                if (isGroup && session.members_pivot?.length > 0) {
+                                                    isCompleted = isCompleted || session.members_pivot[0].is_completed;
+                                                }
                                                 
                                                 // Base colors
-                                                let bgColor = '';
-                                                let borderColor = '';
-                                                let hoverBorderColor = '';
-                                                let titleColor = '';
+                                                let bgColor = 'bg-white';
+                                                let borderColor = 'border-slate-200';
+                                                let hoverBorderColor = 'hover:border-slate-300';
+                                                let titleColor = 'text-slate-800';
                                                 let badgeBgColor = '';
-                                                let badgeTextColor = '';
-                                                let subtitleColor = '';
+                                                let subtitleColor = 'text-slate-500';
 
                                                 if (isGroup) {
                                                     // Group styling
-                                                    bgColor = 'bg-white';
-                                                    borderColor = 'border-slate-200 border-l-[3px] border-l-indigo-400';
-                                                    hoverBorderColor = 'hover:border-slate-300 hover:border-l-indigo-500';
-                                                    titleColor = 'text-indigo-700';
-                                                    badgeBgColor = 'bg-indigo-50 border border-indigo-100';
-                                                    badgeTextColor = 'text-indigo-700';
-                                                    subtitleColor = 'text-slate-500';
+                                                    titleColor = 'text-indigo-900';
+                                                    badgeBgColor = 'bg-indigo-50 text-indigo-700 border border-indigo-100';
+                                                    
+                                                    if (isCompleted) {
+                                                        titleColor = 'text-purple-900';
+                                                        badgeBgColor = 'bg-purple-50 text-purple-700 border border-purple-100';
+                                                    }
                                                 } else {
                                                     // Individual styling
-                                                    let isCompleted = session.status === 'completed' || session.is_completed;
-                                                    bgColor = 'bg-white';
-                                                    borderColor = isCompleted ? 'border-slate-200 border-l-[3px] border-l-emerald-400' : 'border-slate-200 border-l-[3px] border-l-orange-400';
-                                                    hoverBorderColor = isCompleted ? 'hover:border-slate-300 hover:border-l-emerald-500' : 'hover:border-slate-300 hover:border-l-orange-500';
-                                                    titleColor = isCompleted ? 'text-emerald-700' : 'text-orange-600';
-                                                    badgeBgColor = isCompleted ? 'bg-emerald-50 border border-emerald-100' : 'bg-orange-50 border border-orange-100';
-                                                    badgeTextColor = isCompleted ? 'text-emerald-700' : 'text-orange-700';
-                                                    subtitleColor = 'text-slate-500';
+                                                    titleColor = isCompleted ? 'text-emerald-900' : 'text-slate-800';
+                                                    badgeBgColor = isCompleted ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-slate-50 text-slate-700 border border-slate-200';
                                                 }
 
                                                 return (
                                                 <div 
                                                     key={`${session.type}-${session.id}`} 
-                                                    className={`group/session relative p-2 rounded-lg border text-left flex flex-col gap-1.5 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
+                                                    className={`group/session relative p-2.5 rounded-md border text-left flex flex-col gap-2 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
                                                 >
                                                     <Link 
                                                         href={isGroup 
@@ -238,63 +270,79 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                         className="block w-full"
                                                     >
                                                         {/* Header: Badge & Status */}
-                                                        <div className="flex items-start justify-between mb-1.5">
-                                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${badgeBgColor} ${badgeTextColor}`}>
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeBgColor}`}>
                                                                 Sesi {session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
                                                             </span>
                                                             <div className="flex items-center gap-1">
-                                                                {auth.user.role !== 'athlete' && !isGroup && (
+                                                                {auth.user.role !== 'athlete' && (
                                                                     <div className="flex items-center gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                                setSessionToDuplicate(session);
+                                                                                setDuplicateDate(getLocalDateStr(new Date()));
+                                                                                setDuplicateModalOpen(true);
+                                                                            }}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center ${isCompleted ? (isGroup ? 'hover:bg-purple-200 text-purple-700' : 'hover:bg-emerald-200 text-emerald-700') : (isGroup ? 'hover:bg-indigo-200 text-indigo-700' : 'hover:bg-orange-200 text-orange-700')}`}
+                                                                            title="Duplikasi Program"
+                                                                        >
+                                                                            <Copy size={12} />
+                                                                        </button>
+                                                                        {!isGroup && (
                                                                         <button
                                                                             type="button"
                                                                             onClick={(e) => {
                                                                                 e.preventDefault();
                                                                                 router.get(route('admin.individual-trainings.session.edit', session.id));
                                                                             }}
-                                                                            className={`p-1 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-green-700' : 'hover:bg-orange-200 text-orange-700'}`}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center hover:bg-slate-200 text-slate-600`}
                                                                             title="Edit Program"
                                                                         >
-                                                                            <Edit2 size={10} />
+                                                                            <Edit2 size={12} />
                                                                         </button>
+                                                                        )}
                                                                         <button 
-                                                                            onClick={(e) => deleteSession(e, session.id)}
-                                                                            className={`p-1 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-green-200 text-red-600' : 'hover:bg-orange-200 text-red-600'}`}
+                                                                            onClick={(e) => isGroup ? null : deleteSession(e, session.id)}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center ${isCompleted ? (isGroup ? 'hover:bg-purple-200 text-red-600' : 'hover:bg-emerald-200 text-red-600') : (isGroup ? 'hover:bg-indigo-200 text-red-600' : 'hover:bg-orange-200 text-red-600')}`}
                                                                             title="Hapus"
                                                                         >
-                                                                            <Trash2 size={10} />
+                                                                            <Trash2 size={12} />
                                                                         </button>
                                                                     </div>
                                                                 )}
-                                                                {session.status === 'completed' || session.is_completed ? (
-                                                                    <CheckCircle2 size={12} className={isGroup ? 'text-purple-500' : 'text-green-500'} />
+                                                                {isCompleted ? (
+                                                                    <CheckCircle2 size={14} className={`${isGroup ? 'text-purple-600' : 'text-green-600'} ml-0.5 mr-1`} />
                                                                 ) : (
-                                                                    <Clock size={12} className={isGroup ? 'text-indigo-400' : 'text-orange-400'} />
+                                                                    <Clock size={14} className={`${isGroup ? 'text-indigo-500' : 'text-orange-500'} ml-0.5 mr-1`} />
                                                                 )}
                                                             </div>
                                                         </div>
 
                                                         {/* Title */}
-                                                        <div className={`text-xs font-bold leading-snug line-clamp-2 ${titleColor}`}>
+                                                        <div className={`text-sm font-bold leading-snug line-clamp-2 ${titleColor}`}>
                                                             {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
                                                         </div>
 
                                                         {/* Details */}
-                                                        <div className="mt-1.5 flex flex-col gap-1">
+                                                        <div className="mt-2 flex flex-col gap-1.5">
                                                             {session.training_type && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <Dumbbell size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Dumbbell size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.training_type}</span>
                                                                 </div>
                                                             )}
                                                             {session.location && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <MapPin size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <MapPin size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.location}</span>
                                                                 </div>
                                                             )}
                                                             {session.duration_minutes && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <Timer size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Timer size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.duration_minutes} Menit</span>
                                                                 </div>
                                                             )}
@@ -312,7 +360,60 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                 </div>
             </div>
             
-            <style jsx>{`
+            {/* Duplicate Modal */}
+            {duplicateModalOpen && sessionToDuplicate && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-bold text-slate-800">Duplikasi Sesi Latihan</h3>
+                            <button onClick={() => setDuplicateModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                                <p className="text-xs text-slate-500 font-medium mb-1">Sesi yang Diduplikasi:</p>
+                                <p className="text-sm font-bold text-slate-800">{sessionToDuplicate.type === 'group' ? `[GRUP] ${sessionToDuplicate.group?.name || 'Sesi Grup'}` : (sessionToDuplicate.name || 'Sesi Privat')}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">{sessionToDuplicate.training_type}</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal Tujuan</label>
+                                <input 
+                                    type="date" 
+                                    value={duplicateDate}
+                                    onChange={(e) => setDuplicateDate(e.target.value)}
+                                    className="w-full border-slate-300 rounded-lg shadow-sm focus:border-[#ff4d00] focus:ring focus:ring-[#ff4d00] focus:ring-opacity-50"
+                                />
+                            </div>
+                        </div>
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button 
+                                onClick={() => setDuplicateModalOpen(false)}
+                                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    if (!duplicateDate) return;
+                                    const routeName = sessionToDuplicate.type === 'group' 
+                                        ? 'admin.group-trainings.session.duplicate' 
+                                        : 'admin.individual-trainings.session.duplicate';
+                                    router.post(route(routeName, sessionToDuplicate.id), { target_date: duplicateDate }, {
+                                        preserveScroll: true,
+                                        onSuccess: () => setDuplicateModalOpen(false)
+                                    });
+                                }}
+                                className="px-4 py-2 text-sm font-bold bg-[#ff4d00] text-white rounded-lg shadow hover:bg-[#e64500] transition-colors"
+                            >
+                                Duplikasi Sesi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 3px;
                 }

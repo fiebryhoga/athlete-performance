@@ -102,8 +102,8 @@ export default function EditSession({
  };
 
  return (
- <AppLayout title={`Edit Sesi - ${group.name}`}>
- <Head title={`Edit Sesi - ${group.name}`} />
+ <AppLayout title={`Edit Sesi - ${training.group?.name || ''}`}>
+ <Head title={`Edit Sesi - ${training.group?.name || ''}`} />
  
  <div className="mb-8 flex items-center justify-between">
  <div>
@@ -116,7 +116,7 @@ export default function EditSession({
                                 </p>
  </div>
  <Link
- href={route('admin.group-trainings.show', group.id)}
+ href={route('admin.group-trainings.show', training.training_group_id)}
  className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 transition-colors"
  >
  <ChevronLeft size={16} /> Batal & Kembali

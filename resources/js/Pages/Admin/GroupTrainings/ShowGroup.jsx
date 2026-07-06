@@ -2,10 +2,13 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy } from 'lucide-react';
 
 export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+    const [sessionToDuplicate, setSessionToDuplicate] = useState(null);
+    const [duplicateDate, setDuplicateDate] = useState('');
 
     const deleteSession = (e, sessionId) => {
         e.preventDefault();
@@ -192,33 +195,29 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
                                             {day.sessions.map(session => {
                                                 // Group styling
                                                 let bgColor = 'bg-white';
-                                                let borderColor = 'border-slate-200 border-l-[3px] border-l-indigo-400';
-                                                let hoverBorderColor = 'hover:border-slate-300 hover:border-l-indigo-500';
-                                                let titleColor = 'text-indigo-700';
-                                                let badgeBgColor = 'bg-indigo-50 border border-indigo-100';
-                                                let badgeTextColor = 'text-indigo-700';
+                                                let borderColor = 'border-slate-200';
+                                                let hoverBorderColor = 'hover:border-slate-300';
+                                                let titleColor = 'text-indigo-900';
+                                                let badgeBgColor = 'bg-indigo-50 text-indigo-700 border border-indigo-100';
                                                 let subtitleColor = 'text-slate-500';
 
                                                 if (session.status === 'completed' || session.is_completed) {
-                                                    borderColor = 'border-slate-200 border-l-[3px] border-l-purple-400';
-                                                    hoverBorderColor = 'hover:border-slate-300 hover:border-l-purple-500';
-                                                    titleColor = 'text-purple-700';
-                                                    badgeBgColor = 'bg-purple-50 border border-purple-100';
-                                                    badgeTextColor = 'text-purple-700';
+                                                    titleColor = 'text-purple-900';
+                                                    badgeBgColor = 'bg-purple-50 text-purple-700 border border-purple-100';
                                                 }
 
                                                 return (
                                                 <div 
                                                     key={session.id} 
-                                                    className={`group/session relative p-2 rounded-lg border text-left flex flex-col gap-1.5 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
+                                                    className={`group/session relative p-2.5 rounded-md border text-left flex flex-col gap-2 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
                                                 >
                                                     <Link 
                                                         href={route('admin.group-trainings.session.show', session.id)}
                                                         className="block w-full"
                                                     >
                                                         {/* Header: Badge & Status */}
-                                                        <div className="flex items-start justify-between mb-1.5">
-                                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${badgeBgColor} ${badgeTextColor}`}>
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeBgColor}`}>
                                                                 Sesi {session.session_number}/{group.package?.session_count || '∞'}
                                                             </span>
                                                             <div className="flex items-center gap-1">
@@ -228,52 +227,66 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
                                                                             type="button"
                                                                             onClick={(e) => {
                                                                                 e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                                setSessionToDuplicate(session);
+                                                                                setDuplicateDate(getLocalDateStr(new Date()));
+                                                                                setDuplicateModalOpen(true);
+                                                                            }}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center ${session.status === 'completed' || session.is_completed ? 'hover:bg-purple-200 text-purple-700' : 'hover:bg-indigo-200 text-indigo-700'}`}
+                                                                            title="Duplikasi Program"
+                                                                        >
+                                                                            <Copy size={12} />
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
                                                                                 router.get(route('admin.group-trainings.session.edit', session.id));
                                                                             }}
-                                                                            className={`p-1 rounded inline-flex items-center justify-center hover:bg-slate-100 text-slate-500`}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center hover:bg-slate-200 text-slate-600`}
                                                                             title="Edit Program"
                                                                         >
-                                                                            <Edit2 size={10} />
+                                                                            <Edit2 size={12} />
                                                                         </button>
                                                                         <button 
                                                                             onClick={(e) => deleteSession(e, session.id)}
                                                                             className={`p-1 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-red-600' : 'hover:bg-indigo-200 text-red-600'}`}
                                                                             title="Hapus"
                                                                         >
-                                                                            <Trash2 size={10} />
+                                                                            <Trash2 size={12} />
                                                                         </button>
                                                                     </div>
                                                                 )}
                                                                 {session.status === 'completed' || session.is_completed ? (
-                                                                    <CheckCircle2 size={12} className="text-purple-500" />
+                                                                    <CheckCircle2 size={14} className="text-purple-600 ml-0.5 mr-1" />
                                                                 ) : (
-                                                                    <Clock size={12} className="text-indigo-400" />
+                                                                    <Clock size={14} className="text-indigo-500 ml-0.5 mr-1" />
                                                                 )}
                                                             </div>
                                                         </div>
 
                                                         {/* Title */}
-                                                        <div className={`text-xs font-bold leading-snug line-clamp-2 ${titleColor}`}>
+                                                        <div className={`text-sm font-bold leading-snug line-clamp-2 ${titleColor}`}>
                                                             [GRUP] {session.name || group.name}
                                                         </div>
 
                                                         {/* Details */}
-                                                        <div className="mt-1.5 flex flex-col gap-1">
+                                                        <div className="mt-2 flex flex-col gap-1.5">
                                                             {session.training_type && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <Dumbbell size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Dumbbell size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.training_type}</span>
                                                                 </div>
                                                             )}
                                                             {session.location && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <MapPin size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <MapPin size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.location}</span>
                                                                 </div>
                                                             )}
                                                             {session.duration_minutes && (
-                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
-                                                                    <Timer size={10} className="shrink-0" />
+                                                                <div className={`text-xs font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Timer size={12} className="shrink-0" />
                                                                     <span className="truncate">{session.duration_minutes} Menit</span>
                                                                 </div>
                                                             )}
@@ -291,7 +304,57 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
                 </div>
             </div>
             
-            <style jsx>{`
+            {/* Duplicate Modal */}
+            {duplicateModalOpen && sessionToDuplicate && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-bold text-slate-800">Duplikasi Sesi Latihan Grup</h3>
+                            <button onClick={() => setDuplicateModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                                <p className="text-xs text-slate-500 font-medium mb-1">Sesi yang Diduplikasi:</p>
+                                <p className="text-sm font-bold text-slate-800">[GRUP] {sessionToDuplicate.name || group.name}</p>
+                                <p className="text-xs text-slate-500 mt-0.5">{sessionToDuplicate.training_type}</p>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal Tujuan</label>
+                                <input 
+                                    type="date" 
+                                    value={duplicateDate}
+                                    onChange={(e) => setDuplicateDate(e.target.value)}
+                                    className="w-full border-slate-300 rounded-lg shadow-sm focus:border-[#ff4d00] focus:ring focus:ring-[#ff4d00] focus:ring-opacity-50"
+                                />
+                            </div>
+                        </div>
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button 
+                                onClick={() => setDuplicateModalOpen(false)}
+                                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    if (!duplicateDate) return;
+                                    router.post(route('admin.group-trainings.session.duplicate', sessionToDuplicate.id), { target_date: duplicateDate }, {
+                                        preserveScroll: true,
+                                        onSuccess: () => setDuplicateModalOpen(false)
+                                    });
+                                }}
+                                className="px-4 py-2 text-sm font-bold bg-[#ff4d00] text-white rounded-lg shadow hover:bg-[#e64500] transition-colors"
+                            >
+                                Duplikasi Sesi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 3px;
                 }

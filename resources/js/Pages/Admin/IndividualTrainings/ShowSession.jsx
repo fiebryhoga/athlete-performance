@@ -421,24 +421,6 @@ export default function ShowSession({
         const hasPhoto =
             data.proof_photo ||
             (training.proof_photo && !data.remove_proof_photo);
-        const hasSavedDraft =
-            ["in_progress", "saved", "needs_update"].includes(
-                training.status,
-            ) || isCompleted;
-
-        if (isDirty) {
-            setWarningMessage(
-                "Harap Simpan Draft terlebih dahulu sebelum menyelesaikan program.",
-            );
-            return;
-        }
-
-        if (!hasSavedDraft && !isEditingActuals) {
-            setWarningMessage(
-                "Harap Simpan Draft terlebih dahulu sebelum menyelesaikan program.",
-            );
-            return;
-        }
 
         const missingFields = getMissingRequiredActuals();
         if (!hasPhoto) {
@@ -474,73 +456,82 @@ export default function ShowSession({
 
             <div className="pb-12 mx-auto space-y-8 relative">
                 <div className="flex flex-col gap-6">
-                    <PageHeader 
-                        title={training.name || 'Program Latihan'}
-                        subtitle={
-                            <div className="flex flex-col gap-3 mt-1.5">
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <span className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-slate-600" title="Tanggal Latihan">
-                                        <Calendar size={14} className="text-[#ff4d00]" />
-                                        {training.date}
-                                    </span>
-                                    {training.training_type && (
-                                        <span className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-slate-600" title="Fokus Latihan">
-                                            <Target size={14} className="text-blue-500" />
-                                            {training.training_type}
-                                        </span>
-                                    )}
-                                    {training.location && (
-                                        <span className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-slate-600" title="Lokasi">
-                                            <MapPin size={14} className="text-emerald-500" />
-                                            {training.location}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-xs font-bold text-slate-400">Coach Pendamping:</span>
-                                    {coaches && coaches.length > 0 ? (
-                                        coaches.map((c) => (
-                                            <span
-                                                key={c.id}
-                                                className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-md text-xs font-bold shadow-sm"
-                                            >
-                                                <div className="w-4 h-4 rounded-full bg-orange-100 text-[#ff4d00] flex items-center justify-center">
-                                                    <User size={10} />
-                                                </div>
-                                                {c.name}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <span className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-md text-xs font-bold shadow-sm">
-                                            <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
-                                                <User size={10} />
-                                            </div>
-                                            Admin
-                                        </span>
-                                    )}
-                                </div>
+                    <div className="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-start justify-between gap-6">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
+                        <div className="relative z-10 space-y-4 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Link href={route("admin.individual-trainings.index")} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
+                                    <ArrowLeft size={16} /> Kembali
+                                </Link>
+                                <span className="text-xs font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                    Sesi {training.session_number}
+                                </span>
+                                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${training.status === 'completed' || training.is_completed ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
+                                    {training.status === 'completed' || training.is_completed ? 'Selesai' : 'Terjadwal'}
+                                </span>
                             </div>
-                        }
-                        icon={Eye}
-                        badge={`Sesi ${training.session_number}`}
-                        backLink={route("admin.individual-trainings.index")}
-                        backLabel="Kembali ke Daftar"
-                        actions={
-                            <div className="flex flex-wrap items-center gap-3">
-                                <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all opacity-50 cursor-not-allowed">
-                                    <FileText size={18} /> Rancangan PDF
-                                </button>
-                                {isCoachOrAdmin && (
-                                    <Link
-                                        href={route("admin.individual-trainings.session.edit", training.id)}
-                                        className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white border border-transparent rounded-xl text-sm font-bold shadow-md shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all"
-                                    >
-                                        <Edit2 size={18} /> Edit Program
-                                    </Link>
+                            
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                                {training.name || 'Program Latihan'}
+                            </h1>
+                            
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar size={16} className="text-slate-400" />
+                                    <span className="font-medium">{training.date}</span>
+                                </div>
+                                {training.training_type && (
+                                    <div className="flex items-center gap-1.5">
+                                        <Target size={16} className="text-slate-400" />
+                                        <span className="font-medium">{training.training_type}</span>
+                                    </div>
+                                )}
+                                {training.location && (
+                                    <div className="flex items-center gap-1.5">
+                                        <MapPin size={16} className="text-slate-400" />
+                                        <span className="font-medium">{training.location}</span>
+                                    </div>
                                 )}
                             </div>
-                        }
-                    />
+                            
+                            <div className="pt-2 flex flex-wrap items-center gap-3">
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Coach:</span>
+                                {coaches && coaches.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {coaches.map(c => (
+                                            <div key={c.id} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full py-1 pr-3 pl-1">
+                                                <div className="w-6 h-6 rounded-full bg-[#ff4d00]/10 text-[#ff4d00] flex items-center justify-center">
+                                                    <User size={12} />
+                                                </div>
+                                                <span className="text-xs font-semibold text-slate-700">{c.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full py-1 pr-3 pl-1">
+                                        <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">
+                                            <User size={12} />
+                                        </div>
+                                        <span className="text-xs font-semibold text-slate-700">Admin</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-end gap-3 md:pt-8 w-full md:w-auto">
+                            <button className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all opacity-50 cursor-not-allowed">
+                                <FileText size={18} /> PDF
+                            </button>
+                            {isCoachOrAdmin && (
+                                <Link
+                                    href={route("admin.individual-trainings.session.edit", training.id)}
+                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-[#ff4d00] text-white border border-transparent rounded-xl text-sm font-bold shadow-md shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all"
+                                >
+                                    <Edit2 size={18} /> Edit
+                                </Link>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Warning / Error Messages */}

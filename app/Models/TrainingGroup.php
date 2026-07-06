@@ -13,6 +13,11 @@ class TrainingGroup extends Model
         'name',
         'description',
         'subscription_package_id',
+        'expiration_date',
+    ];
+
+    protected $casts = [
+        'expiration_date' => 'date:Y-m-d',
     ];
 
     public function package()

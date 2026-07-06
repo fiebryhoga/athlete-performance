@@ -143,10 +143,18 @@ Route::middleware([
         Route::post('/admin/individual-trainings/session/{training}/feedback', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateFeedback'])->name('admin.individual-trainings.session.feedback');
         Route::delete('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'destroySession'])->name('admin.individual-trainings.session.destroy');
         Route::put('/admin/individual-trainings/session/{training}/title', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateTitle'])->name('admin.individual-trainings.session.update-title');
+        Route::post('/admin/individual-trainings/session/{training}/duplicate', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'duplicateSession'])->name('admin.individual-trainings.session.duplicate');
         
         // NEW Routes for RPE and Completion
         Route::post('/admin/individual-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeRpe'])->name('admin.individual-trainings.session.rpe');
         Route::post('/admin/individual-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'completeTraining'])->name('admin.individual-trainings.session.complete');
+
+        // Athlete-accessible Group Training Routes
+        Route::get('/admin/group-trainings/{group}/show', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showGroup'])->name('admin.group-trainings.show');
+        Route::get('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showSession'])->name('admin.group-trainings.session.show');
+        Route::post('/admin/group-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeRpe'])->name('admin.group-trainings.session.rpe');
+        Route::post('/admin/group-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'completeTraining'])->name('admin.group-trainings.session.complete');
+
 
         // Load Analysis (Strength Training)
         Route::get('/admin/load-analysis', [\App\Http\Controllers\Admin\LoadAnalysisController::class, 'index'])->name('admin.load-analysis.index');
@@ -243,17 +251,14 @@ Route::middleware([
         // Group Trainings
         Route::resource('/admin/groups', \App\Http\Controllers\Admin\GroupController::class)->names('admin.groups');
         
-        // Group Sessions
-        Route::get('/admin/group-trainings/{group}/show', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showGroup'])->name('admin.group-trainings.show');
+        // Group Sessions (Management)
         Route::get('/admin/group-trainings/{group}/session/create', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'createSession'])->name('admin.group-trainings.session.create');
         Route::post('/admin/group-trainings/{group}/session', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeSession'])->name('admin.group-trainings.session.store');
         
-        Route::get('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showSession'])->name('admin.group-trainings.session.show');
-        Route::post('/admin/group-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeRpe'])->name('admin.group-trainings.session.rpe');
         Route::get('/admin/group-trainings/session/{training}/edit', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'editSession'])->name('admin.group-trainings.session.edit');
         Route::put('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'updateSession'])->name('admin.group-trainings.session.update');
-        Route::post('/admin/group-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'completeTraining'])->name('admin.group-trainings.session.complete');
         Route::delete('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'destroySession'])->name('admin.group-trainings.session.destroy');
+        Route::post('/admin/group-trainings/session/{training}/duplicate', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'duplicateSession'])->name('admin.group-trainings.session.duplicate');
         // -----------------------
     });
 });

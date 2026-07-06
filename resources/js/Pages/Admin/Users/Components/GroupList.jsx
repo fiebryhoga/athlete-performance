@@ -12,6 +12,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
         name: '',
         description: '',
         subscription_package_id: '',
+        expiration_date: '',
         member_ids: [],
         coach_ids: [],
     });
@@ -30,6 +31,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
             name: group.name,
             description: group.description || '',
             subscription_package_id: group.subscription_package_id || '',
+            expiration_date: group.expiration_date ? group.expiration_date.split('T')[0] : '',
             member_ids: group.members?.map(m => m.id) || [],
             coach_ids: group.coaches?.map(c => c.id) || [],
         });
@@ -144,32 +146,42 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                     <h2 className="text-xl font-bold text-slate-900 mb-6">{editGroup ? 'Edit Grup' : 'Buat Grup Baru'}</h2>
                     
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Nama Grup</label>
-                                <input
-                                    type="text"
-                                    value={data.name}
-                                    onChange={e => setData('name', e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
-                                    required
-                                />
-                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                            </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Nama Grup</label>
+                            <input
+                                type="text"
+                                value={data.name}
+                                onChange={e => setData('name', e.target.value)}
+                                className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                required
+                            />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Paket Latihan</label>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Paket Langganan Grup</label>
                                 <select
                                     value={data.subscription_package_id}
                                     onChange={e => setData('subscription_package_id', e.target.value)}
                                     className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
                                 >
-                                    <option value="">-- Pilih Paket Grup --</option>
+                                    <option value="">-- Tidak Ada / Kosongkan --</option>
                                     {packages?.map(pkg => (
                                         <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
                                     ))}
                                 </select>
                                 {errors.subscription_package_id && <p className="text-red-500 text-xs mt-1">{errors.subscription_package_id}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tanggal Kedaluwarsa</label>
+                                <input
+                                    type="date"
+                                    value={data.expiration_date}
+                                    onChange={e => setData('expiration_date', e.target.value)}
+                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                />
+                                {errors.expiration_date && <p className="text-red-500 text-xs mt-1">{errors.expiration_date}</p>}
                             </div>
                         </div>
 

@@ -94,7 +94,9 @@ class IndividualTrainingController extends Controller
         // Get group trainings where this athlete is a member of the group
         $groupIds = $user->groups()->pluck('training_groups.id');
         $groupTrainings = \App\Models\GroupTraining::whereIn('training_group_id', $groupIds)
-            ->with(['coach', 'group.package'])
+            ->with(['coach', 'group.package', 'members_pivot' => function ($query) use ($user) {
+                $query->where('athlete_id', $user->id);
+            }])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();
@@ -449,9 +451,20 @@ class IndividualTrainingController extends Controller
     public function destroySession(IndividualTraining $training)
     {
         $userId = $training->user_id;
+        $deletedSessionNumber = $training->session_number;
+        $isPaid = $training->is_athlete_paid;
+
         $training->delete();
+
+        if ($deletedSessionNumber) {
+            \App\Models\IndividualTraining::where('user_id', $userId)
+                ->where('is_athlete_paid', $isPaid)
+                ->where('session_number', '>', $deletedSessionNumber)
+                ->decrement('session_number');
+        }
+
         return redirect()->route('admin.individual-trainings.show', $userId)
-            ->with('message', 'Sesi latihan dihapus.');
+            ->with('message', 'Sesi latihan dihapus dan nomor sesi telah disesuaikan.');
     }
 
     /**
@@ -483,5 +496,61 @@ class IndividualTrainingController extends Controller
         $training->update(['name' => $request->name]);
         
         return back()->with('message', 'Judul sesi berhasil diperbarui!');
+    }
+
+    /**
+     * Duplicate a training session
+     */
+    public function duplicateSession(Request $request, IndividualTraining $training)
+    {
+        $request->validate([
+            'target_date' => 'required|date'
+        ]);
+
+        $user = $training->user;
+
+        // Calculate new session_number
+        $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
+            ->where('is_athlete_paid', false)
+            ->orderBy('session_number', 'desc')
+            ->first();
+        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+
+        // Calculate day_number
+        $firstTrainingDate = IndividualTraining::where('user_id', $user->id)->min('date');
+        if (!$firstTrainingDate) {
+            $firstTrainingDate = $user->created_at->format('Y-m-d');
+        }
+        $day_number = Carbon::parse($firstTrainingDate)->diffInDays(Carbon::parse($request->target_date)) + 1;
+        if ($day_number < 1) $day_number = 1;
+
+        // Duplicate the training record
+        $newTraining = $training->replicate(['is_completed', 'completed_at', 'athlete_note', 'proof_photo', 'athlete_rpe']);
+        $newTraining->date = $request->target_date;
+        $newTraining->day_number = $day_number;
+        $newTraining->session_number = $session_number;
+        $newTraining->status = 'scheduled';
+        $newTraining->is_completed = false;
+        $newTraining->completed_at = null;
+        $newTraining->athlete_note = null;
+        $newTraining->proof_photo = null;
+        $newTraining->athlete_rpe = null;
+        $newTraining->save();
+
+        // Duplicate blocks and items
+        $training->load('blocks.items');
+        foreach ($training->blocks as $block) {
+            $newBlock = $block->replicate(['individual_training_id']);
+            $newBlock->individual_training_id = $newTraining->id;
+            $newBlock->save();
+
+            foreach ($block->items as $item) {
+                $newItem = $item->replicate(['training_block_id']);
+                $newItem->training_block_id = $newBlock->id;
+                $newItem->save();
+            }
+        }
+
+        return back()->with('message', 'Sesi latihan berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
     }
 }

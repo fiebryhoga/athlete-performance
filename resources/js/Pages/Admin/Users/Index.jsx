@@ -1,7 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown
+    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import GroupList from './Components/GroupList';
@@ -275,7 +275,26 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                             user.name.substring(0, 2).toUpperCase()
                                                         )}
                                                     </div>
-                                                    <span className="font-bold text-slate-800 text-sm group-hover:text-[#ff4d00] transition-colors">{user.name}</span>
+                                                    <div>
+                                                        <span className="font-bold text-slate-800 text-sm group-hover:text-[#ff4d00] transition-colors">{user.name}</span>
+                                                        {user.role === 'athlete' && (
+                                                            <div className="flex flex-col gap-1 mt-1.5">
+                                                                {user.package && (
+                                                                    <div className="inline-flex items-center gap-1.5 text-[10px] text-teal-700 bg-teal-50/80 px-2 py-0.5 rounded border border-teal-100 font-medium w-fit">
+                                                                        <Package className="w-3 h-3" /> Privat ({user.package.name})
+                                                                        {user.training_exp_date && <span className="text-rose-500 font-bold ml-1">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                                    </div>
+                                                                )}
+                                                                {user.groups?.map(g => (
+                                                                    <div key={g.id} className="inline-flex items-center gap-1.5 text-[10px] text-indigo-700 bg-indigo-50/80 px-2 py-0.5 rounded border border-indigo-100 font-medium w-fit">
+                                                                        <Users className="w-3 h-3" /> Grup: {g.name}
+                                                                        {g.package && <span className="opacity-75">({g.package.name})</span>}
+                                                                        {g.expiration_date && <span className="text-rose-500 font-bold ml-1">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 align-middle text-slate-500 text-xs font-medium">
@@ -347,6 +366,22 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         <div>
                                             <h3 className="font-bold text-slate-800 text-sm">{user.name}</h3>
                                             <p className="text-slate-500 text-xs mt-0.5">{user.username}</p>
+                                            {user.role === 'athlete' && (
+                                                <div className="flex flex-col gap-1 mt-2">
+                                                    {user.package && (
+                                                        <div className="inline-flex items-center gap-1 text-[9px] text-teal-700 bg-teal-50/80 px-1.5 py-0.5 rounded border border-teal-100 font-medium whitespace-nowrap w-fit">
+                                                            <Package className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[120px]">Privat ({user.package.name})</span>
+                                                            {user.training_exp_date && <span className="text-rose-500 font-bold ml-0.5 shrink-0">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                        </div>
+                                                    )}
+                                                    {user.groups?.map(g => (
+                                                        <div key={g.id} className="inline-flex items-center gap-1 text-[9px] text-indigo-700 bg-indigo-50/80 px-1.5 py-0.5 rounded border border-indigo-100 font-medium whitespace-nowrap w-fit">
+                                                            <Users className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[120px]">Grup: {g.name} {g.package && `(${g.package.name})`}</span>
+                                                            {g.expiration_date && <span className="text-rose-500 font-bold ml-0.5 shrink-0">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
@@ -642,7 +677,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                 onChange={e => setData('subscription_package_id', e.target.value)} 
                                                 className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm"
                                             >
-                                                <option value="">-- Pilih Paket Latihan --</option>
+                                                <option value="">-- Tidak Ada / Kosongkan --</option>
                                                 {packagesList?.map(pkg => (
                                                     <option key={pkg.id} value={pkg.id}>
                                                         {pkg.name} ({pkg.session_count} Sesi)

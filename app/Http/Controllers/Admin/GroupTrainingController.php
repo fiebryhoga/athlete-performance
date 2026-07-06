@@ -182,14 +182,34 @@ class GroupTrainingController extends Controller
         $request->validate([
             'athlete_id' => 'required|exists:users,id',
             'proof_photo' => 'nullable|image|max:5120',
+            'rpes' => 'nullable|array',
+            'group_note' => 'nullable|string',
         ]);
 
         $athleteId = $request->athlete_id;
+
+        // Save RPE data if present
+        if ($request->has('rpes')) {
+            foreach ($request->rpes as $itemId => $rpeData) {
+                \App\Models\GroupTrainingRpeRecord::updateOrCreate(
+                    [
+                        'group_training_id' => $training->id,
+                        'athlete_id' => $athleteId,
+                        'training_block_item_id' => $itemId,
+                    ],
+                    ['rpe_data' => $rpeData]
+                );
+            }
+        }
 
         $memberRecord = \App\Models\GroupTrainingMember::firstOrCreate([
             'group_training_id' => $training->id,
             'athlete_id' => $athleteId,
         ]);
+
+        if ($request->has('group_note')) {
+            $memberRecord->athlete_note = $request->group_note;
+        }
 
         $memberRecord->is_completed = true;
         $memberRecord->completed_at = now();
@@ -360,9 +380,62 @@ class GroupTrainingController extends Controller
     public function destroySession(GroupTraining $training)
     {
         $groupId = $training->training_group_id;
+        $deletedSessionNumber = $training->session_number;
+        $isPaid = $training->is_group_paid;
+        
         $training->delete();
         
+        if ($deletedSessionNumber) {
+            \App\Models\GroupTraining::where('training_group_id', $groupId)
+                ->where('is_group_paid', $isPaid)
+                ->where('session_number', '>', $deletedSessionNumber)
+                ->decrement('session_number');
+        }
+        
         return redirect()->route('admin.group-trainings.show', $groupId)
-            ->with('message', 'Sesi latihan grup berhasil dihapus.');
+            ->with('message', 'Sesi latihan grup berhasil dihapus dan nomor sesi telah disesuaikan.');
+    }
+
+    /**
+     * Duplicate a training session
+     */
+    public function duplicateSession(Request $request, GroupTraining $training)
+    {
+        $request->validate([
+            'target_date' => 'required|date'
+        ]);
+
+        $group = $training->group;
+
+        // Calculate new session_number
+        $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
+            ->where('is_group_paid', false)
+            ->orderBy('session_number', 'desc')
+            ->first();
+        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+
+        // Duplicate the training record
+        $newTraining = $training->replicate(['attendee_ids']);
+        $newTraining->date = $request->target_date;
+        $newTraining->session_number = $session_number;
+        $newTraining->status = 'scheduled';
+        $newTraining->attendee_ids = [];
+        $newTraining->save();
+
+        // Duplicate blocks and items
+        $training->load('blocks.items');
+        foreach ($training->blocks as $block) {
+            $newBlock = $block->replicate(['group_training_id']);
+            $newBlock->group_training_id = $newTraining->id;
+            $newBlock->save();
+
+            foreach ($block->items as $item) {
+                $newItem = $item->replicate(['training_block_id']);
+                $newItem->training_block_id = $newBlock->id;
+                $newItem->save();
+            }
+        }
+
+        return back()->with('message', 'Sesi latihan grup berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
     }
 }

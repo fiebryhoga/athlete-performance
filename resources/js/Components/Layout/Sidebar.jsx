@@ -111,7 +111,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             </div>
 
             {/* Menu List */}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar py-6 px-3 space-y-6">
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-6 px-3 space-y-6">
                 {menuGroups.map((group, groupIdx) => {
                     const filteredItems = group.items.filter(item => item.roles.includes(userRole));
                     if (filteredItems.length === 0) return null;

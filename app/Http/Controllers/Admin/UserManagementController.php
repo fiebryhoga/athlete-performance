@@ -33,7 +33,7 @@ class UserManagementController extends Controller
         $sortField = in_array($sortField, $validSortFields) ? $sortField : 'name';
 
         $users = User::where('role', $tab)
-            ->with(['coaches', 'sport'])
+            ->with(['coaches', 'sport', 'groups.package', 'package'])
             ->when(auth()->user()->role === 'coach', function($q) {
                 $q->whereHas('coaches', function($subQ) {
                     $subQ->where('coach_id', auth()->id());
