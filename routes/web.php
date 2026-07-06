@@ -138,6 +138,7 @@ Route::middleware([
         Route::get('/admin/individual-trainings/{user}/session/create', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'createSession'])->name('admin.individual-trainings.session.create');
         Route::post('/admin/individual-trainings/{user}/session', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeSession'])->name('admin.individual-trainings.session.store');
         Route::get('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'showSession'])->name('admin.individual-trainings.session.show');
+        Route::get('/admin/individual-trainings/session/{training}/export-pdf', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'exportPdf'])->name('admin.individual-trainings.session.export-pdf');
         Route::get('/admin/individual-trainings/session/{training}/edit', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'editSession'])->name('admin.individual-trainings.session.edit');
         Route::put('/admin/individual-trainings/session/{training}', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateSession'])->name('admin.individual-trainings.session.update');
         Route::post('/admin/individual-trainings/session/{training}/feedback', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'updateFeedback'])->name('admin.individual-trainings.session.feedback');
@@ -152,6 +153,7 @@ Route::middleware([
         // Athlete-accessible Group Training Routes
         Route::get('/admin/group-trainings/{group}/show', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showGroup'])->name('admin.group-trainings.show');
         Route::get('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'showSession'])->name('admin.group-trainings.session.show');
+        Route::get('/admin/group-trainings/session/{training}/export-pdf', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'exportPdf'])->name('admin.group-trainings.session.export-pdf');
         Route::post('/admin/group-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'storeRpe'])->name('admin.group-trainings.session.rpe');
         Route::post('/admin/group-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'completeTraining'])->name('admin.group-trainings.session.complete');
 

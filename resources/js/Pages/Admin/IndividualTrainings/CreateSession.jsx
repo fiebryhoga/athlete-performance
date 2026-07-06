@@ -435,15 +435,15 @@ export default function CreateSession({
                             <button
                                 type="button"
                                 onClick={addTextBlock}
-                                className="text-sm font-bold bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-sm hover:shadow-md"
+                                className="text-sm font-bold bg-orange-50 border border-orange-200 text-[#ff4d00] px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md"
                             >
-                                <Type size={16} className="text-slate-400" />{" "}
+                                <Type size={16} className="text-orange-500" />{" "}
                                 Tambah Catatan Teks
                             </button>
                             <button
                                 type="button"
                                 onClick={addPhaseBlock}
-                                className="text-sm font-bold bg-slate-800 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-slate-900 shadow-md hover:shadow-lg"
+                                className="text-sm font-bold bg-[#ff4d00] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-[#e64500] shadow-md shadow-[#ff4d00]/20 hover:shadow-lg"
                             >
                                 <Activity size={16} /> Tambah Fase Latihan
                             </button>

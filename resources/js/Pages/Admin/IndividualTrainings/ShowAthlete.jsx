@@ -265,7 +265,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                 >
                                                     <Link 
                                                         href={isGroup 
-                                                            ? route('admin.group-trainings.session.show', session.id) 
+                                                            ? route('admin.group-trainings.session.show', session.id) + "?from=athlete&athlete_id=" + athlete.id
                                                             : route('admin.individual-trainings.session.show', session.id)}
                                                         className="block w-full"
                                                     >

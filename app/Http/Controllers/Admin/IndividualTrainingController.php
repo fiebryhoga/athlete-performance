@@ -553,4 +553,88 @@ class IndividualTrainingController extends Controller
 
         return back()->with('message', 'Sesi latihan berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
     }
+
+    /**
+     * Export PDF for Individual Training Session
+     */
+    public function exportPdf(IndividualTraining $training)
+    {
+        $training->load(['coach', 'user', 'blocks.items.exercise', 'rpeRecords']);
+        $athlete = $training->user;
+        
+        $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
+        $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
+        
+        $clubLogo = null;
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $athletesData = [];
+        if ($athlete) {
+            $rpes = [];
+            foreach ($training->rpeRecords as $record) {
+                $rpeData = $record->rpe_data;
+                if (is_array($rpeData)) {
+                    foreach ($rpeData as $data) {
+                        if (is_array($data) && isset($data['label']) && isset($data['rpe'])) {
+                            $rpes[] = ['label' => $data['label'], 'value' => $data['rpe']];
+                        }
+                    }
+                }
+            }
+            $athletesData[] = [
+                'name' => $athlete->name,
+                'is_completed' => (bool) $training->is_completed,
+                'note' => $training->athlete_note,
+                'rpes' => $rpes,
+            ];
+        }
+
+        $blocksArray = $training->blocks->map(function ($block) {
+            $blockData = $block->toArray();
+            $blockData['items'] = $block->items->map(function ($item) {
+                $itemData = $item->toArray();
+                if ($item->exercise) {
+                    $itemData['exercise'] = $item->exercise->toArray();
+                    
+                    // Add base64 images
+                    $base64Images = [];
+                    if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
+                        foreach ($item->exercise->images as $img) {
+                            $imgClean = str_replace('storage/', '', ltrim($img, '/'));
+                            $imgPath1 = public_path('storage/' . $imgClean);
+                            $imgPath2 = storage_path('app/public/' . $imgClean);
+                            $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
+                            
+                            if ($finalImgPath) {
+                                $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
+                                $data = file_get_contents($finalImgPath);
+                                $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                            }
+                        }
+                    }
+                    $itemData['exercise']['base64_images'] = $base64Images;
+                }
+                return $itemData;
+            })->toArray();
+            return $blockData;
+        })->toArray();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.training_session_pdf', [
+            'training' => (object)[
+                'title' => ($training->name ?: 'Individual Training Session #' . $training->session_number),
+                'date' => $training->date,
+                'focus' => ($athlete ? $athlete->name : 'Athlete') . ($training->location ? ' | ' . $training->location : ''),
+                'blocks' => $blocksArray,
+            ],
+            'group' => null,
+            'athletesData' => $athletesData,
+            'clubLogo' => $clubLogo
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('Individual_Training_Session_' . $training->id . '.pdf');
+    }
 }

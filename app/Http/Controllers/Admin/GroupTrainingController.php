@@ -438,4 +438,92 @@ class GroupTrainingController extends Controller
 
         return back()->with('message', 'Sesi latihan grup berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
     }
+
+    /**
+     * Export PDF for Group Training Session
+     */
+    public function exportPdf(GroupTraining $training)
+    {
+        $training->load(['coach', 'group', 'blocks.items.exercise', 'members_pivot', 'rpeRecords']);
+        $group = $training->group;
+        
+        $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
+        $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
+        
+        $clubLogo = null;
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $athletesData = [];
+        foreach ($training->members_pivot as $pivot) {
+            $athlete = \App\Models\User::find($pivot->athlete_id);
+            if ($athlete) {
+                $rpes = [];
+                $rpeRecords = $training->rpeRecords->where('athlete_id', $athlete->id);
+                foreach ($rpeRecords as $record) {
+                    $rpeData = $record->rpe_data;
+                    if (is_array($rpeData)) {
+                        foreach ($rpeData as $data) {
+                            if (is_array($data) && isset($data['label']) && isset($data['rpe'])) {
+                                $rpes[] = ['label' => $data['label'], 'value' => $data['rpe']];
+                            }
+                        }
+                    }
+                }
+                $athletesData[] = [
+                    'name' => $athlete->name,
+                    'is_completed' => $pivot->is_completed,
+                    'note' => $pivot->athlete_note,
+                    'rpes' => $rpes,
+                ];
+            }
+        }
+
+        $blocksArray = $training->blocks->map(function ($block) {
+            $blockData = $block->toArray();
+            $blockData['items'] = $block->items->map(function ($item) {
+                $itemData = $item->toArray();
+                if ($item->exercise) {
+                    $itemData['exercise'] = $item->exercise->toArray();
+                    
+                    // Add base64 images
+                    $base64Images = [];
+                    if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
+                        foreach ($item->exercise->images as $img) {
+                            $imgClean = str_replace('storage/', '', ltrim($img, '/'));
+                            $imgPath1 = public_path('storage/' . $imgClean);
+                            $imgPath2 = storage_path('app/public/' . $imgClean);
+                            $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
+                            
+                            if ($finalImgPath) {
+                                $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
+                                $data = file_get_contents($finalImgPath);
+                                $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                            }
+                        }
+                    }
+                    $itemData['exercise']['base64_images'] = $base64Images;
+                }
+                return $itemData;
+            })->toArray();
+            return $blockData;
+        })->toArray();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.training_session_pdf', [
+            'training' => (object)[
+                'title' => ($training->name ?: 'Group Training Session #' . $training->session_number),
+                'date' => $training->date,
+                'focus' => $group->name . ($training->location ? ' | ' . $training->location : ''),
+                'blocks' => $blocksArray,
+            ],
+            'group' => $group,
+            'athletesData' => $athletesData,
+            'clubLogo' => $clubLogo
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('Group_Training_Session_' . $training->id . '.pdf');
+    }
 }

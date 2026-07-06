@@ -519,9 +519,12 @@ export default function ShowSession({
                         </div>
                         
                         <div className="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-end gap-3 md:pt-8 w-full md:w-auto">
-                            <button className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all opacity-50 cursor-not-allowed">
-                                <FileText size={18} /> PDF
-                            </button>
+                            <a 
+                                href={route("admin.individual-trainings.session.export-pdf", training.id)}
+                                className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all"
+                            >
+                                <FileText size={18} /> Download PDF
+                            </a>
                             {isCoachOrAdmin && (
                                 <Link
                                     href={route("admin.individual-trainings.session.edit", training.id)}

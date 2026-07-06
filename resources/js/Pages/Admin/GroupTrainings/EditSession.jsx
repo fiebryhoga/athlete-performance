@@ -269,10 +269,10 @@ export default function EditSession({
  )}
 
  <div className="mt-8 flex justify-end gap-3">
- <button type="button" onClick={addTextBlock} className="text-sm font-bold bg-white border border-zinc-200 text-zinc-900 px-6 py-3 rounded-xl flex items-center gap-2 transition-colors hover:bg-zinc-50 shadow-sm hover:shadow-md">
- <Type size={16} /> Tambah Catatan Teks
+ <button type="button" onClick={addTextBlock} className="text-sm font-bold bg-orange-50 border border-orange-200 text-[#ff4d00] px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md">
+ <Type size={16} className="text-orange-500" /> Tambah Catatan Teks
  </button>
- <button type="button" onClick={addPhaseBlock} className="text-sm font-bold bg-zinc-900 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-zinc-800 shadow-sm hover:shadow-md">
+ <button type="button" onClick={addPhaseBlock} className="text-sm font-bold bg-[#ff4d00] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-[#e64500] shadow-md shadow-[#ff4d00]/20 hover:shadow-lg">
  <Activity size={16} /> Tambah Fase Latihan
  </button>
  </div>
