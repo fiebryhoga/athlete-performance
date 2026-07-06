@@ -9,14 +9,19 @@ class TestItem extends Model
     protected $guarded = ['id'];
 
     public const PARAMS = [
-        'reps'   => 'Repetisi (Reps)',
-        'second' => 'Detik (Seconds)',
-        'minute' => 'Menit (Minutes)',
-        'meter'  => 'Meter',
-        'cm'     => 'Centimeter',
-        'kg'     => 'Kilogram',
-        'vo2max' => 'VO2 Max',
-        'points' => 'Poin (Points)',
+        'reps'    => 'Repetisi (Reps)',
+        'second'  => 'Detik (Seconds)',
+        'minute'  => 'Menit (Minutes)',
+        'meter'   => 'Meter',
+        'cm'      => 'Centimeter',
+        'kg'      => 'Kilogram',
+        'vo2max'  => 'VO2 Max',
+        'points'  => 'Poin (Points)',
+        'n'       => 'Newton (N)',
+        'n_kg'    => 'Newton/Kg (N/kg)',
+        'percent' => 'Persentase (%)',
+        'watt'    => 'Watt (W)',
+        'degree'  => 'Derajat (°)',
     ];
 
     public function category()

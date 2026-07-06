@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useRef } from 'react';
 import { 
     LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3, Package
 } from 'lucide-react';
@@ -6,6 +7,26 @@ import {
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
     
     const { url, props } = usePage();
+    const scrollContainerRef = useRef(null);
+
+    // Persist sidebar scroll position across navigation
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const savedScroll = sessionStorage.getItem('sidebarScrollPos');
+        if (savedScroll) {
+            container.scrollTop = parseInt(savedScroll, 10);
+        }
+
+        const handleScroll = () => {
+            sessionStorage.setItem('sidebarScrollPos', container.scrollTop.toString());
+        };
+
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const userRole = props.auth.user.role; 
     const appSettings = props.app_settings || {}; 
     const appName = appSettings?.name || 'Sistem Performa';
@@ -13,109 +34,43 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
 
     const isActive = (path) => url.startsWith(path);
 
-    // Array definisi Menu
-    const menuItems = [
-        { 
-            name: 'Dashboard', 
-            route: 'dashboard', 
-            checkPath: '/dashboard', 
-            icon: LayoutDashboard,
-            roles: ['superadmin', 'coach', 'athlete'] 
+    const menuGroups = [
+        {
+            title: null, 
+            items: [
+                { name: 'Dashboard', route: 'dashboard', checkPath: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Profilling', route: 'admin.athletes.index', checkPath: '/admin/athletes', icon: Users, roles: ['superadmin', 'coach'] },
+                { name: 'Profil Fisik', route: 'athlete.profiling', checkPath: '/profiling', icon: Target, roles: ['athlete'] },
+            ]
         },
-        { 
-            name: 'Kategori Olahraga', 
-            route: 'admin.sports.index', 
-            checkPath: '/admin/sports', 
-            icon: Trophy,
-            roles: ['superadmin', 'coach'] 
+        {
+            title: 'Master Data & Latihan',
+            items: [
+                { name: 'Kategori Olahraga', route: 'admin.sports.index', checkPath: '/admin/sports', icon: Trophy, roles: ['superadmin', 'coach'] },
+                { name: 'Master Exercise', route: 'admin.exercises.index', checkPath: '/admin/exercises', icon: Dumbbell, roles: ['superadmin', 'coach'] },
+                { name: 'Manajemen Paket', route: 'admin.packages.index', checkPath: '/admin/packages', icon: Package, roles: ['superadmin'] },
+            ]
         },
-        { 
-            name: 'Profilling', 
-            route: 'admin.athletes.index', 
-            checkPath: '/admin/athletes', 
-            icon: Users,
-            roles: ['superadmin', 'coach'] 
+        {
+            title: 'Tes & Pantauan',
+            items: [
+                { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: ClipboardList, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Komposisi Tubuh', route: 'admin.composition-tests.index', checkPath: '/admin/composition', icon: Scale, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Pantauan Harian', route: 'admin.daily-metrics.index', checkPath: '/admin/daily-metrics', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Wellness & Beban', route: 'admin.wellness-rpe.index', checkPath: '/admin/wellness-rpe', icon: HeartPulse, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Analisis Beban', route: 'admin.load-analysis.index', checkPath: '/admin/load-analysis', icon: BarChart3, roles: ['superadmin', 'coach', 'athlete'] },
+            ]
         },
-        { 
-            name: 'Tes Fisik', 
-            route: 'admin.performance.index', 
-            checkPath: '/performance', 
-            icon: ClipboardList,
-            roles: ['superadmin', 'coach', 'athlete'] 
-        },
-        { 
-            name: 'Komposisi Tubuh', 
-            route: 'admin.composition-tests.index',
-            checkPath: '/admin/composition', 
-            icon: Scale, 
-            roles: ['superadmin', 'coach', 'athlete'] 
-        },
-        { 
-            name: 'Pantauan Harian', 
-            route: 'admin.daily-metrics.index', 
-            checkPath: '/admin/daily-metrics', 
-            icon: Activity,
-            roles: ['superadmin', 'coach', 'athlete']
-        },
-        { 
-            name: 'Wellness & Beban', 
-            route: 'admin.wellness-rpe.index', 
-            checkPath: '/admin/wellness-rpe', 
-            icon: HeartPulse,
-            roles: ['superadmin', 'coach', 'athlete'] 
-        },
-        { 
-            name: 'Master Exercise', 
-            route: 'admin.exercises.index', 
-            checkPath: '/admin/exercises', 
-            icon: Dumbbell,
-            roles: ['superadmin', 'coach'] 
-        },
-        { 
-            name: 'Program Latihan', 
-            route: 'admin.individual-trainings.index', 
-            checkPath: '/admin/individual-trainings', 
-            icon: Calendar,
-            roles: ['superadmin', 'coach', 'athlete'] 
-        },
-        { 
-            name: 'Profil Fisik', 
-            route: 'athlete.profiling', 
-            checkPath: '/profiling', 
-            icon: Target,
-            roles: ['athlete'] 
-        },
-        { 
-            name: 'Rekap Sesi', 
-            route: 'admin.reports.sessions', 
-            checkPath: '/admin/reports/sessions', 
-            icon: BarChart3,
-            roles: ['superadmin'] 
-        },
-        { 
-            name: 'Manajemen Paket', 
-            route: 'admin.packages.index', 
-            checkPath: '/admin/packages', 
-            icon: Package,
-            roles: ['superadmin'] 
-        },
-        { 
-            name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', 
-            route: 'admin.users.index', 
-            checkPath: '/admin/users', 
-            icon: Shield,
-            roles: ['superadmin', 'coach'] 
-        },
-        { 
-            name: 'Pengaturan Sistem', 
-            route: 'admin.settings.index', 
-            checkPath: '/admin/settings', 
-            icon: Settings,
-            roles: ['superadmin'] 
-        },
+        {
+            title: 'Sistem & Laporan',
+            items: [
+                { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: Shield, roles: ['superadmin', 'coach'] },
+                { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: BarChart3, roles: ['superadmin'] },
+                { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
+            ]
+        }
     ];
-
-    const filteredMenu = menuItems.filter(item => item.roles.includes(userRole));
 
     // Gaya dasar sidebar
     const sidebarClasses = `
@@ -156,42 +111,60 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             </div>
 
             {/* Menu List */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar py-6 px-3 space-y-1">
-                {filteredMenu.map((item, index) => {
-                    const active = isActive(item.checkPath);
-                    const Icon = item.icon;
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar py-6 px-3 space-y-6">
+                {menuGroups.map((group, groupIdx) => {
+                    const filteredItems = group.items.filter(item => item.roles.includes(userRole));
+                    if (filteredItems.length === 0) return null;
+
                     return (
-                        <div key={index} className="relative group">
-                            <Link
-                                href={route(item.route)}
-                                onClick={() => { if(window.innerWidth < 1024) onMobileClose() }}
-                                className={`
-                                    flex items-center rounded-xl transition-all duration-200 relative
-                                    ${isCollapsed ? 'justify-center p-3' : 'justify-start px-4 py-3 gap-3'}
-                                    ${active 
-                                        ? 'bg-orange-50 text-[#ff4d00] font-semibold' 
-                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'}
-                                `}
-                            >
-                                <Icon className={`flex-shrink-0 transition-all ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${active ? 'text-[#ff4d00]' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                                
-                                {!isCollapsed && (
-                                    <span className="truncate text-sm">{item.name}</span>
-                                )}
-
-                                {/* Indikator Aktif Kiri (hanya di mode expand) */}
-                                {active && !isCollapsed && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#ff4d00] rounded-r-full"></div>
-                                )}
-                            </Link>
-
-                            {/* Tooltip Hover saat Collapsed */}
-                            {isCollapsed && (
-                                <div className="absolute left-[85px] top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl">
-                                    {item.name}
-                                    <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                        <div key={groupIdx} className="space-y-1">
+                            {group.title && !isCollapsed && (
+                                <div className="px-4 py-1 mt-4 mb-2 text-[11px] font-bold text-slate-400/80">
+                                    {group.title}
                                 </div>
                             )}
+                            {group.title && isCollapsed && (
+                                <div className="w-8 h-px bg-slate-200 mx-auto my-2"></div>
+                            )}
+                            
+                            {filteredItems.map((item, index) => {
+                                const active = isActive(item.checkPath);
+                                const Icon = item.icon;
+                                return (
+                                    <div key={index} className="relative group">
+                                        <Link
+                                            href={route(item.route)}
+                                            onClick={() => { if(window.innerWidth < 1024) onMobileClose() }}
+                                            className={`
+                                                flex items-center rounded-xl transition-all duration-200 relative
+                                                ${isCollapsed ? 'justify-center p-3' : 'justify-start px-4 py-3 gap-3'}
+                                                ${active 
+                                                    ? 'bg-orange-50 text-[#ff4d00] font-semibold' 
+                                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'}
+                                            `}
+                                        >
+                                            <Icon className={`flex-shrink-0 transition-all ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} ${active ? 'text-[#ff4d00]' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                                            
+                                            {!isCollapsed && (
+                                                <span className="truncate text-sm">{item.name}</span>
+                                            )}
+
+                                            {/* Indikator Aktif Kiri (hanya di mode expand) */}
+                                            {active && !isCollapsed && (
+                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#ff4d00] rounded-r-full"></div>
+                                            )}
+                                        </Link>
+
+                                        {/* Tooltip Hover saat Collapsed */}
+                                        {isCollapsed && (
+                                            <div className="absolute left-[85px] top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl">
+                                                {item.name}
+                                                <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     );
                 })}

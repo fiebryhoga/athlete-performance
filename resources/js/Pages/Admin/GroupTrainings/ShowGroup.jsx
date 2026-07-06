@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, X, Target, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package } from 'lucide-react';
 
 export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -82,14 +82,27 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
 
     const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
+    const maxSession = useMemo(() => {
+        if (!trainings || trainings.length === 0) return 0;
+        return Math.max(...trainings.map(t => t.session_number || 0));
+    }, [trainings]);
+
+    const expDate = group.training_exp_date 
+        ? new Date(group.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+        : null;
+
+    const packageBadge = group.package 
+        ? `Paket: ${group.package.name} (Sesi ${maxSession}/${group.package.session_count})${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`
+        : 'Tidak Ada Paket';
+
     return (
         <AppLayout title={`Kalender Latihan - ${group.name}`}>
             <Head title={`Kalender Latihan - ${group.name}`} />
             
             <PageHeader 
-                title={`Program Latihan: ${group.name}`}
+                title={`Program Latihan ${group.name}`}
                 subtitle="Pantau dan kelola jadwal program latihan dalam tampilan kalender."
-                badge="Program Latihan"
+                badge={`Program Latihan • ${packageBadge}`}
                 icon={CalendarIcon}
                 actions={
                     <Link
@@ -102,41 +115,6 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
             />
 
             <div className="pb-12 space-y-6">
-                {/* Athlete Profile Summary */}
-                <div className="bg-white p-4 md:p-6 border border-slate-200 rounded-xl flex items-center gap-4 md:gap-6 shadow-sm">
-                    <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                        {group.profile_photo_url ? (
-                            <img src={group.profile_photo_url} alt={group.name} className="h-full w-full object-cover" />
-                        ) : (
-                            <User className="h-6 w-6 md:h-8 md:w-8 text-slate-400" />
-                        )}
-                    </div>
-                    <div>
-                        <h2 className="text-lg md:text-xl font-bold text-slate-900">{group.name}</h2>
-                        <div className="flex flex-wrap items-center gap-3 mt-1.5 md:mt-2">
-                            <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
-                                {group.sport?.name || 'UMUM'}
-                            </span>
-                            <span className="text-xs md:text-sm font-semibold text-slate-600 flex items-center gap-1.5">
-                                <Activity size={14} className="text-slate-400" />
-                                {trainings.length > 0 ? trainings[trainings.length - 1].session_number : 0} Total Sesi
-                            </span>
-                            {group.package && (
-                                <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-md flex items-center gap-1.5">
-                                    <Package size={12} className="text-emerald-500" />
-                                    {group.package.name}
-                                </span>
-                            )}
-                            {group.training_exp_date && (
-                                <span className="text-[10px] md:text-xs font-semibold px-2.5 py-1 bg-[#ff4d00]/10 text-[#ff4d00] rounded-md flex items-center gap-1.5">
-                                    <Target size={12} className="text-[#ff4d00]" />
-                                    Masa Aktif: {new Date(group.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
                 {/* Calendar View */}
                 <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
                     {/* Calendar Header */}
@@ -213,68 +191,94 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
                                         <div className="flex-1 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
                                             {day.sessions.map(session => {
                                                 // Group styling
-                                                let bgColor = 'bg-indigo-50';
-                                                let borderColor = 'border-indigo-200';
-                                                let hoverBorderColor = 'hover:border-indigo-400';
-                                                let titleColor = 'text-indigo-900';
-                                                let badgeBgColor = 'bg-indigo-100';
+                                                let bgColor = 'bg-white';
+                                                let borderColor = 'border-slate-200 border-l-[3px] border-l-indigo-400';
+                                                let hoverBorderColor = 'hover:border-slate-300 hover:border-l-indigo-500';
+                                                let titleColor = 'text-indigo-700';
+                                                let badgeBgColor = 'bg-indigo-50 border border-indigo-100';
                                                 let badgeTextColor = 'text-indigo-700';
-                                                let subtitleColor = 'text-indigo-600';
+                                                let subtitleColor = 'text-slate-500';
 
-                                                if (session.status === 'completed') {
-                                                    bgColor = 'bg-purple-50';
-                                                    borderColor = 'border-purple-200';
-                                                    hoverBorderColor = 'hover:border-purple-400';
-                                                    titleColor = 'text-purple-800';
-                                                    badgeBgColor = 'bg-purple-100';
+                                                if (session.status === 'completed' || session.is_completed) {
+                                                    borderColor = 'border-slate-200 border-l-[3px] border-l-purple-400';
+                                                    hoverBorderColor = 'hover:border-slate-300 hover:border-l-purple-500';
+                                                    titleColor = 'text-purple-700';
+                                                    badgeBgColor = 'bg-purple-50 border border-purple-100';
                                                     badgeTextColor = 'text-purple-700';
-                                                    subtitleColor = 'text-purple-600';
                                                 }
 
                                                 return (
                                                 <div 
-                                                    key={`group-${session.id}`} 
-                                                    className={`group/session relative p-1.5 rounded-md border text-left flex flex-col gap-1 transition-all shadow-sm ${bgColor} ${borderColor} ${hoverBorderColor}`}
+                                                    key={session.id} 
+                                                    className={`group/session relative p-2 rounded-lg border text-left flex flex-col gap-1.5 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
                                                 >
-                                                    <div className="flex items-start justify-between gap-1">
-                                                        <div className="flex-1 min-w-0">
-                                                                <Link 
-                                                                    href={route('admin.group-trainings.session.show', session.id)}
-                                                                    className="block"
-                                                                >
-                                                                    <div className={`text-[11px] font-bold leading-tight line-clamp-2 ${titleColor}`}>
-                                                                        {session.name || 'Sesi Grup'}
+                                                    <Link 
+                                                        href={route('admin.group-trainings.session.show', session.id)}
+                                                        className="block w-full"
+                                                    >
+                                                        {/* Header: Badge & Status */}
+                                                        <div className="flex items-start justify-between mb-1.5">
+                                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${badgeBgColor} ${badgeTextColor}`}>
+                                                                Sesi {session.session_number}/{group.package?.session_count || '∞'}
+                                                            </span>
+                                                            <div className="flex items-center gap-1">
+                                                                {auth.user.role !== 'athlete' && (
+                                                                    <div className="flex items-center gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                router.get(route('admin.group-trainings.session.edit', session.id));
+                                                                            }}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center hover:bg-slate-100 text-slate-500`}
+                                                                            title="Edit Program"
+                                                                        >
+                                                                            <Edit2 size={10} />
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={(e) => deleteSession(e, session.id)}
+                                                                            className={`p-1 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-red-600' : 'hover:bg-indigo-200 text-red-600'}`}
+                                                                            title="Hapus"
+                                                                        >
+                                                                            <Trash2 size={10} />
+                                                                        </button>
                                                                     </div>
-                                                                    <div className="mt-1 flex items-center gap-1">
-                                                                        <span className={`text-[8.5px] font-semibold px-1 py-0.5 rounded ${badgeBgColor} ${badgeTextColor}`}>
-                                                                            Sesi {session.session_number}/{group.package?.session_count || '∞'}
-                                                                        </span>
-                                                                        <span className={`text-[8.5px] font-semibold truncate ${subtitleColor}`}>
-                                                                            • {session.training_type || 'Umum'}
-                                                                        </span>
-                                                                    </div>
-                                                                </Link>
-                                                        </div>
-                                                        
-                                                        {auth.user.role !== 'athlete' && (
-                                                            <div className="flex flex-col gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
-                                                                <Link
-                                                                    href={route('admin.group-trainings.session.edit', session.id)}
-                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-purple-700' : 'hover:bg-indigo-200 text-indigo-700'}`}
-                                                                    title="Edit Program"
-                                                                >
-                                                                    <Edit2 size={10} />
-                                                                </Link>
-                                                                <button 
-                                                                    onClick={(e) => deleteSession(e, session.id)}
-                                                                    className={`p-0.5 rounded inline-flex items-center justify-center ${session.status === 'completed' ? 'hover:bg-purple-200 text-red-600' : 'hover:bg-indigo-200 text-red-600'}`}
-                                                                    title="Hapus"
-                                                                >
-                                                                    <Trash2 size={10} />
-                                                                </button>
+                                                                )}
+                                                                {session.status === 'completed' || session.is_completed ? (
+                                                                    <CheckCircle2 size={12} className="text-purple-500" />
+                                                                ) : (
+                                                                    <Clock size={12} className="text-indigo-400" />
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </div>
+                                                        </div>
+
+                                                        {/* Title */}
+                                                        <div className={`text-xs font-bold leading-snug line-clamp-2 ${titleColor}`}>
+                                                            [GRUP] {session.name || group.name}
+                                                        </div>
+
+                                                        {/* Details */}
+                                                        <div className="mt-1.5 flex flex-col gap-1">
+                                                            {session.training_type && (
+                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Dumbbell size={10} className="shrink-0" />
+                                                                    <span className="truncate">{session.training_type}</span>
+                                                                </div>
+                                                            )}
+                                                            {session.location && (
+                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <MapPin size={10} className="shrink-0" />
+                                                                    <span className="truncate">{session.location}</span>
+                                                                </div>
+                                                            )}
+                                                            {session.duration_minutes && (
+                                                                <div className={`text-[9.5px] font-semibold flex items-center gap-1.5 ${subtitleColor}`}>
+                                                                    <Timer size={10} className="shrink-0" />
+                                                                    <span className="truncate">{session.duration_minutes} Menit</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </Link>
                                                 </div>
                                                 );
                                             })}

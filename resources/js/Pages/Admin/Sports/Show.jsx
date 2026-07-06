@@ -52,6 +52,48 @@ const PARAM_CONFIG = {
         step: '0.01', 
         placeholder: '2.50', 
         hint: 'Use dot (.) for decimals' 
+    },
+    'kg': {
+        label: 'Kilogram (kg)',
+        unit: 'kg',
+        step: '0.1',
+        placeholder: '50.0',
+        hint: 'Use dot (.) for decimals'
+    },
+    'n': {
+        label: 'Newton (N)',
+        unit: 'N',
+        step: '0.1',
+        placeholder: '100.0',
+        hint: 'Use dot (.) for decimals'
+    },
+    'n_kg': {
+        label: 'Newton per Kg (N/kg)',
+        unit: 'N/kg',
+        step: '0.1',
+        placeholder: '10.0',
+        hint: 'Use dot (.) for decimals'
+    },
+    'percent': {
+        label: 'Percentage (%)',
+        unit: '%',
+        step: '0.1',
+        placeholder: '50.0',
+        hint: 'Use dot (.) for decimals'
+    },
+    'watt': {
+        label: 'Watt (W)',
+        unit: 'W',
+        step: '0.1',
+        placeholder: '300.0',
+        hint: 'Use dot (.) for decimals'
+    },
+    'degree': {
+        label: 'Derajat (°)',
+        unit: '°',
+        step: '0.1',
+        placeholder: '90.0',
+        hint: 'Use dot (.) for decimals'
     }
 };
 
@@ -127,9 +169,9 @@ export default function Show({ sport, categories }) {
 
     const getParamIcon = (type) => {
         if (['second', 'minute'].includes(type)) return <Timer className="w-3.5 h-3.5 md:w-3 md:h-3" />;
-        if (['cm', 'meter'].includes(type)) return <Ruler className="w-3.5 h-3.5 md:w-3 md:h-3" />;
-        if (['vo2max'].includes(type)) return <Activity className="w-3.5 h-3.5 md:w-3 md:h-3" />;
-        if (['reps', 'points'].includes(type)) return <Scale className="w-3.5 h-3.5 md:w-3 md:h-3" />;
+        if (['cm', 'meter', 'degree'].includes(type)) return <Ruler className="w-3.5 h-3.5 md:w-3 md:h-3" />;
+        if (['vo2max', 'watt', 'percent'].includes(type)) return <Activity className="w-3.5 h-3.5 md:w-3 md:h-3" />;
+        if (['reps', 'points', 'n', 'n_kg', 'kg'].includes(type)) return <Scale className="w-3.5 h-3.5 md:w-3 md:h-3" />;
         return <Hash className="w-3.5 h-3.5 md:w-3 md:h-3" />;
     };
 
@@ -220,7 +262,7 @@ export default function Show({ sport, categories }) {
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
                                                         {getParamIcon(test.parameter_type)}
-                                                        {test.parameter_type}
+                                                        {PARAM_CONFIG[test.parameter_type]?.label || test.parameter_type}
                                                     </span>
                                                     
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">

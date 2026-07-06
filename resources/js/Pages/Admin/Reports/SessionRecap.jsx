@@ -7,9 +7,7 @@ import Swal from 'sweetalert2';
 
 export default function SessionRecap({ athletes, groups, coaches }) {
     const [activeTab, setActiveTab] = useState('individual'); // 'individual', 'group', 'coach'
-    const [athleteSearch, setAthleteSearch] = useState('');
-    const [groupSearch, setGroupSearch] = useState('');
-    const [coachSearch, setCoachSearch] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const [expandedRows, setExpandedRows] = useState(new Set());
 
     const { post, processing } = useForm();
@@ -28,20 +26,19 @@ export default function SessionRecap({ athletes, groups, coaches }) {
     const totalAthleteSessions = athletes.reduce((sum, a) => sum + (a.total_sessions || 0), 0);
     const totalGroupSessions = groups.reduce((sum, g) => sum + (g.total_sessions || 0), 0);
     const activeCoachesCount = coaches.filter(c => c.total_sessions > 0).length;
-    const totalCoachEarnings = coaches.reduce((sum, c) => sum + (c.total_earnings || 0), 0);
 
     // Filtering
     const filteredAthletes = athletes.filter(a => 
-        a.name.toLowerCase().includes(athleteSearch.toLowerCase()) || 
-        (a.sport?.name || '').toLowerCase().includes(athleteSearch.toLowerCase())
+        a.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (a.sport?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const filteredGroups = groups.filter(g => 
-        g.name.toLowerCase().includes(groupSearch.toLowerCase())
+        g.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const filteredCoaches = coaches.filter(c => 
-        c.name.toLowerCase().includes(coachSearch.toLowerCase())
+        c.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Payment Handlers
@@ -134,104 +131,106 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                 subtitle="Laporan kumulatif sesi latihan atlet, grup, dan perhitungan honor pelatih"
                 icon={Activity}
                 backButton={true}
+                searchPlaceholder={`Cari ${activeTab === 'individual' ? 'klien individu' : activeTab === 'group' ? 'grup' : 'pelatih'}...`}
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
             />
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Individu</p>
-                        <h3 className="text-2xl font-black text-slate-800">{totalAthleteSessions}</h3>
-                    </div>
-                    <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-[#ff4d00]">
-                        <UserCheck className="w-6 h-6" />
-                    </div>
-                </div>
-                <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Grup</p>
-                        <h3 className="text-2xl font-black text-slate-800">{totalGroupSessions}</h3>
-                    </div>
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                        <Users className="w-6 h-6" />
+                <div className="relative bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50/0 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <div className="relative flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Individu</p>
+                            <h3 className="text-3xl font-black text-slate-800">{totalAthleteSessions}</h3>
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-[#ff4d00] shadow-inner">
+                            <UserCheck className="w-6 h-6" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-bold text-slate-500 mb-1">Pelatih Aktif</p>
-                        <h3 className="text-2xl font-black text-slate-800">{activeCoachesCount}</h3>
-                    </div>
-                    <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                        <Activity className="w-6 h-6" />
+                <div className="relative bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-50/0 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <div className="relative flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Grup</p>
+                            <h3 className="text-3xl font-black text-slate-800">{totalGroupSessions}</h3>
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 shadow-inner">
+                            <Users className="w-6 h-6" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-bold text-emerald-600 mb-1">Total Honor Pelatih</p>
-                        <h3 className="text-xl font-black text-emerald-800">{formatCurrency(totalCoachEarnings)}</h3>
+                <div className="relative bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-100 to-indigo-50/0 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <div className="relative flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-bold text-slate-500 mb-1">Pelatih Aktif</p>
+                            <h3 className="text-3xl font-black text-slate-800">{activeCoachesCount}</h3>
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-600 shadow-inner">
+                            <Activity className="w-6 h-6" />
+                        </div>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <Banknote className="w-6 h-6" />
+                </div>
+                <div className="relative bg-emerald-50 rounded-2xl border border-emerald-100 p-6 shadow-sm overflow-hidden group hover:shadow-md transition-all">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-200 to-emerald-100/0 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                    <div className="relative flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-bold text-emerald-600 mb-1">Total Tagihan Pelatih</p>
+                            <h3 className="text-xl font-black text-emerald-800">{formatCurrency(coaches.reduce((sum, c) => sum + (c.unpaid_earnings || 0), 0))}</h3>
+                        </div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center text-emerald-700 shadow-inner">
+                            <Banknote className="w-6 h-6" />
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="mt-8 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <div className="flex flex-wrap border-b border-slate-200 bg-slate-50">
-                    <button
-                        onClick={() => setActiveTab('individual')}
-                        className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-colors ${
-                            activeTab === 'individual' ? 'bg-white text-[#ff4d00] border-b-2 border-[#ff4d00]' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                        <UserCheck size={18} /> Klien Individu
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('group')}
-                        className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-colors ${
-                            activeTab === 'group' ? 'bg-white text-[#ff4d00] border-b-2 border-[#ff4d00]' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                        <Users size={18} /> Grup Latihan
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('coach')}
-                        className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-colors ${
-                            activeTab === 'coach' ? 'bg-white text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                        <Activity size={18} /> Rekap Pelatih (Honor)
-                    </button>
-                </div>
+            <div className="mt-8 flex flex-wrap items-center gap-2 mb-4">
+                <button
+                    onClick={() => setActiveTab('individual')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                        activeTab === 'individual' ? 'bg-[#ff4d00] text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                    <UserCheck size={16} /> Klien Individu
+                </button>
+                <button
+                    onClick={() => setActiveTab('group')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                        activeTab === 'group' ? 'bg-[#ff4d00] text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                    <Users size={16} /> Grup Latihan
+                </button>
+                <button
+                    onClick={() => setActiveTab('coach')}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                        activeTab === 'coach' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                >
+                    <Activity size={16} /> Rekap Pelatih (Honor)
+                </button>
+            </div>
 
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <div className="p-0">
                     {/* INDIVIDUAL TAB */}
                     {activeTab === 'individual' && (
                         <div>
-                            <div className="p-4 border-b border-slate-100 flex justify-end bg-white">
-                                <div className="relative w-full md:w-64">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input 
-                                        type="text"
-                                        value={athleteSearch}
-                                        onChange={e => setAthleteSearch(e.target.value)}
-                                        placeholder="Cari atlet..."
-                                        className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none"
-                                    />
-                                </div>
-                            </div>
-                            
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-slate-50 border-b border-slate-200">
                                         <tr>
                                             <th className="px-5 py-3 w-10"></th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Nama Atlet</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Paket Latihan</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Progress Sesi</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Belum Bayar</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Nama Atlet</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Paket Latihan</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Progress Sesi</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Belum Bayar</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -263,7 +262,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                         )}
                                                     </td>
                                                     <td className="px-5 py-3">
-                                                        {renderProgressBar(athlete.total_sessions, athlete.package_session_count)}
+                                                        {renderProgressBar(athlete.unpaid_sessions, athlete.package_session_count)}
                                                     </td>
                                                     <td className="px-5 py-3 text-center">
                                                         {athlete.unpaid_sessions > 0 ? (
@@ -295,7 +294,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                     <tr className="bg-slate-50/50">
                                                         <td colSpan="6" className="px-10 py-4 border-b border-slate-100">
                                                             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                                                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                                                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600">
                                                                     Riwayat Sesi Latihan
                                                                 </div>
                                                                 {athlete.sessions && athlete.sessions.length > 0 ? (
@@ -353,30 +352,17 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     {/* GROUP TAB */}
                     {activeTab === 'group' && (
                         <div>
-                            <div className="p-4 border-b border-slate-100 flex justify-end bg-white">
-                                <div className="relative w-full md:w-64">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input 
-                                        type="text"
-                                        value={groupSearch}
-                                        onChange={e => setGroupSearch(e.target.value)}
-                                        placeholder="Cari grup..."
-                                        className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none"
-                                    />
-                                </div>
-                            </div>
-                            
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-slate-50 border-b border-slate-200">
                                         <tr>
                                             <th className="px-5 py-3 w-10"></th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Nama Grup</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Anggota</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Paket Latihan</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Progress Sesi</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Belum Bayar</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Nama Grup</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Anggota</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Paket Latihan</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Progress Sesi</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Belum Bayar</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -419,7 +405,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                         )}
                                                     </td>
                                                     <td className="px-5 py-3">
-                                                        {renderProgressBar(group.total_sessions, group.package_session_count)}
+                                                        {renderProgressBar(group.unpaid_sessions, group.package_session_count)}
                                                     </td>
                                                     <td className="px-5 py-3 text-center">
                                                         {group.unpaid_sessions > 0 ? (
@@ -451,7 +437,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                     <tr className="bg-slate-50/50">
                                                         <td colSpan="7" className="px-10 py-4 border-b border-slate-100">
                                                             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                                                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                                                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600">
                                                                     Riwayat Sesi Latihan Grup
                                                                 </div>
                                                                 {group.sessions && group.sessions.length > 0 ? (
@@ -509,87 +495,128 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     {/* COACH TAB */}
                     {activeTab === 'coach' && (
                         <div>
-                            <div className="p-4 border-b border-slate-100 flex justify-end bg-white">
-                                <div className="relative w-full md:w-64">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input 
-                                        type="text"
-                                        value={coachSearch}
-                                        onChange={e => setCoachSearch(e.target.value)}
-                                        placeholder="Cari pelatih..."
-                                        className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
-                                    />
-                                </div>
-                            </div>
-                            
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-slate-50 border-b border-slate-200">
                                         <tr>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Nama Pelatih</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Sesi Individu</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Sesi Grup</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Total Sesi (All)</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Estimasi Honor</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Belum Dicairkan</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                                            <th className="px-5 py-3 w-10"></th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500">Nama Pelatih</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Sesi Individu</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Sesi Grup</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Total Sesi (All)</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Pencairan Terakhir</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Belum Dicairkan</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {filteredCoaches.length > 0 ? filteredCoaches.map(coach => (
-                                            <tr key={coach.id} className="hover:bg-slate-50 transition-colors">
-                                                <td className="px-5 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs shrink-0">
-                                                            {coach.name.substring(0, 2).toUpperCase()}
-                                                        </div>
-                                                        <span className="font-bold text-sm text-slate-800">{coach.name}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-5 py-4 text-center">
-                                                    <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
-                                                        {coach.individual_sessions}
-                                                    </span>
-                                                </td>
-                                                <td className="px-5 py-4 text-center">
-                                                    <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
-                                                        {coach.group_sessions}
-                                                    </span>
-                                                </td>
-                                                <td className="px-5 py-4 text-center">
-                                                    <span className="inline-flex min-w-[2.5rem] px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 font-bold text-sm border border-indigo-100 shadow-sm">
-                                                        {coach.total_sessions}
-                                                    </span>
-                                                </td>
-                                                <td className="px-5 py-4 text-right">
-                                                    <span className="font-bold text-emerald-700">{formatCurrency(coach.total_earnings)}</span>
-                                                </td>
-                                                <td className="px-5 py-4 text-right">
-                                                    {coach.unpaid_earnings > 0 ? (
-                                                        <span className="font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded border border-rose-100">{formatCurrency(coach.unpaid_earnings)}</span>
-                                                    ) : (
-                                                        <span className="text-slate-400 font-semibold">-</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-5 py-4 text-right">
-                                                    {coach.unpaid_sessions > 0 ? (
-                                                        <button
-                                                            onClick={() => handlePayCoach(coach)}
-                                                            disabled={processing}
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shadow-sm shadow-indigo-600/20"
-                                                        >
-                                                            <Banknote className="w-3.5 h-3.5" /> Cairkan Honor
+                                            <React.Fragment key={coach.id}>
+                                                <tr className="hover:bg-slate-50 transition-colors group/row">
+                                                    <td className="px-5 py-3">
+                                                        <button onClick={() => toggleRow(`coach-${coach.id}`)} className="p-1 text-slate-400 hover:text-slate-800 rounded">
+                                                            {expandedRows.has(`coach-${coach.id}`) ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                                         </button>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-50 px-3 py-1.5 rounded-lg">
-                                                            <CheckCircle2 size={14} /> Lunas
+                                                    </td>
+                                                    <td className="px-5 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs shrink-0">
+                                                                {coach.name.substring(0, 2).toUpperCase()}
+                                                            </div>
+                                                            <span className="font-bold text-sm text-slate-800">{coach.name}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-center">
+                                                        <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
+                                                            {coach.individual_sessions}
                                                         </span>
-                                                    )}
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-center">
+                                                        <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
+                                                            {coach.group_sessions}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-center">
+                                                        <span className="inline-flex min-w-[2.5rem] px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 font-bold text-sm border border-indigo-100 shadow-sm">
+                                                            {coach.total_sessions}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-right">
+                                                        <span className="font-bold text-emerald-700">{formatCurrency(coach.last_payout_amount || 0)}</span>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-right">
+                                                        {coach.unpaid_earnings > 0 ? (
+                                                            <span className="font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded border border-rose-100">{formatCurrency(coach.unpaid_earnings)}</span>
+                                                        ) : (
+                                                            <span className="text-slate-400 font-semibold">-</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-5 py-4 text-right">
+                                                        {coach.unpaid_sessions > 0 ? (
+                                                            <button
+                                                                onClick={() => handlePayCoach(coach)}
+                                                                disabled={processing}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shadow-sm shadow-indigo-600/20"
+                                                            >
+                                                                <Banknote className="w-3.5 h-3.5" /> Cairkan Honor
+                                                            </button>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-50 px-3 py-1.5 rounded-lg">
+                                                                <CheckCircle2 size={14} /> Lunas
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                                {/* Expanded Details */}
+                                                {expandedRows.has(`coach-${coach.id}`) && (
+                                                    <tr className="bg-slate-50/50">
+                                                        <td colSpan="8" className="px-10 py-4 border-b border-slate-100">
+                                                            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-600 flex justify-between">
+                                                                    <span>Riwayat Sesi (Belum Dicairkan)</span>
+                                                                </div>
+                                                                {coach.sessions && coach.sessions.length > 0 ? (
+                                                                    <table className="w-full text-left">
+                                                                        <tbody className="divide-y divide-slate-100">
+                                                                            {coach.sessions.map(session => (
+                                                                                <tr key={session.id} className="text-xs hover:bg-slate-50 transition-colors">
+                                                                                    <td className="px-4 py-3 font-medium text-slate-600 w-32 border-r border-slate-50">
+                                                                                        {session.date ? new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 w-24 text-center">
+                                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${session.type === 'Grup' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
+                                                                                            {session.type}
+                                                                                        </span>
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3">
+                                                                                        <span className="font-bold text-slate-800 mr-2">Sesi {session.session_number}:</span>
+                                                                                        <span className="text-slate-600">{session.name}</span>
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 w-28">
+                                                                                        {session.status === 'completed' ? (
+                                                                                            <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-100">Selesai</span>
+                                                                                        ) : (
+                                                                                            <span className="text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-100">Terjadwal</span>
+                                                                                        )}
+                                                                                    </td>
+                                                                                    <td className="px-4 py-3 w-32 text-right">
+                                                                                        <span className="font-bold text-emerald-600">{formatCurrency(session.fee)}</span>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                ) : (
+                                                                    <div className="p-4 text-center text-xs text-slate-400">Tidak ada sesi yang belum dicairkan.</div>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </React.Fragment>
                                         )) : (
                                             <tr>
-                                                <td colSpan="7" className="px-5 py-8 text-center text-slate-400 text-sm font-medium">Tidak ada data pelatih.</td>
+                                                <td colSpan="8" className="px-5 py-8 text-center text-slate-400 text-sm font-medium">Tidak ada data pelatih.</td>
                                             </tr>
                                         )}
                                     </tbody>

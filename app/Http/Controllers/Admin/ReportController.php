@@ -37,8 +37,8 @@ class ReportController extends Controller
                 $athlete->scheduled_sessions = $trainings->whereNotIn('status', ['completed'])->count();
                 $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
 
-                // Session list for drill-down
-                $athlete->sessions = $trainings->map(function ($t) {
+                // Session list for drill-down (hanya yang belum dibayar)
+                $athlete->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -87,8 +87,8 @@ class ReportController extends Controller
                 $group->completed_sessions = $trainings->where('status', 'completed')->count();
                 $group->unpaid_sessions = $trainings->where('is_group_paid', false)->count();
 
-                // Session list for drill-down
-                $group->sessions = $trainings->map(function ($t) {
+                // Session list for drill-down (hanya yang belum dibayar)
+                $group->sessions = $trainings->where('is_group_paid', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -151,14 +151,10 @@ class ReportController extends Controller
 
                 // Unpaid group sessions
                 $unpaidGroup = $groupTrainings->where('is_coach_paid', false);
-
-                // Calculate earnings from package fee
-                $totalEarnings = 0;
                 $unpaidEarnings = 0;
 
                 foreach ($individualTrainings as $session) {
                     $fee = $session->user?->package?->coach_fee_per_session ?? 0;
-                    $totalEarnings += $fee;
 
                     $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
                     $paidIds = $paidIds ?? [];
@@ -169,19 +165,49 @@ class ReportController extends Controller
 
                 foreach ($groupTrainings as $session) {
                     $fee = $session->group?->package?->coach_fee_per_session ?? 0;
-                    $totalEarnings += $fee;
 
                     if (!$session->is_coach_paid) {
                         $unpaidEarnings += $fee;
                     }
                 }
 
-                $coach->individual_sessions = $individualCount;
-                $coach->group_sessions = $groupCount;
-                $coach->total_sessions = $individualCount + $groupCount;
-                $coach->unpaid_sessions = $unpaidIndividual->count() + $unpaidGroup->count();
-                $coach->total_earnings = $totalEarnings;
+                $lastPayout = \App\Models\CoachPayout::where('user_id', $coach->id)->latest('paid_at')->first();
+
+                $coach->individual_sessions = $unpaidIndividual->count();
+                $coach->group_sessions = $unpaidGroup->count();
+                $coach->total_sessions = $unpaidIndividual->count() + $unpaidGroup->count();
+                $coach->unpaid_sessions = $coach->total_sessions;
+                $coach->last_payout_amount = $lastPayout ? $lastPayout->amount : 0;
                 $coach->unpaid_earnings = $unpaidEarnings;
+
+                // Build coach sessions for drill-down
+                $coachSessions = collect();
+
+                foreach ($unpaidIndividual as $session) {
+                    $coachSessions->push([
+                        'id' => 'ind_'.$session->id,
+                        'date' => $session->date ? $session->date->format('Y-m-d') : null,
+                        'name' => $session->name ?: 'Program Individu - ' . ($session->user->name ?? 'Atlet'),
+                        'session_number' => $session->session_number,
+                        'status' => $session->status,
+                        'type' => 'Individu',
+                        'fee' => $session->user?->package?->coach_fee_per_session ?? 0
+                    ]);
+                }
+
+                foreach ($unpaidGroup as $session) {
+                    $coachSessions->push([
+                        'id' => 'grp_'.$session->id,
+                        'date' => $session->date ? $session->date->format('Y-m-d') : null,
+                        'name' => $session->name ?: 'Program Grup - ' . ($session->group->name ?? 'Grup'),
+                        'session_number' => $session->session_number,
+                        'status' => $session->status,
+                        'type' => 'Grup',
+                        'fee' => $session->group?->package?->coach_fee_per_session ?? 0
+                    ]);
+                }
+
+                $coach->sessions = $coachSessions->sortByDesc('date')->values();
 
                 return $coach;
             });
@@ -204,16 +230,21 @@ class ReportController extends Controller
 
     public function payCoach(Request $request, User $user)
     {
+        $unpaidEarnings = 0;
+
         // Mark individual sessions as paid for this coach
         $individualTrainings = IndividualTraining::where('coach_id', $user->id)
             ->orWhereJsonContains('coach_ids', (string)$user->id)
             ->orWhereJsonContains('coach_ids', $user->id)
+            ->with('user.package')
             ->get();
 
         foreach ($individualTrainings as $session) {
             $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
             $paidIds = $paidIds ?? [];
             if (!in_array($user->id, $paidIds) && !in_array((string)$user->id, $paidIds)) {
+                $unpaidEarnings += $session->user?->package?->coach_fee_per_session ?? 0;
+
                 $paidIds[] = $user->id;
                 $session->paid_coach_ids = $paidIds;
                 $session->save();
@@ -221,13 +252,28 @@ class ReportController extends Controller
         }
 
         // Mark group sessions as paid for this coach
-        GroupTraining::where('coach_id', $user->id)
+        $groupTrainings = GroupTraining::where('coach_id', $user->id)
             ->orWhereJsonContains('coach_ids', (string)$user->id)
             ->orWhereJsonContains('coach_ids', $user->id)
             ->where('is_coach_paid', false)
-            ->update(['is_coach_paid' => true]);
+            ->with('group.package')
+            ->get();
 
-        return redirect()->back()->with('success', 'Berhasil menandai sesi pelatih sebagai lunas.');
+        foreach ($groupTrainings as $session) {
+            $unpaidEarnings += $session->group?->package?->coach_fee_per_session ?? 0;
+            $session->is_coach_paid = true;
+            $session->save();
+        }
+
+        if ($unpaidEarnings > 0) {
+            \App\Models\CoachPayout::create([
+                'user_id' => $user->id,
+                'amount' => $unpaidEarnings,
+                'paid_at' => now(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Berhasil mencairkan honor pelatih sebesar Rp ' . number_format($unpaidEarnings, 0, ',', '.'));
     }
 
     public function payGroup(Request $request, TrainingGroup $group)

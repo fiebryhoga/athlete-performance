@@ -5,7 +5,7 @@ import { Save, User, Trophy, MessageSquare, ArrowLeft, Target, AlertTriangle, Ch
 
 const ResultInput = ({ item, value, onChange }) => {
     
-    const decimalTypes = ['second', 'minute', 'meter', 'vo2max'];
+    const decimalTypes = ['second', 'minute', 'meter', 'vo2max', 'kg', 'n', 'n_kg', 'percent', 'watt', 'degree'];
     const isDecimal = decimalTypes.includes(item.parameter_type);
     const step = isDecimal ? "0.01" : "1";
     const placeholder = isDecimal ? "0.00" : "0";

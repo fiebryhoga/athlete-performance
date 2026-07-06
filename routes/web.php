@@ -148,6 +148,10 @@ Route::middleware([
         Route::post('/admin/individual-trainings/session/{training}/rpe', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'storeRpe'])->name('admin.individual-trainings.session.rpe');
         Route::post('/admin/individual-trainings/session/{training}/complete', [\App\Http\Controllers\Admin\IndividualTrainingController::class, 'completeTraining'])->name('admin.individual-trainings.session.complete');
 
+        // Load Analysis (Strength Training)
+        Route::get('/admin/load-analysis', [\App\Http\Controllers\Admin\LoadAnalysisController::class, 'index'])->name('admin.load-analysis.index');
+        Route::get('/admin/load-analysis/{user}', [\App\Http\Controllers\Admin\LoadAnalysisController::class, 'show'])->name('admin.load-analysis.show');
+
         Route::get('composition-tests/create', [CompositionTestController::class, 'create'])->name('admin.composition-tests.create');
         Route::post('composition-tests', [CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
         Route::get('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'index'])->name('admin.composition-tests.index');

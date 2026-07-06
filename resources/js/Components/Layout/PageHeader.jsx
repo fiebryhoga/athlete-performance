@@ -18,7 +18,7 @@ export default function PageHeader({
             
             <div className="relative z-10 w-full lg:w-auto">
                 {badge && (
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-3 inline-block">
+                    <span className="text-[12px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-3 inline-block">
                         {badge}
                     </span>
                 )}
