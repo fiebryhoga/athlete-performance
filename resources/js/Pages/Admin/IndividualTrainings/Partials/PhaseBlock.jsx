@@ -44,7 +44,7 @@ export default function PhaseBlock({
  {
  id:"free_strength",
  label:"Free Individual Strength",
- columns:"full",
+ columns:"note_only",
  },
  { id:"cardio", label:"Cardio Endurance", columns:"cardio" },
  ];
@@ -1051,7 +1051,7 @@ export default function PhaseBlock({
  </div>
  <div className="flex flex-col gap-1.5">
  <span className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
- {["strength_training", "free_strength"].includes(block.category) ? "RPE" : "RIR"}
+ {["interval", "cardio"].includes(block.category) ? "RPE" : "RIR"}
  {setIdx ===
  0 && (
  <button
@@ -1102,6 +1102,9 @@ export default function PhaseBlock({
  placeholder="-"
  />
  </div>
+ </>
+ )}
+ {(currentCat.columns === "full" || currentCat.columns === "medium") && (
  <div className="flex flex-col gap-1.5">
  <span className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
  Rest
@@ -1155,7 +1158,6 @@ export default function PhaseBlock({
  placeholder="-"
  />
  </div>
- </>
  )}
  </>
  )}

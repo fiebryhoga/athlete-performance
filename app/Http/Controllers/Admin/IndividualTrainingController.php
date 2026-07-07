@@ -270,51 +270,114 @@ class IndividualTrainingController extends Controller
             'coach_ids' => $request->coach_ids,
         ]);
 
-        // Recreate blocks and items
-        // First delete existing blocks
-        $training->blocks()->delete();
+        // Process blocks
+        $existingBlockIds = [];
+        $existingItemIds = [];
 
         if (!empty($request->blocks)) {
             foreach ($request->blocks as $blockIndex => $blockData) {
-                $block = TrainingBlock::create([
-                    'individual_training_id' => $training->id,
-                    'step' => $blockData['step'] ?? 2,
-                    'category' => $blockData['category'] ?? 'warm_up',
-                    'title' => $blockData['title'] ?? null,
-                    'description' => $blockData['description'] ?? null,
-                    'sort_order' => $blockIndex,
-                    'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
-                ]);
-
-                if (!empty($blockData['items'])) {
-                    foreach ($blockData['items'] as $itemIndex => $itemData) {
-                        TrainingBlockItem::create([
-                            'training_block_id' => $block->id,
-                            'exercise_id' => $itemData['exercise_id'] ?? null,
-                            'note' => $itemData['note'] ?? null,
-                            'load' => $itemData['load'] ?? null,
-                            'load_unit' => $itemData['load_unit'] ?? 'kg',
-                            'sets' => $itemData['sets'] ?? null,
-                            'reps' => $itemData['reps'] ?? null,
-                            'reps_unit' => $itemData['reps_unit'] ?? 'reps',
-                            'duration' => $itemData['duration'] ?? null,
-                            'tempo' => $itemData['tempo'] ?? null,
-                            'rir' => $itemData['rir'] ?? null,
-                            'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
-                            'intensity' => $itemData['intensity'] ?? null,
-                            'reps_array' => $itemData['reps_array'] ?? null,
-                            'load_array' => $itemData['load_array'] ?? null,
-                            'distance_array' => $itemData['distance_array'] ?? null,
-                            'minutes_array' => $itemData['minutes_array'] ?? null,
-                            'tempo_array' => $itemData['tempo_array'] ?? null,
-                            'rir_array' => $itemData['rir_array'] ?? null,
-                            'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
-                            'sort_order' => $itemIndex,
+                if (!empty($blockData['id'])) {
+                    $block = TrainingBlock::find($blockData['id']);
+                    if ($block) {
+                        $block->update([
+                            'step' => $blockData['step'] ?? 2,
+                            'category' => $blockData['category'] ?? 'warm_up',
+                            'title' => $blockData['title'] ?? null,
+                            'description' => $blockData['description'] ?? null,
+                            'sort_order' => $blockIndex,
+                            'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
                         ]);
+                    }
+                } else {
+                    $block = TrainingBlock::create([
+                        'individual_training_id' => $training->id,
+                        'step' => $blockData['step'] ?? 2,
+                        'category' => $blockData['category'] ?? 'warm_up',
+                        'title' => $blockData['title'] ?? null,
+                        'description' => $blockData['description'] ?? null,
+                        'sort_order' => $blockIndex,
+                        'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
+                    ]);
+                }
+                
+                if ($block) {
+                    $existingBlockIds[] = $block->id;
+                }
+
+                if (!empty($blockData['items']) && $block) {
+                    foreach ($blockData['items'] as $itemIndex => $itemData) {
+                        if (!empty($itemData['id'])) {
+                            $item = TrainingBlockItem::find($itemData['id']);
+                            if ($item) {
+                                $item->update([
+                                    'exercise_id' => $itemData['exercise_id'] ?? null,
+                                    'note' => $itemData['note'] ?? null,
+                                    'load' => $itemData['load'] ?? null,
+                                    'load_unit' => $itemData['load_unit'] ?? 'kg',
+                                    'sets' => $itemData['sets'] ?? null,
+                                    'reps' => $itemData['reps'] ?? null,
+                                    'reps_unit' => $itemData['reps_unit'] ?? 'reps',
+                                    'duration' => $itemData['duration'] ?? null,
+                                    'tempo' => $itemData['tempo'] ?? null,
+                                    'rir' => $itemData['rir'] ?? null,
+                                    'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
+                                    'intensity' => $itemData['intensity'] ?? null,
+                                    'reps_array' => $itemData['reps_array'] ?? null,
+                                    'load_array' => $itemData['load_array'] ?? null,
+                                    'distance_array' => $itemData['distance_array'] ?? null,
+                                    'minutes_array' => $itemData['minutes_array'] ?? null,
+                                    'tempo_array' => $itemData['tempo_array'] ?? null,
+                                    'rir_array' => $itemData['rir_array'] ?? null,
+                                    'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
+                                    'sort_order' => $itemIndex,
+                                ]);
+                            }
+                        } else {
+                            $item = TrainingBlockItem::create([
+                                'training_block_id' => $block->id,
+                                'exercise_id' => $itemData['exercise_id'] ?? null,
+                                'note' => $itemData['note'] ?? null,
+                                'load' => $itemData['load'] ?? null,
+                                'load_unit' => $itemData['load_unit'] ?? 'kg',
+                                'sets' => $itemData['sets'] ?? null,
+                                'reps' => $itemData['reps'] ?? null,
+                                'reps_unit' => $itemData['reps_unit'] ?? 'reps',
+                                'duration' => $itemData['duration'] ?? null,
+                                'tempo' => $itemData['tempo'] ?? null,
+                                'rir' => $itemData['rir'] ?? null,
+                                'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
+                                'intensity' => $itemData['intensity'] ?? null,
+                                'reps_array' => $itemData['reps_array'] ?? null,
+                                'load_array' => $itemData['load_array'] ?? null,
+                                'distance_array' => $itemData['distance_array'] ?? null,
+                                'minutes_array' => $itemData['minutes_array'] ?? null,
+                                'tempo_array' => $itemData['tempo_array'] ?? null,
+                                'rir_array' => $itemData['rir_array'] ?? null,
+                                'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
+                                'sort_order' => $itemIndex,
+                            ]);
+                        }
+                        
+                        if ($item) {
+                            $existingItemIds[] = $item->id;
+                        }
                     }
                 }
             }
         }
+
+        // Delete removed items
+        $blocks = TrainingBlock::where('individual_training_id', $training->id)->get();
+        foreach ($blocks as $block) {
+            TrainingBlockItem::where('training_block_id', $block->id)
+                ->whereNotIn('id', $existingItemIds)
+                ->delete();
+        }
+        
+        // Delete removed blocks
+        TrainingBlock::where('individual_training_id', $training->id)
+            ->whereNotIn('id', $existingBlockIds)
+            ->delete();
 
         return redirect()->route('admin.individual-trainings.session.show', $training->id)
             ->with('message', 'Sesi latihan berhasil diperbarui!');
@@ -593,14 +656,9 @@ class IndividualTrainingController extends Controller
             ];
         }
 
-        $blocksArray = $training->blocks->map(function ($block) {
-            $blockData = $block->toArray();
-            $blockData['items'] = $block->items->map(function ($item) {
-                $itemData = $item->toArray();
+        $training->blocks->each(function ($block) {
+            $block->items->each(function ($item) {
                 if ($item->exercise) {
-                    $itemData['exercise'] = $item->exercise->toArray();
-                    
-                    // Add base64 images
                     $base64Images = [];
                     if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
                         foreach ($item->exercise->images as $img) {
@@ -616,21 +674,27 @@ class IndividualTrainingController extends Controller
                             }
                         }
                     }
-                    $itemData['exercise']['base64_images'] = $base64Images;
+                    $item->exercise->setAttribute('base64_images', $base64Images);
                 }
-                return $itemData;
-            })->toArray();
-            return $blockData;
-        })->toArray();
+            });
+        });
+
+        // Pastikan nama dan tanggal tersedia untuk title
+        $training->title = $training->name ?: 'Individual Training Session #' . $training->session_number;
+        $training->focus = ($athlete ? $athlete->name : 'Athlete') . ($training->location ? ' | ' . $training->location : '');
+        
+        $coachNames = [];
+        if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
+            $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                ->pluck('name')
+                ->toArray();
+        }
+        $training->coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.training_session_pdf', [
-            'training' => (object)[
-                'title' => ($training->name ?: 'Individual Training Session #' . $training->session_number),
-                'date' => $training->date,
-                'focus' => ($athlete ? $athlete->name : 'Athlete') . ($training->location ? ' | ' . $training->location : ''),
-                'blocks' => $blocksArray,
-            ],
-            'group' => null,
+            'training' => $training,
+            'playerName' => $athlete ? $athlete->name : 'Athlete',
+            'athlete' => $athlete,
             'athletesData' => $athletesData,
             'clubLogo' => $clubLogo
         ])->setPaper('a4', 'landscape');

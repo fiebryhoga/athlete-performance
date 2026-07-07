@@ -125,7 +125,7 @@
         $clubName = strtoupper($club->name ?? 'CLUB NAME');
         $title = $reportTitle ? strtoupper($reportTitle) : "DAILY WELLNESS & RPE REPORT $clubName";
         
-        $wellnessCols = $options['wellness'] ? 5 : 0;
+        $wellnessCols = $options['wellness'] ? 7 : 0;
         $rpeCols = $options['rpe'] ? 5 : 0;
         $painCols = $options['pain'] ? 1 : 0;
     @endphp
@@ -157,7 +157,7 @@
             <tr class="group-header">
                 <th colspan="3">PLAYER IDENTITY</th>
                 @if($options['wellness'])
-                    <th colspan="5" class="alt-bg">WELLNESS METRICS</th>
+                    <th colspan="7" class="alt-bg">WELLNESS METRICS</th>
                 @endif
                 @if($options['rpe'])
                     <th colspan="5">RPE & LOAD</th>
@@ -176,6 +176,8 @@
                     <th>Fatigue</th>
                     <th>Soreness</th>
                     <th>Stress</th>
+                    <th>Motiv</th>
+                    <th>Mood</th>
                     <th style="background-color:#e4e4e7">Score</th>
                 @endif
                 
@@ -208,6 +210,8 @@
                         <td>{{ $log ? $log->fatigue : '-' }}</td>
                         <td>{{ $log ? $log->muscle_soreness : '-' }}</td>
                         <td>{{ $log ? $log->stress : '-' }}</td>
+                        <td>{{ $log ? $log->motivation : '-' }}</td>
+                        <td>{{ $log ? $log->mood_state : '-' }}</td>
                         <td class="font-bold" style="background-color:#f4f4f5">{{ $log ? $log->daily_wellness_score : '-' }}</td>
                     @endif
                     

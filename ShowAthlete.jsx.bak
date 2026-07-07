@@ -157,7 +157,7 @@ export default function ShowAthlete({ auth, athlete, trainings, exercises = [], 
  )}
  </div>
  <div>
- <h2 className="text-xl font-black text-zinc-900 ">{athlete.name}</h2>
+ <h2 className="text-xl font-bold text-zinc-900 ">{athlete.name}</h2>
  <div className="mt-2 flex items-center gap-4 text-sm font-semibold text-zinc-500">
  <span className="flex items-center gap-1.5"><Activity size={14}/> {athlete.sport?.name || 'Cabang Olahraga'}</span>
  <span className="flex items-center gap-1.5 capitalize"><Dumbbell size={14}/> {athlete.role}</span>
@@ -173,7 +173,7 @@ export default function ShowAthlete({ auth, athlete, trainings, exercises = [], 
         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-zinc-200 shadow-sm text-zinc-500 z-10 shrink-0">
             <Calendar size={16} />
         </div>
-        <h3 className="text-xl font-black text-zinc-900 bg-zinc-50 pr-4">{group.monthYear}</h3>
+        <h3 className="text-xl font-bold text-zinc-900 bg-zinc-50 pr-4">{group.monthYear}</h3>
     </div>
     <div className="space-y-3">
         {group.days.map((dayData, dayIndex) => {
@@ -208,7 +208,7 @@ export default function ShowAthlete({ auth, athlete, trainings, exercises = [], 
                 <div key={dayIndex} className="relative flex items-start group">
                     <div className="hidden md:block w-24 shrink-0 text-right pr-6 pt-5">
                         <div className="text-sm font-bold text-zinc-900">{dayData.displayDate}</div>
-                        {dayData.isToday && <div className="text-[10px] font-black uppercase tracking-wider text-zinc-400 mt-1">Hari Ini</div>}
+                        {dayData.isToday && <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-1">Hari Ini</div>}
                     </div>
                     <div className="w-10 h-10 flex items-center justify-center shrink-0 z-10 pt-4">
                         <div className={`w-3.5 h-3.5 rounded-full border-[3px] border-zinc-50 shadow-sm ${dayData.isToday ? 'bg-zinc-900' : 'bg-[#ff4d00]'}`}></div>
@@ -219,7 +219,7 @@ export default function ShowAthlete({ auth, athlete, trainings, exercises = [], 
                                 <div className="md:hidden">
                                     <h3 className="font-bold text-zinc-900 flex items-center gap-2">
                                         {dayData.displayDate}
-                                        {dayData.isToday && <span className="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-black bg-zinc-900 text-white">Hari Ini</span>}
+                                        {dayData.isToday && <span className="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-zinc-900 text-white">Hari Ini</span>}
                                     </h3>
                                 </div>
                             </div>
@@ -245,7 +245,7 @@ export default function ShowAthlete({ auth, athlete, trainings, exercises = [], 
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="bg-zinc-900 text-white text-xs font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                                                    <span className="bg-zinc-900 text-white text-xs font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider">
                                                         Sesi {session.session_number}
                                                     </span>
                                                     <span className="text-sm font-semibold text-zinc-500">

@@ -398,7 +398,7 @@ export default function ShowSession({
                     strength_training: "full",
                     stretching: "note_only",
                     interval: "cardio",
-                    free_strength: "basic",
+                    free_strength: "note_only",
                     cardio: "cardio",
                 };
                 const columns = categoryMap[block.category] || "basic";
@@ -765,7 +765,7 @@ export default function ShowSession({
                                             strength_training: "full",
                                             stretching: "note_only",
                                             interval: "cardio",
-                                            free_strength: "full",
+                                            free_strength: "note_only",
                                             cardio: "cardio",
                                         };
                                         const columns =

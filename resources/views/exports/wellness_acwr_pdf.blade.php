@@ -137,7 +137,7 @@
                 <thead>
                     <tr class="group-header">
                         <th class="alt-bg" style="width: 8%;">Hari</th>
-                        <th colspan="4" class="alt-bg">Wellness Metrics (1-7)</th>
+                        <th colspan="6" class="alt-bg">Wellness Metrics (1-5)</th>
                         <th colspan="2" class="alt-bg">AM Session</th>
                         <th colspan="2" class="alt-bg">PM Session</th>
                         <th colspan="2" class="alt-bg">Daily Totals</th>
@@ -148,6 +148,8 @@
                         <th title="Fatigue">Fatigue</th>
                         <th title="Soreness">Soreness</th>
                         <th title="Stress">Stress</th>
+                        <th title="Motivation">Motiv</th>
+                        <th title="Mood State">Mood</th>
                         <th>RPE</th>
                         <th>Dur (m)</th>
                         <th>RPE</th>
@@ -168,6 +170,8 @@
                             <td class="font-bold">{{ $day['fatigue'] }}</td>
                             <td class="font-bold">{{ $day['muscle_soreness'] }}</td>
                             <td class="font-bold">{{ $day['stress'] }}</td>
+                            <td class="font-bold">{{ $day['motivation'] ?? '-' }}</td>
+                            <td class="font-bold">{{ $day['mood_state'] ?? '-' }}</td>
                             
                             <td>{{ $day['am_rpe'] }}</td>
                             <td>{{ $day['am_duration'] }}</td>
@@ -180,7 +184,7 @@
                     @endforeach
                     
                     <tr style="background-color: #18181b; color: #ffffff;">
-                        <td colspan="5" style="text-align: right; padding-right: 15px; font-size: 8px; font-weight: bold;">
+                        <td colspan="7" style="text-align: right; padding-right: 15px; font-size: 8px; font-weight: bold;">
                         <span style="color: #fcfcfc;">Total Mingguan (Minggu {{ $week['week_number'] }}) :</span>
     
                         

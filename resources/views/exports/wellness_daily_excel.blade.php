@@ -4,7 +4,7 @@
     $title = $reportTitle ? strtoupper($reportTitle) : "DAILY WELLNESS & RPE REPORT $clubName";
     
     $totalCols = 3;
-    if ($options['wellness']) $totalCols += 5;
+    if ($options['wellness']) $totalCols += 7;
     if ($options['rpe']) $totalCols += 5;
     if ($options['pain']) $totalCols += 1;
 @endphp
@@ -37,7 +37,7 @@
         <tr>
             <th colspan="3" style="border: 1px solid #000000; font-weight: bold; text-align: center; background-color: #1f2937; color: #ffffff;">PLAYER IDENTITY</th>
             @if($options['wellness'])
-                <th colspan="5" style="border: 1px solid #000000; font-weight: bold; text-align: center; background-color: #374151; color: #ffffff;">WELLNESS METRICS</th>
+                <th colspan="7" style="border: 1px solid #000000; font-weight: bold; text-align: center; background-color: #374151; color: #ffffff;">WELLNESS METRICS</th>
             @endif
             @if($options['rpe'])
                 <th colspan="5" style="border: 1px solid #000000; font-weight: bold; text-align: center; background-color: #1f2937; color: #ffffff;">RPE & LOAD</th>
@@ -57,6 +57,8 @@
                 <th style="border: 1px solid #000000; font-weight: bold; text-align: center;">Fatigue</th>
                 <th style="border: 1px solid #000000; font-weight: bold; text-align: center;">Soreness</th>
                 <th style="border: 1px solid #000000; font-weight: bold; text-align: center;">Stress</th>
+                <th style="border: 1px solid #000000; font-weight: bold; text-align: center;">Motivation</th>
+                <th style="border: 1px solid #000000; font-weight: bold; text-align: center;">Mood</th>
                 <th style="border: 1px solid #000000; font-weight: bold; text-align: center; background-color: #e5e7eb;">Total Score</th>
             @endif
             
@@ -89,6 +91,8 @@
                     <td style="border: 1px solid #000000; text-align: center;">{{ $log ? $log->fatigue : '-' }}</td>
                     <td style="border: 1px solid #000000; text-align: center;">{{ $log ? $log->muscle_soreness : '-' }}</td>
                     <td style="border: 1px solid #000000; text-align: center;">{{ $log ? $log->stress : '-' }}</td>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $log ? $log->motivation : '-' }}</td>
+                    <td style="border: 1px solid #000000; text-align: center;">{{ $log ? $log->mood_state : '-' }}</td>
                     <td style="border: 1px solid #000000; text-align: center; font-weight: bold; background-color: #f9fafb;">{{ $log ? $log->daily_wellness_score : '-' }}</td>
                 @endif
                 

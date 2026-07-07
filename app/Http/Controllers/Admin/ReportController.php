@@ -284,4 +284,161 @@ class ReportController extends Controller
 
         return redirect()->back()->with('success', 'Berhasil menandai sesi grup sebagai lunas.');
     }
+    public function exportAthleteReportPdf(Request $request, User $user)
+    {
+        // Load all trainings for this athlete
+        $trainings = IndividualTraining::where('user_id', $user->id)
+            ->with(['coach', 'blocks.items.exercise', 'rpeRecords'])
+            ->orderBy('session_number', 'asc')
+            ->get();
+
+        $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
+        $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
+        
+        $clubLogo = null;
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        // Prepare each training's data
+        $trainings->each(function ($training) use ($user) {
+            $training->blocks->each(function ($block) {
+                $block->items->each(function ($item) {
+                    if ($item->exercise) {
+                        $base64Images = [];
+                        if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
+                            foreach ($item->exercise->images as $img) {
+                                $imgClean = str_replace('storage/', '', ltrim($img, '/'));
+                                $imgPath1 = public_path('storage/' . $imgClean);
+                                $imgPath2 = storage_path('app/public/' . $imgClean);
+                                $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
+                                
+                                if ($finalImgPath) {
+                                    $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
+                                    $data = file_get_contents($finalImgPath);
+                                    $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                }
+                            }
+                        }
+                        $item->exercise->setAttribute('base64_images', $base64Images);
+                    }
+                });
+            });
+
+            // Set title and focus
+            $training->title = $training->name ?: 'Session #' . $training->session_number;
+            $training->focus = ($training->location ? $training->location : '');
+            
+            $coachNames = [];
+            if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
+                $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                    ->pluck('name')
+                    ->toArray();
+            }
+            $training->coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
+
+            // Process RPEs for the footer of each session if needed
+            $rpes = [];
+            foreach ($training->rpeRecords as $record) {
+                $rpeData = $record->rpe_data;
+                if (is_array($rpeData)) {
+                    foreach ($rpeData as $data) {
+                        if (is_array($data) && isset($data['label']) && isset($data['rpe'])) {
+                            $rpes[] = ['label' => $data['label'], 'value' => $data['rpe']];
+                        }
+                    }
+                }
+            }
+            
+            $training->athleteData = [
+                'name' => $user->name,
+                'is_completed' => (bool) $training->is_completed,
+                'note' => $training->athlete_note,
+                'rpes' => $rpes,
+            ];
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.athlete_session_report_pdf', [
+            'trainings' => $trainings,
+            'athlete' => $user,
+            'clubLogo' => $clubLogo
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('Laporan_Sesi_' . str_replace(' ', '_', $user->name) . '.pdf');
+    }
+
+
+    public function exportGroupReportPdf(Request $request, \App\Models\TrainingGroup $group)
+    {
+        // Load all trainings for this group
+        $trainings = GroupTraining::where('training_group_id', $group->id)
+            ->with(['coach', 'blocks.items.exercise', 'rpe_records'])
+            ->orderBy('session_number', 'asc')
+            ->get();
+
+        $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
+        $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
+        
+        $clubLogo = null;
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        // Prepare each training's data
+        $trainings->each(function ($training) use ($group) {
+            $training->blocks->each(function ($block) {
+                $block->items->each(function ($item) {
+                    if ($item->exercise) {
+                        $base64Images = [];
+                        if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
+                            foreach ($item->exercise->images as $img) {
+                                $imgClean = str_replace('storage/', '', ltrim($img, '/'));
+                                $imgPath1 = public_path('storage/' . $imgClean);
+                                $imgPath2 = storage_path('app/public/' . $imgClean);
+                                $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
+                                
+                                if ($finalImgPath) {
+                                    $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
+                                    $data = file_get_contents($finalImgPath);
+                                    $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                                }
+                            }
+                        }
+                        $item->exercise->setAttribute('base64_images', $base64Images);
+                    }
+                });
+            });
+
+            // Set title and focus
+            $training->title = $training->name ?: 'Session #' . $training->session_number;
+            $training->focus = ($training->location ? $training->location : '');
+            
+            $coachNames = [];
+            if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
+                $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                    ->pluck('name')
+                    ->toArray();
+            }
+            $training->coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
+
+            $training->athleteData = [
+                'name' => $group->name,
+                'is_completed' => true,
+                'note' => '',
+                'rpes' => [],
+            ];
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.athlete_session_report_pdf', [
+            'trainings' => $trainings,
+            'athlete' => (object)['name' => $group->name, 'package' => null],
+            'clubLogo' => $clubLogo
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('Laporan_Sesi_Grup_' . str_replace(' ', '_', $group->name) . '.pdf');
+    }
 }

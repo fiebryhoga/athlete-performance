@@ -143,7 +143,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     <div className="relative flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Individu</p>
-                            <h3 className="text-3xl font-black text-slate-800">{totalAthleteSessions}</h3>
+                            <h3 className="text-3xl font-bold text-slate-800">{totalAthleteSessions}</h3>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-[#ff4d00] shadow-inner">
                             <UserCheck className="w-6 h-6" />
@@ -155,7 +155,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     <div className="relative flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Grup</p>
-                            <h3 className="text-3xl font-black text-slate-800">{totalGroupSessions}</h3>
+                            <h3 className="text-3xl font-bold text-slate-800">{totalGroupSessions}</h3>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 shadow-inner">
                             <Users className="w-6 h-6" />
@@ -167,7 +167,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     <div className="relative flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold text-slate-500 mb-1">Pelatih Aktif</p>
-                            <h3 className="text-3xl font-black text-slate-800">{activeCoachesCount}</h3>
+                            <h3 className="text-3xl font-bold text-slate-800">{activeCoachesCount}</h3>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-600 shadow-inner">
                             <Activity className="w-6 h-6" />
@@ -179,7 +179,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                     <div className="relative flex items-center justify-between">
                         <div>
                             <p className="text-xs font-bold text-emerald-600 mb-1">Total Tagihan Pelatih</p>
-                            <h3 className="text-xl font-black text-emerald-800">{formatCurrency(coaches.reduce((sum, c) => sum + (c.unpaid_earnings || 0), 0))}</h3>
+                            <h3 className="text-xl font-bold text-emerald-800">{formatCurrency(coaches.reduce((sum, c) => sum + (c.unpaid_earnings || 0), 0))}</h3>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center text-emerald-700 shadow-inner">
                             <Banknote className="w-6 h-6" />

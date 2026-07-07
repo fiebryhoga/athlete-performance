@@ -234,7 +234,7 @@ export default function ExerciseItem({
  )}
  </div>
  <div className="flex items-center gap-1.5 px-2 border-l border-zinc-200 ">
- <span className="text-[9px] text-zinc-500 font-bold">{["strength_training", "free_strength"].includes(block.category) ? "RPE" : "RIR"}</span>
+ <span className="text-[9px] text-zinc-500 font-bold">{["interval", "cardio"].includes(block.category) ? "RPE" : "RIR"}</span>
  {isEditableTarget ? (
  <input
  type="text"
@@ -247,22 +247,22 @@ export default function ExerciseItem({
  <span className="text-xs font-bold text-zinc-900 ">{rir || "-"}</span>
  )}
  </div>
- <div className="flex items-center gap-1.5 px-2 border-l border-zinc-200 ">
- <span className="text-[9px] text-zinc-500 font-bold">{"Rest"}</span>
- {isEditableTarget ? (
- <input
- type="text"
- value={data.targets?.[item.id]?.rest_per_set_array?.[sIdx] ?? ""}
- onChange={(e) => handleTargetArrayChange(item.id, "rest_per_set_array", sIdx, e.target.value)}
- className="w-16 border-zinc-300 focus:border-zinc-500 focus:ring-zinc-500 rounded-md shadow-sm text-xs py-0.5 px-1 font-bold h-6"
- placeholder="-"
- />
- ) : (
- <span className="text-xs font-bold text-zinc-900 ">{rst || "-"}</span>
- )}
- </div>
- </>
- )}
+  </>
+  )}
+  <div className="flex items-center gap-1.5 px-2 border-l border-zinc-200 ">
+  <span className="text-[9px] text-zinc-500 font-bold">{"Rest"}</span>
+  {isEditableTarget ? (
+  <input
+  type="text"
+  value={data.targets?.[item.id]?.rest_per_set_array?.[sIdx] ?? ""}
+  onChange={(e) => handleTargetArrayChange(item.id, "rest_per_set_array", sIdx, e.target.value)}
+  className="w-16 border-zinc-300 focus:border-zinc-500 focus:ring-zinc-500 rounded-md shadow-sm text-xs py-0.5 px-1 font-bold h-6"
+  placeholder="-"
+  />
+  ) : (
+  <span className="text-xs font-bold text-zinc-900 ">{rst || "-"}</span>
+  )}
+  </div>
  </>
  )}
  </div>
@@ -299,7 +299,7 @@ export default function ExerciseItem({
  </div>
  </div>
 
- {((block.target_filled_by === "athlete" && ["full", "medium", "cardio"].includes(columns)) || ["strength_training", "free_strength", "interval", "cardio"].includes(block.category)) && (
+ {((block.target_filled_by === "athlete" && ["full", "medium", "cardio"].includes(columns)) || ["strength_training", "interval", "cardio"].includes(block.category)) && (
  <div className="bg-zinc-50 border border-zinc-200/60 rounded-xl p-3 sm:p-4 ml-0 lg:ml-3.5 mt-2 flex flex-col gap-4 w-full">
  {block.target_filled_by === "athlete" && ["full", "medium", "cardio"].includes(columns) && (
  <div className="mb-4">
@@ -368,10 +368,10 @@ export default function ExerciseItem({
  </div>
  )}
 
- {["strength_training", "free_strength", "interval", "cardio"].includes(block.category) && (
+ {["strength_training", "interval", "cardio"].includes(block.category) && (
  <div className="mb-4">
  <h5 className="text-[10px] font-bold text-zinc-500 mb-3">
- {["strength_training", "free_strength"].includes(block.category) ? "RPE" : "RIR"}
+ {["interval", "cardio"].includes(block.category) ? "RPE" : "RIR"}
  </h5>
  <div className="flex flex-wrap gap-3">
  {Array.from({ length: Math.max(1, maxSets) }).map((_, sIdx) => {

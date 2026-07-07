@@ -45,7 +45,7 @@ export default function AthleteIndex({ auth, days }) {
                                         <span className={`text-[10px] font-bold ${day.is_today ? 'text-[#ff4d00]' : 'text-slate-400'}`}>
                                             {day.day_name.substring(0, 3)}
                                         </span>
-                                        <span className={`text-lg font-black leading-none mt-0.5 ${day.is_today ? 'text-slate-900' : 'text-slate-700'}`}>
+                                        <span className={`text-lg font-bold leading-none mt-0.5 ${day.is_today ? 'text-slate-900' : 'text-slate-700'}`}>
                                             {day.formatted_date.split(' ')[0]}
                                         </span>
                                     </div>

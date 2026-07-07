@@ -95,6 +95,11 @@ class WellnessRpeController extends Controller
         if ($season_start_date) {
             $start = Carbon::parse($season_start_date)->startOfWeek(); 
             $end = Carbon::today()->endOfWeek(); 
+            
+            $allLogs = WellnessRpe::where('user_id', $athlete->id)
+                ->where('record_date', '>=', $start->format('Y-m-d'))
+                ->where('record_date', '<=', $end->format('Y-m-d'))
+                ->get();
 
             $currentDate = $start->copy();
             $weekNumber = 1;
@@ -105,17 +110,25 @@ class WellnessRpeController extends Controller
                 
                 $days = [];
                 for ($i = 0; $i < 7; $i++) {
+                    $dateStr = $currentDate->format('Y-m-d');
+                    $log = $allLogs->first(function ($item) use ($dateStr) {
+                        return \Carbon\Carbon::parse($item->record_date)->format('Y-m-d') === $dateStr;
+                    });
+                    
                     $days[] = [
-                        'date' => $currentDate->format('Y-m-d'),
-                        'day_name' => $currentDate->locale(app()->getLocale())->translatedFormat('l'),
-                        'formatted_date' => $currentDate->locale(app()->getLocale())->translatedFormat('d M Y'),
+                        'date' => $dateStr,
+                        'day_name' => $currentDate->locale(app()->getLocale())->shortDayName,
+                        'formatted_date' => $currentDate->format('d M Y'),
+                        'has_data' => $log ? true : false,
+                        'wellness_score' => $log ? $log->daily_wellness_score : null,
+                        'daily_load' => $log ? $log->daily_load : null,
                     ];
                     $currentDate->addDay();
                 }
 
                 $calendarWeeks[] = [
                     'week_number' => $weekNumber,
-                    'week_range' => $weekStart->locale(app()->getLocale())->translatedFormat('d M Y') . ' - ' . $weekEnd->locale(app()->getLocale())->translatedFormat('d M Y'),
+                    'week_range' => $weekStart->format('d M') . ' - ' . $weekEnd->format('d M'),
                     'days' => $days
                 ];
 
@@ -160,12 +173,15 @@ class WellnessRpeController extends Controller
      */
     public function sessionForm(Request $request)
     {
-        $date = $request->date ? Carbon::parse($request->date)->format('Y-m-d') : Carbon::today()->format('Y-m-d');
+        $date = $request->date ? Carbon::parse($request->date)->setTimezone(config('app.timezone'))->format('Y-m-d') : Carbon::today()->format('Y-m-d');
         
         $user = \Illuminate\Support\Facades\Auth::user();
         $isAthlete = $user && $user->role === 'athlete';
         
         $targetPlayerId = $isAthlete ? $user->id : null;
+        if (!$isAthlete && $request->query('athlete_id')) {
+            $targetPlayerId = $request->query('athlete_id');
+        }
         $isCompleted = false;
 
         if ($request->query('training_id')) {
@@ -200,6 +216,7 @@ class WellnessRpeController extends Controller
             'redirectTo' => $request->query('redirect_to'),
             'mode' => $request->query('mode', 'all'),
             'training_id' => $request->query('training_id'),
+            'athlete_id' => $targetPlayerId,
             'isCompleted' => $isCompleted
         ]);
     }
@@ -213,20 +230,28 @@ class WellnessRpeController extends Controller
 
         $request->validate([
             'date' => 'required|date',
+            'athlete_id' => 'nullable|exists:users,id',
             'session_type' => 'nullable|in:am,pm',
             'rpe' => 'nullable|numeric|min:1|max:10',
             'duration' => 'nullable|integer|min:1',
-            'quality_of_sleep' => 'nullable|integer|min:1|max:7',
-            'fatigue' => 'nullable|integer|min:1|max:7',
-            'stress' => 'nullable|integer|min:1|max:7',
-            'muscle_soreness' => 'nullable|integer|min:1|max:7',
+            'quality_of_sleep' => 'nullable|integer|min:1|max:5',
+            'fatigue' => 'nullable|integer|min:1|max:5',
+            'stress' => 'nullable|integer|min:1|max:5',
+            'muscle_soreness' => 'nullable|integer|min:1|max:5',
+            'motivation' => 'nullable|integer|min:1|max:5',
+            'mood_state' => 'nullable|integer|min:1|max:5',
             'muscle_pain_areas' => 'nullable|array',
         ]);
 
-        $date = Carbon::parse($request->date)->format('Y-m-d');
+        $date = Carbon::parse($request->date)->setTimezone(config('app.timezone'))->format('Y-m-d');
         
+        $targetUserId = $user->id;
+        if ($request->filled('athlete_id') && in_array($user->role, ['superadmin', 'coach'])) {
+            $targetUserId = $request->athlete_id;
+        }
+
         $log = WellnessRpe::firstOrNew([
-            'user_id' => $user->id,
+            'user_id' => $targetUserId,
             'record_date' => $date
         ]);
 
@@ -244,6 +269,8 @@ class WellnessRpeController extends Controller
         if ($request->has('fatigue')) $log->fatigue = $request->fatigue;
         if ($request->has('stress')) $log->stress = $request->stress;
         if ($request->has('muscle_soreness')) $log->muscle_soreness = $request->muscle_soreness;
+        if ($request->has('motivation')) $log->motivation = $request->motivation;
+        if ($request->has('mood_state')) $log->mood_state = $request->mood_state;
         if ($request->has('muscle_pain_areas')) $log->muscle_pain_areas = $request->muscle_pain_areas;
 
         // Calculate load
@@ -251,8 +278,8 @@ class WellnessRpeController extends Controller
         $pmLoad = ($log->pm_rpe && $log->pm_duration) ? ($log->pm_rpe * $log->pm_duration) : 0;
         $log->daily_load = $amLoad + $pmLoad;
 
-        // Calculate Daily Wellness Score (Max 28)
-        $log->daily_wellness_score = (int)$log->quality_of_sleep + (int)$log->fatigue + (int)$log->stress + (int)$log->muscle_soreness;
+        // Calculate Daily Wellness Score (Max 30)
+        $log->daily_wellness_score = (int)$log->quality_of_sleep + (int)$log->fatigue + (int)$log->stress + (int)$log->muscle_soreness + (int)$log->motivation + (int)$log->mood_state;
 
         $log->save();
 
@@ -281,6 +308,112 @@ class WellnessRpeController extends Controller
             'redirectTo' => $request->query('redirect_to')
         ]);
     }
+    public function athleteAnalysis(Request $request, $user)
+    {
+        $athlete = User::where('role', 'athlete')->findOrFail($user);
+        $endOfWeek = Carbon::today()->endOfWeek()->format('Y-m-d');
+        
+        $allLogs = WellnessRpe::where('user_id', $athlete->id)
+            ->where('record_date', '<=', $endOfWeek)
+            ->orderBy('record_date', 'asc')
+            ->get();
+
+        $firstLog = $allLogs->first();
+        $firstLogDate = $firstLog ? Carbon::parse($firstLog->record_date)->startOfWeek() : Carbon::today()->startOfWeek();
+        $targetStartOfWeek = Carbon::parse($endOfWeek)->startOfWeek();
+        $totalWeeks = (int) $firstLogDate->diffInWeeks($targetStartOfWeek) + 1;
+        
+        $weeklyLoads = [];
+        $allWeeksData = [];
+
+        for ($index = 0; $index < $totalWeeks; $index++) {
+            $wStart = $firstLogDate->copy()->addWeeks($index)->format('Y-m-d');
+            $wEnd = $firstLogDate->copy()->addWeeks($index)->endOfWeek()->format('Y-m-d');
+
+            $wLogs = $allLogs->filter(function($l) use ($wStart, $wEnd) {
+                return $l->record_date >= $wStart && $l->record_date <= $wEnd;
+            });
+
+            $weekLoad = $wLogs->sum('daily_load');
+            $weeklyLoads[$index] = $weekLoad;
+
+            $acwr = 0;
+            if ($index > 0) {
+                $sumPrevLoad = 0;
+                $countPrevWeeks = 0;
+                $limit = max(0, $index - 4);
+                for ($j = $index - 1; $j >= $limit; $j--) {
+                    $sumPrevLoad += $weeklyLoads[$j];
+                    $countPrevWeeks++;
+                }
+                $chronicLoad = $countPrevWeeks > 0 ? ($sumPrevLoad / $countPrevWeeks) : 0;
+                $acwr = $chronicLoad > 0 ? round($weekLoad / $chronicLoad, 2) : 0;
+            }
+
+            $daily_loads_w = [];
+            $chartData = [];
+            for ($i = 0; $i < 7; $i++) {
+                $cDate = Carbon::parse($wStart)->addDays($i);
+                $cDateStr = $cDate->format('Y-m-d');
+                
+                $logToday = $wLogs->first(function($l) use ($cDateStr) {
+                    return Carbon::parse($l->record_date)->format('Y-m-d') === $cDateStr;
+                });
+                
+                $daily_loads_w[] = $logToday ? (float)$logToday->daily_load : 0;
+                
+                $chartData[] = [
+                    'dateStr' => $cDateStr,
+                    'dayName' => $cDate->locale(app()->getLocale())->shortDayName,
+                    'dateLabel' => $cDate->format('d M'),
+                    'hasData' => !!$logToday,
+                    'wellness' => $logToday ? $logToday->daily_wellness_score : 0,
+                    'amLoad' => $logToday && $logToday->am_duration && $logToday->am_rpe ? round($logToday->am_duration * $logToday->am_rpe, 1) : 0,
+                    'pmLoad' => $logToday && $logToday->pm_duration && $logToday->pm_rpe ? round($logToday->pm_duration * $logToday->pm_rpe, 1) : 0,
+                    'load' => $logToday ? $logToday->daily_load : 0,
+                    'notes' => $logToday ? ($logToday->notes ?? '-') : '-',
+                    'rawData' => $logToday ? [
+                        'quality_of_sleep' => $logToday->quality_of_sleep,
+                        'fatigue' => $logToday->fatigue,
+                        'muscle_soreness' => $logToday->muscle_soreness,
+                        'stress' => $logToday->stress,
+                        'motivation' => $logToday->motivation,
+                        'mood_state' => $logToday->mood_state,
+                        'am_rpe' => $logToday->am_rpe,
+                        'am_duration' => $logToday->am_duration,
+                        'pm_rpe' => $logToday->pm_rpe,
+                        'pm_duration' => $logToday->pm_duration,
+                    ] : null
+                ];
+            }
+            
+            $mean_daily_load = $weekLoad / 7;
+            $standard_deviation = $this->calculateStandardDeviation($daily_loads_w);
+            $training_monotony = $standard_deviation > 0 ? round($mean_daily_load / $standard_deviation, 2) : 0;
+            $strain = round($weekLoad * $training_monotony, 2);
+            
+            $allWeeksData[] = [
+                'week_number' => $index + 1,
+                'start_date' => $wStart,
+                'end_date' => $wEnd,
+                'weekly_load' => $weekLoad,
+                'mean_daily_load' => round($mean_daily_load, 2),
+                'standard_deviation' => round($standard_deviation, 2),
+                'training_monotony' => $training_monotony,
+                'strain' => $strain,
+                'acwr' => $acwr,
+                'chartData' => $chartData
+            ];
+        }
+        
+        // Reverse so current week is at the top
+        $allWeeksData = array_reverse($allWeeksData);
+
+        return Inertia::render('Admin/WellnessRpe/AthleteAnalysis', [
+            'athlete' => $athlete,
+            'weeklyData' => $allWeeksData
+        ]);
+    }
 
     /**
      * Mengambil dan menghitung data untuk satu minggu penuh (Senin - Minggu)
@@ -290,7 +423,7 @@ class WellnessRpeController extends Controller
      */
     public function getWeeklyData(Request $request)
     {
-        $date = $request->date ? Carbon::parse($request->date) : Carbon::today();
+        $date = $request->date ? Carbon::parse($request->date)->setTimezone(config('app.timezone')) : Carbon::today();
         
         $startOfWeek = $date->copy()->startOfWeek()->format('Y-m-d');
         $endOfWeek = $date->copy()->endOfWeek()->format('Y-m-d');     

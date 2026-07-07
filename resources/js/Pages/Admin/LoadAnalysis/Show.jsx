@@ -138,7 +138,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                     </div>
                                     <p className="text-[10px] md:text-xs font-bold text-slate-500 mb-0.5">{card.label}</p>
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-xl md:text-2xl font-black text-slate-800">{card.value}</span>
+                                        <span className="text-xl md:text-2xl font-bold text-slate-800">{card.value}</span>
                                         <span className="text-[10px] font-bold text-slate-400">{card.suffix}</span>
                                     </div>
                                 </div>
@@ -202,7 +202,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                                             <div>
-                                                <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+                                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                                     <TrendingUp className="w-5 h-5 text-slate-500" />
                                                     Load & ACWR Trend
                                                 </h3>
@@ -272,11 +272,11 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                             <Calendar className="w-5 h-5" />
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-black text-slate-800 text-sm md:text-base">Week {weeklyData.length - idx}</h4>
+                                                            <h4 className="font-bold text-slate-800 text-sm md:text-base">Week {weeklyData.length - idx}</h4>
                                                             <p className="text-xs font-medium text-slate-400">({week.label})</p>
                                                         </div>
                                                     </div>
-                                                    <div className={`px-4 py-1.5 rounded-xl border text-xs font-black flex items-center gap-2 ${
+                                                    <div className={`px-4 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-2 ${
                                                         week.acwr > 1.5 ? 'bg-rose-50 text-rose-600 border-rose-200' : 
                                                         (week.acwr >= 0.8 && week.acwr <= 1.3 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200')
                                                     }`}>
@@ -293,7 +293,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                         {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => (
                                                             <div key={day} className="bg-white border border-slate-100 rounded-xl p-2 md:p-3 text-center shadow-sm">
                                                                 <div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1 md:mb-2">{day}</div>
-                                                                <div className="text-[10px] md:text-sm font-black text-slate-800 break-words">
+                                                                <div className="text-[10px] md:text-sm font-bold text-slate-800 break-words">
                                                                     {week.daily_volumes?.[day] > 0 ? week.daily_volumes[day].toLocaleString('id-ID') : '-'}
                                                                 </div>
                                                             </div>
@@ -309,27 +309,27 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                     <div className="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-3">
                                                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 shadow-sm">
                                                             <div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5">Weekly Load</div>
-                                                            <div className="text-lg md:text-xl font-black text-slate-800">{week.total_volume.toLocaleString('id-ID')}</div>
+                                                            <div className="text-lg md:text-xl font-bold text-slate-800">{week.total_volume.toLocaleString('id-ID')}</div>
                                                         </div>
                                                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 shadow-sm">
                                                             <div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5">Mean Daily</div>
-                                                            <div className="text-lg md:text-xl font-black text-slate-800">{week.mean_load.toLocaleString('id-ID')}</div>
+                                                            <div className="text-lg md:text-xl font-bold text-slate-800">{week.mean_load.toLocaleString('id-ID')}</div>
                                                         </div>
                                                         <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 shadow-sm">
                                                             <div className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-1.5">Std. Deviation</div>
-                                                            <div className="text-lg md:text-xl font-black text-slate-800">{week.std_dev.toLocaleString('id-ID')}</div>
+                                                            <div className="text-lg md:text-xl font-bold text-slate-800">{week.std_dev.toLocaleString('id-ID')}</div>
                                                         </div>
                                                         <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
                                                             <div className="text-[9px] md:text-[10px] font-bold text-emerald-500 uppercase mb-1.5">Monotony</div>
-                                                            <div className={`text-lg md:text-xl font-black ${week.monotony > 2.0 ? 'text-rose-500' : 'text-emerald-500'}`}>{week.monotony}</div>
+                                                            <div className={`text-lg md:text-xl font-bold ${week.monotony > 2.0 ? 'text-rose-500' : 'text-emerald-500'}`}>{week.monotony}</div>
                                                         </div>
                                                         <div className={`rounded-xl p-3 shadow-sm border ${week.strain > 20000 ? 'bg-rose-50 border-rose-100' : 'bg-white border-slate-100'}`}>
                                                             <div className={`text-[9px] md:text-[10px] font-bold uppercase mb-1.5 ${week.strain > 20000 ? 'text-rose-500' : 'text-rose-400'}`}>Strain</div>
-                                                            <div className={`text-lg md:text-xl font-black ${week.strain > 20000 ? 'text-rose-600' : 'text-rose-500'}`}>{week.strain.toLocaleString('id-ID')}</div>
+                                                            <div className={`text-lg md:text-xl font-bold ${week.strain > 20000 ? 'text-rose-600' : 'text-rose-500'}`}>{week.strain.toLocaleString('id-ID')}</div>
                                                         </div>
                                                         <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm flex flex-col justify-between">
                                                             <div className="text-[9px] md:text-[10px] font-bold text-rose-500 uppercase mb-1.5">ACWR Ratio</div>
-                                                            <div className={`text-lg md:text-xl font-black ${
+                                                            <div className={`text-lg md:text-xl font-bold ${
                                                                 week.acwr > 1.5 ? 'text-rose-500' : 
                                                                 (week.acwr >= 0.8 && week.acwr <= 1.3 ? 'text-emerald-500' : 'text-slate-800')
                                                             }`}>{week.acwr > 0 ? week.acwr : 'N/A'}</div>
@@ -401,7 +401,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                 </span>
                                             </td>
                                             <td className="px-5 py-3 text-right">
-                                                <span className="text-sm font-black text-[#ff4d00]">{ex.total_volume.toLocaleString('id-ID')}</span>
+                                                <span className="text-sm font-bold text-[#ff4d00]">{ex.total_volume.toLocaleString('id-ID')}</span>
                                                 <span className="text-[10px] text-slate-400 ml-1">kg</span>
                                             </td>
                                             <td className="px-5 py-3 text-center">
@@ -473,7 +473,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                         <span className="text-xs font-bold text-slate-600">{session.exercise_count}</span>
                                                     </td>
                                                     <td className="px-5 py-3 text-right">
-                                                        <span className="text-sm font-black text-[#ff4d00]">{session.total_volume.toLocaleString('id-ID')}</span>
+                                                        <span className="text-sm font-bold text-[#ff4d00]">{session.total_volume.toLocaleString('id-ID')}</span>
                                                         <span className="text-[10px] text-slate-400 ml-1">kg</span>
                                                     </td>
                                                     <td className="px-5 py-3 text-center">
@@ -503,7 +503,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.sets}</td>
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.reps}</td>
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.max_load} kg</td>
-                                                                                <td className="px-4 py-2 text-right font-black text-[#ff4d00]">{ex.volume.toLocaleString('id-ID')} kg</td>
+                                                                                <td className="px-4 py-2 text-right font-bold text-[#ff4d00]">{ex.volume.toLocaleString('id-ID')} kg</td>
                                                                             </tr>
                                                                         ))}
                                                                     </tbody>

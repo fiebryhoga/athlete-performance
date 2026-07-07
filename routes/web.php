@@ -125,6 +125,7 @@ Route::middleware([
         
         // New per-client routes for Wellness RPE
         Route::get('/admin/wellness-rpe/athlete/{user}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'showAthlete'])->name('admin.wellness-rpe.athlete.show');
+        Route::get("/admin/wellness-rpe/athlete/{user}/analysis", [\App\Http\Controllers\Admin\WellnessRpeController::class, "athleteAnalysis"])->name("admin.wellness-rpe.athlete.analysis");
         Route::get('/admin/wellness-rpe/athlete/{user}/date/{date}', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'showAthleteDate'])->name('admin.wellness-rpe.athlete.date.show');
         
         Route::post('/admin/wellness-rpe/weekly-data', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'getWeeklyData'])->name('admin.wellness-rpe.weekly-data');
@@ -183,10 +184,19 @@ Route::middleware([
         Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
         Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
         Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
+        Route::get('/admin/reports/sessions/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportAthleteReportPdf'])->name('admin.reports.sessions.export-athlete');
+        Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
         
+        Route::get('/admin/phv-calculator', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'index'])->name('admin.phv-calculator.index');
+        Route::get('/admin/phv-calculator/{user}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'show'])->name('admin.phv-calculator.show');
+        Route::get('/admin/phv-calculator/{user}/create', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'create'])->name('admin.phv-calculator.create');
+        Route::post('/admin/phv-calculator/{user}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'store'])->name('admin.phv-calculator.store');
+        Route::get('/admin/phv-calculator/edit/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'edit'])->name('admin.phv-calculator.edit');
+        Route::put('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'update'])->name('admin.phv-calculator.update');
+        Route::delete('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'destroy'])->name('admin.phv-calculator.destroy');        
         Route::resource('/admin/users', UserManagementController::class)->names('admin.users');
 
         Route::get('/admin/sports', [SportController::class, 'index'])->name('admin.sports.index');

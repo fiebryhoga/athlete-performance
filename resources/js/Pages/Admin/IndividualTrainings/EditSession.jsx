@@ -97,6 +97,14 @@ export default function EditSession({
  const duplicateBlock = (index) => {
  const newBlocks = [...data.blocks];
  const blockToCopy = JSON.parse(JSON.stringify(newBlocks[index]));
+ delete blockToCopy.id;
+ if (blockToCopy.items) {
+     blockToCopy.items = blockToCopy.items.map(item => {
+         const newItem = { ...item };
+         delete newItem.id;
+         return newItem;
+     });
+ }
  newBlocks.splice(index + 1, 0, blockToCopy);
  setData("blocks", newBlocks);
  };

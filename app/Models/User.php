@@ -98,4 +98,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'coach_athlete', 'coach_id', 'athlete_id')->withTimestamps();
     }
+
+    public function phvAssessments()
+    {
+        return $this->hasMany(PhvAssessment::class);
+    }
 }

@@ -118,57 +118,46 @@ export default function WellnessAthleteRow({ athlete, visibleIdx, actions }) {
 
     const getDailyWellnessTextClass = (val) => {
         if (!val || val === 0) return "text-slate-400 ";
-        if (val >= 4 && val <= 7) return "text-blue-600 ";
-        if (val >= 8 && val <= 10)
-            return "text-emerald-600 ";
-        if (val >= 11 && val <= 13) return "text-lime-600 ";
-        if (val >= 14 && val <= 16)
-            return "text-yellow-500 ";
-        if (val >= 17 && val <= 19) return "text-amber-500 ";
-        if (val >= 20 && val <= 22)
-            return "text-orange-500 ";
-        if (val >= 23 && val <= 28) return "text-red-600 ";
-        return "text-slate-900 ";
+        if (val <= 9) return "text-red-600 ";
+        if (val <= 13) return "text-orange-500 ";
+        if (val <= 16) return "text-amber-500 ";
+        if (val <= 19) return "text-yellow-500 ";
+        if (val <= 23) return "text-lime-600 ";
+        if (val <= 27) return "text-emerald-600 ";
+        return "text-blue-600 ";
     };
 
     const getWeeklyWellnessTextClass = (val) => {
         if (!val || val === 0) return "text-slate-400 ";
-        if (val >= 28 && val <= 51) return "text-blue-600 ";
-        if (val >= 52 && val <= 75)
-            return "text-emerald-600 ";
-        if (val >= 76 && val <= 99) return "text-lime-600 ";
-        if (val >= 100 && val <= 123)
-            return "text-yellow-500 ";
-        if (val >= 124 && val <= 147)
-            return "text-amber-500 ";
-        if (val >= 148 && val <= 171)
-            return "text-orange-500 ";
-        if (val >= 172 && val <= 196) return "text-red-600 ";
-        return "text-slate-900 ";
+        if (val <= 66) return "text-red-600 ";
+        if (val <= 90) return "text-orange-500 ";
+        if (val <= 114) return "text-amber-500 ";
+        if (val <= 138) return "text-yellow-500 ";
+        if (val <= 162) return "text-lime-600 ";
+        if (val <= 186) return "text-emerald-600 ";
+        return "text-blue-600 ";
     };
 
     const getDailyWellnessText = (val) => {
         if (!val || val === 0) return "";
-        if (val >= 4 && val <= 7) return "Sangat Baik";
-        if (val >= 8 && val <= 10) return "Baik";
-        if (val >= 11 && val <= 13) return "Cukup Baik";
-        if (val >= 14 && val <= 16) return "Sedang";
-        if (val >= 17 && val <= 19) return "Cukup Buruk";
-        if (val >= 20 && val <= 22) return "Buruk";
-        if (val >= 23 && val <= 28) return "Sangat Buruk";
-        return "";
+        if (val <= 9) return "Sangat Buruk";
+        if (val <= 13) return "Buruk";
+        if (val <= 16) return "Cukup Buruk";
+        if (val <= 19) return "Sedang";
+        if (val <= 23) return "Cukup Baik";
+        if (val <= 27) return "Baik";
+        return "Sangat Baik";
     };
 
     const getWeeklyWellnessText = (val) => {
         if (!val || val === 0) return "";
-        if (val >= 28 && val <= 51) return "Sangat Baik";
-        if (val >= 52 && val <= 75) return "Baik";
-        if (val >= 76 && val <= 99) return "Cukup Baik";
-        if (val >= 100 && val <= 123) return "Sedang";
-        if (val >= 124 && val <= 147) return "Cukup Buruk";
-        if (val >= 148 && val <= 171) return "Buruk";
-        if (val >= 172 && val <= 196) return "Sangat Buruk";
-        return "";
+        if (val <= 66) return "Sangat Buruk";
+        if (val <= 90) return "Buruk";
+        if (val <= 114) return "Cukup Buruk";
+        if (val <= 138) return "Sedang";
+        if (val <= 162) return "Cukup Baik";
+        if (val <= 186) return "Baik";
+        return "Sangat Baik";
     };
 
     // --- CEK ERROR RPE (1-10) ---

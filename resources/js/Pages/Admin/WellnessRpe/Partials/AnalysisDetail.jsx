@@ -54,23 +54,23 @@ export default function AnalysisDetail({ weeklyData, athleteWeeklyInfo, onBack }
 
     const getDailyWellnessColor = (score) => {
         if (!score && score !== 0) return { text: 'text-slate-500', bg: 'bg-slate-100 ', border: 'border-slate-300 ', label: 'N/A' };
-        if (score >= 23) return { text: 'text-red-700 ', bg: 'bg-red-100 ', border: 'border-red-200 ', label: "Sangat Buruk" };
-        if (score >= 20) return { text: 'text-orange-700 ', bg: 'bg-orange-100 ', border: 'border-orange-200 ', label: "Buruk" };
-        if (score >= 17) return { text: 'text-amber-700 ', bg: 'bg-amber-100 ', border: 'border-amber-200 ', label: "Agak Buruk" };
-        if (score >= 14) return { text: 'text-yellow-700 ', bg: 'bg-yellow-100 ', border: 'border-yellow-200 ', label: "Sedang" };
-        if (score >= 11) return { text: 'text-sky-700 ', bg: 'bg-sky-100 ', border: 'border-sky-200 ', label: "Agak Baik" };
-        if (score >= 8) return { text: 'text-emerald-700 ', bg: 'bg-emerald-100 ', border: 'border-emerald-200 ', label: "Baik" };
+        if (score <= 9) return { text: 'text-red-700 ', bg: 'bg-red-100 ', border: 'border-red-200 ', label: "Sangat Buruk" };
+        if (score <= 13) return { text: 'text-orange-700 ', bg: 'bg-orange-100 ', border: 'border-orange-200 ', label: "Buruk" };
+        if (score <= 16) return { text: 'text-amber-700 ', bg: 'bg-amber-100 ', border: 'border-amber-200 ', label: "Agak Buruk" };
+        if (score <= 19) return { text: 'text-yellow-700 ', bg: 'bg-yellow-100 ', border: 'border-yellow-200 ', label: "Sedang" };
+        if (score <= 23) return { text: 'text-sky-700 ', bg: 'bg-sky-100 ', border: 'border-sky-200 ', label: "Agak Baik" };
+        if (score <= 27) return { text: 'text-emerald-700 ', bg: 'bg-emerald-100 ', border: 'border-emerald-200 ', label: "Baik" };
         return { text: 'text-teal-700 ', bg: 'bg-teal-100 ', border: 'border-teal-200 ', label: "Sangat Baik" };
     };
 
     const getWeeklyWellnessColor = (score) => {
         if (!score && score !== 0) return { text: 'text-slate-500', bg: 'bg-slate-100 ', border: 'border-slate-300 ', label: 'N/A' };
-        if (score >= 172) return { text: 'text-red-700 ', bg: 'bg-red-100 ', border: 'border-red-200 ', label: "Sangat Buruk" };
-        if (score >= 148) return { text: 'text-orange-700 ', bg: 'bg-orange-100 ', border: 'border-orange-200 ', label: "Buruk" };
-        if (score >= 124) return { text: 'text-amber-700 ', bg: 'bg-amber-100 ', border: 'border-amber-200 ', label: "Agak Buruk" };
-        if (score >= 100) return { text: 'text-yellow-700 ', bg: 'bg-yellow-100 ', border: 'border-yellow-200 ', label: "Sedang" };
-        if (score >= 76) return { text: 'text-sky-700 ', bg: 'bg-sky-100 ', border: 'border-sky-200 ', label: "Agak Baik" };
-        if (score >= 52) return { text: 'text-emerald-700 ', bg: 'bg-emerald-100 ', border: 'border-emerald-200 ', label: "Baik" };
+        if (score <= 66) return { text: 'text-red-700 ', bg: 'bg-red-100 ', border: 'border-red-200 ', label: "Sangat Buruk" };
+        if (score <= 90) return { text: 'text-orange-700 ', bg: 'bg-orange-100 ', border: 'border-orange-200 ', label: "Buruk" };
+        if (score <= 114) return { text: 'text-amber-700 ', bg: 'bg-amber-100 ', border: 'border-amber-200 ', label: "Agak Buruk" };
+        if (score <= 138) return { text: 'text-yellow-700 ', bg: 'bg-yellow-100 ', border: 'border-yellow-200 ', label: "Sedang" };
+        if (score <= 162) return { text: 'text-sky-700 ', bg: 'bg-sky-100 ', border: 'border-sky-200 ', label: "Agak Baik" };
+        if (score <= 186) return { text: 'text-emerald-700 ', bg: 'bg-emerald-100 ', border: 'border-emerald-200 ', label: "Baik" };
         return { text: 'text-teal-700 ', bg: 'bg-teal-100 ', border: 'border-teal-200 ', label: "Sangat Baik" };
     };
 

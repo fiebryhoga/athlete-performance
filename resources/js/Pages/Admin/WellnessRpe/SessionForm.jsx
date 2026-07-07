@@ -45,6 +45,7 @@ export default function SessionForm({
     mode = "all",
     training_id,
     isCompleted = false,
+    athlete_id = null,
 }) {
     
     // Wellness is locked when completed, RPE is always editable
@@ -61,10 +62,13 @@ export default function SessionForm({
         stress: log?.stress || "",
         fatigue: log?.fatigue || "",
         muscle_soreness: log?.muscle_soreness || "",
+        motivation: log?.motivation || "",
+        mood_state: log?.mood_state || "",
 
         muscle_pain_areas: log?.muscle_pain_areas || [],
         other_pain: "", // Temporary field to handle "Other:" text
         redirect_to: redirectTo || "",
+        athlete_id: athlete_id,
     });
 
     const [isWellnessExpanded, setIsWellnessExpanded] = useState(
@@ -109,10 +113,6 @@ export default function SessionForm({
     const submit = (e) => {
         e.preventDefault();
 
-        if ((mode === 'all' || mode === 'rpe') && !isRpeComplete) {
-            setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
-            return;
-        }
         setRpeError('');
 
         transform((data) => {
@@ -131,7 +131,7 @@ export default function SessionForm({
         post(route("admin.wellness-rpe.store-session"));
     };
 
-    const isWellnessComplete = data.quality_of_sleep && data.stress && data.fatigue && data.muscle_soreness;
+    const isWellnessComplete = data.quality_of_sleep && data.stress && data.fatigue && data.muscle_soreness && data.motivation && data.mood_state;
 
     // RPE validation: current session RPE & Duration must be filled
     const isRpeComplete = data.rpe && data.duration;
@@ -140,19 +140,16 @@ export default function SessionForm({
 
     const isSubmitDisabled = processing 
         || (mode === 'wellness' && isWellnessLocked)
-        || ((mode === 'all' || mode === 'wellness') && !isWellnessComplete && !isWellnessLocked)
-        || ((mode === 'all' || mode === 'rpe') && !isRpeComplete);
+        || ((mode === 'all' || mode === 'wellness') && !isWellnessComplete && !isWellnessLocked);
 
     const renderScaleButtons = (field, label, leftLabel, rightLabel) => {
         const getColorClass = (num, isSelected) => {
             const colors = {
-                1: "bg-[#673ab7]", // Purple
-                2: "bg-[#4285f4]", // Blue
-                3: "bg-[#34a853]", // Green
-                4: "bg-[#fbbc05]", // Yellow
-                5: "bg-[#ff9800]", // Orange
-                6: "bg-[#f57c00]", // Dark Orange
-                7: "bg-[#ea4335]", // Red
+                1: "bg-[#ea4335]", // Red (Awful)
+                2: "bg-[#f57c00]", // Orange (Poor)
+                3: "bg-[#fbbc05]", // Yellow (OK)
+                4: "bg-[#4285f4]", // Blue (Good)
+                5: "bg-[#34a853]", // Green (Excellent)
             };
 
             const baseColor = colors[num];
@@ -174,7 +171,7 @@ export default function SessionForm({
                 </div>
 
                 <div className="flex">
-                    {[1, 2, 3, 4, 5, 6, 7].map((num, idx) => (
+                    {[1, 2, 3, 4, 5].map((num, idx) => (
                         <button
                             key={num}
                             type="button"
@@ -185,7 +182,7 @@ export default function SessionForm({
                             }}
                             className={`flex-1 sm:h-12 py-3 font-bold text-sm sm:text-base transition-all relative
                                 ${idx === 0 ? "rounded-l-md" : ""} 
-                                ${idx === 6 ? "rounded-r-md" : ""}
+                                ${idx === 4 ? "rounded-r-md" : ""}
                                 ${getColorClass(num, data[field] === num)}
                                 ${isWellnessLocked ? 'cursor-not-allowed opacity-50' : ''}
                             `}
@@ -222,11 +219,11 @@ export default function SessionForm({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    if ((mode === 'all' || mode === 'rpe') && !isRpeComplete && !isCompleted) {
-                                        setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM) sebelum kembali.');
-                                        return;
+                                    if (redirectTo) {
+                                        window.location.href = redirectTo;
+                                    } else {
+                                        window.location.href = route("admin.individual-trainings.index");
                                     }
-                                    window.location.href = route("admin.individual-trainings.index");
                                 }}
                                 className="flex justify-center items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm w-full sm:w-auto"
                             >
@@ -236,10 +233,6 @@ export default function SessionForm({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        if ((mode === 'all' || mode === 'rpe') && !isRpeComplete && !isCompleted) {
-                                            setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM) sebelum kembali.');
-                                            return;
-                                        }
                                         window.location.href = route("admin.individual-trainings.show", training_id);
                                     }}
                                     className="flex justify-center items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-all shadow-md shadow-[#ff4d00]/20 w-full sm:w-auto"
@@ -288,27 +281,39 @@ export default function SessionForm({
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {renderScaleButtons(
                                             "quality_of_sleep",
-                                            "Bagaimana kualitas tidur Anda semalam?",
-                                            "Sangat Sangat Baik",
-                                            "Sangat Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "stress",
-                                            "Bagaimana tingkat stres Anda?",
-                                            "Sangat Sangat Rendah",
-                                            "Sangat Sangat Tinggi",
+                                            "Kualitas Tidur (Quality of Sleep)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
                                         )}
                                         {renderScaleButtons(
                                             "fatigue",
-                                            "Seberapa lelah yang Anda rasakan?",
-                                            "Sangat Sangat Rendah",
-                                            "Sangat Sangat Tinggi",
+                                            "Tingkat Kelelahan (Fatigue)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
                                         )}
                                         {renderScaleButtons(
                                             "muscle_soreness",
-                                            "Bagaimana tingkat kekakuan/nyeri otot Anda?",
-                                            "Sangat Sangat Rendah",
-                                            "Sangat Sangat Tinggi",
+                                            "Nyeri Otot (Muscle Soreness)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
+                                        )}
+                                        {renderScaleButtons(
+                                            "stress",
+                                            "Tingkat Stres (Stress)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
+                                        )}
+                                        {renderScaleButtons(
+                                            "motivation",
+                                            "Motivasi Latihan (Motivation)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
+                                        )}
+                                        {renderScaleButtons(
+                                            "mood_state",
+                                            "Kondisi Mood (Mood State)",
+                                            "Sangat Buruk",
+                                            "Sangat Baik",
                                         )}
                                     </div>
 
@@ -414,12 +419,9 @@ export default function SessionForm({
                     {/* RPE SECTION */}
                     {(mode === "all" || mode === "rpe") && (
                         <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
-                            <div
-                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-slate-50  hover:bg-slate-100  transition-colors"
-                                onClick={() => setIsRpeExpanded(!isRpeExpanded)}
-                            >
+                            <div className="p-6 sm:p-8 flex justify-between items-center bg-slate-50 border-b border-slate-100">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-slate-200  rounded-xl text-slate-900 ">
+                                    <div className="p-3 bg-white border border-slate-200 rounded-xl text-[#ff4d00] shadow-sm">
                                         <Activity size={24} />
                                     </div>
                                     <div>
@@ -431,13 +433,9 @@ export default function SessionForm({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
-                                    {isRpeExpanded ? "Tutup" : "Buka"}
-                                </div>
                             </div>
 
-                            {isRpeExpanded && (
-                                <div className="p-6 sm:p-8 border-t border-slate-100  animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="p-6 sm:p-8 bg-white">
                                     <div className="space-y-6">
                                         {/* Session Type */}
                                         <div className="space-y-3">
@@ -581,7 +579,6 @@ export default function SessionForm({
                                         </div>
                                     </div>
                                 </div>
-                            )}
                         </div>
                     )}
 
@@ -614,10 +611,10 @@ export default function SessionForm({
                                         setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
                                     }
                                 }}
-                                className={`w-full py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 ${
+                                className={`w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 ${
                                     isSubmitDisabled 
                                         ? "bg-slate-300  text-slate-500  cursor-not-allowed shadow-none"
-                                        : "bg-[#ff4d00] text-white  hover:bg-[#e64500]"
+                                        : "bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105"
                                 }`}
                             >
                                 <>Selesai <CheckSquare size={18} /></>

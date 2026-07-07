@@ -13,7 +13,10 @@ import {
     Dumbbell,
     Clock,
     User,
-    CheckCircle2
+    CheckCircle2,
+    FileEdit,
+    Zap,
+    Smile
 } from "lucide-react";
 
 export default function ShowDetail({
@@ -23,7 +26,7 @@ export default function ShowDetail({
     selectedDate,
     formattedDate,
 }) {
-    const renderScoreCard = (title, icon, score, colorClass, max = 7) => (
+    const renderScoreCard = (title, icon, score, colorClass, max = 5) => (
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <div className="flex items-center gap-3 mb-3">
                 <div className={`p-2 rounded-lg ${colorClass} bg-opacity-10`}>
@@ -32,7 +35,7 @@ export default function ShowDetail({
                 <h4 className="text-sm font-bold text-slate-700">{title}</h4>
             </div>
             <div className="flex items-end gap-2">
-                <span className="text-3xl font-black text-slate-900 leading-none">
+                <span className="text-3xl font-bold text-slate-900 leading-none">
                     {score || '-'}
                 </span>
                 <span className="text-sm font-bold text-slate-400 mb-1">/ {max}</span>
@@ -55,12 +58,26 @@ export default function ShowDetail({
                     badge={formattedDate}
                     icon={HeartPulse}
                     actions={
-                        <Link
-                            href={route("admin.wellness-rpe.athlete.show", athlete.id)}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
-                        >
-                            <ArrowLeft size={16} /> Kembali ke Kalender
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href={route("admin.wellness-rpe.athlete.show", athlete.id)}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+                            >
+                                <ArrowLeft size={16} /> Kembali ke Kalender
+                            </Link>
+                            <Link
+                                href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'wellness', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-sm"
+                            >
+                                <HeartPulse size={16} /> {log && log.daily_wellness_score ? 'Edit Wellness' : 'Isi Wellness'}
+                            </Link>
+                            <Link
+                                href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'rpe', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
+                                className="flex items-center gap-2 px-4 py-2.5 border border-[#ff4d00] text-[#ff4d00] rounded-lg text-sm font-bold hover:bg-[#ff4d00] hover:text-white cursor-pointer transition-all shadow-sm"
+                            >
+                                <Dumbbell size={16} /> {log && log.daily_load ? 'Edit RPE' : 'Isi RPE'}
+                            </Link>
+                        </div>
                     }
                 />
 
@@ -81,15 +98,17 @@ export default function ShowDetail({
                                     <HeartPulse className="text-[#ff4d00]" size={20} />
                                     Wellness Metrics
                                     <span className="ml-auto text-sm font-bold bg-orange-50 text-[#ff4d00] px-3 py-1 rounded-full border border-orange-100">
-                                        Total Score: {log.daily_wellness_score || '-'} / 28
+                                        Total Score: {log.daily_wellness_score || '-'} / 30
                                     </span>
                                 </h3>
                                 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {renderScoreCard("Kualitas Tidur", <Moon size={18} className="text-indigo-500" />, log.quality_of_sleep, "bg-indigo-500")}
                                     {renderScoreCard("Tingkat Stres", <Brain size={18} className="text-rose-500" />, log.stress, "bg-rose-500")}
-                                    {renderScoreCard("Kelelahan (Fatigue)", <Activity size={18} className="text-amber-500" />, log.fatigue, "bg-amber-500")}
-                                    {renderScoreCard("Nyeri Otot (Soreness)", <Flame size={18} className="text-red-500" />, log.muscle_soreness, "bg-red-500")}
+                                    {renderScoreCard("Kelelahan", <Activity size={18} className="text-amber-500" />, log.fatigue, "bg-amber-500")}
+                                    {renderScoreCard("Nyeri Otot", <Flame size={18} className="text-red-500" />, log.muscle_soreness, "bg-red-500")}
+                                    {renderScoreCard("Motivasi", <Zap size={18} className="text-yellow-500" />, log.motivation, "bg-yellow-500")}
+                                    {renderScoreCard("Kondisi Mood", <Smile size={18} className="text-sky-500" />, log.mood_state, "bg-sky-500")}
                                 </div>
                             </div>
 

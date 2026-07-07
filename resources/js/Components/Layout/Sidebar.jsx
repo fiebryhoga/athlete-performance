@@ -54,6 +54,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
         {
             title: 'Tes & Pantauan',
             items: [
+                { name: 'Kalkulator PHV', route: 'admin.phv-calculator.index', checkPath: '/admin/phv-calculator', icon: HeartPulse, roles: ['superadmin', 'coach'] },
                 { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: ClipboardList, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Komposisi Tubuh', route: 'admin.composition-tests.index', checkPath: '/admin/composition', icon: Scale, roles: ['superadmin', 'coach', 'athlete'] },

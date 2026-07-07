@@ -444,7 +444,7 @@ class GroupTrainingController extends Controller
      */
     public function exportPdf(GroupTraining $training)
     {
-        $training->load(['coach', 'group', 'blocks.items.exercise', 'members_pivot', 'rpeRecords']);
+        $training->load(['coach', 'group', 'blocks.items.exercise', 'members_pivot', 'rpe_records']);
         $group = $training->group;
         
         $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
@@ -482,14 +482,9 @@ class GroupTrainingController extends Controller
             }
         }
 
-        $blocksArray = $training->blocks->map(function ($block) {
-            $blockData = $block->toArray();
-            $blockData['items'] = $block->items->map(function ($item) {
-                $itemData = $item->toArray();
+        $training->blocks->each(function ($block) {
+            $block->items->each(function ($item) {
                 if ($item->exercise) {
-                    $itemData['exercise'] = $item->exercise->toArray();
-                    
-                    // Add base64 images
                     $base64Images = [];
                     if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
                         foreach ($item->exercise->images as $img) {
@@ -505,19 +500,26 @@ class GroupTrainingController extends Controller
                             }
                         }
                     }
-                    $itemData['exercise']['base64_images'] = $base64Images;
+                    $item->exercise->setAttribute('base64_images', $base64Images);
                 }
-                return $itemData;
-            })->toArray();
-            return $blockData;
-        })->toArray();
+            });
+        });
+
+        $coachNames = [];
+        if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
+            $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                ->pluck('name')
+                ->toArray();
+        }
+        $coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.training_session_pdf', [
             'training' => (object)[
                 'title' => ($training->name ?: 'Group Training Session #' . $training->session_number),
                 'date' => $training->date,
                 'focus' => $group->name . ($training->location ? ' | ' . $training->location : ''),
-                'blocks' => $blocksArray,
+                'blocks' => $training->blocks,
+                'coachList' => $coachList,
             ],
             'group' => $group,
             'athletesData' => $athletesData,

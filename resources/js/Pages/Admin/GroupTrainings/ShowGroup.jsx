@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy, Download } from 'lucide-react';
 
 export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -108,12 +108,21 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
                 badge={`Program Latihan • ${packageBadge}`}
                 icon={CalendarIcon}
                 actions={
-                    <Link
-                        href={route('admin.individual-trainings.index')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
-                    >
-                        <ChevronLeft size={16} /> Kembali
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={route('admin.reports.sessions.export-group', group.id)}
+                            target="_blank"
+                            className="flex items-center gap-2 px-4 py-2 bg-[#ff4d00] text-white rounded-xl text-xs font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-[#ff4d00]/20"
+                        >
+                            <Download size={16} /> Download Laporan Sesi
+                        </a>
+                        <Link
+                            href={route('admin.individual-trainings.index')}
+                            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                        >
+                            <ChevronLeft size={16} /> Kembali
+                        </Link>
+                    </div>
                 }
             />
 

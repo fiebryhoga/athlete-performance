@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Layout/PageHeader';
 import { Head, Link, router } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Trash2, User, Activity, Edit2, PenLine, MapPin, Dumbbell, Check, CheckCircle2, Clock, Timer, X, Target, Package, Copy, Download, Users, List } from 'lucide-react';
 
 export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }) {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -121,12 +121,21 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                 badge={`Program Latihan • ${packageBadge}`}
                 icon={CalendarIcon}
                 actions={
-                    <Link
-                        href={route('admin.individual-trainings.index')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
-                    >
-                        <ChevronLeft size={16} /> Kembali
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <a
+                            href={route('admin.reports.sessions.export-athlete', athlete.id)}
+                            target="_blank"
+                            className="flex items-center gap-2 px-4 py-2 bg-[#ff4d00] text-white rounded-xl text-xs font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-[#ff4d00]/20"
+                        >
+                            <Download size={16} /> Download Laporan Sesi
+                        </a>
+                        <Link
+                            href={route('admin.individual-trainings.index')}
+                            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                        >
+                            <ChevronLeft size={16} /> Kembali
+                        </Link>
+                    </div>
                 }
             />
 
@@ -163,26 +172,36 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                             </div>
                         </div>
                         
-                        <div className="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm">
+                        <div className="flex flex-wrap items-center gap-2">
                             <button
                                 onClick={() => setSessionFilter('all')}
-                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'all' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                                    sessionFilter === 'all' 
+                                        ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20' 
+                                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                }`}
                             >
-                                Semua
+                                <List size={16} /> Semua
                             </button>
-                            <div className="w-px h-5 bg-slate-200"></div>
                             <button
                                 onClick={() => setSessionFilter('individual')}
-                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'individual' ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                                    sessionFilter === 'individual' 
+                                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' 
+                                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                }`}
                             >
-                                Privat
+                                <User size={16} /> Privat
                             </button>
-                            <div className="w-px h-5 bg-slate-200"></div>
                             <button
                                 onClick={() => setSessionFilter('group')}
-                                className={`px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${sessionFilter === 'group' ? 'bg-indigo-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                                    sessionFilter === 'group' 
+                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' 
+                                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                }`}
                             >
-                                Grup
+                                <Users size={16} /> Grup
                             </button>
                         </div>
                     </div>
