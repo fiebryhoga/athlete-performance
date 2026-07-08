@@ -1,8 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
+import CompositionAnatomy from '@/Pages/Admin/CompositionTests/Partials/CompositionAnatomy';
 import { 
     User, Calendar, Activity, Trophy, TrendingUp, TrendingDown, 
-    Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, ArrowRight, HeartPulse, Battery, History
+    Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, ArrowRight, HeartPulse, Battery, History, FileText
 } from 'lucide-react';
 import { 
     ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
@@ -10,7 +11,7 @@ import {
     ComposedChart, Bar, Line
 } from 'recharts';
 
-export default function AthleteProfiling({ user, stats, radarData, history, trendData, daily_metrics, training_loads }) {
+export default function AthleteProfiling({ user, stats, radarData, history, trendData, daily_metrics, training_loads, latest_phv, latest_composition, latest_wellness, latest_dpa }) {
 
     
     const calculateBMI = (h, w) => {
@@ -52,17 +53,6 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                     <div className="relative z-10 w-full md:w-auto">
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Profil Fisik</h1>
                         <p className="text-slate-500 text-xs md:text-sm mt-1">Data performa dan komposisi tubuh Anda</p>
-                    </div>
-                    <div className="bg-white border border-slate-200 px-4 py-2.5 rounded-xl flex items-center gap-3 shadow-sm w-full md:w-auto relative z-10 shrink-0">
-                        <div className="p-2 bg-orange-50 text-[#ff4d00] rounded-lg">
-                            <Calendar className="w-4 h-4 md:w-5 md:h-5" />
-                        </div>
-                        <div>
-                            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold">Hari Ini</p>
-                            <p className="text-xs md:text-sm font-bold text-slate-700">
-                                {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                            </p>
-                        </div>
                     </div>
                 </div>
 
@@ -134,7 +124,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                     <span className="w-1.5 h-4 bg-[#ff4d00] rounded-full"></span> Peta Kemampuan vs Target
                                 </h3>
                                 <div className="flex-1 w-full min-h-[250px] relative">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    {/* <ResponsiveContainer width="100%" minHeight={250}>
                                         <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
                                             <PolarGrid stroke="#e2e8f0" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} />
@@ -144,7 +134,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                             <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
                                             <RechartsTooltip contentStyle={{borderRadius:'8px', fontSize: '12px'}} />
                                         </RadarChart>
-                                    </ResponsiveContainer>
+                                    </ResponsiveContainer> */}
                                 </div>
                             </div>
 
@@ -154,7 +144,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                     <span className="w-1.5 h-4 bg-emerald-500 rounded-full"></span> Tren Progress (6 Sesi Terakhir)
                                 </h3>
                                 <div className="flex-1 w-full min-h-[250px] relative">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    {/* <ResponsiveContainer width="100%" minHeight={250}>
                                         <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
@@ -168,7 +158,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                             <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
                                             <Area type="monotone" dataKey="score" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
                                         </AreaChart>
-                                    </ResponsiveContainer>
+                                    </ResponsiveContainer> */}
                                 </div>
                             </div>
                         </div>
@@ -235,7 +225,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                         </h3>
                         <div className="flex-1 w-full min-h-[300px] relative">
                             {training_loads && training_loads.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
+                                /* <ResponsiveContainer width="100%" minHeight={300}>
                                     <ComposedChart data={training_loads} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                         <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
@@ -247,7 +237,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                         <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="#ff4d00" fillOpacity={0.6} radius={[4, 4, 0, 0]} barSize={20} />
                                         <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="#475569" strokeWidth={3} dot={{r: 3}} activeDot={{r: 5}} />
                                     </ComposedChart>
-                                </ResponsiveContainer>
+                                </ResponsiveContainer> */ null
                             ) : (
                                 <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                                     <Activity className="w-6 h-6 md:w-8 md:h-8 opacity-20" />
@@ -265,7 +255,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                         </h3>
                         <div className="flex-1 w-full min-h-[300px] relative">
                             {daily_metrics && daily_metrics.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
+                                /* <ResponsiveContainer width="100%" minHeight={300}>
                                     <AreaChart data={daily_metrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                         <defs>
                                             <linearGradient id="colorRecSmall" x1="0" y1="0" x2="0" y2="1">
@@ -279,7 +269,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                         <RechartsTooltip contentStyle={customTooltipStyle} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }} />
                                         <Area type="natural" dataKey="recovery" name="Recovery %" stroke="#10b981" strokeWidth={3} fill="url(#colorRecSmall)" activeDot={{r: 5}} />
                                     </AreaChart>
-                                </ResponsiveContainer>
+                                </ResponsiveContainer> */ null
                             ) : (
                                 <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                                     <HeartPulse className="w-6 h-6 md:w-8 md:h-8 opacity-20" />
@@ -291,6 +281,119 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                 </div>
 
                 
+                {/* Comprehensive Athlete Profiling Metrics */}
+                <div className="mb-6 md:mb-8">
+                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <Target className="w-4 h-4 text-[#ff4d00]" />
+                        Athlete Profiling Metrics
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+                        {/* PHV & Growth */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <Activity className="w-5 h-5 text-emerald-500"/>
+                                    PHV & Pertumbuhan
+                                </h4>
+                                {latest_phv && <span className="text-xs font-medium bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full">{new Date(latest_phv.assessment_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_phv ? (
+                                <div className="space-y-6 flex-1">
+                                    <div>
+                                        <p className="text-sm text-slate-500 font-medium mb-1">Status PHV</p>
+                                        <p className="text-2xl font-black text-emerald-600 tracking-tight">{latest_phv.phv_status}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold mb-1">Maturity Offset</p>
+                                            <p className="text-lg font-bold text-slate-800">{latest_phv.maturity_offset} <span className="text-xs text-slate-400 font-medium">tahun</span></p>
+                                        </div>
+                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold mb-1">Prediksi Tinggi</p>
+                                            <p className="text-lg font-bold text-slate-800">{latest_phv.predicted_adult_height} <span className="text-xs text-slate-400 font-medium">cm</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <Activity className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data PHV</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Wellness & RPE */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-orange-500"/>
+                                    Wellness & Beban
+                                </h4>
+                                {latest_wellness && <span className="text-xs font-medium bg-orange-50 text-orange-600 px-3 py-1 rounded-full">{new Date(latest_wellness.record_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_wellness ? (
+                                <div className="space-y-6 flex-1">
+                                    <div className="flex justify-between items-end border-b border-slate-100 pb-4">
+                                        <div>
+                                            <p className="text-sm text-slate-500 font-medium mb-1">Skor Wellness</p>
+                                            <p className="text-3xl font-black text-emerald-600 tracking-tight">{latest_wellness.daily_wellness_score} <span className="text-sm text-slate-400 font-medium">/ 30</span></p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-slate-500 font-medium mb-1">Session RPE</p>
+                                            <p className="text-3xl font-black text-orange-500 tracking-tight">{latest_wellness.session_rpe ?? '-'} <span className="text-sm text-slate-400 font-medium">/ 10</span></p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
+                                        <span className="text-sm text-[#ff4d00] font-bold">Daily Load (AU)</span>
+                                        <span className="text-xl font-black text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <Zap className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data Wellness</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* DPA Status */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <User className="w-5 h-5 text-indigo-500"/>
+                                    Dynamic Posture
+                                </h4>
+                                {latest_dpa && <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full">{new Date(latest_dpa.assessment_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_dpa ? (
+                                <div className="space-y-6 flex-1">
+                                    <div>
+                                        <p className="text-sm text-slate-500 font-medium mb-1">Status DPA</p>
+                                        <p className="text-2xl font-black text-indigo-600 tracking-tight">Assessed</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                                            <p className="text-sm text-indigo-500 font-bold">Total Kompensasi</p>
+                                            <p className="text-xl font-black text-indigo-600">{latest_dpa.total_score} <span className="text-xs text-indigo-400 font-medium">temuan</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <User className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data DPA</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {latest_composition && (
+                    <div className="mb-6 md:mb-8">
+                        {/* <CompositionAnatomy test={latest_composition} /> */}
+                    </div>
+                )}
+
                 <div className="mb-6">
                     <div className="flex items-center gap-2 mb-4 px-1">
                         <History className="w-5 h-5 text-slate-400" /> 

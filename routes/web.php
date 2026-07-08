@@ -112,6 +112,13 @@ Route::middleware([
     Route::middleware(['role:admin,coach,athlete'])->group(function () {
         
         
+        Route::get('/admin/athletes/dpa', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'index'])->name('admin.athletes.dpa.index');
+        Route::get('/admin/athletes/{user}/dpa', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'show'])->name('admin.athletes.dpa.show');
+        Route::post('/admin/athletes/{user}/dpa', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'store'])->name('admin.athletes.dpa.store');
+        Route::post('/admin/athletes/{user}/dpa/export-pdf', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'exportPdf'])->name('admin.athletes.dpa.export-pdf');
+        Route::put('/admin/athletes/dpa/assessment/{dpaAssessment}', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'update'])->name('admin.athletes.dpa.update');
+        Route::delete('/admin/athletes/dpa/assessment/{dpaAssessment}', [\App\Http\Controllers\Admin\DpaAssessmentController::class, 'destroy'])->name('admin.athletes.dpa.destroy');
+
         Route::post('/admin/daily-metrics/set-start-date/{user}', [\App\Http\Controllers\Admin\DailyMetricController::class, 'setStartDate'])->name('admin.daily-metrics.set-start-date');
         Route::get('/admin/daily-metrics/athlete/{user}', [\App\Http\Controllers\Admin\DailyMetricController::class, 'show'])->name('admin.daily-metrics.show');
         Route::resource('/admin/daily-metrics', \App\Http\Controllers\Admin\DailyMetricController::class)
@@ -186,6 +193,7 @@ Route::middleware([
         Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
         Route::get('/admin/reports/sessions/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportAthleteReportPdf'])->name('admin.reports.sessions.export-athlete');
         Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
+        Route::get('/admin/reports/profiling/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProfilingPdf'])->name('admin.reports.profiling.export-pdf');
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
@@ -213,6 +221,15 @@ Route::middleware([
         Route::get('/admin/benchmarks', [BenchmarkController::class, 'index'])->name('admin.benchmarks.index');
         Route::get('/admin/benchmarks/{sport}', [BenchmarkController::class, 'edit'])->name('admin.benchmarks.edit');
         Route::put('/admin/benchmarks/{sport}', [BenchmarkController::class, 'update'])->name('admin.benchmarks.update');
+
+        Route::prefix('admin/dpa-compensations')->name('admin.dpa-compensations.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'store'])->name('store');
+            Route::get('/{dpaCompensation}/edit', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'edit'])->name('edit');
+            Route::post('/{dpaCompensation}', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'update'])->name('update');
+            Route::delete('/{dpaCompensation}', [\App\Http\Controllers\Admin\DpaCompensationController::class, 'destroy'])->name('destroy');
+        });
 
         
         Route::get('/admin/performance/create', [PerformanceController::class, 'create'])->name('admin.performance.create');

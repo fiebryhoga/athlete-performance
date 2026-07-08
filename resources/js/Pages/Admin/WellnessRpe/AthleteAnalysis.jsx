@@ -22,10 +22,10 @@ export default function AthleteAnalysis({
 
     const getAcwrBadgeClass = (acwr) => {
         if (!acwr || acwr === 0) return 'text-slate-400 bg-transparent';
-        if (acwr < 0.8) return 'text-orange-500 font-black';
-        if (acwr >= 0.8 && acwr <= 1.3) return 'text-emerald-500 font-black';
-        if (acwr > 1.3 && acwr <= 1.5) return 'text-yellow-500 font-black';
-        return 'text-red-600 font-black';
+        if (acwr < 0.8) return 'text-orange-500 font-bold';
+        if (acwr >= 0.8 && acwr <= 1.3) return 'text-emerald-500 font-bold';
+        if (acwr > 1.3 && acwr <= 1.5) return 'text-yellow-500 font-bold';
+        return 'text-red-600 font-bold';
     };
 
     const getDailyLoadBadgeClass = (val) => {
@@ -37,13 +37,13 @@ export default function AthleteAnalysis({
 
     const getDailyWellnessColor = (score) => {
         if (!score && score !== 0) return { text: 'text-slate-500', bg: 'bg-slate-100', border: 'border-slate-300', label: 'N/A' };
-        if (score <= 9) return { text: 'text-red-700', bg: 'bg-red-100', border: 'border-red-200', label: "Sangat Buruk" };
-        if (score <= 13) return { text: 'text-orange-700', bg: 'bg-orange-100', border: 'border-orange-200', label: "Buruk" };
-        if (score <= 16) return { text: 'text-amber-700', bg: 'bg-amber-100', border: 'border-amber-200', label: "Agak Buruk" };
-        if (score <= 19) return { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', label: "Sedang" };
-        if (score <= 23) return { text: 'text-sky-700', bg: 'bg-sky-100', border: 'border-sky-200', label: "Agak Baik" };
-        if (score <= 27) return { text: 'text-emerald-700', bg: 'bg-emerald-100', border: 'border-emerald-200', label: "Baik" };
-        return { text: 'text-teal-700', bg: 'bg-teal-100', border: 'border-teal-200', label: "Sangat Baik" };
+        if (score <= 9) return { text: 'text-teal-700', bg: 'bg-teal-100', border: 'border-teal-200', label: "Sangat Baik" };
+        if (score <= 13) return { text: 'text-emerald-700', bg: 'bg-emerald-100', border: 'border-emerald-200', label: "Baik" };
+        if (score <= 17) return { text: 'text-sky-700', bg: 'bg-sky-100', border: 'border-sky-200', label: "Agak Baik" };
+        if (score <= 20) return { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', label: "Sedang" };
+        if (score <= 23) return { text: 'text-amber-700', bg: 'bg-amber-100', border: 'border-amber-200', label: "Agak Buruk" };
+        if (score <= 27) return { text: 'text-orange-700', bg: 'bg-orange-100', border: 'border-orange-200', label: "Buruk" };
+        return { text: 'text-red-700', bg: 'bg-red-100', border: 'border-red-200', label: "Sangat Buruk" };
     };
 
     return (
@@ -83,7 +83,7 @@ export default function AthleteAnalysis({
                             {/* Header per minggu */}
                             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-[#ff4d00]/10 flex items-center justify-center text-[#ff4d00] font-black text-xs">
+                                    <div className="h-8 w-8 rounded-full bg-[#ff4d00]/10 flex items-center justify-center text-[#ff4d00] font-bold text-xs">
                                         W{week.week_number}
                                     </div>
                                     <div>
@@ -116,7 +116,7 @@ export default function AthleteAnalysis({
                                                 <td className="px-4 py-3 text-center">
                                                     {day.wellness > 0 ? (
                                                         <div className="flex flex-col items-center gap-1">
-                                                            <span className={`font-black px-2.5 py-0.5 rounded text-[11px] border ${getDailyWellnessColor(day.wellness).bg} ${getDailyWellnessColor(day.wellness).text} ${getDailyWellnessColor(day.wellness).border}`}>
+                                                            <span className={`font-bold px-2.5 py-0.5 rounded text-[11px] border ${getDailyWellnessColor(day.wellness).bg} ${getDailyWellnessColor(day.wellness).text} ${getDailyWellnessColor(day.wellness).border}`}>
                                                                 {day.wellness}
                                                             </span>
                                                             <span className={`text-[9px] font-bold ${getDailyWellnessColor(day.wellness).text}`}>
@@ -137,7 +137,7 @@ export default function AthleteAnalysis({
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
                                                     {day.load > 0 ? (
-                                                        <span className={`font-black px-2.5 py-1 rounded text-xs border ${getDailyLoadBadgeClass(day.load)}`}>
+                                                        <span className={`font-bold px-2.5 py-1 rounded text-xs border ${getDailyLoadBadgeClass(day.load)}`}>
                                                             {day.load}
                                                         </span>
                                                     ) : <span className="text-slate-300">-</span>}
@@ -166,11 +166,11 @@ export default function AthleteAnalysis({
                                 <div className="grid grid-cols-2 md:grid-cols-6 gap-y-6 gap-x-4">
                                     <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
                                         <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Weekly Load</p>
-                                        <p className="text-2xl font-black text-slate-900">{week.weekly_load}</p>
+                                        <p className="text-2xl font-bold text-slate-900">{week.weekly_load}</p>
                                     </div>
                                     <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
                                         <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">ACWR Ratio</p>
-                                        <p className={`text-2xl font-black ${getAcwrBadgeClass(week.acwr)} inline-block`}>
+                                        <p className={`text-2xl font-bold ${getAcwrBadgeClass(week.acwr)} inline-block`}>
                                             {week.acwr > 0 ? week.acwr : <span className="text-slate-400 text-lg">0.00</span>}
                                         </p>
                                     </div>

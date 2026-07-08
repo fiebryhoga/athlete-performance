@@ -26,40 +26,70 @@ class DashboardController extends Controller
             
             // For new dashboard:
             // 1. Pending trainings (not completed)
-            $pendingTrainings = \App\Models\IndividualTraining::where('user_id', $user->id)
+            $today = Carbon::today();
+
+            // 1a. Individual Trainings Today
+            $individualTrainings = \App\Models\IndividualTraining::where('user_id', $user->id)
                 ->where('is_completed', false)
-                ->whereDate('date', '<=', Carbon::today())
-                ->orderBy('date', 'asc')
+                ->whereDate('date', $today)
                 ->get()
                 ->map(function ($training) {
                     return [
                         'id' => $training->id,
-                        'name' => $training->name ?? 'Latihan',
+                        'name' => $training->name ?? 'Latihan Individu',
                         'date' => Carbon::parse($training->date)->format('d M Y'),
+                        'raw_date' => Carbon::parse($training->date)->startOfDay(),
                         'training_type' => $training->training_type,
                         'status' => $training->status,
                         'session_number' => $training->session_number,
+                        'is_group' => false,
+                        'route' => route('admin.individual-trainings.session.show', $training->id),
                     ];
                 });
 
-            // 2. Wellness Status Today
-            $hasWellnessToday = \App\Models\WellnessRpe::where('user_id', $user->id)
-                ->whereDate('record_date', Carbon::today())
-                ->exists();
+            // 1b. Group Trainings Today
+            $groupTrainings = \App\Models\GroupTrainingMember::where('athlete_id', $user->id)
+                ->where('is_completed', false)
+                ->whereHas('groupTraining', function($q) use ($today) {
+                    $q->whereDate('date', $today);
+                })
+                ->with('groupTraining')
+                ->get()
+                ->map(function ($member) {
+                    $training = $member->groupTraining;
+                    return [
+                        'id' => $training->id,
+                        'name' => $training->name ?? 'Latihan Grup',
+                        'date' => Carbon::parse($training->date)->format('d M Y'),
+                        'raw_date' => Carbon::parse($training->date)->startOfDay(),
+                        'training_type' => $training->training_type ?? 'Group',
+                        'status' => $training->status,
+                        'session_number' => $training->session_number,
+                        'is_group' => true,
+                        'route' => route('admin.group-trainings.session.show', $training->id), // Fixed route
+                    ];
+                });
 
-            // 3. Daily Metric Status Today
-            $hasDailyMetricToday = \App\Models\DailyMetric::where('user_id', $user->id)
-                ->whereDate('record_date', Carbon::today())
-                ->exists();
+            // Merge and sort
+            $todayAgendas = $individualTrainings->concat($groupTrainings)->sortBy('raw_date')->values();
+
+            // 2. Wellness Status Today (specifically wellness fields)
+            $wellnessRecord = \App\Models\WellnessRpe::where('user_id', $user->id)
+                ->whereDate('record_date', $today)
+                ->first();
+                
+            $hasWellnessToday = $wellnessRecord && !is_null($wellnessRecord->quality_of_sleep);
+            $hasRpeToday = $wellnessRecord && (!is_null($wellnessRecord->am_rpe) || !is_null($wellnessRecord->pm_rpe));
 
             // 4. Quick Stats
             $totalSessions = PerformanceTest::where('user_id', $user->id)->count();
 
             return Inertia::render('Athlete/Dashboard', [
                 'user' => $user,
-                'pending_trainings' => $pendingTrainings,
+                'today_agendas' => $todayAgendas,
                 'has_wellness_today' => $hasWellnessToday,
-                'has_daily_metric_today' => $hasDailyMetricToday,
+                'has_rpe_today' => $hasRpeToday,
+                'today_date' => $today->format('Y-m-d'),
                 'stats' => [
                     'sport' => $user->sport->name ?? '-',
                     'total_sessions' => $totalSessions,
@@ -164,7 +194,67 @@ class DashboardController extends Controller
             ['subject' => 'Agility', 'A' => 75, 'B' => 100],
         ];
 
+        // Today's Agendas
+        $today = Carbon::today();
+        $adminUser = Auth::user();
+
+        // Fetch all coaches to resolve coach_ids array
+        $allCoaches = \App\Models\User::whereIn('role', ['coach', 'superadmin'])->get()->keyBy('id');
+
+        // 1. Group Trainings Today
+        $groupQuery = \App\Models\GroupTraining::whereDate('date', $today)->where('status', 'scheduled');
+        if ($adminUser->role === 'coach') {
+            $groupQuery->whereJsonContains('coach_ids', $adminUser->id);
+        }
+        $groupTrainings = $groupQuery->with(['coach', 'group'])->get()->map(function ($training) use ($allCoaches) {
+            $actualCoaches = collect($training->coach_ids ?? [])->map(function ($id) use ($allCoaches) {
+                return $allCoaches->get($id)->name ?? '';
+            })->filter()->implode(', ');
+
+            return [
+                'id' => $training->id,
+                'name' => $training->name ?? 'Latihan Grup',
+                'participant_name' => $training->group->name ?? 'Grup',
+                'date' => Carbon::parse($training->date)->format('d M Y'),
+                'raw_date' => Carbon::parse($training->date)->startOfDay(),
+                'training_type' => 'Group',
+                'status' => $training->status,
+                'session_number' => $training->session_number,
+                'coach_name' => $actualCoaches ?: ($training->coach->name ?? 'Tidak Ada'),
+                'is_group' => true,
+                'route' => route('admin.group-trainings.session.show', $training->id),
+            ];
+        });
+
+        // 2. Individual Trainings Today
+        $individualQuery = \App\Models\IndividualTraining::whereDate('date', $today)->where('is_completed', false);
+        if ($adminUser->role === 'coach') {
+            $individualQuery->whereJsonContains('coach_ids', $adminUser->id);
+        }
+        $individualTrainings = $individualQuery->with(['user', 'coach'])->get()->map(function ($training) use ($allCoaches) {
+            $actualCoaches = collect($training->coach_ids ?? [])->map(function ($id) use ($allCoaches) {
+                return $allCoaches->get($id)->name ?? '';
+            })->filter()->implode(', ');
+
+            return [
+                'id' => $training->id,
+                'name' => 'Latihan Individu',
+                'participant_name' => $training->user->name ?? 'Atlet',
+                'date' => Carbon::parse($training->date)->format('d M Y'),
+                'raw_date' => Carbon::parse($training->date)->startOfDay(),
+                'training_type' => $training->training_type ?? 'Private',
+                'status' => $training->status,
+                'session_number' => $training->session_number,
+                'coach_name' => $actualCoaches ?: ($training->coach->name ?? 'Tidak Ada'),
+                'is_group' => false,
+                'route' => route('admin.individual-trainings.session.show', $training->id),
+            ];
+        });
+
+        $todayAgendas = $individualTrainings->concat($groupTrainings)->sortBy('raw_date')->values();
+
         return Inertia::render('Dashboard', [ 
+            'today_agendas' => $todayAgendas,
             'stats' => [
                 'total_atlet' => $totalAtlet,
                 'sesi_bulan_ini' => $sesiBulanIni,
@@ -272,6 +362,11 @@ class DashboardController extends Controller
             ];
         })->values();
 
+        $latest_phv = \App\Models\PhvAssessment::where('user_id', $user->id)->orderBy('assessment_date', 'desc')->first();
+        $latest_composition = \App\Models\CompositionTest::where('user_id', $user->id)->orderBy('date', 'desc')->first();
+        $latest_wellness = \App\Models\WellnessRpe::where('user_id', $user->id)->orderBy('record_date', 'desc')->first();
+        $latest_dpa = \App\Models\DpaAssessment::where('user_id', $user->id)->orderBy('assessment_date', 'desc')->first();
+
         return Inertia::render('Athlete/Profiling', [
             'user' => $user,
             'stats' => [
@@ -285,7 +380,11 @@ class DashboardController extends Controller
             'trendData' => $trendData,
             'history' => $history,
             'daily_metrics' => $dailyMetrics, 
-            'training_loads' => $trainingLoads 
+            'training_loads' => $trainingLoads,
+            'latest_phv' => $latest_phv,
+            'latest_composition' => $latest_composition,
+            'latest_wellness' => $latest_wellness,
+            'latest_dpa' => $latest_dpa
         ]);
     }
 }

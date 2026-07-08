@@ -103,4 +103,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(PhvAssessment::class);
     }
+
+    public function dpaAssessments()
+    {
+        return $this->hasMany(DpaAssessment::class);
+    }
 }

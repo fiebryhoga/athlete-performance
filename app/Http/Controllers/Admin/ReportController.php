@@ -441,4 +441,26 @@ class ReportController extends Controller
 
         return $pdf->download('Laporan_Sesi_Grup_' . str_replace(' ', '_', $group->name) . '.pdf');
     }
+
+    public function exportProfilingPdf(Request $request, User $user)
+    {
+        $athlete = User::with(['sport', 'performanceTests.results.testItem.category'])->findOrFail($user->id);
+        
+        $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
+        $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
+        
+        $clubLogo = null;
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.profiling_pdf', [
+            'athlete' => $athlete,
+            'clubLogo' => $clubLogo
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download("Profiling_Athlete_{$athlete->name}.pdf");
+    }
 }

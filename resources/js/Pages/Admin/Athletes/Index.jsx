@@ -1,7 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { Search, Users, ChevronRight, Activity, Target, Flame, Info, Ruler, Weight } from 'lucide-react';
+import { Search, Users, ChevronRight, Activity, Target, Flame, Info, Ruler, Weight, Zap, Scale, TrendingUp } from 'lucide-react';
 import PageHeader from '@/Components/Layout/PageHeader';
 
 export default function Index({ athletes, filters }) {
@@ -79,31 +79,52 @@ export default function Index({ athletes, filters }) {
                             {/* Card Body - Physical Metrics */}
                             <div className="p-5 bg-slate-50/50 flex-1 flex flex-col justify-between gap-4">
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col items-center justify-center shadow-sm">
-                                        <Ruler className="w-4 h-4 text-slate-300 mb-1.5" />
-                                        <div className="flex items-end gap-1 text-slate-700">
-                                            <span className="font-bold text-lg leading-none">{athlete.height || '-'}</span>
-                                            {athlete.height && <span className="text-[10px] font-bold text-slate-400 mb-0.5">cm</span>}
+                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-center shadow-sm">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                                            <span className="text-[9px] font-bold text-slate-400">PHV Status</span>
+                                        </div>
+                                        <div className="text-slate-700 font-bold text-xs line-clamp-1">
+                                            {athlete.latest_phv?.phv_status || '-'}
                                         </div>
                                     </div>
-                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col items-center justify-center shadow-sm">
-                                        <Weight className="w-4 h-4 text-slate-300 mb-1.5" />
-                                        <div className="flex items-end gap-1 text-slate-700">
-                                            <span className="font-bold text-lg leading-none">{athlete.weight || '-'}</span>
-                                            {athlete.weight && <span className="text-[10px] font-bold text-slate-400 mb-0.5">kg</span>}
+                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-center shadow-sm">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <Scale className="w-3.5 h-3.5 text-blue-500" />
+                                            <span className="text-[9px] font-bold text-slate-400">Muscle Mass</span>
+                                        </div>
+                                        <div className="text-slate-700 font-bold text-xs line-clamp-1">
+                                            {athlete.latest_composition?.muscle_mass ? `${athlete.latest_composition.muscle_mass} kg` : '-'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-center shadow-sm">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <Zap className="w-3.5 h-3.5 text-orange-500" />
+                                            <span className="text-[9px] font-bold text-slate-400">Wellness</span>
+                                        </div>
+                                        <div className="text-slate-700 font-bold text-xs line-clamp-1">
+                                            {athlete.latest_wellness?.daily_wellness_score ? `${athlete.latest_wellness.daily_wellness_score} / 25` : '-'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col justify-center shadow-sm">
+                                        <div className="flex items-center gap-1.5 mb-1.5">
+                                            <Activity className="w-3.5 h-3.5 text-rose-500" />
+                                            <span className="text-[9px] font-bold text-slate-400">Daily Load</span>
+                                        </div>
+                                        <div className="text-slate-700 font-bold text-xs line-clamp-1">
+                                            {athlete.latest_wellness?.daily_load || '-'}
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div className="flex items-center justify-between pt-2 text-xs">
-                                    <div className="flex items-center gap-1.5 text-slate-500 font-medium bg-white px-2 py-1 rounded-md border border-slate-100 shadow-sm">
+                                <div className="flex items-center justify-between pt-2 text-xs border-t border-slate-100">
+                                    <div className="flex items-center gap-1.5 text-slate-500 font-medium">
                                         <Info className="w-3.5 h-3.5 text-slate-400" />
                                         <span>{athlete.age ? `${athlete.age} Thn` : 'Umur -'}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5 font-bold">
-                                        <span className={athlete.gender === 'L' ? 'text-blue-600 bg-blue-50 px-3 py-1 rounded-md border border-blue-100' : 'text-pink-600 bg-pink-50 px-3 py-1 rounded-md border border-pink-100'}>
-                                            {athlete.gender === 'L' ? 'Laki-laki' : (athlete.gender === 'P' ? 'Perempuan' : 'N/A')}
-                                        </span>
+                                        <span className="mx-1 text-slate-300">•</span>
+                                        <span className="flex items-center gap-1"><Ruler className="w-3 h-3"/>{athlete.height || '-'}</span>
+                                        <span className="mx-1 text-slate-300">•</span>
+                                        <span className="flex items-center gap-1"><Weight className="w-3 h-3"/>{athlete.weight || '-'}</span>
                                     </div>
                                 </div>
                             </div>

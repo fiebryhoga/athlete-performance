@@ -11,12 +11,12 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
                 </Link>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Athlete Analysis</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">Client Analysis</h1>
                         <p className="text-slate-500 font-medium text-sm mt-1">Comprehensive performance report and physical metrics.</p>
                     </div>
-                    {safeAthlete.name && (
-                        <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="w-full md:w-auto bg-white border border-slate-200 text-[#ff4d00] px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-orange-50 hover:border-orange-200 transition-all shadow-sm flex items-center justify-center gap-2">
-                            <Activity className="w-4 h-4" /> View Training Logs
+                    {safeAthlete.id && (
+                        <Link href={route('admin.individual-trainings.show', safeAthlete.id)} className="w-full md:w-auto bg-white border border-slate-200 text-[#ff4d00] px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-orange-50 hover:border-orange-200 transition-all shadow-sm flex items-center justify-center gap-2">
+                            <Activity className="w-4 h-4" /> Lihat Program Latihan
                         </Link>
                     )}
                 </div>

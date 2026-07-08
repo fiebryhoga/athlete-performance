@@ -1,5 +1,5 @@
 import AppLayout from "@/Layouts/AppLayout";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, usePage, Link } from "@inertiajs/react";
 import {
     Users,
     Activity,
@@ -13,25 +13,51 @@ import {
     Zap,
     ChevronRight,
     Sparkles,
+    User,
+    Dumbbell,
+    ArrowRight,
+    ClipboardList,
 } from "lucide-react";
 import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
     Radar,
     RadarChart,
     PolarGrid,
     PolarAngleAxis,
     PolarRadiusAxis,
-    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
 } from "recharts";
+
+const StatCard = ({ title, value, icon: Icon, colorClass, isText }) => (
+    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-200 transition-all flex items-center justify-between group cursor-default">
+        <div>
+            <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+            <h3 className={`font-bold ${isText ? "text-xl text-slate-700" : "text-3xl text-slate-900"}`}>
+                {value}
+            </h3>
+        </div>
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${colorClass} group-hover:scale-110 transition-transform`}>
+            <Icon size={24} />
+        </div>
+    </div>
+);
+
+const MiniStatCard = ({ label, value, unit, icon: Icon }) => (
+    <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl flex items-center gap-4 hover:bg-white hover:shadow-sm hover:border-slate-200 transition-all cursor-default group">
+        <div className="w-10 h-10 rounded-full bg-white border border-slate-100 group-hover:border-orange-100 flex items-center justify-center text-slate-500 group-hover:text-[#ff4d00] transition-colors">
+            <Icon size={20} />
+        </div>
+        <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">{label}</p>
+            <p className="text-lg font-bold text-slate-800 leading-none">
+                {value} <span className="text-xs font-medium text-slate-500 ml-0.5">{unit}</span>
+            </p>
+        </div>
+    </div>
+);
 
 export default function Dashboard({ auth }) {
     const {
@@ -42,33 +68,26 @@ export default function Dashboard({ auth }) {
             top_athletes: [],
             cabor_performance: [],
         },
+        today_agendas = [],
     } = usePage().props;
 
     const GENDER_COLORS = ["#ff4d00", "#ec4899"];
-
-    const getTrend = (idx) => (idx % 2 === 0 ? "+2.4%" : "-1.1%");
-    const getTrendColor = (idx) =>
-        idx % 2 === 0 ? "text-emerald-300" : "text-rose-300";
 
     return (
         <AppLayout title="Dashboard">
             <Head title="Performance Overview" />
 
             <div className="space-y-8 pb-10">
+                {/* HERO HEADER */}
                 <div className="relative min-h-[300px] flex mb-8 group">
-                    {/* Background Container with overflow hidden */}
                     <div className="absolute inset-0 rounded-2xl shadow-xl shadow-[#ff4d00]/10 border border-[#ff4d00]/20 overflow-hidden z-0">
                         <div className="absolute inset-0 bg-gradient-to-r from-[#ff4d00] via-[#ff6600] to-[#ff8c00]"></div>
-
                         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
-
                         <div className="absolute -right-20 -top-20 w-[400px] h-[400px] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
                         <div className="absolute right-32 -bottom-24 w-[300px] h-[300px] border-[20px] border-white/5 rounded-full pointer-events-none"></div>
-
                         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-400/20 rounded-full mix-blend-overlay filter blur-[100px] animate-pulse pointer-events-none"></div>
                     </div>
 
-                    {/* Model Image - Outside overflow-hidden so it can pop out */}
                     <div className="absolute right-4 md:right-12 -bottom-0 z-10 h-[350px] md:h-[420px] pointer-events-none hidden md:block opacity-90">
                         <img
                             src="/assets/images/model2.png"
@@ -80,14 +99,9 @@ export default function Dashboard({ auth }) {
                     <div className="relative z-20 flex flex-col justify-between w-full h-full p-8 md:p-10">
                         <div className="max-w-xl xl:max-w-2xl">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 mb-5 shadow-sm">
-                                <Sparkles
-                                    size={14}
-                                    className="text-yellow-200 fill-yellow-200"
-                                />
-                                <span className="text-[10px] font-bold text-white">
-                                    {auth?.user?.role === "superadmin"
-                                        ? "Superadmin Area"
-                                        : "Coach Area"}
+                                <Sparkles size={14} className="text-yellow-200 fill-yellow-200" />
+                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                                    {auth?.user?.role === "superadmin" ? "Superadmin Hub" : "Coach Hub"}
                                 </span>
                             </div>
 
@@ -99,27 +113,26 @@ export default function Dashboard({ auth }) {
                             </h1>
 
                             <p className="text-orange-100 text-sm md:text-base leading-relaxed font-medium max-w-lg mb-8 md:mb-10">
-                                Berikut adalah ringkasan performa terbaru. Anda
-                                membina{" "}
+                                Berikut adalah ringkasan sistem. Anda mengelola{" "}
                                 <span className="font-bold text-white border-b border-white/40 pb-0.5">
                                     {stats?.total_atlet || 0} atlet aktif
                                 </span>{" "}
-                                yang siap mencapai potensi maksimalnya hari ini.
+                                dengan total {stats?.sesi_bulan_ini || 0} sesi latihan bulan ini.
                             </p>
                         </div>
 
                         <div className="w-fit flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-4 rounded-xl shadow-lg hover:bg-white/20 transition-all cursor-default relative overflow-hidden group/date">
                             <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-0 group-hover/date:animate-shine"></div>
-
                             <div className="relative z-10 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-[#ff4d00] shrink-0">
                                 <Calendar size={20} strokeWidth={2.5} />
                             </div>
                             <div className="relative z-10 pr-2">
-                                <p className="text-[10px] text-orange-200 font-bold mb-0.5">
-                                    Tanggal Hari Ini
+                                <p className="text-[10px] text-orange-200 font-bold mb-0.5 uppercase tracking-wider">
+                                    Hari Ini
                                 </p>
                                 <p className="text-base font-bold text-white leading-none whitespace-nowrap">
                                     {new Date().toLocaleDateString("id-ID", {
+                                        weekday: "long",
                                         day: "numeric",
                                         month: "long",
                                         year: "numeric",
@@ -130,27 +143,28 @@ export default function Dashboard({ auth }) {
                     </div>
                 </div>
 
+                {/* QUICK STATS */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     <StatCard
-                        title="Total Athletes"
+                        title="Total Atlet Aktif"
                         value={stats?.total_atlet || 0}
                         icon={Users}
                         colorClass="bg-orange-50 text-[#ff4d00]"
                     />
                     <StatCard
-                        title="Sessions This Month"
+                        title="Sesi Bulan Ini"
                         value={stats?.sesi_bulan_ini || 0}
                         icon={Calendar}
-                        colorClass="bg-purple-50 text-purple-600"
+                        colorClass="bg-blue-50 text-blue-600"
                     />
                     <StatCard
-                        title="Global Avg Score"
+                        title="Rata-rata Skor Global"
                         value={stats?.avg_skor_global || 0}
                         icon={Activity}
                         colorClass="bg-emerald-50 text-emerald-600"
                     />
                     <StatCard
-                        title="Top Category"
+                        title="Cabor Terbaik"
                         value={stats?.cabor_unggulan || "-"}
                         icon={Trophy}
                         isText={true}
@@ -158,31 +172,73 @@ export default function Dashboard({ auth }) {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <MiniStatCard
-                        label="Average Age"
-                        value={stats?.avg_age || 0}
-                        unit="Years Old"
-                        icon={Timer}
-                    />
-                    <MiniStatCard
-                        label="Average Height"
-                        value={stats?.avg_height || 0}
-                        unit="Centimeters"
-                        icon={Ruler}
-                    />
-                    <MiniStatCard
-                        label="Average Weight"
-                        value={stats?.avg_weight || 0}
-                        unit="Kilograms"
-                        icon={Weight}
-                    />
+
+
+                {/* TODAY'S AGENDAS */}
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                    <div className="p-5 md:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <ClipboardList size={20} />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-bold text-slate-800 leading-tight">Jadwal Latihan Hari Ini</h2>
+                                <p className="text-xs text-slate-500 font-medium">Sesi latihan privat dan grup yang dijadwalkan untuk hari ini.</p>
+                            </div>
+                        </div>
+                        <div className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200">
+                            {today_agendas?.length || 0} Sesi
+                        </div>
+                    </div>
+                    <div className="p-5 md:p-6 bg-white">
+                        {today_agendas?.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {today_agendas.map((agenda, index) => (
+                                    <div key={index} className="group relative bg-white border border-slate-200 hover:border-[#ff4d00] rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs ${agenda.is_group ? 'bg-purple-500' : 'bg-blue-500'}`}>
+                                                    {agenda.is_group ? <Users size={16}/> : <User size={16}/>}
+                                                </div>
+                                                <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded-md ${agenda.is_group ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+                                                    {agenda.is_group ? 'Grup' : 'Privat'}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                                Sesi {agenda.session_number || '-'}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-base font-bold text-slate-900 mb-1 leading-tight line-clamp-1">{agenda.participant_name}</h3>
+                                        <p className="text-xs text-slate-500 mb-4 font-medium flex items-center gap-1">
+                                            <User size={12} className="text-slate-400" /> Coach: <span className="text-slate-700">{agenda.coach_name}</span>
+                                        </p>
+                                        <Link
+                                            href={agenda.route}
+                                            className="inline-flex items-center gap-2 w-full justify-center px-4 py-2 bg-slate-50 hover:bg-[#ff4d00] text-slate-700 hover:text-white border border-slate-200 hover:border-[#ff4d00] rounded-lg text-sm font-bold transition-colors"
+                                        >
+                                            Kelola Sesi <ArrowRight size={16} />
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-12 flex flex-col items-center justify-center text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm mb-4">
+                                    <ClipboardList size={32} />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-800 mb-2">Tidak ada jadwal latihan hari ini</h3>
+                                <p className="text-slate-500 max-w-sm text-sm">Semua jadwal telah selesai atau memang tidak ada latihan yang dijadwalkan pada hari ini.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
+                {/* CHARTS & LISTS ROW */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
-                            <div className="p-5 border-b border-slate-100 bg-slate-50/30">
+                        {/* Radar Chart */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/50">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
                                     <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600">
                                         <Target size={16} />
@@ -193,315 +249,137 @@ export default function Dashboard({ auth }) {
                             <div className="p-2 flex-1 min-h-[280px]">
                                 <ResponsiveContainer width="100%" height="100%">
                                     {charts?.radar?.length > 0 ? (
-                                        <RadarChart
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius="70%"
-                                            data={charts.radar}
-                                        >
+                                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={charts.radar}>
                                             <defs>
-                                                <linearGradient
-                                                    id="colorAthlete"
-                                                    x1="0"
-                                                    y1="0"
-                                                    x2="0"
-                                                    y2="1"
-                                                >
-                                                    <stop
-                                                        offset="5%"
-                                                        stopColor="#ff4d00"
-                                                        stopOpacity={0.7}
-                                                    />
-                                                    <stop
-                                                        offset="95%"
-                                                        stopColor="#ff4d00"
-                                                        stopOpacity={0.1}
-                                                    />
+                                                <linearGradient id="colorAthlete" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.7} />
+                                                    <stop offset="95%" stopColor="#ff4d00" stopOpacity={0.1} />
                                                 </linearGradient>
                                             </defs>
-                                            <PolarGrid
-                                                stroke="#e2e8f0"
-                                                strokeDasharray="3 3"
-                                            />
-                                            <PolarAngleAxis
-                                                dataKey="subject"
-                                                tick={{
-                                                    fill: "#64748b",
-                                                    fontSize: 10,
-                                                    fontWeight: 600,
-                                                }}
-                                            />
-                                            <PolarRadiusAxis
-                                                angle={30}
-                                                domain={[0, 100]}
-                                                tick={false}
-                                                axisLine={false}
-                                            />
-                                            <Radar
-                                                name="Target"
-                                                dataKey="B"
-                                                stroke="#cbd5e1"
-                                                strokeWidth={2}
-                                                strokeDasharray="4 4"
-                                                fill="transparent"
-                                            />
-                                            <Radar
-                                                name="Athlete"
-                                                dataKey="A"
-                                                stroke="#ff4d00"
-                                                strokeWidth={2}
-                                                fill="url(#colorAthlete)"
-                                                fillOpacity={1}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{
-                                                    borderRadius: "8px",
-                                                    border: "none",
-                                                }}
-                                                itemStyle={{
-                                                    fontSize: "12px",
-                                                    fontWeight: "bold",
-                                                    color: "#1e293b",
-                                                }}
-                                            />
-                                            <Legend
-                                                wrapperStyle={{
-                                                    fontSize: "11px",
-                                                    paddingTop: "10px",
-                                                }}
-                                                iconType="circle"
-                                            />
+                                            <PolarGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                                            <Radar name="Target" dataKey="B" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="4 4" fill="transparent" />
+                                            <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="url(#colorAthlete)" fillOpacity={1} />
                                         </RadarChart>
                                     ) : (
-                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">
-                                            No benchmark data available
-                                        </div>
+                                        <div className="flex items-center justify-center h-full text-sm text-slate-400">Tidak ada data</div>
                                     )}
                                 </ResponsiveContainer>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
-                            <div className="p-5 border-b border-slate-100 bg-slate-50/30">
+                        {/* Top Athletes */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <div className="p-1.5 bg-pink-50 rounded-lg text-pink-500">
-                                        <Users size={16} />
+                                    <div className="p-1.5 bg-amber-50 rounded-lg text-amber-600">
+                                        <Trophy size={16} />
                                     </div>
-                                    Gender Distribution
+                                    Top 5 Atlet
                                 </h3>
                             </div>
-                            <div className="p-4 flex-1 flex flex-col items-center justify-center relative min-h-[280px]">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    {charts?.gender?.length > 0 ? (
-                                        <PieChart>
-                                            <Pie
-                                                data={charts.gender}
-                                                innerRadius={65}
-                                                outerRadius={85}
-                                                dataKey="value"
-                                                paddingAngle={4}
-                                                stroke="none"
-                                            >
-                                                {charts.gender.map(
-                                                    (entry, index) => (
-                                                        <Cell
-                                                            key={`cell-${index}`}
-                                                            fill={
-                                                                GENDER_COLORS[
-                                                                    index %
-                                                                        GENDER_COLORS.length
-                                                                ]
-                                                            }
-                                                        />
-                                                    ),
-                                                )}
-                                            </Pie>
-                                            <Tooltip
-                                                contentStyle={{
-                                                    borderRadius: "8px",
-                                                    border: "none",
-                                                }}
-                                                itemStyle={{
-                                                    fontSize: "12px",
-                                                    fontWeight: "bold",
-                                                }}
-                                            />
-                                            <Legend
-                                                verticalAlign="bottom"
-                                                height={36}
-                                                iconType="circle"
-                                                wrapperStyle={{
-                                                    fontSize: "12px",
-                                                }}
-                                            />
-                                        </PieChart>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">
-                                            No gender data
-                                        </div>
-                                    )}
-                                </ResponsiveContainer>
-                                {charts?.gender?.length > 0 && (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
-                                        <span className="text-3xl font-bold text-slate-700">
-                                            {charts.gender.reduce(
-                                                (a, b) => a + b.value,
-                                                0,
-                                            )}
-                                        </span>
-                                        <span className="text-[10px] text-slate-400 font-bold">
-                                            Total
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm md:col-span-2 overflow-hidden">
-                            <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-                                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                    <div className="p-1.5 bg-orange-50 rounded-lg text-[#ff4d00]">
-                                        <Activity size={16} />
-                                    </div>
-                                    Recent Activity
-                                </h3>
-                            </div>
-
-                            <div className="p-2">
-                                {(lists?.recent_activity?.length || 0) > 0 ? (
-                                    <div className="divide-y divide-slate-50">
-                                        {lists.recent_activity
-                                            .slice(0, 3)
-                                            .map((act, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors group cursor-default"
-                                                >
-                                                    <div className="w-10 h-10 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-[#ff4d00] font-bold text-xs shadow-sm group-hover:scale-105 transition-transform">
-                                                        {act.user
-                                                            ? act.user
-                                                                  .substring(
-                                                                      0,
-                                                                      2,
-                                                                  )
-                                                                  .toUpperCase()
-                                                            : "NA"}
+                            <div className="p-0 flex-1">
+                                {lists?.top_athletes?.length > 0 ? (
+                                    <div className="divide-y divide-slate-100">
+                                        {lists.top_athletes.map((atlet, index) => (
+                                            <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
+                                                        index === 0 ? "bg-yellow-100 text-yellow-700" :
+                                                        index === 1 ? "bg-slate-200 text-slate-700" :
+                                                        index === 2 ? "bg-orange-100 text-orange-700" :
+                                                        "bg-slate-100 text-slate-500"
+                                                    }`}>
+                                                        #{index + 1}
                                                     </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex justify-between items-center mb-0.5">
-                                                            <p className="text-sm font-bold text-slate-800 truncate pr-2">
-                                                                {act.title}
-                                                            </p>
-                                                            <span className="text-xs font-bold text-[#ff4d00] bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
-                                                                {act.score}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex justify-between items-center">
-                                                            <p className="text-xs text-slate-500 truncate">
-                                                                <span className="font-medium text-slate-600">
-                                                                    {act.user}
-                                                                </span>{" "}
-                                                                • {act.sport}
-                                                            </p>
-                                                            <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap pl-2">
-                                                                {act.date}
-                                                            </p>
-                                                        </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-slate-800 leading-tight">{atlet.name}</h4>
+                                                        <p className="text-[10px] uppercase font-bold text-slate-400">{atlet.sport}</p>
                                                     </div>
                                                 </div>
-                                            ))}
+                                                <div className="text-right">
+                                                    <span className="inline-block px-2.5 py-1 bg-green-50 text-green-700 rounded-md text-sm font-bold">
+                                                        {atlet.score}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : (
-                                    <div className="py-8 text-center">
-                                        <p className="text-sm text-slate-400 italic font-medium">
-                                            No recent activity found.
-                                        </p>
-                                    </div>
+                                    <div className="flex items-center justify-center h-full text-sm text-slate-400 min-h-[200px]">Belum ada data atlet</div>
                                 )}
                             </div>
                         </div>
                     </div>
 
+                    {/* Right Column: Gender & Cabor */}
                     <div className="space-y-6">
-                        <div className="bg-[#ff4d00] rounded-lg p-6 text-white shadow-lg relative overflow-hidden h-fit">
-                            <Trophy
-                                size={140}
-                                className="absolute -top-4 -right-6 opacity-10 rotate-12"
-                            />
-                            <h3 className="font-bold text-xl mb-6 relative z-10 border-b border-white/20 pb-4">
-                                🏆 Top 5 Elite
-                            </h3>
-                            <div className="space-y-4 relative z-10">
-                                {(lists?.top_athletes?.length || 0) > 0 ? (
-                                    lists.top_athletes.map((user, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="flex items-center bg-white/10 p-3 rounded-lg backdrop-blur-sm hover:bg-white/20 transition cursor-pointer border border-white/5"
-                                        >
-                                            <div className="w-8 h-8 flex items-center justify-center bg-white text-[#ff4d00] font-bold rounded-full mr-3 text-sm shadow-md">
-                                                {idx + 1}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                    <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+                                        <Users size={16} />
+                                    </div>
+                                    Distribusi Gender
+                                </h3>
+                            </div>
+                            <div className="p-5 flex flex-col items-center">
+                                <div className="h-[200px] w-full mb-4">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        {charts?.gender?.length > 0 ? (
+                                            <PieChart>
+                                                <Pie data={charts.gender} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                                                    {charts.gender.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={GENDER_COLORS[index % GENDER_COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} />
+                                            </PieChart>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-sm text-slate-400">Tidak ada data</div>
+                                        )}
+                                    </ResponsiveContainer>
+                                </div>
+                                <div className="flex items-center justify-center gap-6 w-full">
+                                    {charts?.gender?.map((item, i) => (
+                                        <div key={i} className="flex items-center gap-2">
+                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: GENDER_COLORS[i % GENDER_COLORS.length] }}></div>
+                                            <span className="text-xs font-medium text-slate-600">{item.name}</span>
+                                            <span className="text-sm font-bold text-slate-800">{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                    <div className="p-1.5 bg-rose-50 rounded-lg text-rose-600">
+                                        <TrendingUp size={16} />
+                                    </div>
+                                    Performa Cabor
+                                </h3>
+                            </div>
+                            <div className="p-5 space-y-4">
+                                {lists?.cabor_performance?.length > 0 ? (
+                                    lists.cabor_performance.map((cabor, i) => (
+                                        <div key={i}>
+                                            <div className="flex justify-between items-center mb-1.5">
+                                                <span className="text-sm font-bold text-slate-700">{cabor.name}</span>
+                                                <span className="text-sm font-bold text-[#ff4d00]">{cabor.score}</span>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-bold text-sm truncate">
-                                                    {user.name}
-                                                </p>
-                                                <p className="text-xs text-orange-200">
-                                                    {user.sport}
-                                                </p>
-                                            </div>
-                                            <div className="text-right ml-2">
-                                                <p className="font-bold text-sm">
-                                                    {user.score}
-                                                </p>
-                                                <p
-                                                    className={`text-[10px] font-medium ${getTrendColor(idx)}`}
-                                                >
-                                                    {getTrend(idx)}
-                                                </p>
+                                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="h-full bg-gradient-to-r from-[#ff4d00] to-[#ff7a00] rounded-full transition-all duration-1000"
+                                                    style={{ width: `${Math.min((cabor.score / 100) * 100, 100)}%` }}
+                                                ></div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-orange-200 font-medium">
-                                        Not enough data.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
-                            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm">
-                                <Zap size={16} className="text-amber-500" />{" "}
-                                Sport Rankings
-                            </h3>
-                            <div className="space-y-3">
-                                {(lists?.cabor_performance?.length || 0) > 0 ? (
-                                    lists.cabor_performance
-                                        .slice(0, 5)
-                                        .map((cabor, idx) => (
-                                            <div key={idx} className="group">
-                                                <div className="flex justify-between items-end mb-1">
-                                                    <span className="text-sm font-semibold text-slate-700">
-                                                        {cabor.name}
-                                                    </span>
-                                                    <span className="text-sm font-bold text-slate-800">
-                                                        {cabor.score}
-                                                    </span>
-                                                </div>
-                                                <div className="w-full bg-slate-100 rounded-full h-2">
-                                                    <div
-                                                        className="bg-slate-800 h-2 rounded-full transition-all duration-500 group-hover:bg-[#ff4d00]"
-                                                        style={{
-                                                            width: `${cabor.score}%`,
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        ))
-                                ) : (
-                                    <p className="text-xs text-slate-400 font-medium">
-                                        No sport data available.
-                                    </p>
+                                    <div className="text-center text-sm text-slate-400 py-4">Belum ada data cabor</div>
                                 )}
                             </div>
                         </div>
@@ -509,50 +387,5 @@ export default function Dashboard({ auth }) {
                 </div>
             </div>
         </AppLayout>
-    );
-}
-
-function StatCard({ title, value, icon: Icon, colorClass, isText = false }) {
-    return (
-        <div className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-slate-500 text-xs font-bold mb-1">
-                        {title}
-                    </p>
-                    <h3
-                        className={`font-bold text-slate-800 ${isText ? "text-xl mt-1 truncate" : "text-3xl"}`}
-                    >
-                        {value}
-                    </h3>
-                </div>
-                <div className={`p-3 rounded-lg ${colorClass} shrink-0`}>
-                    <Icon size={20} />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function MiniStatCard({ label, value, unit, icon: Icon }) {
-    return (
-        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm flex items-center gap-4 hover:border-orange-200 transition-colors">
-            <div className="p-3 bg-slate-50 text-slate-600 rounded-lg border border-slate-100 shrink-0">
-                <Icon size={20} />
-            </div>
-            <div className="min-w-0">
-                <p className="text-[10px] text-slate-400 font-bold truncate">
-                    {label}
-                </p>
-                <div className="flex items-baseline gap-1">
-                    <p className="text-xl font-bold text-slate-800 truncate">
-                        {value}
-                    </p>
-                    <span className="text-xs text-slate-400 font-medium truncate">
-                        {unit}
-                    </span>
-                </div>
-            </div>
-        </div>
     );
 }

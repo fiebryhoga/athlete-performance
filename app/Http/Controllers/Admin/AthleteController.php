@@ -36,7 +36,10 @@ class AthleteController extends Controller
 
         return Inertia::render('Admin/Athletes/Index', [
             'athletes' => $query->latest()->paginate(10)->through(function ($athlete) {
-                $athlete->profile_photo_url = $athlete->profile_photo_url; 
+                $athlete->profile_photo_url = $athlete->profile_photo_url;
+                $athlete->latest_phv = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+                $athlete->latest_composition = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
+                $athlete->latest_wellness = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
                 return $athlete;
             })->withQueryString(),
             
@@ -325,6 +328,11 @@ class AthleteController extends Controller
             $query->latest(); // Urutkan foto terbaru di atas
         }]);
 
+        $latest_phv = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+        $latest_composition = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
+        $latest_wellness = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
+        $latest_dpa = \App\Models\DpaAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+
         return Inertia::render('Admin/Athletes/Show', [
             'athlete' => $athlete,
             'stats' => $stats,
@@ -335,7 +343,11 @@ class AthleteController extends Controller
             'strengths' => $strengths,
             'weaknesses' => $weaknesses,
             'has_data' => $hasData,
-            'historical_labels' => $historicalLabels 
+            'historical_labels' => $historicalLabels,
+            'latest_phv' => $latest_phv,
+            'latest_composition' => $latest_composition,
+            'latest_wellness' => $latest_wellness,
+            'latest_dpa' => $latest_dpa
         ]);
     }
 

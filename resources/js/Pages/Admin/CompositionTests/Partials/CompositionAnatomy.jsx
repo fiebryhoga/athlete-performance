@@ -5,6 +5,8 @@ import React from 'react';
 export default function CompositionAnatomy({ test }) {
  if (!test) return null;
 
+ const imgUrl = '/assets/images/siluet-tubuh.png';
+
  const w = parseFloat(test.weight) || 1; 
 
  
@@ -63,18 +65,20 @@ export default function CompositionAnatomy({ test }) {
  </p>
  </div>
  
- <div className="flex flex-row items-center md:items-stretch w-full mx-auto md:h-[480px] gap-3 sm:gap-6 md:gap-0 flex-1">
+ <div className="flex flex-row items-center md:items-stretch w-full mx-auto h-[320px] sm:h-[400px] md:h-[480px] gap-3 sm:gap-6 md:gap-0 flex-1">
  
- <div className="relative w-[110px] sm:w-[160px] md:w-[220px] h-[320px] sm:h-[400px] md:h-full shrink-0 group">
+ <div className="relative w-[110px] sm:w-[160px] md:w-[220px] h-[320px] sm:h-[400px] md:h-[480px] shrink-0 group">
  
+ <img src={imgUrl} className="absolute inset-0 w-full h-full object-contain opacity-10" alt="body silhouette fallback" />
+
  <div 
  className="absolute inset-0 z-10 transition-transform duration-500 group-hover:scale-[1.02]"
  style={{
- WebkitMaskImage: 'url("/assets/images/siluet-tubuh.png")',
+ WebkitMaskImage: `url("${imgUrl}")`,
  WebkitMaskSize: 'contain',
  WebkitMaskRepeat: 'no-repeat',
  WebkitMaskPosition: 'center',
- maskImage: 'url("/assets/images/siluet-tubuh.png")',
+ maskImage: `url("${imgUrl}")`,
  maskSize: 'contain',
  maskRepeat: 'no-repeat',
  maskPosition: 'center',
@@ -95,7 +99,7 @@ export default function CompositionAnatomy({ test }) {
  ))}
  </div>
 
- <div className="hidden md:block flex-1 relative min-w-[40px] lg:min-w-[60px] mx-1 shrink-0 pointer-events-none">
+ <div className="hidden md:block flex-1 relative min-w-[40px] lg:min-w-[60px] mx-1 shrink-0 pointer-events-none h-[320px] sm:h-[400px] md:h-[480px]">
  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 w-full h-full">
  {sections.map(sec => (
  <path
@@ -103,16 +107,16 @@ export default function CompositionAnatomy({ test }) {
  d={`M 0,${sec.y1} C 40,${sec.y1} 60,${sec.y2} 100,${sec.y2}`}
  fill="none"
  stroke={sec.bg}
- strokeWidth="1.5"
+ strokeWidth="2"
  strokeDasharray="4 4"
  vectorEffect="non-scaling-stroke"
- className="opacity-30 "
+ className="opacity-60"
  />
  ))}
  </svg>
  </div>
 
- <div className="flex-1 md:w-[320px] flex flex-col justify-between h-[320px] sm:h-[400px] md:h-full shrink-0 relative z-10 space-y-2 md:space-y-4 py-1">
+ <div className="flex-1 md:w-[320px] flex flex-col justify-between h-[320px] sm:h-[400px] md:h-[480px] shrink-0 relative z-10 space-y-2 md:space-y-4 py-1">
  {sections.map(sec => (
  <div 
  key={`card-${sec.id}`} 

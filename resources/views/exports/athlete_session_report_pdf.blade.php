@@ -752,7 +752,7 @@
 
 
     <div class="footer">
-     Power by: Athlete Performance Management
+     Powered by: Olympus Training Surabaya
     </div>
 
 

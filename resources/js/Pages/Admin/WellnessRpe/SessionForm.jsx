@@ -145,11 +145,11 @@ export default function SessionForm({
     const renderScaleButtons = (field, label, leftLabel, rightLabel) => {
         const getColorClass = (num, isSelected) => {
             const colors = {
-                1: "bg-[#ea4335]", // Red (Awful)
-                2: "bg-[#f57c00]", // Orange (Poor)
+                1: "bg-[#34a853]", // Green (Excellent)
+                2: "bg-[#4285f4]", // Blue (Good)
                 3: "bg-[#fbbc05]", // Yellow (OK)
-                4: "bg-[#4285f4]", // Blue (Good)
-                5: "bg-[#34a853]", // Green (Excellent)
+                4: "bg-[#f57c00]", // Orange (Poor)
+                5: "bg-[#ea4335]", // Red (Awful)
             };
 
             const baseColor = colors[num];
@@ -282,38 +282,38 @@ export default function SessionForm({
                                         {renderScaleButtons(
                                             "quality_of_sleep",
                                             "Kualitas Tidur (Quality of Sleep)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "fatigue",
                                             "Tingkat Kelelahan (Fatigue)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "muscle_soreness",
                                             "Nyeri Otot (Muscle Soreness)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "stress",
                                             "Tingkat Stres (Stress)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "motivation",
                                             "Motivasi Latihan (Motivation)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                         {renderScaleButtons(
                                             "mood_state",
                                             "Kondisi Mood (Mood State)",
-                                            "Sangat Buruk",
                                             "Sangat Baik",
+                                            "Sangat Buruk",
                                         )}
                                     </div>
 

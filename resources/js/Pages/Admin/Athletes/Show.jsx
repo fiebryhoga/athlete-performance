@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import AthleteGallery from './Partials/AthleteGallery';
+import CompositionAnatomy from '@/Pages/Admin/CompositionTests/Partials/CompositionAnatomy';
 import { 
     User, Calendar, Activity, Trophy, ArrowLeft, TrendingUp, TrendingDown, 
     Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, Minus, FileText, ChevronRight
@@ -10,7 +11,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip
 } from 'recharts';
 
-export default function Show({ athlete, stats, radar_data, comparison_data, item_analysis, history_data, strengths, weaknesses, has_data, historical_labels }) {
+export default function Show({ athlete, stats, radar_data, comparison_data, item_analysis, history_data, strengths, weaknesses, has_data, historical_labels, latest_phv, latest_composition, latest_wellness, latest_dpa }) {
 
     const calculateBMI = (h, w) => {
         if (!h || !w) return '-';
@@ -44,15 +45,15 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" />
                             Back to Athletes
                         </Link>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight leading-tight">Athlete Analysis</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight leading-tight">Client Analysis</h1>
                         <p className="text-slate-500 font-medium text-xs md:text-sm mt-1">Comprehensive performance report and physical metrics.</p>
                     </div>
-                    {safeAthlete.name && (
+                    {safeAthlete.id && (
                         <Link 
-                            href={route('admin.performance.index', { search: safeAthlete.name })}
+                            href={route('admin.individual-trainings.show', safeAthlete.id)}
                             className="w-full md:w-auto bg-[#ff4d00] text-white px-6 py-3.5 md:py-3 rounded-xl font-bold text-xs md:text-sm hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 touch-manipulation shrink-0"
                         >
-                            <Activity className="w-4 h-4 md:w-5 md:h-5" /> View Training Logs
+                            <Activity className="w-4 h-4 md:w-5 md:h-5" /> Lihat Program Latihan
                         </Link>
                     )}
                 </div>
@@ -176,64 +177,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             </div>
                         )}
                     </div>
-                </div>
-
-                
-
-                {has_data && item_analysis && item_analysis.length > 0 && (
-                    <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8 min-w-0 w-full overflow-hidden">
-                        <h3 className="text-xs font-bold text-slate-800 mb-4 md:mb-6 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-[#ff4d00]" />
-                            Detailed Progress (Last {historical_labels ? historical_labels.length + 1 : 1} Tests)
-                        </h3>
-                        
-                        
-                        <div className="h-[320px] md:h-[350px] w-full relative">
-                            <ResponsiveContainer width="100%" height="100%">
-                                
-                                <BarChart data={item_analysis} margin={{ top: 10, right: 10, left: -20, bottom: 20 }} barGap={2}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    
-                                    
-                                    <XAxis 
-                                        dataKey="name" 
-                                        tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} 
-                                        axisLine={false} 
-                                        tickLine={false} 
-                                        interval={0} 
-                                        angle={-45}           /* Memiringkan teks 45 derajat */
-                                        textAnchor="end"      /* Memastikan ujung teks rata dengan titik bar-nya */
-                                        height={80}           /* Memberikan ruang 80px ke bawah agar teks panjang tidak terpotong */
-                                    />
-                                    
-                                    <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                    <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.1)', fontSize:'12px'}} />
-                                    <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} iconType="circle" />
-                                    
-                                    {historical_labels && historical_labels.map((label, index) => {
-                                        const colorIndex = 4 - historical_labels.length + index; 
-                                        const color = historicalColors[colorIndex] || '#cbd5e1';
-                                        return (
-                                            <Bar 
-                                                key={label.key} 
-                                                name={label.name} 
-                                                dataKey={label.key} 
-                                                fill={color} 
-                                                radius={[4, 4, 0, 0]} 
-                                                barSize={10} 
-                                            />
-                                        );
-                                    })}
-
-                                    <Bar name="Current Test" dataKey="score" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={10} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                )}
-
-                
-                {has_data && (
+                </div>{has_data && (
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8 overflow-hidden">
                         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
                             
@@ -287,6 +231,125 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                 athlete={athlete} 
                 galleries={athlete.galleries || []} 
             />
+
+                {/* Comprehensive Athlete Profiling Metrics */}
+                <div className="mb-6 md:mb-8">
+                    <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <Target className="w-4 h-4 text-[#ff4d00]" />
+                        Athlete Profiling Metrics
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+                        {/* PHV & Growth */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <Activity className="w-5 h-5 text-emerald-500"/>
+                                    PHV & Pertumbuhan
+                                </h4>
+                                {latest_phv && <span className="text-xs font-medium bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full">{new Date(latest_phv.assessment_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_phv ? (
+                                <div className="space-y-6 flex-1">
+                                    <div>
+                                        <p className="text-sm text-slate-500 font-medium mb-1">Status PHV</p>
+                                        <p className="text-2xl font-black text-emerald-600 tracking-tight">{latest_phv.phv_status}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold mb-1">Maturity Offset</p>
+                                            <p className="text-lg font-bold text-slate-800">{latest_phv.maturity_offset} <span className="text-xs text-slate-400 font-medium">tahun</span></p>
+                                        </div>
+                                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                            <p className="text-xs text-slate-500 font-bold mb-1">Prediksi Tinggi</p>
+                                            <p className="text-lg font-bold text-slate-800">{latest_phv.predicted_adult_height} <span className="text-xs text-slate-400 font-medium">cm</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <Activity className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data PHV</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Wellness & RPE */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-orange-500"/>
+                                    Wellness & Beban
+                                </h4>
+                                {latest_wellness && <span className="text-xs font-medium bg-orange-50 text-orange-600 px-3 py-1 rounded-full">{new Date(latest_wellness.record_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_wellness ? (
+                                <div className="space-y-6 flex-1">
+                                    <div className="flex justify-between items-end border-b border-slate-100 pb-4">
+                                        <div>
+                                            <p className="text-sm text-slate-500 font-medium mb-1">Skor Wellness</p>
+                                            <p className="text-3xl font-black text-emerald-600 tracking-tight">{latest_wellness.daily_wellness_score} <span className="text-sm text-slate-400 font-medium">/ 30</span></p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-slate-500 font-medium mb-1">Session RPE</p>
+                                            <p className="text-3xl font-black text-orange-500 tracking-tight">{latest_wellness.session_rpe ?? '-'} <span className="text-sm text-slate-400 font-medium">/ 10</span></p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
+                                        <span className="text-sm text-[#ff4d00] font-bold">Daily Load (AU)</span>
+                                        <span className="text-xl font-black text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <Zap className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data Wellness</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* DPA Status */}
+                        <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col transition-all hover:shadow-md">
+                            <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                    <User className="w-5 h-5 text-indigo-500"/>
+                                    Dynamic Posture
+                                </h4>
+                                {latest_dpa && <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full">{new Date(latest_dpa.assessment_date).toLocaleDateString('id-ID')}</span>}
+                            </div>
+                            {latest_dpa ? (
+                                <div className="space-y-6 flex-1">
+                                    <div>
+                                        <p className="text-sm text-slate-500 font-medium mb-1">Status DPA</p>
+                                        <p className="text-2xl font-black text-indigo-600 tracking-tight">Assessed</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                                            <p className="text-sm text-indigo-500 font-bold">Total Kompensasi</p>
+                                            <p className="text-xl font-black text-indigo-600">{latest_dpa.total_score} <span className="text-xs text-indigo-400 font-medium">temuan</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center text-slate-400 py-10 gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <User className="w-8 h-8 opacity-30" />
+                                    <p className="text-sm font-medium">Belum ada data DPA</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {latest_composition && (
+                    <div className="mb-6 md:mb-8">
+                        <CompositionAnatomy test={latest_composition} />
+                    </div>
+                )}
+
+                
+
+
+                
+                
 
                 <div className="bg-white border border-slate-200 mt-6 rounded-2xl overflow-hidden shadow-sm">
                     <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
