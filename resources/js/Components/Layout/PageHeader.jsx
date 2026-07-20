@@ -18,12 +18,12 @@ export default function PageHeader({
             
             <div className="relative z-10 w-full lg:w-auto">
                 {badge && (
-                    <span className="text-[12px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-3 inline-block">
+                    <span className="text-[12px] font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full mb-3 inline-block">
                         {badge}
                     </span>
                 )}
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                    {Icon && <Icon className="w-7 h-7 md:w-8 md:h-8 text-[#ff4d00]" />} 
+                    {Icon && <Icon className="w-7 h-7 md:w-8 md:h-8 text-orange-500" />} 
                     {title}
                 </h2>
                 {subtitle && (
@@ -39,7 +39,7 @@ export default function PageHeader({
                             placeholder={searchPlaceholder} 
                             value={searchValue || ''} 
                             onChange={(e) => onSearchChange && onSearchChange(e.target.value)} 
-                            className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 shadow-sm text-sm focus:ring-[#ff4d00] focus:border-[#ff4d00] transition-all outline-none" 
+                            className="w-full pl-10 pr-4 py-2.5 rounded-lg border-slate-200 shadow-sm text-sm focus:ring-orange-500 focus:border-orange-500 transition-all outline-none" 
                         />
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                     </form>

@@ -105,8 +105,8 @@ export default function Index({ tests, sports, filters = {} }) {
                                         className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-slate-200 hover:border-slate-300 rounded-lg transition-colors text-sm font-medium text-slate-700 group shadow-sm touch-manipulation"
                                     >
                                         <div className="flex items-center gap-2 truncate">
-                                            <Filter className={`h-4 w-4 ${selectedSport ? 'text-[#ff4d00]' : 'text-slate-400'}`} />
-                                            <span className={`truncate ${selectedSport ? 'text-[#ff4d00] font-bold' : ''}`}>
+                                            <Filter className={`h-4 w-4 ${selectedSport ? 'text-orange-500' : 'text-slate-400'}`} />
+                                            <span className={`truncate ${selectedSport ? 'text-orange-500 font-bold' : ''}`}>
                                                 {selectedSportLabel}
                                             </span>
                                         </div>
@@ -119,8 +119,8 @@ export default function Index({ tests, sports, filters = {} }) {
                                                 className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport === '' ? 'bg-orange-50/50' : ''}`}
                                                 onClick={() => { setSelectedSport(''); setIsDropdownOpen(false); }}
                                             >
-                                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>All Sports</span>
-                                                {selectedSport === '' && <Check className="w-4 h-4 text-[#ff4d00]" />}
+                                                <span className={`text-sm ${selectedSport === '' ? 'font-bold text-orange-500' : 'text-slate-600 font-medium'}`}>All Sports</span>
+                                                {selectedSport === '' && <Check className="w-4 h-4 text-orange-500" />}
                                             </div>
                                             <div className="h-px bg-slate-100 my-1"></div>
                                             {sports.map((sport) => (
@@ -129,8 +129,8 @@ export default function Index({ tests, sports, filters = {} }) {
                                                     className={`px-5 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between group touch-manipulation ${selectedSport == sport.id ? 'bg-orange-50/50' : ''}`}
                                                     onClick={() => { setSelectedSport(sport.id); setIsDropdownOpen(false); }}
                                                 >
-                                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-[#ff4d00]' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
-                                                    {selectedSport == sport.id && <Check className="w-4 h-4 text-[#ff4d00]" />}
+                                                    <span className={`text-sm ${selectedSport == sport.id ? 'font-bold text-orange-500' : 'text-slate-600 font-medium'}`}>{sport.name}</span>
+                                                    {selectedSport == sport.id && <Check className="w-4 h-4 text-orange-500" />}
                                                 </div>
                                             ))}
                                         </div>
@@ -149,7 +149,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                 <Link 
                                     href={route('admin.performance.create')} 
-                                    className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95"
+                                    className="w-full md:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95"
                                 >
                                     <Plus className="w-4 h-4" /> New Test
                                 </Link>
@@ -178,7 +178,7 @@ export default function Index({ tests, sports, filters = {} }) {
                                             </span>
                                         </div>
                                         
-                                        <h3 className="font-bold text-slate-800 text-lg md:text-xl truncate group-hover:text-[#ff4d00] transition-colors mt-1">
+                                        <h3 className="font-bold text-slate-800 text-lg md:text-xl truncate group-hover:text-orange-500 transition-colors mt-1">
                                             {test.athlete?.name || 'Unknown Athlete'}
                                         </h3>
                                         <div className="flex items-center gap-2 mt-2">
@@ -265,7 +265,7 @@ export default function Index({ tests, sports, filters = {} }) {
 
                                         <Link 
                                             href={route('admin.performance.show', test.id)}
-                                            className={`py-4 text-xs md:text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#e64500] transition-colors flex items-center justify-center gap-2 group/btn touch-manipulation shadow-inner ${isAthlete ? 'rounded-b-2xl' : 'col-span-3 lg:col-span-1'}`}
+                                            className={`py-4 text-xs md:text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 group/btn touch-manipulation shadow-inner ${isAthlete ? 'rounded-b-2xl' : 'col-span-3 lg:col-span-1'}`}
                                         >
                                             View Details <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                                         </Link>

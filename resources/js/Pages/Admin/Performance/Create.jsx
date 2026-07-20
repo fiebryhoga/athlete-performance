@@ -48,7 +48,7 @@ export default function Create({ athletes }) {
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] bg-white">
                 
                 
-                <div className="lg:w-5/12 bg-gradient-to-br from-[#ff4d00] to-[#cc3d00] relative overflow-hidden flex flex-col justify-between p-8 lg:p-12 text-white">
+                <div className="lg:w-5/12 bg-gradient-to-br from-orange-500 to-[#cc3d00] relative overflow-hidden flex flex-col justify-between p-8 lg:p-12 text-white">
                     <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black/40 to-transparent opacity-50"></div>
                     
@@ -66,7 +66,7 @@ export default function Create({ athletes }) {
 
                     <div className="relative z-10 mt-12 lg:mt-0 hidden lg:block">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-white text-[#ff4d00] flex items-center justify-center font-bold shadow-lg shadow-black/20">1</div>
+                            <div className="w-10 h-10 rounded-full bg-white text-orange-500 flex items-center justify-center font-bold shadow-lg shadow-black/20">1</div>
                             <span className="font-bold text-lg">Session Setup</span>
                         </div>
                         <div className="h-10 border-l-2 border-white/20 ml-5 my-1"></div>
@@ -83,7 +83,7 @@ export default function Create({ athletes }) {
                         
                         <div className="mb-10">
                             <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2 capitalize">
-                                <Target className="w-6 h-6 text-[#ff4d00]" /> Session Details
+                                <Target className="w-6 h-6 text-orange-500" /> Session Details
                             </h2>
                             <p className="text-slate-500 mt-1 text-sm font-medium">Please fill in the required information below.</p>
                         </div>
@@ -95,13 +95,13 @@ export default function Create({ athletes }) {
                                 <label className="block text-[10px] font-bold text-slate-500 ml-1">Test Date <span className="text-rose-500">*</span></label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Calendar className="h-5 w-5 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                        <Calendar className="h-5 w-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                     </div>
                                     <input 
                                         type="date"
                                         value={data.date}
                                         onChange={e => setData('date', e.target.value)}
-                                        className="block w-full pl-11 pr-4 py-3 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-700 outline-none hover:border-slate-300 shadow-sm"
+                                        className="block w-full pl-11 pr-4 py-3 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-700 outline-none hover:border-slate-300 shadow-sm"
                                     />
                                 </div>
                                 {errors.date && <p className="text-rose-500 text-xs font-bold flex items-center gap-1 mt-1.5 ml-1"><X className="w-3 h-3"/> {errors.date}</p>}
@@ -114,7 +114,7 @@ export default function Create({ athletes }) {
                                 <div 
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     className={`w-full flex items-center justify-between pl-3 pr-4 py-3 rounded-lg border cursor-pointer transition-all shadow-sm group ${
-                                        isDropdownOpen ? 'border-[#ff4d00] ring-2 ring-[#ff4d00]/20 bg-white' : 'border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300'
+                                        isDropdownOpen ? 'border-orange-500 ring-2 ring-orange-500/20 bg-white' : 'border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300'
                                     } ${errors.user_id ? 'border-rose-300 bg-rose-50/50' : ''}`}
                                 >
                                     <div className="flex items-center gap-3 overflow-hidden">
@@ -138,7 +138,7 @@ export default function Create({ athletes }) {
                                                     type="text" 
                                                     autoFocus
                                                     placeholder="Type name or sport..."
-                                                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] placeholder-slate-400 outline-none transition-all shadow-sm"
+                                                    className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder-slate-400 outline-none transition-all shadow-sm"
                                                     onChange={(e) => setSearchQuery(e.target.value)}
                                                 />
                                             </div>
@@ -153,8 +153,8 @@ export default function Create({ athletes }) {
                                                             data.user_id === athlete.id ? 'bg-teal-50 text-teal-700' : 'hover:bg-orange-50 text-slate-700'
                                                         }`}
                                                     >
-                                                        <span className={`font-bold text-sm ${data.user_id === athlete.id ? 'text-teal-700' : 'group-hover:text-[#ff4d00]'}`}>{athlete.name}</span>
-                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border transition-colors ${data.user_id === athlete.id ? 'bg-white border-teal-200 text-teal-600' : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:border-orange-200 group-hover:text-[#ff4d00] group-hover:bg-white'}`}>
+                                                        <span className={`font-bold text-sm ${data.user_id === athlete.id ? 'text-teal-700' : 'group-hover:text-orange-500'}`}>{athlete.name}</span>
+                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border transition-colors ${data.user_id === athlete.id ? 'bg-white border-teal-200 text-teal-600' : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:border-orange-200 group-hover:text-orange-500 group-hover:bg-white'}`}>
                                                             {athlete.sport_name}
                                                         </span>
                                                     </div>
@@ -182,7 +182,7 @@ export default function Create({ athletes }) {
                                     placeholder={`e.g. Training - ${data.date}`}
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
-                                    className="block w-full px-4 py-3 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-700 placeholder-slate-400 hover:border-slate-300 outline-none shadow-sm text-sm"
+                                    className="block w-full px-4 py-3 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-700 placeholder-slate-400 hover:border-slate-300 outline-none shadow-sm text-sm"
                                 />
                                 <p className="text-[10px] text-slate-400 font-medium ml-1 mt-1.5">Will default to date if left blank.</p>
                             </div>
@@ -191,7 +191,7 @@ export default function Create({ athletes }) {
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="w-full bg-[#ff4d00] text-white font-bold py-3.5 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm group disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="w-full bg-orange-500 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm group disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
                                     {processing ? (
                                         <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Processing...</span>

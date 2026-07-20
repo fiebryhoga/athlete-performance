@@ -113,7 +113,7 @@ export default function DpaIndex({ auth, players }) {
                                     <span
                                         className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${
                                             player.total_records > 0
-                                                ? "bg-[#ff4d00] text-slate-50 "
+                                                ? "bg-orange-500 text-slate-50 "
                                                 : "bg-slate-100 text-slate-500 border border-slate-200 "
                                         }`}
                                     >

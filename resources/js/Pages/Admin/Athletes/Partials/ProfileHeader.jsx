@@ -5,7 +5,7 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
     return (
         <>
             <div className="mb-8">
-                <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] font-bold text-slate-400 hover:text-[#ff4d00] mb-4 group transition-colors">
+                <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] font-bold text-slate-400 hover:text-orange-500 mb-4 group transition-colors">
                     <ArrowLeft className="w-3 h-3 mr-1.5 transition-transform group-hover:-translate-x-1" />
                     Back to Athletes List
                 </Link>
@@ -15,7 +15,7 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
                         <p className="text-slate-500 font-medium text-sm mt-1">Comprehensive performance report and physical metrics.</p>
                     </div>
                     {safeAthlete.id && (
-                        <Link href={route('admin.individual-trainings.show', safeAthlete.id)} className="w-full md:w-auto bg-white border border-slate-200 text-[#ff4d00] px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-orange-50 hover:border-orange-200 transition-all shadow-sm flex items-center justify-center gap-2">
+                        <Link href={route('admin.individual-trainings.show', safeAthlete.id)} className="w-full md:w-auto bg-white border border-slate-200 text-orange-500 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-orange-50 hover:border-orange-200 transition-all shadow-sm flex items-center justify-center gap-2">
                             <Activity className="w-4 h-4" /> Lihat Program Latihan
                         </Link>
                     )}
@@ -28,18 +28,18 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
                 
                 <div className="relative z-10 w-28 h-28 mb-5 mt-2">
                     {safeAthlete.profile_photo_url ? (
-                        <img src={safeAthlete.profile_photo_url} alt={safeAthlete.name} className="w-full h-full rounded-lg object-cover shadow-lg shadow-[#ff4d00]/10 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300" />
+                        <img src={safeAthlete.profile_photo_url} alt={safeAthlete.name} className="w-full h-full rounded-lg object-cover shadow-lg shadow-orange-500/10 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300" />
                     ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#ff4d00] to-orange-500 rounded-lg flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-[#ff4d00]/20 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-500 rounded-lg flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-orange-500/20 border-4 border-white rotate-3 group-hover:rotate-0 transition-transform duration-300">
                             {initial}
                         </div>
                     )}
                 </div>
                 
-                <h2 className="text-xl font-bold text-slate-800 tracking-tight group-hover:text-[#ff4d00] transition-colors">{safeAthlete.name || 'Unknown Name'}</h2>
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight group-hover:text-orange-500 transition-colors">{safeAthlete.name || 'Unknown Name'}</h2>
                 <p className="text-[10px] text-slate-400 font-bold mt-1 mb-3">{safeAthlete.username || '-'}</p>
                 
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[10px] font-bold border border-orange-100 mb-6">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-50 text-orange-500 rounded-lg text-[10px] font-bold border border-orange-100 mb-6">
                     <Trophy className="w-3.5 h-3.5" /> {safeAthlete.sport?.name || 'No Sport'}
                 </span>
 
@@ -58,7 +58,7 @@ export default function ProfileHeader({ safeAthlete, bmi, initial }) {
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-lg border border-slate-100/50 transition-colors hover:bg-orange-50 hover:border-orange-100">
                         <p className="text-[10px] text-slate-400 font-bold mb-1">BMI</p>
-                        <p className="font-bold text-[#ff4d00]">{bmi}</p>
+                        <p className="font-bold text-orange-500">{bmi}</p>
                     </div>
                 </div>
             </div>

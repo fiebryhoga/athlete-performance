@@ -24,6 +24,7 @@ class IndividualTraining extends Model
         'completed_at',
         'athlete_note',
         'proof_photo',
+        'is_extra',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class IndividualTraining extends Model
         'completed_at' => 'datetime',
         'coach_ids' => 'array',
         'date' => 'date:Y-m-d',
+        'is_extra' => 'boolean',
     ];
 
     public function user()

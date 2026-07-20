@@ -30,7 +30,7 @@ const InputField = memo(({ label, id, type ="number", step ="0.1", placeholder =
             placeholder={placeholder}
             value={value ?? ''}
             onChange={handleChange}
-            className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d00]/20 focus-visible:border-[#ff4d00] ${
+            className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 ${
                 error ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/50' : 'border-slate-200'
             }`}
         />
@@ -54,7 +54,7 @@ const SelectField = memo(({ label, id, value, onChange, error, tooltip, options 
                 id={id}
                 value={value ?? ''}
                 onChange={handleChange}
-                className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d00]/20 focus-visible:border-[#ff4d00] ${
+                className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500 ${
                     error ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/50' : 'border-slate-200'
                 }`}
             >
@@ -244,9 +244,9 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                 </div>
 
                 <div className="px-6 py-4 bg-orange-50/50 border-b border-orange-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff4d00] rounded-full blur-3xl opacity-[0.03] -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500 rounded-full blur-3xl opacity-[0.03] -mr-10 -mt-10 pointer-events-none"></div>
                     <div className="flex items-start gap-3 max-w-2xl relative z-10">
-                        <div className="p-2 bg-orange-100 rounded-lg text-[#ff4d00] mt-0.5 shrink-0">
+                        <div className="p-2 bg-orange-100 rounded-lg text-orange-500 mt-0.5 shrink-0">
                             <Calculator className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
@@ -259,7 +259,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                     <button 
                         type="button" 
                         onClick={handleAutoCalculate}
-                        className="inline-flex items-center justify-center shrink-0 rounded-xl text-sm font-bold transition-all bg-[#ff4d00] text-white shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] h-10 px-5 gap-2 w-full sm:w-auto relative z-10"
+                        className="inline-flex items-center justify-center shrink-0 rounded-xl text-sm font-bold transition-all bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 h-10 px-5 gap-2 w-full sm:w-auto relative z-10"
                     >
                         <Wand2 className="w-4 h-4" /> {"Auto Calculate"}
                     </button>
@@ -350,7 +350,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                         type="submit" 
                         form="composition-form" 
                         disabled={processing} 
-                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-50 bg-[#ff4d00] text-white shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] h-10 px-6 gap-2"
+                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-50 bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 h-10 px-6 gap-2"
                     >
                         <Save className="w-4 h-4" />
                         {processing ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Analysis')}

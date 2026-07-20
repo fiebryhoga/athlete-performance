@@ -24,7 +24,7 @@ export default function AthleteIndex({ auth, days }) {
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-200 text-[#ff4d00]">
+                            <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-200 text-orange-500">
                                 <Calendar size={20} />
                             </div>
                             <div>
@@ -42,7 +42,7 @@ export default function AthleteIndex({ auth, days }) {
                             >
                                 <div className="flex items-center gap-4">
                                     <div className="flex flex-col items-center justify-center w-12 h-12 bg-white rounded-xl border border-slate-200 shadow-sm shrink-0">
-                                        <span className={`text-[10px] font-bold ${day.is_today ? 'text-[#ff4d00]' : 'text-slate-400'}`}>
+                                        <span className={`text-[10px] font-bold ${day.is_today ? 'text-orange-500' : 'text-slate-400'}`}>
                                             {day.day_name.substring(0, 3)}
                                         </span>
                                         <span className={`text-lg font-bold leading-none mt-0.5 ${day.is_today ? 'text-slate-900' : 'text-slate-700'}`}>
@@ -52,13 +52,13 @@ export default function AthleteIndex({ auth, days }) {
                                     
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <h4 className={`text-sm font-bold ${day.is_today ? 'text-[#ff4d00]' : 'text-slate-900'}`}>
+                                            <h4 className={`text-sm font-bold ${day.is_today ? 'text-orange-500' : 'text-slate-900'}`}>
                                                 {day.is_today ? 'Hari Ini' : day.formatted_date}
                                             </h4>
                                             {day.is_today && (
                                                 <span className="relative flex h-2 w-2">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4d00] opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ff4d00]"></span>
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                                                 </span>
                                             )}
                                         </div>
@@ -86,13 +86,13 @@ export default function AthleteIndex({ auth, days }) {
                                 <div className="flex items-center gap-2 mt-2 sm:mt-0">
                                     <Link
                                         href={route("admin.wellness-rpe.session-form", { date: day.date, mode: 'wellness' })}
-                                        className="flex-1 sm:flex-none text-center px-4 py-2 bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 hover:border-[#ff4d00] hover:text-[#ff4d00] hover:shadow-sm transition-all"
+                                        className="flex-1 sm:flex-none text-center px-4 py-2 bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 hover:border-orange-500 hover:text-orange-500 hover:shadow-sm transition-all"
                                     >
                                         Isi Wellness
                                     </Link>
                                     <Link
                                         href={route("admin.wellness-rpe.session-form", { date: day.date, mode: 'rpe' })}
-                                        className="flex-1 sm:flex-none text-center px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-[#ff4d00] hover:shadow-md hover:shadow-[#ff4d00]/20 transition-all"
+                                        className="flex-1 sm:flex-none text-center px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-orange-500 hover:shadow-md hover:shadow-orange-500/20 transition-all"
                                     >
                                         Isi RPE
                                     </Link>

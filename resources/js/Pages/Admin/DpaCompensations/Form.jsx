@@ -131,7 +131,7 @@ export default function DpaForm({ auth, dpaCompensation }) {
                         <button
                             onClick={handleSubmit}
                             disabled={processing}
-                            className="bg-[#ff4d00] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-[#e64500] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="bg-orange-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             <Save size={18} strokeWidth={2} /> 
                             {processing ? "Saving..." : "Save Compensation"}

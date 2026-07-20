@@ -40,7 +40,7 @@ export default function DpaIndex({ auth, compensations }) {
                     canCreate && (
                         <Link
                             href={route('admin.dpa-compensations.create')}
-                            className="bg-[#ff4d00] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-[#e64500] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            className="bg-orange-500 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             <Plus size={18} strokeWidth={2} /> {t("Add Compensation")}
                         </Link>

@@ -21,6 +21,7 @@ export default function EditSession({
         location: training.location || "Gym",
         coach_ids: training.coach_ids || [],
         blocks: training.blocks?.length > 0 ? training.blocks : [],
+        is_extra: training.is_extra || false,
     });
 
  const [isExModalOpen, setIsExModalOpen] = useState(false);
@@ -180,6 +181,20 @@ export default function EditSession({
  {errors.location && <div className="text-red-500 text-xs mt-1">{errors.location}</div>}
  </div>
  <div className="md:col-span-2 lg:col-span-3">
+    <div className="flex items-center gap-2 p-3 bg-zinc-50 border border-zinc-200 rounded-lg cursor-pointer" onClick={() => setData('is_extra', !data.is_extra)}>
+        <input
+            type="checkbox"
+            checked={data.is_extra}
+            onChange={(e) => setData('is_extra', e.target.checked)}
+            className="w-4 h-4 text-zinc-900 rounded border-zinc-300 focus:ring-zinc-900"
+        />
+        <label className="text-sm font-semibold text-zinc-900 cursor-pointer">
+            Sesi Tambahan (Turnamen / PR / Latihan Mandiri)
+            <span className="block text-xs text-zinc-500 mt-0.5">Sesi ini tidak akan memotong kuota paket latihan.</span>
+        </label>
+    </div>
+ </div>
+ <div className="md:col-span-2 lg:col-span-3">
  <label className="block text-[11px] font-bold text-zinc-500 mb-2">Coach Pendamping (Pilih 1 atau 2)</label>
  <div className="flex flex-wrap gap-3">
  {coachesList && coachesList.length > 0 ? coachesList.map(coach => (
@@ -277,10 +292,10 @@ export default function EditSession({
  )}
 
  <div className="mt-8 flex justify-end gap-3">
- <button type="button" onClick={addTextBlock} className="text-sm font-bold bg-orange-50 border border-orange-200 text-[#ff4d00] px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md">
+ <button type="button" onClick={addTextBlock} className="text-sm font-bold bg-orange-50 border border-orange-200 text-orange-500 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md">
  <Type size={16} className="text-orange-500" /> Tambah Catatan Teks
  </button>
- <button type="button" onClick={addPhaseBlock} className="text-sm font-bold bg-[#ff4d00] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-[#e64500] shadow-md shadow-[#ff4d00]/20 hover:shadow-lg">
+ <button type="button" onClick={addPhaseBlock} className="text-sm font-bold bg-orange-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-600 shadow-md shadow-orange-500/20 hover:shadow-lg">
  <Activity size={16} /> Tambah Fase Latihan
  </button>
  </div>
@@ -290,7 +305,7 @@ export default function EditSession({
  <button
  type="submit"
  disabled={processing}
- className="px-8 py-3 text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#e64500] rounded-xl transition-all shadow-md shadow-[#ff4d00]/20 disabled:opacity-50"
+ className="px-8 py-3 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
  >
  {processing ? "MENYIMPAN..." : "SIMPAN PROGRAM SESI INI"}
  </button>

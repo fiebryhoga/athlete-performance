@@ -67,13 +67,13 @@ export default function ShowDetail({
                             </Link>
                             <Link
                                 href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'wellness', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-sm"
+                                className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-sm"
                             >
                                 <HeartPulse size={16} /> {log && log.daily_wellness_score ? 'Edit Wellness' : 'Isi Wellness'}
                             </Link>
                             <Link
                                 href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'rpe', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
-                                className="flex items-center gap-2 px-4 py-2.5 border border-[#ff4d00] text-[#ff4d00] rounded-lg text-sm font-bold hover:bg-[#ff4d00] hover:text-white cursor-pointer transition-all shadow-sm"
+                                className="flex items-center gap-2 px-4 py-2.5 border border-orange-500 text-orange-500 rounded-lg text-sm font-bold hover:bg-orange-500 hover:text-white cursor-pointer transition-all shadow-sm"
                             >
                                 <Dumbbell size={16} /> {log && log.daily_load ? 'Edit RPE' : 'Isi RPE'}
                             </Link>
@@ -95,9 +95,9 @@ export default function ShowDetail({
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <HeartPulse className="text-[#ff4d00]" size={20} />
+                                    <HeartPulse className="text-orange-500" size={20} />
                                     Wellness Metrics
-                                    <span className="ml-auto text-sm font-bold bg-orange-50 text-[#ff4d00] px-3 py-1 rounded-full border border-orange-100">
+                                    <span className="ml-auto text-sm font-bold bg-orange-50 text-orange-500 px-3 py-1 rounded-full border border-orange-100">
                                         Total Score: {log.daily_wellness_score || '-'} / 30
                                     </span>
                                 </h3>
@@ -114,10 +114,10 @@ export default function ShowDetail({
 
                             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <Dumbbell className="text-[#ff4d00]" size={20} />
+                                    <Dumbbell className="text-orange-500" size={20} />
                                     RPE & Load
                                     <span className="ml-auto text-sm font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200">
-                                        Daily Load: <span className="text-[#ff4d00] ml-1">{log.daily_load || '-'}</span>
+                                        Daily Load: <span className="text-orange-500 ml-1">{log.daily_load || '-'}</span>
                                     </span>
                                 </h3>
 
@@ -157,7 +157,7 @@ export default function ShowDetail({
                         <div className="space-y-6">
                             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full flex flex-col">
                                 <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <User className="text-[#ff4d00]" size={20} />
+                                    <User className="text-orange-500" size={20} />
                                     Area Nyeri Otot
                                 </h3>
                                 

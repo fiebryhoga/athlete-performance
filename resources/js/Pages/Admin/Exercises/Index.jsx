@@ -251,7 +251,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                     <Link href={route("admin.exercises.bulk-create")} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs md:text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm">
                                         <AlignLeft size={16} /> Buat Banyak
                                     </Link>
-                                    <Link href={route("admin.exercises.create")} className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20">
+                                    <Link href={route("admin.exercises.create")} className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-orange-600 transition-colors shadow-sm shadow-orange-500/20">
                                         <Plus size={16} /> Buat Latihan
                                     </Link>
                                 </>
@@ -259,13 +259,13 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             {activeTab === "categories" && (
                                 <button
                                     onClick={() => openCategoryModal()}
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20"
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-orange-600 transition-colors shadow-sm shadow-orange-500/20"
                                 >
                                     <Plus size={16} /> Buat Kategori
                                 </button>
                             )}
                             {activeTab === "packages" && (
-                                <Link href={route("admin.exercise-packages.create")} className="flex items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-xs md:text-sm font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-orange-500/20">
+                                <Link href={route("admin.exercise-packages.create")} className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-xs md:text-sm font-bold hover:bg-orange-600 transition-colors shadow-sm shadow-orange-500/20">
                                     <Plus size={16} /> Buat Paket
                                 </Link>
                             )}

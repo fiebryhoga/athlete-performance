@@ -45,15 +45,15 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                         <div className="grid grid-cols-2 gap-3 mb-4">
                             {/* SET 1 */}
                             <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2">SET 1</div>
+                                <div className="text-[10px] font-bold text-orange-500 text-center mb-2">SET 1</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
-                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_1_load || ''} onChange={e => handleExChange(i, 'set_1_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_1_load || ''} onChange={e => handleExChange(i, 'set_1_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">REPS</p>
-                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_1_reps || ''} onChange={e => handleExChange(i, 'set_1_reps', e.target.value)} className="w-full text-center text-xs font-bold text-[#ff4d00] p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_1_reps || ''} onChange={e => handleExChange(i, 'set_1_reps', e.target.value)} className="w-full text-center text-xs font-bold text-orange-500 p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                 </div>
                             </div>
@@ -64,26 +64,26 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
-                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_2_load || ''} onChange={e => handleExChange(i, 'set_2_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_2_load || ''} onChange={e => handleExChange(i, 'set_2_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">REPS</p>
-                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_2_reps || ''} onChange={e => handleExChange(i, 'set_2_reps', e.target.value)} className="w-full text-center text-xs font-bold text-[#ff4d00] p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_2_reps || ''} onChange={e => handleExChange(i, 'set_2_reps', e.target.value)} className="w-full text-center text-xs font-bold text-orange-500 p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                 </div>
                             </div>
 
                             {/* SET 3 */}
                             <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-2.5 shadow-sm">
-                                <div className="text-[10px] font-bold text-[#ff4d00] text-center mb-2">SET 3</div>
+                                <div className="text-[10px] font-bold text-orange-500 text-center mb-2">SET 3</div>
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
-                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_3_load || ''} onChange={e => handleExChange(i, 'set_3_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_3_load || ''} onChange={e => handleExChange(i, 'set_3_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">REPS</p>
-                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_3_reps || ''} onChange={e => handleExChange(i, 'set_3_reps', e.target.value)} className="w-full text-center text-xs font-bold text-[#ff4d00] p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_3_reps || ''} onChange={e => handleExChange(i, 'set_3_reps', e.target.value)} className="w-full text-center text-xs font-bold text-orange-500 p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                 </div>
                             </div>
@@ -94,11 +94,11 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                                 <div className="flex gap-2">
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">LOAD</p>
-                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_4_load || ''} onChange={e => handleExChange(i, 'set_4_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_4_load || ''} onChange={e => handleExChange(i, 'set_4_load', e.target.value)} className="w-full text-center text-xs p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-[8px] text-slate-400 text-center mb-1 font-bold">REPS</p>
-                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_4_reps || ''} onChange={e => handleExChange(i, 'set_4_reps', e.target.value)} className="w-full text-center text-xs font-bold text-[#ff4d00] p-2 rounded-lg border border-slate-200 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none touch-manipulation bg-white min-w-0"/>
+                                        <input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_4_reps || ''} onChange={e => handleExChange(i, 'set_4_reps', e.target.value)} className="w-full text-center text-xs font-bold text-orange-500 p-2 rounded-lg border border-slate-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none touch-manipulation bg-white min-w-0"/>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                 ))}
 
                 {!is_athlete && (
-                    <button type="button" onClick={addNewRow} className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 font-bold text-sm hover:border-[#ff4d00] hover:text-[#ff4d00] hover:bg-orange-50 transition-all w-full touch-manipulation mt-2 bg-white">
+                    <button type="button" onClick={addNewRow} className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 font-bold text-sm hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all w-full touch-manipulation mt-2 bg-white">
                         <Plus className="w-5 h-5" /> Tambah Gerakan Baru
                     </button>
                 )}
@@ -128,7 +128,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                 {/* Custom scrollbar class dengan properti overflow-x-auto, DITAMBAH pb-32 agar ada ruang bawah ekstra jika menu dropdown terbuka di baris terbawah */}
                 <div className="w-full overflow-x-auto pb-20 relative rounded-lg">
                     <table className="w-full min-w-[900px] table-fixed text-sm text-left border-collapse relative">
-                        <thead className="bg-[#ff4d00] text-white text-[11px] font-bold relative z-50">
+                        <thead className="bg-orange-500 text-white text-[11px] font-bold relative z-50">
                             <tr>
                                 <th rowSpan="2" className="border-r border-b border-orange-700 px-3 py-3 text-center w-[25%] z-50">EXERCISE</th>
                                 <th colSpan="2" className="border-r border-b border-orange-700 px-1 py-2 text-center bg-orange-800/40 w-[12%]">SET 1</th>
@@ -169,19 +169,19 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                                         />
                                     </td>
                                     
-                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_1_load || ''} onChange={e => handleExChange(i, 'set_1_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
-                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_1_reps || ''} onChange={e => handleExChange(i, 'set_1_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-[#ff4d00] focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_1_load || ''} onChange={e => handleExChange(i, 'set_1_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_1_reps || ''} onChange={e => handleExChange(i, 'set_1_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-orange-500 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
                                     
-                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_2_load || ''} onChange={e => handleExChange(i, 'set_2_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
-                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_2_reps || ''} onChange={e => handleExChange(i, 'set_2_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-[#ff4d00] focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_2_load || ''} onChange={e => handleExChange(i, 'set_2_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_2_reps || ''} onChange={e => handleExChange(i, 'set_2_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-orange-500 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
                                     
-                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_3_load || ''} onChange={e => handleExChange(i, 'set_3_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
-                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_3_reps || ''} onChange={e => handleExChange(i, 'set_3_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-[#ff4d00] focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_3_load || ''} onChange={e => handleExChange(i, 'set_3_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0 bg-slate-50/50"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_3_reps || ''} onChange={e => handleExChange(i, 'set_3_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-orange-500 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
                                     
-                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_4_load || ''} onChange={e => handleExChange(i, 'set_4_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
-                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_4_reps || ''} onChange={e => handleExChange(i, 'set_4_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-[#ff4d00] focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="decimal" value={ex.set_4_load || ''} onChange={e => handleExChange(i, 'set_4_load', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
+                                    <td className="border-r border-slate-200 p-0"><input disabled={is_athlete} type="text" inputMode="numeric" value={ex.set_4_reps || ''} onChange={e => handleExChange(i, 'set_4_reps', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-center px-1 py-4 font-medium text-orange-500 focus:ring-2 focus:ring-inset focus:ring-orange-500 text-xs min-w-0"/></td>
                                     
-                                    <td className="p-0"><input disabled={is_athlete} type="text" placeholder="..." value={ex.notes || ''} onChange={e => handleExChange(i, 'notes', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-xs px-3 py-4 italic text-slate-500 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] min-w-0"/></td>
+                                    <td className="p-0"><input disabled={is_athlete} type="text" placeholder="..." value={ex.notes || ''} onChange={e => handleExChange(i, 'notes', e.target.value)} className="w-full h-full min-h-[50px] border-none outline-none bg-transparent text-xs px-3 py-4 italic text-slate-500 focus:ring-2 focus:ring-inset focus:ring-orange-500 min-w-0"/></td>
                                     
                                     {!is_athlete && (
                                         <td className="bg-slate-50 group-hover:bg-orange-50/80 border-l border-slate-200 p-0 text-center relative z-10">
@@ -199,7 +199,7 @@ export default function ExcelTable({ data, is_athlete, handleExChange, libExerci
                 {/* Tombol Tambah Baris */}
                 {!is_athlete && (
                     <div className="bg-slate-50 border-t border-slate-200 p-4 flex justify-center shrink-0 absolute bottom-0 left-0 right-0 z-[20] rounded-b-3xl">
-                        <button type="button" onClick={addNewRow} className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 font-bold text-sm hover:border-[#ff4d00] hover:text-[#ff4d00] hover:bg-orange-50 transition-all min-w-[300px]">
+                        <button type="button" onClick={addNewRow} className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 font-bold text-sm hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50 transition-all min-w-[300px]">
                             <Plus className="w-5 h-5" /> Tambah Gerakan Baru
                         </button>
                     </div>

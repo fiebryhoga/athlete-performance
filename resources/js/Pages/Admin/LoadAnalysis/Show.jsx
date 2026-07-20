@@ -55,7 +55,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
             category: e.category,
         })), [exerciseStats]);
 
-    const barColors = ['#ff4d00', '#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ea580c', '#c2410c', '#9a3412', '#7c2d12', '#431407'];
+    const barColors = ['orange-500', '#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ea580c', '#c2410c', '#9a3412', '#7c2d12', '#431407'];
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -84,7 +84,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                 <div className="bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl shadow-lg px-4 py-3">
                     <p className="text-xs font-bold text-slate-800 mb-1">{data.fullName}</p>
                     <p className="text-xs text-slate-500">{data.category}</p>
-                    <p className="text-xs font-bold text-[#ff4d00] mt-1">Volume: {data.volume?.toLocaleString('id-ID')} kg</p>
+                    <p className="text-xs font-bold text-orange-500 mt-1">Volume: {data.volume?.toLocaleString('id-ID')} kg</p>
                 </div>
             );
         }
@@ -121,7 +121,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                         { label: 'Total Sesi', value: summary.total_sessions, suffix: 'sesi', icon: Calendar, color: 'purple' },
                     ].map((card, i) => {
                         const colorMap = {
-                            orange: { bg: 'from-orange-50 to-orange-100', icon: 'text-[#ff4d00]', border: 'border-orange-100' },
+                            orange: { bg: 'from-orange-50 to-orange-100', icon: 'text-orange-500', border: 'border-orange-100' },
                             blue: { bg: 'from-blue-50 to-blue-100', icon: 'text-blue-600', border: 'border-blue-100' },
                             emerald: { bg: 'from-emerald-50 to-emerald-100', icon: 'text-emerald-600', border: 'border-emerald-100' },
                             indigo: { bg: 'from-indigo-50 to-indigo-100', icon: 'text-indigo-600', border: 'border-indigo-100' },
@@ -161,7 +161,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                     onClick={() => setActiveChartTab(tab.key)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
                                         activeChartTab === tab.key
-                                            ? 'bg-[#ff4d00] text-white shadow-md shadow-orange-500/20'
+                                            ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
                                             : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                                     }`}
                                 >
@@ -180,15 +180,15 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                             <AreaChart data={trendData}>
                                                 <defs>
                                                     <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.2} />
-                                                        <stop offset="95%" stopColor="#ff4d00" stopOpacity={0.02} />
+                                                        <stop offset="5%" stopColor="orange-500" stopOpacity={0.2} />
+                                                        <stop offset="95%" stopColor="orange-500" stopOpacity={0.02} />
                                                     </linearGradient>
                                                 </defs>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                                                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} angle={-30} textAnchor="end" height={60} />
                                                 <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickFormatter={formatVolume} />
                                                 <Tooltip content={<CustomTooltip />} />
-                                                <Area type="monotone" dataKey="volume" stroke="#ff4d00" strokeWidth={2.5} fill="url(#volumeGradient)" dot={{ r: 4, fill: '#ff4d00', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: '#ff4d00' }} name="Volume Load" />
+                                                <Area type="monotone" dataKey="volume" stroke="orange-500" strokeWidth={2.5} fill="url(#volumeGradient)" dot={{ r: 4, fill: 'orange-500', stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6, fill: 'orange-500' }} name="Volume Load" />
                                             </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -355,7 +355,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                 <Tooltip content={<ExerciseTooltip />} />
                                                 <Bar dataKey="volume" name="Volume Load" radius={[0, 6, 6, 0]} maxBarSize={28}>
                                                     {exerciseChartData.map((_, idx) => (
-                                                        <Cell key={idx} fill={barColors[idx] || '#ff4d00'} />
+                                                        <Cell key={idx} fill={barColors[idx] || 'orange-500'} />
                                                     ))}
                                                 </Bar>
                                             </BarChart>
@@ -371,7 +371,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                 {exerciseStats.length > 0 && (
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-                            <Award className="w-4 h-4 text-[#ff4d00]" />
+                            <Award className="w-4 h-4 text-orange-500" />
                             <h3 className="text-sm font-bold text-slate-800">Statistik per Exercise</h3>
                         </div>
                         <div className="overflow-x-auto">
@@ -401,7 +401,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                 </span>
                                             </td>
                                             <td className="px-5 py-3 text-right">
-                                                <span className="text-sm font-bold text-[#ff4d00]">{ex.total_volume.toLocaleString('id-ID')}</span>
+                                                <span className="text-sm font-bold text-orange-500">{ex.total_volume.toLocaleString('id-ID')}</span>
                                                 <span className="text-[10px] text-slate-400 ml-1">kg</span>
                                             </td>
                                             <td className="px-5 py-3 text-center">
@@ -426,7 +426,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                 {sessions.length > 0 && (
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-[#ff4d00]" />
+                            <Calendar className="w-4 h-4 text-orange-500" />
                             <h3 className="text-sm font-bold text-slate-800">Detail Volume per Sesi</h3>
                         </div>
                         <div className="overflow-x-auto">
@@ -473,7 +473,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                         <span className="text-xs font-bold text-slate-600">{session.exercise_count}</span>
                                                     </td>
                                                     <td className="px-5 py-3 text-right">
-                                                        <span className="text-sm font-bold text-[#ff4d00]">{session.total_volume.toLocaleString('id-ID')}</span>
+                                                        <span className="text-sm font-bold text-orange-500">{session.total_volume.toLocaleString('id-ID')}</span>
                                                         <span className="text-[10px] text-slate-400 ml-1">kg</span>
                                                     </td>
                                                     <td className="px-5 py-3 text-center">
@@ -503,7 +503,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.sets}</td>
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.reps}</td>
                                                                                 <td className="px-4 py-2 text-center text-slate-600 font-bold">{ex.max_load} kg</td>
-                                                                                <td className="px-4 py-2 text-right font-bold text-[#ff4d00]">{ex.volume.toLocaleString('id-ID')} kg</td>
+                                                                                <td className="px-4 py-2 text-right font-bold text-orange-500">{ex.volume.toLocaleString('id-ID')} kg</td>
                                                                             </tr>
                                                                         ))}
                                                                     </tbody>
@@ -525,7 +525,7 @@ export default function Show({ athlete, sessions, exerciseStats, weeklyData, sum
                 {sessions.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-24 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 text-center">
                         <div className="p-4 bg-white border border-slate-200 rounded-full mb-4 shadow-sm">
-                            <Dumbbell className="w-10 h-10 text-[#ff4d00]" />
+                            <Dumbbell className="w-10 h-10 text-orange-500" />
                         </div>
                         <h3 className="text-lg font-bold text-slate-800">Belum ada data beban latihan</h3>
                         <p className="text-sm text-slate-500 mt-2 font-medium max-w-md">

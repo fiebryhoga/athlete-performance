@@ -72,7 +72,7 @@ export default function AthleteCalendar({
 
                 {/* TABS NAVIGATION */}
                 <div className="flex items-center gap-2 border-b border-slate-200 mb-6 pb-4">
-                    <div className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-[#ff4d00] shadow-md shadow-[#ff4d00]/20 flex items-center gap-2 cursor-default">
+                    <div className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-orange-500 shadow-md shadow-orange-500/20 flex items-center gap-2 cursor-default">
                         <CalendarIcon size={16} />
                         Kalender Harian
                     </div>
@@ -118,19 +118,19 @@ export default function AthleteCalendar({
                                                 href={targetRoute}
                                                 className={`group relative overflow-hidden flex flex-col justify-between p-4 bg-white border rounded-xl hover:shadow-md transition-all cursor-pointer ${
                                                     isToday 
-                                                    ? "border-[#ff4d00] ring-1 ring-[#ff4d00]/30 shadow-[0_4px_12px_rgba(255,77,0,0.1)]" 
-                                                    : "border-slate-200 hover:border-[#ff4d00]/50"
+                                                    ? "border-orange-500 ring-1 ring-orange-500/30 shadow-[0_4px_12px_rgba(255,77,0,0.1)]" 
+                                                    : "border-slate-200 hover:border-orange-500/50"
                                                 }`}
                                             >
                                                 {isToday && (
                                                     <div className="absolute top-0 right-0 w-8 h-8 bg-orange-50 rounded-bl-full flex items-start justify-end p-1.5 z-10">
-                                                        <div className="w-2 h-2 rounded-full bg-[#ff4d00] animate-pulse"></div>
+                                                        <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
                                                     </div>
                                                 )}
 
                                                 <div className="flex flex-col gap-1 mb-4 z-10">
                                                     <div className="flex items-center justify-between">
-                                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isToday ? "text-[#ff4d00]" : "text-slate-400"}`}>
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${isToday ? "text-orange-500" : "text-slate-400"}`}>
                                                             {day.day_name}
                                                         </span>
                                                         {day.has_data ? (
@@ -160,7 +160,7 @@ export default function AthleteCalendar({
                                                     ) : (
                                                         <span className="text-[10px] font-medium text-slate-400 italic">Belum ada data</span>
                                                     )}
-                                                    <div className="h-6 w-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-[#ff4d00] group-hover:text-white text-slate-400 transition-colors shrink-0">
+                                                    <div className="h-6 w-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white text-slate-400 transition-colors shrink-0">
                                                         <ChevronRight size={12} />
                                                     </div>
                                                 </div>

@@ -223,7 +223,7 @@ export default function Form({ auth, athlete, assessment }) {
                         <div className="w-full lg:w-5/12 flex flex-col gap-6">
                             <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
                                 <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                    <UserCircle className="w-5 h-5 text-[#ff4d00]" />
+                                    <UserCircle className="w-5 h-5 text-orange-500" />
                                     Data Atlet & Pengukuran
                                 </h3>
 
@@ -379,7 +379,7 @@ export default function Form({ auth, athlete, assessment }) {
                                         <button
                                             type="submit"
                                             disabled={processing || !result}
-                                            className="px-6 py-2.5 bg-[#ff4d00] hover:bg-[#e64500] text-white font-bold rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 shadow-md shadow-[#ff4d00]/20"
+                                            className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 shadow-md shadow-orange-500/20"
                                         >
                                             <Save className="w-4 h-4" />
                                             {isEditing
@@ -402,7 +402,7 @@ export default function Form({ auth, athlete, assessment }) {
                             <div className="bg-white rounded-xl p-6 lg:p-8 shadow-sm border border-slate-200">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                                     <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                        <Activity className="text-[#ff4d00] w-6 h-6" />
+                                        <Activity className="text-orange-500 w-6 h-6" />
                                         Hasil & Proyeksi
                                     </h3>
 

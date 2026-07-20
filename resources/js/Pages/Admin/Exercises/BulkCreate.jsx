@@ -81,7 +81,7 @@ export default function BulkCreate({ categories = [] }) {
                         <button
                             type="submit"
                             disabled={processing || !data.names.trim()}
-                            className="px-6 py-2.5 text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#e64500] rounded-xl transition-colors disabled:opacity-50 shadow-sm shadow-[#ff4d00]/20"
+                            className="px-6 py-2.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-colors disabled:opacity-50 shadow-sm shadow-orange-500/20"
                         >
                             {processing ? "Memproses..." : "Buat Secara Massal"}
                         </button>

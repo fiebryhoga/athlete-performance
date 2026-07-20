@@ -41,7 +41,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                 
                 <div className="mb-6 md:mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="w-full md:w-auto">
-                        <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
+                        <Link href={route('admin.athletes.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-orange-500 mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
                             <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" />
                             Back to Athletes
                         </Link>
@@ -51,7 +51,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                     {safeAthlete.id && (
                         <Link 
                             href={route('admin.individual-trainings.show', safeAthlete.id)}
-                            className="w-full md:w-auto bg-[#ff4d00] text-white px-6 py-3.5 md:py-3 rounded-xl font-bold text-xs md:text-sm hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 touch-manipulation shrink-0"
+                            className="w-full md:w-auto bg-orange-500 text-white px-6 py-3.5 md:py-3 rounded-xl font-bold text-xs md:text-sm hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 touch-manipulation shrink-0"
                         >
                             <Activity className="w-4 h-4 md:w-5 md:h-5" /> Lihat Program Latihan
                         </Link>
@@ -72,7 +72,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     className="w-full h-full rounded-2xl object-cover shadow-sm border-2 border-slate-50"
                                 />
                             ) : (
-                                <div className="w-full h-full bg-orange-50 rounded-2xl flex items-center justify-center text-[#ff4d00] text-3xl font-bold shadow-sm border-2 border-orange-100">
+                                <div className="w-full h-full bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 text-3xl font-bold shadow-sm border-2 border-orange-100">
                                     {initial}
                                 </div>
                             )}
@@ -80,7 +80,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                         
                         <h2 className="text-lg md:text-xl font-bold text-slate-800 relative z-10">{safeAthlete.name || 'Unknown Name'}</h2>
                         <p className="text-[10px] md:text-xs text-slate-500 font-mono mb-3 mt-0.5 relative z-10">{safeAthlete.username || '-'}</p>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-[#ff4d00] rounded-lg text-[9px] md:text-[10px] font-bold border border-orange-100 mb-5 relative z-10">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-500 rounded-lg text-[9px] md:text-[10px] font-bold border border-orange-100 mb-5 relative z-10">
                             <Trophy className="w-3.5 h-3.5" /> {safeAthlete.sport?.name || 'No Sport'}
                         </span>
 
@@ -99,7 +99,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             </div>
                             <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
                                 <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1 flex items-center justify-center gap-1"><Scale className="w-3 h-3"/> BMI</p>
-                                <p className="font-bold text-[#ff4d00] text-sm md:text-base">{bmi}</p>
+                                <p className="font-bold text-orange-500 text-sm md:text-base">{bmi}</p>
                             </div>
                         </div>
                     </div>
@@ -114,7 +114,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                                 <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Avg Score</p>
-                                <p className="text-xl md:text-3xl font-bold text-[#ff4d00] truncate">{formatScore(stats?.average_score)}</p>
+                                <p className="text-xl md:text-3xl font-bold text-orange-500 truncate">{formatScore(stats?.average_score)}</p>
                             </div>
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                                 <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-1.5">Best Score</p>
@@ -131,7 +131,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 
                                 <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
                                     <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                        <Target className="w-4 h-4 text-[#ff4d00]" />
+                                        <Target className="w-4 h-4 text-orange-500" />
                                         Skill Map (Average)
                                     </h3>
                                     <div className="flex-1 min-h-[250px] md:min-h-[300px] w-full relative">
@@ -141,7 +141,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }} />
                                                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                                 <Radar name="Target" dataKey="B" stroke="#cbd5e1" strokeWidth={1} fill="#f8fafc" fillOpacity={0.5} strokeDasharray="3 3" />
-                                                <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.3} />
+                                                <Radar name="Athlete" dataKey="A" stroke="orange-500" strokeWidth={2} fill="orange-500" fillOpacity={0.3} />
                                                 <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
                                                 <RechartsTooltip contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                             </RadarChart>
@@ -152,7 +152,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 
                                 <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
                                     <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                        <Activity className="w-4 h-4 text-[#ff4d00]" />
+                                        <Activity className="w-4 h-4 text-orange-500" />
                                         Latest vs Previous
                                     </h3>
                                     <div className="flex-1 min-h-[250px] md:min-h-[300px] w-full relative">
@@ -164,7 +164,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                                 <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 4px 6px -1px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                                 <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} iconType="circle" />
                                                 <Bar name="Previous Avg" dataKey="previous" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={14} />
-                                                <Bar name="Latest" dataKey="latest" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={14} />
+                                                <Bar name="Latest" dataKey="latest" fill="orange-500" radius={[4, 4, 0, 0]} barSize={14} />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
@@ -235,7 +235,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                 {/* Comprehensive Athlete Profiling Metrics */}
                 <div className="mb-6 md:mb-8">
                     <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-[#ff4d00]" />
+                        <Target className="w-4 h-4 text-orange-500" />
                         Athlete Profiling Metrics
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
@@ -295,8 +295,8 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                         </div>
                                     </div>
                                     <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
-                                        <span className="text-sm text-[#ff4d00] font-bold">Daily Load (AU)</span>
-                                        <span className="text-xl font-bold text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
+                                        <span className="text-sm text-orange-500 font-bold">Daily Load (AU)</span>
+                                        <span className="text-xl font-bold text-orange-500">{latest_wellness.daily_load ?? '-'}</span>
                                     </div>
                                 </div>
                             ) : (
@@ -357,7 +357,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                             <FileText className="w-4 h-4 text-slate-400" /> 5 Session History Terakhir
                         </h3>
                         {safeAthlete.name && (
-                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:text-white bg-white hover:bg-[#ff4d00] px-3.5 py-2 rounded-lg border border-slate-200 hover:border-[#ff4d00] shadow-sm transition-all flex items-center gap-1 touch-manipulation">
+                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-orange-500 hover:text-white bg-white hover:bg-orange-500 px-3.5 py-2 rounded-lg border border-slate-200 hover:border-orange-500 shadow-sm transition-all flex items-center gap-1 touch-manipulation">
                                 View All Logs <ChevronRight className="w-3.5 h-3.5" />
                             </Link>
                         )}
@@ -372,7 +372,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 <div key={session.id} className="p-4 bg-white hover:bg-orange-50/30 transition-colors flex flex-col gap-3">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                                            <Calendar className="w-3.5 h-3.5 text-[#ff4d00]" />
+                                            <Calendar className="w-3.5 h-3.5 text-orange-500" />
                                             {session.full_date}
                                         </div>
                                         <span className={`px-2 py-1 rounded text-[9px] font-bold border ${
@@ -386,11 +386,11 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     <div className="flex justify-between items-end border-t border-slate-50 pt-2">
                                         <div>
                                             <p className="text-[10px] text-slate-400 font-bold mb-0.5">Final Score</p>
-                                            <p className="font-bold text-[#ff4d00] text-xl">{formatScore(session.score)}</p>
+                                            <p className="font-bold text-orange-500 text-xl">{formatScore(session.score)}</p>
                                         </div>
                                         <Link 
                                             href={route('admin.performance.show', session.id)} 
-                                            className="px-4 py-2 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all touch-manipulation"
+                                            className="px-4 py-2 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-lg hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all touch-manipulation"
                                         >
                                             Details
                                         </Link>
@@ -420,13 +420,13 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     history_data.slice().reverse().slice(0, 5).map((session) => (
                                         <tr key={session.id} className="hover:bg-orange-50/30 transition-colors group">
                                             <td className="px-6 py-4 font-bold text-slate-700 flex items-center gap-2.5 text-sm">
-                                                <div className="p-1.5 bg-slate-50 rounded-md text-[#ff4d00] border border-slate-100">
+                                                <div className="p-1.5 bg-slate-50 rounded-md text-orange-500 border border-slate-100">
                                                     <Calendar className="w-4 h-4" />
                                                 </div>
                                                 {session.full_date}
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                <span className="font-bold text-[#ff4d00] text-lg">{formatScore(session.score)}</span>
+                                                <span className="font-bold text-orange-500 text-lg">{formatScore(session.score)}</span>
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold border ${
@@ -440,7 +440,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                             <td className="px-6 py-4 text-right pr-6">
                                                 <Link 
                                                     href={route('admin.performance.show', session.id)} 
-                                                    className="inline-flex items-center justify-center px-4 py-2 text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-[#ff4d00] hover:text-white hover:border-[#ff4d00] transition-all"
+                                                    className="inline-flex items-center justify-center px-4 py-2 text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all"
                                                 >
                                                     Details
                                                 </Link>

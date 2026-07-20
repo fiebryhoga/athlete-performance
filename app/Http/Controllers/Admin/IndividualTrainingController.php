@@ -158,14 +158,22 @@ class IndividualTrainingController extends Controller
             'location' => 'required|string|max:255',
             'coach_ids' => 'nullable|array',
             'blocks' => 'array',
+            'is_extra' => 'boolean',
         ]);
 
-        $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
-            ->where('is_athlete_paid', false)
-            ->orderBy('session_number', 'desc')
-            ->first();
+        $isExtra = $request->input('is_extra', false);
 
-        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        if ($isExtra) {
+            $session_number = null;
+        } else {
+            $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
+                ->where('is_athlete_paid', false)
+                ->where('is_extra', false)
+                ->orderBy('session_number', 'desc')
+                ->first();
+
+            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        }
 
         // Calculate day number
         $firstTrainingDate = IndividualTraining::where('user_id', $user->id)->min('date');
@@ -183,6 +191,7 @@ class IndividualTrainingController extends Controller
             'date' => $request->date,
             'day_number' => $day_number,
             'session_number' => $session_number,
+            'is_extra' => $isExtra,
             'name' => $request->name,
             'training_type' => $request->training_type,
             'location' => $request->location,
@@ -260,7 +269,33 @@ class IndividualTrainingController extends Controller
             'training_type' => 'required|string',
             'location' => 'nullable|string',
             'coach_ids' => 'nullable|array',
+            'is_extra' => 'boolean',
         ]);
+
+        $isExtra = $request->input('is_extra', false);
+        
+        // Handle session_number recalculation if is_extra changes
+        if ($training->is_extra !== $isExtra) {
+            if ($isExtra) {
+                // Changing to extra: remove session number and decrement others
+                $oldSessionNumber = $training->session_number;
+                if ($oldSessionNumber) {
+                    \App\Models\IndividualTraining::where('user_id', $training->user_id)
+                        ->where('is_athlete_paid', $training->is_athlete_paid)
+                        ->where('session_number', '>', $oldSessionNumber)
+                        ->decrement('session_number');
+                }
+                $training->session_number = null;
+            } else {
+                // Changing from extra to normal: assign new session number at the end
+                $lastUnpaidSession = IndividualTraining::where('user_id', $training->user_id)
+                    ->where('is_athlete_paid', false)
+                    ->where('is_extra', false)
+                    ->orderBy('session_number', 'desc')
+                    ->first();
+                $training->session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+            }
+        }
 
         $training->update([
             'date' => $request->date,
@@ -268,6 +303,7 @@ class IndividualTrainingController extends Controller
             'training_type' => $request->training_type,
             'location' => $request->location,
             'coach_ids' => $request->coach_ids,
+            'is_extra' => $isExtra,
         ]);
 
         // Process blocks
@@ -573,11 +609,16 @@ class IndividualTrainingController extends Controller
         $user = $training->user;
 
         // Calculate new session_number
-        $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
-            ->where('is_athlete_paid', false)
-            ->orderBy('session_number', 'desc')
-            ->first();
-        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        if ($training->is_extra) {
+            $session_number = null;
+        } else {
+            $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
+                ->where('is_athlete_paid', false)
+                ->where('is_extra', false)
+                ->orderBy('session_number', 'desc')
+                ->first();
+            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        }
 
         // Calculate day_number
         $firstTrainingDate = IndividualTraining::where('user_id', $user->id)->min('date');
@@ -590,6 +631,7 @@ class IndividualTrainingController extends Controller
         // Duplicate the training record
         $newTraining = $training->replicate(['is_completed', 'completed_at', 'athlete_note', 'proof_photo', 'athlete_rpe']);
         $newTraining->date = $request->target_date;
+        $newTraining->is_extra = $training->is_extra;
         $newTraining->day_number = $day_number;
         $newTraining->session_number = $session_number;
         $newTraining->status = 'scheduled';
@@ -680,7 +722,7 @@ class IndividualTrainingController extends Controller
         });
 
         // Pastikan nama dan tanggal tersedia untuk title
-        $training->title = $training->name ?: 'Individual Training Session #' . $training->session_number;
+        $training->title = $training->name ?: ($training->is_extra ? 'Extra Activity / Tournament' : 'Individual Training Session #' . $training->session_number);
         $training->focus = ($athlete ? $athlete->name : 'Athlete') . ($training->location ? ' | ' . $training->location : '');
         
         $coachNames = [];

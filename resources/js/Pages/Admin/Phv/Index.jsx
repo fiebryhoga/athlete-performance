@@ -40,7 +40,7 @@ export default function Index({ auth, athletes }) {
                                     <Link 
                                         key={athlete.id} 
                                         href={route('admin.phv-calculator.show', athlete.id)}
-                                        className="group bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:border-[#ff4d00] hover:shadow-md transition-all flex flex-col justify-between"
+                                        className="group bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:border-orange-500 hover:shadow-md transition-all flex flex-col justify-between"
                                     >
                                         <div>
                                             <div className="flex items-center gap-4 mb-4">
@@ -52,7 +52,7 @@ export default function Index({ auth, athletes }) {
                                                     )}
                                                 </div>
                                                 <div className="overflow-hidden">
-                                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-[#ff4d00] transition-colors">{athlete.name}</h3>
+                                                    <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-orange-500 transition-colors">{athlete.name}</h3>
                                                     <p className="text-sm text-slate-500 capitalize flex items-center gap-2">
                                                         {athlete.gender === 'female' ? 'Perempuan' : 'Laki-laki'} 
                                                         {athlete.age && <span className="bg-slate-100 px-2 rounded-full text-xs font-bold text-slate-600">{Math.round(athlete.age)} Thn</span>}
@@ -89,7 +89,7 @@ export default function Index({ auth, athletes }) {
                                             </div>
                                         </div>
                                         
-                                        <div className="mt-5 pt-3 border-t border-slate-50 flex items-center justify-between text-[#ff4d00] font-bold text-sm">
+                                        <div className="mt-5 pt-3 border-t border-slate-50 flex items-center justify-between text-orange-500 font-bold text-sm">
                                             <span>Lihat Riwayat Lengkap</span>
                                             <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                                         </div>

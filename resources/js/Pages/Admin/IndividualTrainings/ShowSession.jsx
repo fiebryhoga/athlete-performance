@@ -423,7 +423,8 @@ export default function ShowSession({
             (training.proof_photo && !data.remove_proof_photo);
 
         const missingFields = getMissingRequiredActuals();
-        if (!hasPhoto) {
+        
+        if (isAthlete && !hasPhoto) {
             missingFields.push("Foto Bukti (wajib diunggah)");
         }
 
@@ -460,10 +461,10 @@ export default function ShowSession({
                         <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                         <div className="relative z-10 space-y-4 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
-                                <Link href={route("admin.individual-trainings.index")} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
+                                <button type="button" onClick={() => window.history.back()} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
                                     <ArrowLeft size={16} /> Kembali
-                                </Link>
-                                <span className="text-xs font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                </button>
+                                <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
                                     Sesi {training.session_number}
                                 </span>
                                 <span className={`text-xs font-bold px-3 py-1 rounded-full border ${training.status === 'completed' || training.is_completed ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
@@ -500,7 +501,7 @@ export default function ShowSession({
                                     <div className="flex flex-wrap gap-2">
                                         {coaches.map(c => (
                                             <div key={c.id} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full py-1 pr-3 pl-1">
-                                                <div className="w-6 h-6 rounded-full bg-[#ff4d00]/10 text-[#ff4d00] flex items-center justify-center">
+                                                <div className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center">
                                                     <User size={12} />
                                                 </div>
                                                 <span className="text-xs font-semibold text-slate-700">{c.name}</span>
@@ -528,7 +529,7 @@ export default function ShowSession({
                             {isCoachOrAdmin && (
                                 <Link
                                     href={route("admin.individual-trainings.session.edit", training.id)}
-                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-[#ff4d00] text-white border border-transparent rounded-xl text-sm font-bold shadow-md shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all"
+                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all"
                                 >
                                     <Edit2 size={18} /> Edit
                                 </Link>
@@ -1120,7 +1121,7 @@ export default function ShowSession({
                         </div>
                         <button
                             onClick={() => setWarningMessage("")}
-                            className="w-full py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-colors shadow-md shadow-[#ff4d00]/20"
+                            className="w-full py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md shadow-orange-500/20"
                         >
                             OK, Mengerti
                         </button>
@@ -1154,7 +1155,7 @@ export default function ShowSession({
                             <button
                                 onClick={confirmAndComplete}
                                 disabled={processing}
-                                className="px-5 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-[#ff4d00]/20"
+                                className="px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-orange-500/20"
                             >
                                 <CheckCircle2 size={16} /> Ya, Selesai
                             </button>

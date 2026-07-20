@@ -28,7 +28,7 @@ const ResultInput = ({ item, value, onChange }) => {
                 
                 
                 <div className="self-start sm:self-auto flex items-center gap-1 px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-500 whitespace-nowrap">
-                    <Target className="w-3 h-3 text-[#ff4d00]" />
+                    <Target className="w-3 h-3 text-orange-500" />
                     {Number(item.target_value)} <span className="text-slate-400 font-medium ml-0.5 lowercase tracking-normal">{item.unit}</span>
                 </div>
             </div>
@@ -43,7 +43,7 @@ const ResultInput = ({ item, value, onChange }) => {
                     className={`block w-full pl-3 pr-12 py-2.5 rounded-lg border font-bold text-slate-800 transition-all shadow-sm text-base md:text-lg outline-none ${
                         isError 
                         ? 'border-amber-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 bg-white' 
-                        : 'border-slate-200 focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 bg-white'
+                        : 'border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 bg-white'
                     }`}
                     placeholder={placeholder}
                     onWheel={(e) => e.target.blur()} 
@@ -100,7 +100,7 @@ export default function Edit({ test, categories }) {
                             
                             
                             <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-                                <Link href={route('admin.performance.index')} className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-[#ff4d00] hover:border-orange-200 hover:bg-orange-50 transition-colors shrink-0">
+                                <Link href={route('admin.performance.index')} className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 hover:text-orange-500 hover:border-orange-200 hover:bg-orange-50 transition-colors shrink-0">
                                     <ArrowLeft className="w-5 h-5" />
                                 </Link>
                                 <div className="min-w-0">
@@ -124,7 +124,7 @@ export default function Edit({ test, categories }) {
                                     type="submit" disabled={processing}
                                     className={`px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-sm hover:shadow-md ${
                                         isDirty 
-                                        ? 'bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-[#ff4d00]/20 hover:-translate-y-0.5' 
+                                        ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-orange-500/20 hover:-translate-y-0.5' 
                                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     }`}
                                 >
@@ -146,7 +146,7 @@ export default function Edit({ test, categories }) {
                             
                             <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center">
                                 <div className="flex items-center gap-2 md:gap-3">
-                                    <div className="w-1.5 h-5 md:h-6 bg-[#ff4d00] rounded-full"></div>
+                                    <div className="w-1.5 h-5 md:h-6 bg-orange-500 rounded-full"></div>
                                     <h3 className="font-bold text-slate-800 text-sm md:text-base">{category.name}</h3>
                                 </div>
                                 <span className="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded shadow-sm">
@@ -174,7 +174,7 @@ export default function Edit({ test, categories }) {
                     
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 md:p-6">
                         <h3 className="font-bold text-slate-800 mb-4 flex gap-2 items-center text-sm md:text-base">
-                            <div className="p-1.5 bg-orange-50 text-[#ff4d00] rounded-md border border-orange-100">
+                            <div className="p-1.5 bg-orange-50 text-orange-500 rounded-md border border-orange-100">
                                 <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
                             Coach Notes & Evaluation
@@ -183,7 +183,7 @@ export default function Edit({ test, categories }) {
                             <textarea 
                                 value={data.notes}
                                 onChange={(e) => setData('notes', e.target.value)}
-                                className="w-full rounded-lg border-slate-200 bg-slate-50 p-4 text-slate-700 min-h-[120px] focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all placeholder:text-slate-400 font-medium resize-y text-sm leading-relaxed hover:bg-white outline-none shadow-sm"
+                                className="w-full rounded-lg border-slate-200 bg-slate-50 p-4 text-slate-700 min-h-[120px] focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all placeholder:text-slate-400 font-medium resize-y text-sm leading-relaxed hover:bg-white outline-none shadow-sm"
                                 placeholder="Write detailed evaluation regarding the athlete's performance in this session..."
                             ></textarea>
                             <div className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-400 pointer-events-none">
@@ -202,7 +202,7 @@ export default function Edit({ test, categories }) {
                         type="submit" disabled={processing}
                         className={`px-6 py-3 rounded-lg font-bold text-sm flex justify-center items-center gap-2 shadow-lg transition-all active:scale-[0.98] w-auto ${
                             isDirty 
-                            ? 'bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-[#ff4d00]/20' 
+                            ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-orange-500/20' 
                             : 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                         }`}
                     >

@@ -140,7 +140,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-semibold text-slate-800 text-lg">Profil Kebugaran Harian</h3>
-                        <span className="text-xs font-medium text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Hari Ini vs Rata-rata</span>
+                        <span className="text-xs font-medium text-orange-500 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">Hari Ini vs Rata-rata</span>
                     </div>
                     <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -150,7 +150,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                                 <PolarRadiusAxis angle={30} domain={[0, 'dataMax']} tick={false} axisLine={false} />
                                 <Tooltip contentStyle={customTooltipStyle} />
                                 <Legend wrapperStyle={{fontSize: '12px', color: '#64748b', paddingTop: '15px'}} />
-                                <Radar name="Hari Ini" dataKey="today" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.3} />
+                                <Radar name="Hari Ini" dataKey="today" stroke="orange-500" strokeWidth={2} fill="orange-500" fillOpacity={0.3} />
                                 <Radar name="Rata-rata" dataKey="avg" stroke="#94a3b8" strokeWidth={2} fill="#94a3b8" fillOpacity={0.1} strokeDasharray="4 4" />
                             </RadarChart>
                         </ResponsiveContainer>
@@ -290,7 +290,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                             <button 
                                 key={range} 
                                 onClick={() => setTimeRange(range)} 
-                                className={`flex-1 sm:flex-none px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${timeRange === range ? 'bg-white text-[#ff4d00] shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                                className={`flex-1 sm:flex-none px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${timeRange === range ? 'bg-white text-orange-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
                             >
                                 {range}
                             </button>
@@ -306,7 +306,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                             type="date" 
                             value={selectedDate} 
                             onChange={(e) => setSelectedDate(e.target.value)} 
-                            className="pl-10 pr-4 py-2 w-full text-sm font-medium text-slate-700 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/50 focus:border-[#ff4d00] transition-all bg-white cursor-pointer shadow-sm"
+                            className="pl-10 pr-4 py-2 w-full text-sm font-medium text-slate-700 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white cursor-pointer shadow-sm"
                         />
                     </div>
                 </div>
@@ -444,7 +444,7 @@ export default function AnalyticsDashboard({ dailyHistory, formatDateToIndo }) {
                                                     <td className="md:hidden px-4 py-3.5 text-right">
                                                         <button 
                                                             onClick={() => toggleExpand(index)} 
-                                                            className={`p-1.5 rounded-lg border transition-colors flex items-center justify-center ml-auto ${isExpanded ? 'bg-[#ff4d00] text-white border-[#ff4d00]' : 'text-[#ff4d00] border-orange-200 hover:bg-orange-50'}`}
+                                                            className={`p-1.5 rounded-lg border transition-colors flex items-center justify-center ml-auto ${isExpanded ? 'bg-orange-500 text-white border-orange-500' : 'text-orange-500 border-orange-200 hover:bg-orange-50'}`}
                                                         >
                                                             {isExpanded ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                         </button>

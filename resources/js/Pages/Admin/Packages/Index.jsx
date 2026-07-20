@@ -81,7 +81,7 @@ export default function Index({ packages }) {
             text: `Paket "${pkg.name}" akan dihapus permanen!`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ff4d00',
+            confirmButtonColor: 'orange-500',
             cancelButtonColor: '#94a3b8',
             confirmButtonText: 'Ya, Hapus!',
             cancelButtonText: 'Batal',
@@ -131,7 +131,7 @@ export default function Index({ packages }) {
                 actions={
                     <button 
                         onClick={() => openModal()} 
-                        className="flex items-center gap-2 px-4 py-2 bg-[#ff4d00] hover:bg-[#ff4d00]/90 text-white rounded-xl text-xs md:text-sm font-bold transition-all shadow-sm shadow-[#ff4d00]/20 hover:shadow-md hover:shadow-[#ff4d00]/30 hover:-translate-y-0.5"
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-500/90 text-white rounded-xl text-xs md:text-sm font-bold transition-all shadow-sm shadow-orange-500/20 hover:shadow-md hover:shadow-orange-500/30 hover:-translate-y-0.5"
                     >
                         <Plus size={18} strokeWidth={2.5} />
                         Tambah Paket
@@ -141,17 +141,17 @@ export default function Index({ packages }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPackages.map(pkg => (
-                    <div key={pkg.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-[#ff4d00]/10 hover:-translate-y-1 transition-all duration-300 group flex flex-col">
+                    <div key={pkg.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 group flex flex-col">
                         <div className="p-5 flex-1 border-b border-slate-100 flex flex-col">
                             <div className="flex items-start justify-between mb-3">
                                 <div>
-                                    <h3 className="font-bold text-lg text-slate-900 group-hover:text-[#ff4d00] transition-colors">{pkg.name}</h3>
+                                    <h3 className="font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">{pkg.name}</h3>
                                     {pkg.description && (
                                         <p className="text-xs text-slate-500 mt-1 line-clamp-2">{pkg.description}</p>
                                     )}
                                 </div>
-                                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-[#ff4d00]/10 group-hover:border-[#ff4d00]/20 transition-colors">
-                                    <Package size={20} className="text-slate-400 group-hover:text-[#ff4d00] transition-colors" />
+                                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-orange-500/10 group-hover:border-orange-500/20 transition-colors">
+                                    <Package size={20} className="text-slate-400 group-hover:text-orange-500 transition-colors" />
                                 </div>
                             </div>
 
@@ -176,7 +176,7 @@ export default function Index({ packages }) {
                                             <DollarSign size={12} />
                                             <span className="text-[10px] font-bold">HARGA PAKET KLIEN</span>
                                         </div>
-                                        <span className="text-lg font-bold text-[#ff4d00]">{formatCurrency(pkg.price)}</span>
+                                        <span className="text-lg font-bold text-orange-500">{formatCurrency(pkg.price)}</span>
                                     </div>
                                 )}
                             </div>
@@ -184,7 +184,7 @@ export default function Index({ packages }) {
                         <div className="flex bg-slate-50 border-t border-slate-100">
                             <button
                                 onClick={() => openModal(pkg)}
-                                className="flex-1 py-3 text-xs font-bold text-slate-600 hover:text-[#ff4d00] hover:bg-[#ff4d00]/5 flex items-center justify-center gap-2 transition-colors border-r border-slate-200"
+                                className="flex-1 py-3 text-xs font-bold text-slate-600 hover:text-orange-500 hover:bg-orange-500/5 flex items-center justify-center gap-2 transition-colors border-r border-slate-200"
                             >
                                 <Edit2 size={14} /> Edit
                             </button>
@@ -205,7 +205,7 @@ export default function Index({ packages }) {
                         <p className="text-sm text-slate-500 mb-6">Mulai dengan menambahkan paket baru.</p>
                         <button 
                             onClick={() => openModal()} 
-                            className="flex items-center gap-2 px-6 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#ff4d00]/90 transition-all shadow-sm shadow-[#ff4d00]/20 hover:-translate-y-0.5"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-500/90 transition-all shadow-sm shadow-orange-500/20 hover:-translate-y-0.5"
                         >
                             <Plus size={18} strokeWidth={2.5} />
                             Tambah Paket
@@ -227,7 +227,7 @@ export default function Index({ packages }) {
                                 type="text"
                                 value={data.name}
                                 onChange={e => setData('name', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 placeholder="Contoh: Paket 12 Sesi"
                                 required
                             />
@@ -239,7 +239,7 @@ export default function Index({ packages }) {
                             <textarea
                                 value={data.description}
                                 onChange={e => setData('description', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 placeholder="Tuliskan deskripsi singkat paket"
                                 rows="3"
                             />
@@ -253,7 +253,7 @@ export default function Index({ packages }) {
                                     type="number"
                                     value={data.session_count}
                                     onChange={e => setData('session_count', e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                    className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     min="1"
                                     required
                                 />
@@ -266,7 +266,7 @@ export default function Index({ packages }) {
                                     type="number"
                                     value={data.coach_fee_per_session}
                                     onChange={e => setData('coach_fee_per_session', e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                    className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                     min="0"
                                     placeholder="Rp"
                                     required
@@ -281,7 +281,7 @@ export default function Index({ packages }) {
                                 type="number"
                                 value={data.price}
                                 onChange={e => setData('price', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 min="0"
                                 placeholder="Rp"
                             />
@@ -298,7 +298,7 @@ export default function Index({ packages }) {
                             </button>
                             <button
                                 type="submit"
-                                className="px-5 py-2.5 text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#ff4d00]/90 rounded-xl shadow-sm shadow-[#ff4d00]/20 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                                className="px-5 py-2.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-500/90 rounded-xl shadow-sm shadow-orange-500/20 hover:shadow-md hover:-translate-y-0.5 transition-all"
                             >
                                 {editingPackage ? 'Simpan Perubahan' : 'Tambah Paket'}
                             </button>

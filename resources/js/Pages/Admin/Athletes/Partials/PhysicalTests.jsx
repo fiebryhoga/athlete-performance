@@ -16,19 +16,19 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Total Sessions</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 transition-colors"/> Total Sessions</p>
                     <p className="text-2xl md:text-3xl font-bold text-slate-800">{stats?.total_sessions || 0}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Avg Score</p>
-                    <p className="text-2xl md:text-3xl font-bold text-[#ff4d00]">{formatScore(stats?.average_score)}</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 transition-colors"/> Avg Score</p>
+                    <p className="text-2xl md:text-3xl font-bold text-orange-500">{formatScore(stats?.average_score)}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all group">
                     <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-500 transition-colors"/> Best Score</p>
                     <p className="text-2xl md:text-3xl font-bold text-emerald-500">{formatScore(stats?.highest_score)}</p>
                 </div>
                 <div className="bg-white p-4 md:p-5 rounded-lg border border-slate-100 shadow-sm hover:border-orange-200 hover:shadow-md transition-all group">
-                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#ff4d00] transition-colors"/> Last Activity</p>
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold mb-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 transition-colors"/> Last Activity</p>
                     <p className="text-xs md:text-sm font-bold text-slate-700 leading-tight mt-2">{stats?.latest_date || '-'}</p>
                 </div>
             </div>
@@ -37,7 +37,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full mb-8">
                     <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-100 shadow-sm flex flex-col hover:shadow-md transition-shadow">
                         <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <div className="p-1.5 bg-orange-50 rounded-md text-[#ff4d00]"><Target className="w-4 h-4" /></div>
+                            <div className="p-1.5 bg-orange-50 rounded-md text-orange-500"><Target className="w-4 h-4" /></div>
                             Skill Map (Average)
                         </h3>
                         <div className="flex-1 min-h-[250px] md:min-h-[300px]">
@@ -47,7 +47,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                     <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: '600' }} />
                                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                     <Radar name="Target" dataKey="B" stroke="#fbbf24" strokeWidth={2} fill="#fbbf24" fillOpacity={0.1} />
-                                    <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.5} />
+                                    <Radar name="Athlete" dataKey="A" stroke="orange-500" strokeWidth={2} fill="orange-500" fillOpacity={0.5} />
                                     <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                                     <RechartsTooltip contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)'}} />
                                 </RadarChart>
@@ -69,7 +69,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                     <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius:'8px', border:'none', boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)', fontSize:'12px'}} />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
                                     <Bar name="Previous" dataKey="previous" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={16} />
-                                    <Bar name="Latest" dataKey="latest" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={16} />
+                                    <Bar name="Latest" dataKey="latest" fill="orange-500" radius={[4, 4, 0, 0]} barSize={16} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -110,7 +110,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                 {item_analysis.map((item, idx) => (
                                     <tr key={idx} className="hover:bg-orange-50/30 transition-colors group">
                                         <td className="px-4 md:px-6 py-3 md:py-4">
-                                            <div className="font-bold text-slate-800 text-xs md:text-sm group-hover:text-[#ff4d00] transition-colors">{item.name}</div>
+                                            <div className="font-bold text-slate-800 text-xs md:text-sm group-hover:text-orange-500 transition-colors">{item.name}</div>
                                             <div className="text-[9px] md:text-[10px] text-slate-400 font-bold mt-0.5">{item.category}</div>
                                         </td>
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center font-bold text-slate-800 bg-slate-50/30 whitespace-nowrap">
@@ -130,7 +130,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                         </td>
                                         
                                         <td className="px-4 md:px-6 py-3 md:py-4 text-center">
-                                            <span className="inline-block font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded text-xs md:text-sm border border-orange-100 min-w-[50px] md:min-w-[60px]">
+                                            <span className="inline-block font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded text-xs md:text-sm border border-orange-100 min-w-[50px] md:min-w-[60px]">
                                                 {formatScore(item.score)}%
                                             </span>
                                         </td>
@@ -211,7 +211,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                             <FileText className="w-3.5 h-3.5 text-slate-400" /> Session History
                         </h3>
                         {safeAthlete.name && (
-                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-[#ff4d00] hover:underline bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm hover:bg-orange-50 transition-colors">
+                            <Link href={route('admin.performance.index', { search: safeAthlete.name })} className="text-[10px] md:text-xs font-bold text-orange-500 hover:underline bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm hover:bg-orange-50 transition-colors">
                                 View All Logs &rarr;
                             </Link>
                         )}
@@ -240,7 +240,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                                 {session.full_date}
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-center">
-                                                <span className="font-bold text-[#ff4d00] text-base md:text-lg">{formatScore(session.score)}</span>
+                                                <span className="font-bold text-orange-500 text-base md:text-lg">{formatScore(session.score)}</span>
                                             </td>
                                             
                                             
@@ -254,7 +254,7 @@ export default function PhysicalTests({ has_data, stats, formatScore, formatNumb
                                                 </span>
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-right">
-                                                <Link href={route('admin.performance.show', session.id)} className="text-[10px] md:text-xs font-bold text-slate-500 hover:text-[#ff4d00] transition-colors whitespace-nowrap">
+                                                <Link href={route('admin.performance.show', session.id)} className="text-[10px] md:text-xs font-bold text-slate-500 hover:text-orange-500 transition-colors whitespace-nowrap">
                                                     Details &rarr;
                                                 </Link>
                                             </td>

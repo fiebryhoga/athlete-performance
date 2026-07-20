@@ -119,7 +119,7 @@ export default function Index({ sports }) {
                     isSuperadmin && (
                         <button 
                             onClick={() => setIsModalOpen(true)}
-                            className="flex items-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg text-sm font-bold hover:bg-[#e64500] transition-all shadow-lg shadow-[#ff4d00]/20 active:scale-95 w-full sm:w-auto justify-center"
+                            className="flex items-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 active:scale-95 w-full sm:w-auto justify-center"
                         >
                             <Plus className="w-4 h-4 md:w-5 md:h-5" /> Add Sport
                         </button>
@@ -134,10 +134,10 @@ export default function Index({ sports }) {
                         <Link 
                             key={sport.id} 
                             href={route('admin.sports.show', sport.id)}
-                            className="group bg-white p-6 rounded-lg border border-slate-200 hover:border-[#ff4d00] hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full"
+                            className="group bg-white p-6 rounded-lg border border-slate-200 hover:border-orange-500 hover:shadow-lg transition-all duration-300 relative overflow-hidden flex flex-col h-full"
                         >
                             <div className="flex justify-between items-start mb-4">
-                                <div className="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden bg-orange-50 text-[#ff4d00] flex justify-center items-center group-hover:bg-[#ff4d00] group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <div className="w-12 h-12 rounded-lg border border-slate-100 overflow-hidden bg-orange-50 text-orange-500 flex justify-center items-center group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shadow-sm">
                                     <Dumbbell className="w-6 h-6" />
                                 </div>
                                 
@@ -170,19 +170,19 @@ export default function Index({ sports }) {
                                     )}
                                     
                                     <div className="p-2 rounded-lg bg-slate-50 group-hover:bg-orange-50 transition-colors">
-                                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#ff4d00]" />
+                                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-orange-500" />
                                     </div>
                                 </div>
                             </div>
                             
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-[#ff4d00] transition-colors">{sport.name}</h3>
+                            <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-orange-500 transition-colors">{sport.name}</h3>
                             <p className="text-xs text-slate-500 mb-6 line-clamp-2 flex-grow leading-relaxed font-medium">
                                 {sport.description || 'No additional description provided for this sport.'}
                             </p>
 
                             <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-4 border-t border-slate-100 mt-auto">
                                 <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                                    <Users className="w-3.5 h-3.5 text-[#ff4d00]" />
+                                    <Users className="w-3.5 h-3.5 text-orange-500" />
                                     <span>{sport.athletes_count} Athletes</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
@@ -225,7 +225,7 @@ export default function Index({ sports }) {
                                     type="text" 
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
-                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
                                     placeholder="e.g. Basketball, Swimming..."
                                     autoFocus
                                 />
@@ -237,7 +237,7 @@ export default function Index({ sports }) {
                                 <textarea 
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
-                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none transition-all outline-none custom-scrollbar"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none transition-all outline-none custom-scrollbar"
                                     placeholder="Brief description about this sport..."
                                 />
                             </div>
@@ -253,7 +253,7 @@ export default function Index({ sports }) {
                                 <button 
                                     type="submit" 
                                     disabled={processing} 
-                                    className="px-6 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 disabled:opacity-70 flex items-center gap-2"
+                                    className="px-6 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 disabled:opacity-70 flex items-center gap-2"
                                 >
                                     {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
                                     {processing ? 'Saving...' : 'Save Data'}
@@ -286,7 +286,7 @@ export default function Index({ sports }) {
                                     type="text" 
                                     value={duplicateForm.data.name}
                                     onChange={e => duplicateForm.setData('name', e.target.value)}
-                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
                                     placeholder="Enter unique name..."
                                     autoFocus
                                 />
@@ -304,7 +304,7 @@ export default function Index({ sports }) {
                                 <button 
                                     type="submit" 
                                     disabled={duplicateForm.processing} 
-                                    className="px-6 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 disabled:opacity-70 flex items-center gap-2"
+                                    className="px-6 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 disabled:opacity-70 flex items-center gap-2"
                                 >
                                     {duplicateForm.processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Copy className="w-4 h-4" />}
                                     {duplicateForm.processing ? 'Duplicating...' : 'Duplicate Data'}
@@ -337,7 +337,7 @@ export default function Index({ sports }) {
                                     type="text" 
                                     value={editForm.data.name}
                                     onChange={e => editForm.setData('name', e.target.value)}
-                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm py-2.5 placeholder-slate-400 transition-all outline-none"
                                     placeholder="Enter sport name..."
                                     autoFocus
                                 />
@@ -349,7 +349,7 @@ export default function Index({ sports }) {
                                 <textarea 
                                     value={editForm.data.description}
                                     onChange={e => editForm.setData('description', e.target.value)}
-                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none transition-all outline-none custom-scrollbar"
+                                    className="w-full rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-sm py-2.5 min-h-[100px] placeholder-slate-400 resize-none transition-all outline-none custom-scrollbar"
                                     placeholder="Brief description about this sport..."
                                 />
                             </div>
@@ -365,7 +365,7 @@ export default function Index({ sports }) {
                                 <button 
                                     type="submit" 
                                     disabled={editForm.processing} 
-                                    className="px-6 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 disabled:opacity-70 flex items-center gap-2"
+                                    className="px-6 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 disabled:opacity-70 flex items-center gap-2"
                                 >
                                     {editForm.processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
                                     {editForm.processing ? 'Saving...' : 'Save Changes'}

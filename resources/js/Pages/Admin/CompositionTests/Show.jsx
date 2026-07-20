@@ -274,7 +274,7 @@ export default function Show({ auth, player, history, benchmarks }) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl opacity-60 -mr-10 -mt-10 pointer-events-none"></div>
                         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-60 -ml-10 -mb-10 pointer-events-none"></div>
                         <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-5 shadow-sm relative z-10">
-                            <Activity size={32} className="text-[#ff4d00]" />
+                            <Activity size={32} className="text-orange-500" />
                         </div>
                         <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2 relative z-10">
                             {"No Analytics Data"}
@@ -285,7 +285,7 @@ export default function Show({ auth, player, history, benchmarks }) {
                         {true && (
                             <button
                                 onClick={handleAddRecord}
-                                className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all bg-[#ff4d00] text-white hover:bg-[#e64500] h-10 px-6 shadow-lg shadow-[#ff4d00]/20 focus:outline-none focus:ring-2 focus:ring-[#ff4d00] focus:ring-offset-2 relative z-10"
+                                className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all bg-orange-500 text-white hover:bg-orange-600 h-10 px-6 shadow-lg shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 relative z-10"
                             >
                                 <Plus size={16} className="mr-2" /> 
                                 {"Input Data Now"}

@@ -71,7 +71,7 @@ export default function AthleteAnalysis({
                         <CalendarIcon size={16} />
                         Kalender Harian
                     </Link>
-                    <div className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-[#ff4d00] shadow-md shadow-[#ff4d00]/20 flex items-center gap-2 cursor-default">
+                    <div className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-orange-500 shadow-md shadow-orange-500/20 flex items-center gap-2 cursor-default">
                         <TrendingUp size={16} />
                         Analisis ACWR
                     </div>
@@ -83,7 +83,7 @@ export default function AthleteAnalysis({
                             {/* Header per minggu */}
                             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-[#ff4d00]/10 flex items-center justify-center text-[#ff4d00] font-bold text-xs">
+                                    <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 font-bold text-xs">
                                         W{week.week_number}
                                     </div>
                                     <div>
@@ -158,9 +158,9 @@ export default function AthleteAnalysis({
 
                             {/* Monitoring Metrics Block */}
                             <div className="bg-slate-50 p-6 text-slate-900 border-t border-slate-200 relative overflow-hidden">
-                                <div className="absolute right-0 top-0 w-32 h-32 bg-[#ff4d00] opacity-5 rounded-bl-full pointer-events-none"></div>
+                                <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500 opacity-5 rounded-bl-full pointer-events-none"></div>
                                 <div className="flex items-center gap-2 mb-6">
-                                    <Activity className="w-5 h-5 text-[#ff4d00]" />
+                                    <Activity className="w-5 h-5 text-orange-500" />
                                     <h4 className="text-sm font-bold tracking-tight text-slate-900">Load Metrics & Monitoring</h4>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-6 gap-y-6 gap-x-4">
@@ -184,7 +184,7 @@ export default function AthleteAnalysis({
                                     </div>
                                     <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
                                         <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Monotony</p>
-                                        <p className="text-xl font-bold mt-1 text-[#ff4d00]">{week.training_monotony}</p>
+                                        <p className="text-xl font-bold mt-1 text-orange-500">{week.training_monotony}</p>
                                     </div>
                                     <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
                                         <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Strain</p>

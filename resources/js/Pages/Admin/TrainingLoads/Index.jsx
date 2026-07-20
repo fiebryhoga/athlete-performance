@@ -34,7 +34,7 @@ export default function Index({ athletes }) {
                             
                             <div className="flex items-start gap-3 md:gap-4 mb-4">
                                 
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-lg md:text-xl shrink-0 border-2 border-slate-100 shadow-sm group-hover:border-orange-200 transition-colors">
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-lg md:text-xl shrink-0 border-2 border-slate-100 shadow-sm group-hover:border-orange-200 transition-colors">
                                     {athlete.profile_photo_url ? (
                                         <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                                     ) : (
@@ -43,7 +43,7 @@ export default function Index({ athletes }) {
                                 </div>
                                 
                                 <div className="min-w-0 pt-0.5 md:pt-1">
-                                    <h3 className="font-bold text-slate-800 text-base md:text-lg leading-tight group-hover:text-[#ff4d00] transition-colors truncate">{athlete.name}</h3>
+                                    <h3 className="font-bold text-slate-800 text-base md:text-lg leading-tight group-hover:text-orange-500 transition-colors truncate">{athlete.name}</h3>
                                     <div className="mt-1 md:mt-1.5 flex items-center">
                                         <span className="text-[10px] md:text-xs font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 truncate max-w-[120px]">
                                             {athlete.sport?.name || 'Tanpa Cabor'}
@@ -54,12 +54,12 @@ export default function Index({ athletes }) {
 
                             <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
                                 <div className="text-[10px] md:text-xs font-bold text-slate-500 flex items-center gap-1.5">
-                                    <Activity className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#ff4d00]" />
+                                    <Activity className="w-3.5 h-3.5 md:w-4 md:h-4 text-orange-500" />
                                     <span className="text-slate-800 text-sm md:text-base">{athlete.total_records || 0}</span> Data Load
                                 </div>
                                 <Link 
                                     href={route('admin.training-loads.show', athlete.id)}
-                                    className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-white bg-[#ff4d00] px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:-translate-y-0.5 transition-all"
+                                    className="flex items-center gap-1 text-[10px] md:text-xs font-bold text-white bg-orange-500 px-3 md:px-4 py-1.5 md:py-2 rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:-translate-y-0.5 transition-all"
                                 >
                                     Detail <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                 </Link>
@@ -70,7 +70,7 @@ export default function Index({ athletes }) {
             ) : (
                 <div className="flex flex-col items-center justify-center py-16 md:py-20 rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 text-center shadow-sm mx-2 md:mx-0">
                     <div className="p-4 bg-white border border-slate-200 rounded-full mb-3 shadow-sm">
-                        <Search className="w-6 h-6 md:w-8 md:h-8 text-[#ff4d00]" />
+                        <Search className="w-6 h-6 md:w-8 md:h-8 text-orange-500" />
                     </div>
                     <h3 className="text-slate-800 font-bold text-base md:text-lg">Atlet tidak ditemukan</h3>
                     <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium px-4">Coba gunakan kata kunci pencarian yang lain.</p>

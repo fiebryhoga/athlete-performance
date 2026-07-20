@@ -73,8 +73,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
 
     const SortIcon = ({ field }) => {
         if (filters.sort_field !== field) return <ArrowUpDown className="w-3 h-3 text-slate-300 ml-1 inline-block" />;
-        if (filters.sort_direction === 'asc') return <ArrowUp className="w-3 h-3 text-[#ff4d00] ml-1 inline-block" />;
-        return <ArrowDown className="w-3 h-3 text-[#ff4d00] ml-1 inline-block" />;
+        if (filters.sort_direction === 'asc') return <ArrowUp className="w-3 h-3 text-orange-500 ml-1 inline-block" />;
+        return <ArrowDown className="w-3 h-3 text-orange-500 ml-1 inline-block" />;
     };
 
     const openCreateModal = () => {
@@ -188,7 +188,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                     
                     <div className="relative z-10 w-full lg:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
                         <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                             {auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}
                         </h2>
@@ -205,13 +205,13 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 placeholder="Cari nama atau ID..." 
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm touch-manipulation" 
+                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm touch-manipulation" 
                             />
                         </div>
                         {auth.user.role === 'superadmin' && (
                             <button 
                                 onClick={openCreateModal}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95 touch-manipulation shrink-0"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95 touch-manipulation shrink-0"
                             >
                                 <Plus className="w-4 h-4 md:w-5 md:h-5" /> Tambah Akun
                             </button>
@@ -228,7 +228,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 onClick={() => handleTabChange(tab.id)}
                                 className={`px-6 py-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
                                     activeTab === tab.id 
-                                    ? 'border-[#ff4d00] text-[#ff4d00]' 
+                                    ? 'border-orange-500 text-orange-500' 
                                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
                                 }`}
                             >
@@ -271,7 +271,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         <tr key={user.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-4 align-middle">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-sm border border-orange-100 shadow-sm overflow-hidden">
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-sm border border-orange-100 shadow-sm overflow-hidden">
                                                         {user.profile_photo_url ? (
                                                             <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                                         ) : (
@@ -279,7 +279,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <span className="font-bold text-slate-800 text-sm group-hover:text-[#ff4d00] transition-colors">{user.name}</span>
+                                                        <span className="font-bold text-slate-800 text-sm group-hover:text-orange-500 transition-colors">{user.name}</span>
                                                         {user.role === 'athlete' && (
                                                             <div className="flex flex-col gap-1 mt-1.5">
                                                                 {user.package && (
@@ -307,7 +307,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border ${
                                                     user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                                                     user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                    'bg-orange-50 text-[#ff4d00] border-orange-100'
+                                                    'bg-orange-50 text-orange-500 border-orange-100'
                                                 }`}>
                                                     <Shield className="w-3 h-3"/> {user.role}
                                                 </span>
@@ -364,7 +364,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                             <div key={user.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-4">
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-base border border-orange-100 shadow-sm overflow-hidden">
+                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-base border border-orange-100 shadow-sm overflow-hidden">
                                             {user.profile_photo_url ? (
                                                 <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -396,7 +396,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold border ${
                                             user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                                             user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                            'bg-orange-50 text-[#ff4d00] border-orange-100'
+                                            'bg-orange-50 text-orange-500 border-orange-100'
                                         }`}>
                                             <Shield className="w-3 h-3"/> {user.role}
                                         </span>
@@ -443,7 +443,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                     disabled={!link.url}
                                     className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-bold rounded-md transition-all ${
                                         link.active 
-                                        ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20' 
+                                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
                                         : link.url 
                                             ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' 
                                             : 'text-slate-300 cursor-not-allowed'
@@ -467,7 +467,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                         <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10">
                             <div>
                                 <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
-                                    <UserCog className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]" />
+                                    <UserCog className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                                     {modalMode === 'create' ? 'Tambah Akun' : 'Edit Akun'}
                                 </h3>
                                 <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">
@@ -484,7 +484,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 <div className="flex flex-col items-center mb-6 md:mb-8">
                                 <div 
                                     onClick={() => auth.user.role === 'superadmin' && fileInputRef.current?.click()}
-                                    className={`w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-slate-50 overflow-hidden relative group transition-all ${auth.user.role === 'superadmin' ? 'border-slate-300 cursor-pointer hover:border-[#ff4d00] hover:bg-orange-50' : 'border-slate-200 cursor-not-allowed opacity-70'}`}
+                                    className={`w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-slate-50 overflow-hidden relative group transition-all ${auth.user.role === 'superadmin' ? 'border-slate-300 cursor-pointer hover:border-orange-500 hover:bg-orange-50' : 'border-slate-200 cursor-not-allowed opacity-70'}`}
                                 >
                                     {photoPreview ? (
                                         <>
@@ -494,7 +494,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
+                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
                                             <UploadCloud className="w-5 h-5 md:w-6 md:h-6 mb-1" />
                                             <span className="text-[9px] md:text-[10px] font-bold mt-0.5 md:mt-1">Photo</span>
                                         </div>
@@ -507,12 +507,12 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                             <div className={data.role === 'athlete' ? 'grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8' : 'space-y-4 md:space-y-5'}>
                                 {/* Account Information Column */}
                                 <div className="space-y-4 md:space-y-5">
-                                    {data.role === 'athlete' && <h4 className="text-[10px] font-bold text-[#ff4d00] mb-2 border-b border-orange-100 pb-2">Account Information</h4>}
+                                    {data.role === 'athlete' && <h4 className="text-[10px] font-bold text-orange-500 mb-2 border-b border-orange-100 pb-2">Account Information</h4>}
                                     
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Role / Jabatan</label>
                                         <select
-                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                             value={data.role}
                                             onChange={e => setData('role', e.target.value)}
                                             disabled={auth.user.role !== 'superadmin'}
@@ -528,11 +528,11 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Nama Lengkap</label>
                                         <div className="relative group">
                                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                                <User className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                             </div>
                                             <input 
                                                 type="text" 
-                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
+                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
                                                 value={data.name}
                                                 onChange={e => setData('name', e.target.value)}
                                                 placeholder="e.g. John Doe"
@@ -546,7 +546,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Login ID (Username)</label>
                                         <input 
                                             type="text" 
-                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-xs md:text-sm text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation disabled:cursor-not-allowed"
+                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-xs md:text-sm text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation disabled:cursor-not-allowed"
                                             value={data.username}
                                             onChange={e => setData('username', e.target.value)}
                                             placeholder="e.g. admin_01"
@@ -562,11 +562,11 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         </label>
                                         <div className="relative group">
                                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                                <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                             </div>
                                             <input 
                                                 type="password" 
-                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
+                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
                                                 value={data.password}
                                                 onChange={e => setData('password', e.target.value)}
                                                 placeholder="••••••••"
@@ -585,7 +585,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                             >
                                                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                                                     data.is_gym_guard 
-                                                        ? 'bg-[#ff4d00] border-[#ff4d00]' 
+                                                        ? 'bg-orange-500 border-orange-500' 
                                                         : 'border-slate-300 bg-white'
                                                 }`}>
                                                     {data.is_gym_guard && (
@@ -613,7 +613,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     <select 
                                                         value={data.sport_id} 
                                                         onChange={e => setData('sport_id', e.target.value)} 
-                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                                                         disabled={auth.user.role !== 'superadmin'}
                                                     >
                                                         <option value="">-- Select Sport --</option>
@@ -627,8 +627,8 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                 <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Assign Coaches (Max 2)</label>
                                                 <div className="flex flex-wrap gap-2">
                                                     {coachesList && coachesList.map((coach) => (
-                                                        <label key={coach.id} onClick={() => auth.user.role === 'superadmin' && handleCoachToggle(coach.id)} className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs md:text-sm font-medium select-none ${auth.user.role === 'superadmin' ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed opacity-60'} ${data.coach_ids.includes(coach.id) ? 'border-[#ff4d00] bg-orange-50 text-[#ff4d00]' : 'border-slate-200 text-slate-700'}`}>
-                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${data.coach_ids.includes(coach.id) ? 'bg-[#ff4d00] border-[#ff4d00]' : 'border-slate-300'}`}>
+                                                        <label key={coach.id} onClick={() => auth.user.role === 'superadmin' && handleCoachToggle(coach.id)} className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs md:text-sm font-medium select-none ${auth.user.role === 'superadmin' ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed opacity-60'} ${data.coach_ids.includes(coach.id) ? 'border-orange-500 bg-orange-50 text-orange-500' : 'border-slate-200 text-slate-700'}`}>
+                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${data.coach_ids.includes(coach.id) ? 'bg-orange-500 border-orange-500' : 'border-slate-300'}`}>
                                                                 {data.coach_ids.includes(coach.id) && <UserCheck className="w-3 h-3 text-white" />}
                                                             </div>
                                                             {coach.name}
@@ -644,7 +644,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 {/* Physical Metrics Column (Only for Athlete) */}
                                 {data.role === 'athlete' && (
                                     <div className="space-y-4 md:space-y-5 border-t border-slate-100 pt-5 md:pt-0 md:border-t-0 md:border-l md:pl-6 lg:pl-8">
-                                        <h4 className="text-[10px] font-bold text-[#ff4d00] mb-2 border-b border-orange-100 pb-2">Physical Metrics</h4>
+                                        <h4 className="text-[10px] font-bold text-orange-500 mb-2 border-b border-orange-100 pb-2">Physical Metrics</h4>
                                         
                                         <div className="grid grid-cols-2 gap-3 md:gap-4">
                                             <div>
@@ -653,7 +653,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     <select 
                                                         value={data.gender} 
                                                         onChange={e => setData('gender', e.target.value)} 
-                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium"
+                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium"
                                                     >
                                                         <option value="L">Male</option>
                                                         <option value="P">Female</option>
@@ -667,7 +667,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     type="number" 
                                                     value={data.age} 
                                                     onChange={e => setData('age', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
                                                     placeholder="e.g. 25" 
                                                 />
                                             </div>
@@ -681,7 +681,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     step="0.01" 
                                                     value={data.height} 
                                                     onChange={e => setData('height', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
                                                     placeholder="e.g. 175" 
                                                 />
                                             </div>
@@ -692,7 +692,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     step="0.01" 
                                                     value={data.weight} 
                                                     onChange={e => setData('weight', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
                                                     placeholder="e.g. 70" 
                                                 />
                                             </div>
@@ -702,7 +702,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     type="date" 
                                                     value={data.training_exp_date} 
                                                     onChange={e => setData('training_exp_date', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
                                                 />
                                             </div>
                                         </div>
@@ -712,7 +712,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                             <select 
                                                 value={data.subscription_package_id} 
                                                 onChange={e => setData('subscription_package_id', e.target.value)} 
-                                                className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] text-xs md:text-sm transition-all outline-none font-medium shadow-sm"
+                                                className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm"
                                             >
                                                 <option value="">-- Tidak Ada / Kosongkan --</option>
                                                 {packagesList?.map(pkg => (
@@ -746,7 +746,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="px-6 py-2.5 bg-[#ff4d00] text-white font-bold text-sm rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
+                                    className="px-6 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                                 >
                                     {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                     {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Buat Akun' : 'Simpan Perubahan')}

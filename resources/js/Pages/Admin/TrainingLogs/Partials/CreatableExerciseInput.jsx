@@ -39,7 +39,7 @@ export default function CreatableExerciseInput({ value, options, onChange, onNew
                     e.stopPropagation(); // Mencegah klik menyebar ke tabel
                     if(!disabled) setIsOpen(true); 
                 }} 
-                className="w-full h-full border-none outline-none bg-transparent text-xs md:text-sm px-2 md:px-4 py-3 focus:ring-2 focus:ring-inset focus:ring-[#ff4d00] font-bold text-slate-700 placeholder-slate-400 touch-manipulation truncate relative z-10"
+                className="w-full h-full border-none outline-none bg-transparent text-xs md:text-sm px-2 md:px-4 py-3 focus:ring-2 focus:ring-inset focus:ring-orange-500 font-bold text-slate-700 placeholder-slate-400 touch-manipulation truncate relative z-10"
             />
             
             {!disabled && (
@@ -63,7 +63,7 @@ export default function CreatableExerciseInput({ value, options, onChange, onNew
                             className="group flex items-center justify-between px-3 md:px-4 py-2.5 hover:bg-orange-50 cursor-pointer border-b border-slate-50 last:border-b-0"
                             onClick={(e) => { e.stopPropagation(); handleSelect(opt); }}
                         >
-                            <span className="text-xs md:text-sm text-slate-700 font-medium group-hover:text-[#ff4d00] truncate pr-2 w-full">{opt}</span>
+                            <span className="text-xs md:text-sm text-slate-700 font-medium group-hover:text-orange-500 truncate pr-2 w-full">{opt}</span>
                             
                             <button
                                 type="button"
@@ -85,7 +85,7 @@ export default function CreatableExerciseInput({ value, options, onChange, onNew
                     {isNew && (
                         <div 
                             onClick={(e) => { e.stopPropagation(); onNewOption(inputValue.trim()); handleSelect(inputValue.trim()); }} 
-                            className="px-3 md:px-4 py-3 text-xs md:text-sm text-[#ff4d00] bg-orange-50/50 hover:bg-orange-100 cursor-pointer font-bold flex items-center gap-2 border-t border-slate-100"
+                            className="px-3 md:px-4 py-3 text-xs md:text-sm text-orange-500 bg-orange-50/50 hover:bg-orange-100 cursor-pointer font-bold flex items-center gap-2 border-t border-slate-100"
                         >
                             <Plus className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">Tambah Baru "{inputValue}"</span>
                         </div>

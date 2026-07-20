@@ -10,7 +10,7 @@ const ScaleRadio = ({ label, name, data, setData }) => (
             {[1, 2, 3, 4, 5].map(num => (
                 <label key={num} className={`relative w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-lg cursor-pointer text-xs md:text-sm font-semibold transition-all duration-200 shrink-0 ${
                     data[name] == num 
-                    ? 'bg-[#ff4d00] text-white shadow-sm ring-2 ring-orange-200 ring-offset-1' 
+                    ? 'bg-orange-500 text-white shadow-sm ring-2 ring-orange-200 ring-offset-1' 
                     : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800'
                 }`}>
                     <input type="radio" name={name} value={num} checked={data[name] == num} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full m-0" onChange={e => setData(name, e.target.value)} />
@@ -22,7 +22,7 @@ const ScaleRadio = ({ label, name, data, setData }) => (
 );
 
 
-const CustomSelect = ({ options, value, onChange, placeholder, iconColorClass = "text-[#ff4d00]", activeBgClass = "bg-orange-50 text-orange-700", hoverClass = "hover:text-orange-600" }) => {
+const CustomSelect = ({ options, value, onChange, placeholder, iconColorClass = "text-orange-500", activeBgClass = "bg-orange-50 text-orange-700", hoverClass = "hover:text-orange-600" }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <div className="relative w-full">
@@ -97,7 +97,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                 <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-white shadow-sm shrink-0">
                     <div>
                         <h3 className="font-bold text-lg md:text-xl text-slate-800 flex items-center gap-2.5">
-                            <div className="p-1.5 bg-orange-50 rounded-lg text-[#ff4d00]">
+                            <div className="p-1.5 bg-orange-50 rounded-lg text-orange-500">
                                 <HeartPulse className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
                             {activeData.find(d => d.record_date === selectedDate) ? 'Edit Readiness & Load' : 'Input Readiness & Load'}
@@ -106,7 +106,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                             {formatDateToIndo(new Date(selectedDate), 'full')}
                         </p>
                     </div>
-                    <button type="button" onClick={onClose} className="p-2 text-slate-400 hover:bg-orange-50 hover:text-[#ff4d00] rounded-full transition-colors">
+                    <button type="button" onClick={onClose} className="p-2 text-slate-400 hover:bg-orange-50 hover:text-orange-500 rounded-full transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -145,20 +145,20 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
 
                                 
                                 <div className="bg-orange-50/50 p-4 md:p-5 rounded-xl border border-orange-100 relative z-20">
-                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Pagi <span className="text-[10px] bg-[#ff4d00] text-white px-2 py-0.5 rounded">AM</span></h5>
+                                    <h5 className="font-bold text-slate-700 text-xs md:text-sm mb-4 flex items-center gap-2">Sesi Pagi <span className="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded">AM</span></h5>
                                     <div className="space-y-4">
                                         <div className="relative z-30">
                                             <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Tipe Latihan</label>
-                                            <CustomSelect options={sessionTypes} value={data.am_session_type} onChange={val => setData('am_session_type', val)} placeholder="Pilih tipe sesi..." iconColorClass="text-[#ff4d00]" activeBgClass="bg-orange-50 text-[#ff4d00]" hoverClass="hover:text-[#ff4d00]"/>
+                                            <CustomSelect options={sessionTypes} value={data.am_session_type} onChange={val => setData('am_session_type', val)} placeholder="Pilih tipe sesi..." iconColorClass="text-orange-500" activeBgClass="bg-orange-50 text-orange-500" hoverClass="hover:text-orange-500"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3 md:gap-4 relative z-20">
                                             <div>
                                                 <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Beban (RPE)</label>
-                                                <CustomSelect options={rpeOptions} value={data.am_rpe} onChange={val => setData('am_rpe', val)} placeholder="Skala 1-10" iconColorClass="text-[#ff4d00]" activeBgClass="bg-orange-50 text-[#ff4d00]" hoverClass="hover:text-[#ff4d00]"/>
+                                                <CustomSelect options={rpeOptions} value={data.am_rpe} onChange={val => setData('am_rpe', val)} placeholder="Skala 1-10" iconColorClass="text-orange-500" activeBgClass="bg-orange-50 text-orange-500" hoverClass="hover:text-orange-500"/>
                                             </div>
                                             <div>
                                                 <label className="text-[10px] md:text-xs font-bold text-slate-500 mb-1.5 block">Durasi (Mnt)</label>
-                                                <input type="number" min="0" value={data.am_duration} onChange={e => setData('am_duration', e.target.value)} className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-white px-3 py-2 focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none transition-colors" placeholder="0"/>
+                                                <input type="number" min="0" value={data.am_duration} onChange={e => setData('am_duration', e.target.value)} className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-white px-3 py-2 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-colors" placeholder="0"/>
                                             </div>
                                         </div>
                                     </div>
@@ -191,7 +191,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                                         rows="2" 
                                         value={data.notes} 
                                         onChange={e => setData('notes', e.target.value)} 
-                                        className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 focus:bg-white focus:border-[#ff4d00] focus:ring-1 focus:ring-[#ff4d00] outline-none transition-all resize-none" 
+                                        className="w-full text-xs md:text-sm rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 focus:bg-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-all resize-none" 
                                         placeholder="Cth: Latihan sangat intens, cuaca sedang buruk..."
                                     ></textarea>
                                 </div>
@@ -204,7 +204,7 @@ export default function TrainingModal({ isOpen, onClose, activeData, selectedDat
                 
                 <div className="px-5 md:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 shrink-0">
                     <button type="button" onClick={onClose} className="px-4 md:px-5 py-2 md:py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-xs md:text-sm rounded-lg hover:bg-slate-100 transition-colors">Batal</button>
-                    <button type="submit" form="training-load-form" disabled={processing} className="px-5 md:px-6 py-2 md:py-2.5 bg-[#ff4d00] text-white font-bold text-xs md:text-sm rounded-lg shadow-sm hover:bg-[#e64500] transition-colors flex items-center gap-2">
+                    <button type="submit" form="training-load-form" disabled={processing} className="px-5 md:px-6 py-2 md:py-2.5 bg-orange-500 text-white font-bold text-xs md:text-sm rounded-lg shadow-sm hover:bg-orange-600 transition-colors flex items-center gap-2">
                         {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4" />}
                         Simpan Data
                     </button>

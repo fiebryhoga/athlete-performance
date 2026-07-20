@@ -125,7 +125,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                         <a
                             href={route('admin.reports.sessions.export-athlete', athlete.id)}
                             target="_blank"
-                            className="flex items-center gap-2 px-4 py-2 bg-[#ff4d00] text-white rounded-xl text-xs font-bold hover:bg-[#e64500] transition-colors shadow-sm shadow-[#ff4d00]/20"
+                            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold hover:bg-orange-600 transition-colors shadow-sm shadow-orange-500/20"
                         >
                             <Download size={16} /> Download Laporan Sesi
                         </a>
@@ -177,7 +177,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                 onClick={() => setSessionFilter('all')}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
                                     sessionFilter === 'all' 
-                                        ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20' 
+                                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
                                         : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
@@ -228,7 +228,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                         <div className="flex items-center justify-between mb-1.5">
                                             <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold ${
                                                 day.isToday 
-                                                    ? 'bg-[#ff4d00] text-white shadow-sm' 
+                                                    ? 'bg-orange-500 text-white shadow-sm' 
                                                     : day.isCurrentMonth 
                                                         ? 'text-slate-700' 
                                                         : 'text-slate-400'
@@ -238,7 +238,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                             {auth.user.role !== 'athlete' && (
                                                 <Link 
                                                     href={route('admin.individual-trainings.session.create', { user: athlete.id, date: day.dateStr })}
-                                                    className="w-6 h-6 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-[#ff4d00] hover:text-white transition-all shadow-sm"
+                                                    className="w-6 h-6 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white transition-all shadow-sm"
                                                     title="Tambah Sesi"
                                                 >
                                                     <Plus size={14} strokeWidth={2.5} />
@@ -290,9 +290,15 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                     >
                                                         {/* Header: Badge & Status */}
                                                         <div className="flex items-start justify-between mb-2">
-                                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeBgColor}`}>
-                                                                Sesi {session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
-                                                            </span>
+                                                            {session.is_extra ? (
+                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-200`}>
+                                                                    Sesi Tambahan
+                                                                </span>
+                                                            ) : (
+                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeBgColor}`}>
+                                                                    Sesi {session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
+                                                                </span>
+                                                            )}
                                                             <div className="flex items-center gap-1">
                                                                 {auth.user.role !== 'athlete' && (
                                                                     <div className="flex items-center gap-0.5 opacity-0 group-hover/session:opacity-100 transition-opacity">
@@ -401,7 +407,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                     type="date" 
                                     value={duplicateDate}
                                     onChange={(e) => setDuplicateDate(e.target.value)}
-                                    className="w-full border-slate-300 rounded-lg shadow-sm focus:border-[#ff4d00] focus:ring focus:ring-[#ff4d00] focus:ring-opacity-50"
+                                    className="w-full border-slate-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50"
                                 />
                             </div>
                         </div>
@@ -423,7 +429,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                         onSuccess: () => setDuplicateModalOpen(false)
                                     });
                                 }}
-                                className="px-4 py-2 text-sm font-bold bg-[#ff4d00] text-white rounded-lg shadow hover:bg-[#e64500] transition-colors"
+                                className="px-4 py-2 text-sm font-bold bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition-colors"
                             >
                                 Duplikasi Sesi
                             </button>

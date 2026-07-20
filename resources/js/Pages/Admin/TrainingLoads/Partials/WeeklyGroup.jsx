@@ -35,7 +35,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             <div className="px-4 md:px-6 py-4 border-b border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2 md:gap-3">
                     
-                    <Calendar className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/>
+                    <Calendar className="w-4 h-4 md:w-5 md:h-5 text-orange-500"/>
                     <h3 className="font-bold text-slate-800 text-base md:text-lg">Periode: {week.label}</h3>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -65,7 +65,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                             <YAxis yAxisId="right" orientation="right" tick={{fontSize: 10, fill: '#f43f5e', fontWeight: 'bold'}} axisLine={false} tickLine={false} domain={[0,40]} dx={5} />
                             <RechartsTooltip contentStyle={customTooltipStyle} cursor={{fill: '#f8fafc'}} />
                             
-                            <Bar yAxisId="left" dataKey="load" name="Daily Load (AU)" fill="#ff4d00" radius={[4,4,0,0]} barSize={24} />
+                            <Bar yAxisId="left" dataKey="load" name="Daily Load (AU)" fill="orange-500" radius={[4,4,0,0]} barSize={24} />
                             <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness Score" stroke="#f43f5e" strokeWidth={3} dot={{r: 4, strokeWidth: 2, fill: '#fff'}} activeDot={{r: 6}} />
                         </ComposedChart>
                     </ResponsiveContainer>
@@ -79,7 +79,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                             <p className="font-bold text-slate-800 text-xs md:text-sm mt-0.5">Hari dengan Load Tertinggi</p>
                         </div>
                         
-                        <span className="font-bold text-xl md:text-2xl text-[#ff4d00] group-hover:scale-110 transition-transform">{Math.max(...week.days.map(d => d.load))} <span className="text-xs md:text-sm font-bold text-slate-400">AU</span></span>
+                        <span className="font-bold text-xl md:text-2xl text-orange-500 group-hover:scale-110 transition-transform">{Math.max(...week.days.map(d => d.load))} <span className="text-xs md:text-sm font-bold text-slate-400">AU</span></span>
                     </div>
                     <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100 flex items-center justify-between group hover:border-rose-200 transition-colors">
                         <div>
@@ -107,7 +107,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                             <th className="hidden lg:table-cell px-3 md:px-4 py-3 md:py-4">Sesi Sore (PM)</th>
                             <th className="hidden xl:table-cell px-3 md:px-4 py-3 md:py-4">Catatan</th>
                             
-                            <th className="px-3 md:px-4 py-3 md:py-4 text-center text-[#ff4d00]">Daily Load</th>
+                            <th className="px-3 md:px-4 py-3 md:py-4 text-center text-orange-500">Daily Load</th>
                             
                             
                             <th className="px-4 md:px-6 py-3 md:py-4 text-right">Aksi</th>
@@ -151,7 +151,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                             {day.data?.notes ? (
                                                 <button 
                                                     onClick={() => setDetailNote(day)}
-                                                    className="flex items-center gap-1.5 max-w-[140px] text-left text-[11px] text-slate-600 italic bg-slate-50 hover:bg-orange-50 hover:text-[#ff4d00] px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-orange-200 transition-colors group/note"
+                                                    className="flex items-center gap-1.5 max-w-[140px] text-left text-[11px] text-slate-600 italic bg-slate-50 hover:bg-orange-50 hover:text-orange-500 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-orange-200 transition-colors group/note"
                                                     title="Lihat Catatan Lengkap"
                                                 >
                                                     <span className="truncate flex-1">"{day.data.notes}"</span>
@@ -164,7 +164,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
 
                                         <td className="px-3 md:px-4 py-3 text-center">
                                             {day.load ? (
-                                                <span className="font-bold text-[#ff4d00] bg-orange-50 px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm">{day.load}</span>
+                                                <span className="font-bold text-orange-500 bg-orange-50 px-2 md:px-3 py-1 rounded-lg text-xs md:text-sm">{day.load}</span>
                                             ) : <span className="text-slate-300">-</span>}
                                         </td>
                                         
@@ -174,14 +174,14 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                                 
                                                 <button 
                                                     onClick={() => toggleExpand(dIndex)} 
-                                                    className={`md:hidden p-1.5 rounded-lg border transition-colors flex items-center justify-center ${isExpanded ? 'bg-[#ff4d00] text-white border-[#ff4d00]' : 'text-[#ff4d00] border-orange-200 hover:bg-orange-50'}`}
+                                                    className={`md:hidden p-1.5 rounded-lg border transition-colors flex items-center justify-center ${isExpanded ? 'bg-orange-500 text-white border-orange-500' : 'text-orange-500 border-orange-200 hover:bg-orange-50'}`}
                                                 >
                                                     <Activity className="w-3.5 h-3.5" />
                                                 </button>
 
                                                 
                                                 <button onClick={() => openModal(day.dateStr)} className={`inline-flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1.5 rounded-xl transition-all whitespace-nowrap ${
-                                                    day.data ? 'bg-white border border-slate-200 text-slate-500 hover:text-[#ff4d00] hover:border-orange-200 hover:bg-orange-50 hover:shadow-sm' : 'bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-sm'
+                                                    day.data ? 'bg-white border border-slate-200 text-slate-500 hover:text-orange-500 hover:border-orange-200 hover:bg-orange-50 hover:shadow-sm' : 'bg-orange-500 text-white hover:bg-orange-600 shadow-sm'
                                                 }`}>
                                                     {day.data ? <><Edit3 className="w-3 h-3" /> Edit</> : <><Plus className="w-3 h-3" /> Isi Data</>}
                                                 </button>
@@ -200,7 +200,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                                     </div>
                                                     <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
                                                         <span className="text-[9px] font-bold text-slate-400 block mb-1">Total Load</span>
-                                                        {day.load ? <span className="font-bold text-[#ff4d00] text-sm">{day.load} AU</span> : <span className="text-slate-300">-</span>}
+                                                        {day.load ? <span className="font-bold text-orange-500 text-sm">{day.load} AU</span> : <span className="text-slate-300">-</span>}
                                                     </div>
                                                 </div>
 
@@ -231,10 +231,10 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                                                 {day.data?.notes && (
                                                     <button 
                                                         onClick={() => setDetailNote(day)}
-                                                        className="w-full flex items-center justify-between text-left text-xs text-slate-600 italic bg-white hover:bg-orange-50 hover:text-[#ff4d00] px-3 py-2 rounded-xl border border-slate-200 transition-colors"
+                                                        className="w-full flex items-center justify-between text-left text-xs text-slate-600 italic bg-white hover:bg-orange-50 hover:text-orange-500 px-3 py-2 rounded-xl border border-slate-200 transition-colors"
                                                     >
                                                         <span className="truncate pr-2">Lihat Catatan: "{day.data.notes}"</span>
-                                                        <Eye className="w-4 h-4 shrink-0 text-[#ff4d00]" />
+                                                        <Eye className="w-4 h-4 shrink-0 text-orange-500" />
                                                     </button>
                                                 )}
                                             </td>
@@ -249,7 +249,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
 
             
             
-            <div className="bg-[#ff4d00] p-4 md:p-6 text-white border-b border-orange-700">
+            <div className="bg-orange-500 p-4 md:p-6 text-white border-b border-orange-700">
                 <div className="flex items-center gap-2 mb-3 md:mb-4 opacity-90">
                     <TrendingUp className="w-4 h-4" />
                     <h4 className="text-[10px] md:text-xs font-bold">Load Metrics & Monitoring</h4>
@@ -313,7 +313,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2.5 md:space-y-3.5 h-fit">
                         <div className="flex justify-between items-center pb-2.5 border-b border-slate-100">
                             <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Total (Train/Match/Travel)</span>
-                            <span className="text-lg md:text-xl font-bold text-[#ff4d00]">{week.metrics.totals.all}</span>
+                            <span className="text-lg md:text-xl font-bold text-orange-500">{week.metrics.totals.all}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
                             <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Total Training Sessions</span>
@@ -352,7 +352,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                         <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                             <div className="flex items-center gap-3">
                                 
-                                <div className="p-2 bg-orange-100 text-[#ff4d00] rounded-xl">
+                                <div className="p-2 bg-orange-100 text-orange-500 rounded-xl">
                                     <FileText className="w-4 h-4 md:w-5 md:h-5" />
                                 </div>
                                 <div>

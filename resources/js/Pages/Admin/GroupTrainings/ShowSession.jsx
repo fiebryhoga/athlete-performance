@@ -461,7 +461,8 @@ export default function ShowSession({
             (currentPivot?.proof_photo && !data.remove_proof_photo);
 
         const missingFields = getMissingRequiredActuals();
-        if (!hasPhoto) {
+        
+        if (isAthlete && !hasPhoto) {
             missingFields.push("Foto Bukti (wajib diunggah)");
         }
 
@@ -498,9 +499,9 @@ export default function ShowSession({
                         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                         <div className="relative z-10 space-y-4 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
-                                <Link href={backUrl} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
+                                <button type="button" onClick={() => window.history.back()} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
                                     <ArrowLeft size={16} /> Kembali
-                                </Link>
+                                </button>
                                 <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
                                     Sesi {training.session_number}
                                 </span>
@@ -1179,7 +1180,7 @@ export default function ShowSession({
                         </div>
                         <button
                             onClick={() => setWarningMessage("")}
-                            className="w-full py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-colors shadow-md shadow-[#ff4d00]/20"
+                            className="w-full py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md shadow-orange-500/20"
                         >
                             OK, Mengerti
                         </button>
@@ -1218,7 +1219,7 @@ export default function ShowSession({
                             <button
                                 onClick={confirmAndComplete}
                                 disabled={processing}
-                                className="px-5 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-[#ff4d00]/20"
+                                className="px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-orange-500/20"
                             >
                                 <CheckCircle2 size={16} /> Ya, Selesai
                             </button>

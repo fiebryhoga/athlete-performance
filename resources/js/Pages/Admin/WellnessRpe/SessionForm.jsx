@@ -235,7 +235,7 @@ export default function SessionForm({
                                     onClick={() => {
                                         window.location.href = route("admin.individual-trainings.show", training_id);
                                     }}
-                                    className="flex justify-center items-center gap-2 px-4 py-2.5 bg-[#ff4d00] text-white rounded-xl text-sm font-bold hover:bg-[#e64500] transition-all shadow-md shadow-[#ff4d00]/20 w-full sm:w-auto"
+                                    className="flex justify-center items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 w-full sm:w-auto"
                                 >
                                     {mode === "wellness" ? (
                                         <>Ke Program Latihan <ArrowRight size={16} /></>
@@ -357,7 +357,7 @@ export default function SessionForm({
                                                                     data.muscle_pain_areas.includes(
                                                                         area,
                                                                     )
-                                                                        ? "bg-[#ff4d00] border-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20"
+                                                                        ? "bg-orange-500 border-orange-500 text-white shadow-md shadow-orange-500/20"
                                                                         : "bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700"
                                                                 }`}
                                                             >
@@ -366,7 +366,7 @@ export default function SessionForm({
                                                                         data.muscle_pain_areas.includes(
                                                                             area,
                                                                         )
-                                                                            ? "bg-white border-white text-[#ff4d00]"
+                                                                            ? "bg-white border-white text-orange-500"
                                                                             : "bg-white border-slate-300"
                                                                     }`}
                                                                 >
@@ -398,7 +398,7 @@ export default function SessionForm({
                                                     <input
                                                         type="text"
                                                         placeholder="Sebutkan titik nyeri lainnya..."
-                                                        className="w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-sm font-medium text-slate-900  focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
+                                                        className="w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-sm font-medium text-slate-900  focus:ring-2 focus:ring-orange-500  outline-none transition-all"
                                                         value={data.other_pain}
                                                         onChange={(e) =>
                                                             setData(
@@ -421,7 +421,7 @@ export default function SessionForm({
                         <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
                             <div className="p-6 sm:p-8 flex justify-between items-center bg-slate-50 border-b border-slate-100">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-white border border-slate-200 rounded-xl text-[#ff4d00] shadow-sm">
+                                    <div className="p-3 bg-white border border-slate-200 rounded-xl text-orange-500 shadow-sm">
                                         <Activity size={24} />
                                     </div>
                                     <div>
@@ -451,7 +451,7 @@ export default function SessionForm({
                                                     onClick={() => handleSessionTypeChange("am")}
                                                     className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
                                                         data.session_type === "am"
-                                                            ? "border-[#ff4d00] bg-orange-50 text-[#ff4d00] "
+                                                            ? "border-orange-500 bg-orange-50 text-orange-500 "
                                                             : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
@@ -462,7 +462,7 @@ export default function SessionForm({
                                                     onClick={() => handleSessionTypeChange("pm")}
                                                     className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
                                                         data.session_type === "pm"
-                                                            ? "border-[#ff4d00] bg-orange-50 text-[#ff4d00] "
+                                                            ? "border-orange-500 bg-orange-50 text-orange-500 "
                                                             : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
                                                     }`}
                                                 >
@@ -490,7 +490,7 @@ export default function SessionForm({
                                                         max="10"
                                                         value={data.rpe}
                                                         onChange={(e) => setData("rpe", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
+                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-orange-500  outline-none transition-all"
                                                         placeholder="Masukkan angka 1 - 10"
                                                     />
                                                 </div>
@@ -571,7 +571,7 @@ export default function SessionForm({
                                                         min="1"
                                                         value={data.duration}
                                                         onChange={(e) => setData("duration", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-[#ff4d00]  outline-none transition-all"
+                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-orange-500  outline-none transition-all"
                                                         placeholder="Misal: 60"
                                                     />
                                                 </div>
@@ -596,7 +596,7 @@ export default function SessionForm({
                                 {training_id && (
                                     <Link
                                         href={route("admin.individual-trainings.show", training_id)}
-                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105 font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20"
+                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-orange-500 text-white  hover:bg-orange-600 hover:scale-105 font-bold text-sm transition-all shadow-lg shadow-orange-500/20"
                                     >
                                         Lanjut: Lihat Program Aktual <ArrowRight size={18} />
                                     </Link>
@@ -611,10 +611,10 @@ export default function SessionForm({
                                         setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
                                     }
                                 }}
-                                className={`w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-[#ff4d00]/20 flex items-center justify-center gap-2 ${
+                                className={`w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 ${
                                     isSubmitDisabled 
                                         ? "bg-slate-300  text-slate-500  cursor-not-allowed shadow-none"
-                                        : "bg-[#ff4d00] text-white  hover:bg-[#e64500] hover:scale-105"
+                                        : "bg-orange-500 text-white  hover:bg-orange-600 hover:scale-105"
                                 }`}
                             >
                                 <>Selesai <CheckSquare size={18} /></>

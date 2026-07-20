@@ -39,7 +39,7 @@ export default function Show({ auth, athlete, assessments }) {
                                 </Link>
                                 <Link 
                                     href={route('admin.phv-calculator.create', athlete.id)}
-                                    className="px-4 py-2 bg-[#ff4d00] hover:bg-[#e64500] text-white font-bold rounded-lg text-sm flex items-center gap-2 transition-colors shadow-sm shadow-[#ff4d00]/20"
+                                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg text-sm flex items-center gap-2 transition-colors shadow-sm shadow-orange-500/20"
                                 >
                                     <Plus className="w-4 h-4" /> Catat Penilaian Baru
                                 </Link>
@@ -48,12 +48,12 @@ export default function Show({ auth, athlete, assessments }) {
                     />
 
                     {latest && (
-                        <div className="mb-6 bg-white rounded-xl shadow-sm border border-[#ff4d00]/20 overflow-hidden relative">
+                        <div className="mb-6 bg-white rounded-xl shadow-sm border border-orange-500/20 overflow-hidden relative">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
                             
                             <div className="p-6 md:p-8 relative z-10">
                                 <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 mb-6">
-                                    <Activity className="text-[#ff4d00] w-6 h-6" />
+                                    <Activity className="text-orange-500 w-6 h-6" />
                                     Latest PHV Result
                                     <span className="text-sm font-medium text-slate-500 ml-2 bg-slate-100 px-3 py-1 rounded-full">
                                         {new Date(latest.assessment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -176,7 +176,7 @@ export default function Show({ auth, athlete, assessments }) {
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link 
                                                         href={route('admin.phv-calculator.edit', item.id)}
-                                                        className="p-2 text-slate-400 hover:text-[#ff4d00] hover:bg-orange-50 rounded-lg transition-colors"
+                                                        className="p-2 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
                                                         title="Edit"
                                                     >
                                                         <Edit className="w-4 h-4" />

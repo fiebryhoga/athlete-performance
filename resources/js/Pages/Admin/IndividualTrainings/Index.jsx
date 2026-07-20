@@ -91,12 +91,12 @@ export default function Index({ athletes, groups }) {
                                                     <User className="h-6 w-6 text-slate-400" />
                                                 )}
                                             </div>
-                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-[#ff4d00] transition-colors shadow-sm">
+                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-orange-500 transition-colors shadow-sm">
                                                 <ChevronRight size={18} />
                                             </div>
                                         </div>
                                         <div className="relative z-10 mb-6">
-                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-[#ff4d00] transition-colors">
+                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">
                                                 {athlete.name}
                                             </h3>
                                             <p className="text-xs text-slate-500 font-semibold mt-1">
@@ -145,12 +145,12 @@ export default function Index({ athletes, groups }) {
                                             <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 ">
                                                 <Users className="h-6 w-6 text-slate-400" />
                                             </div>
-                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-[#ff4d00] transition-colors shadow-sm">
+                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-orange-500 transition-colors shadow-sm">
                                                 <ChevronRight size={18} />
                                             </div>
                                         </div>
                                         <div className="relative z-10 mb-6">
-                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-[#ff4d00] transition-colors">
+                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">
                                                 {group.name}
                                             </h3>
                                             <p className="text-xs text-slate-500 font-semibold mt-1">

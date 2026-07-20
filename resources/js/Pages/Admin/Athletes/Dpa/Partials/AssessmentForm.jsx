@@ -39,7 +39,7 @@ export default function AssessmentForm({
                 <div className="p-5 md:p-6 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-5">
                     <div>
                         <div className="flex items-center gap-2.5 mb-1.5">
-                            <div className="p-1.5 rounded-md bg-[#ff4d00] text-slate-50 shadow-sm">
+                            <div className="p-1.5 rounded-md bg-orange-500 text-slate-50 shadow-sm">
                                 {isEditMode ? (
                                     <Edit size={16} strokeWidth={2.5} />
                                 ) : (
@@ -111,7 +111,7 @@ export default function AssessmentForm({
                                                     className={`flex flex-col border rounded-xl overflow-hidden cursor-pointer transition-all ${
                                                         isChecked
                                                             ? "border-slate-900 ring-1 ring-slate-900 bg-slate-50 shadow-sm"
-                                                            : "border-slate-200 bg-white hover:bg-slate-50 :bg-[#ff4d00]/30"
+                                                            : "border-slate-200 bg-white hover:bg-slate-50 :bg-orange-500/30"
                                                     }`}
                                                 >
                                                     {comp.image_path ? (
@@ -194,7 +194,7 @@ export default function AssessmentForm({
                     <button
                         type="submit"
                         disabled={processing}
-                        className="w-full md:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 :ring-slate-300 disabled:pointer-events-none disabled:opacity-50 bg-[#ff4d00] text-slate-50 hover:bg-[#ff4d00]/90 :bg-slate-50/90 shadow h-9 px-6 py-2 gap-2"
+                        className="w-full md:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 :ring-slate-300 disabled:pointer-events-none disabled:opacity-50 bg-orange-500 text-slate-50 hover:bg-orange-500/90 :bg-slate-50/90 shadow h-9 px-6 py-2 gap-2"
                     >
                         <Save size={16} />
                         {isEditMode ? "Update Data" : "Save Assessment"}

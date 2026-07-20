@@ -212,7 +212,7 @@ export default function Show({ athlete, trainingHistory }) {
                 {displayedWeeks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 border border-dashed border-slate-300 rounded-2xl bg-slate-50/50 text-slate-400">
                         <div className="p-4 bg-white border border-slate-200 rounded-full shadow-sm mb-4">
-                            <ActivitySquare className="w-8 h-8 md:w-10 md:h-10 text-[#ff4d00]" />
+                            <ActivitySquare className="w-8 h-8 md:w-10 md:h-10 text-orange-500" />
                         </div>
                         <h3 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">
                             {searchDate ? 'DATA MINGGU TIDAK DITEMUKAN' : 'BELUM ADA DATA LOAD'}

@@ -45,9 +45,9 @@ export default function AthleteDashboard({
 
             <div className="w-full pb-12 overflow-x-hidden sm:overflow-visible">
                 {/* Header Section */}
-                <div className="relative min-h-[250px] mb-8 group rounded-xl shadow-xl shadow-[#ff4d00]/10 border border-[#ff4d00]/20 overflow-hidden z-0">
+                <div className="relative min-h-[250px] mb-8 group rounded-xl shadow-xl shadow-orange-500/10 border border-orange-500/20 overflow-hidden z-0">
                     {/* Background Pattern */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#ff4d00] via-[#ff6600] to-[#ff8c00]"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-[#ff6600] to-[#ff8c00]"></div>
                     <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none"></div>
                     <div className="absolute -right-20 -top-20 w-[400px] h-[400px] border-[40px] border-white/5 rounded-full pointer-events-none"></div>
                     <div className="absolute right-32 -bottom-24 w-[300px] h-[300px] border-[20px] border-white/5 rounded-full pointer-events-none"></div>
@@ -90,7 +90,7 @@ export default function AthleteDashboard({
 
                         <div className="w-fit flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-4 rounded-xl shadow-lg hover:bg-white/20 transition-all cursor-default relative overflow-hidden group/date">
                             <div className="absolute top-0 -inset-full h-full w-1/2 z-0 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-0 group-hover/date:animate-shine"></div>
-                            <div className="relative z-10 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-[#ff4d00] shrink-0">
+                            <div className="relative z-10 w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-orange-500 shrink-0">
                                 <Calendar size={20} strokeWidth={2.5} />
                             </div>
                             <div className="relative z-10 pr-2">
@@ -121,7 +121,7 @@ export default function AthleteDashboard({
                             <Activity className="w-3.5 h-3.5 text-slate-400" />{" "}
                             Cabang Olahraga
                         </p>
-                        <p className="font-bold text-lg text-[#ff4d00]">
+                        <p className="font-bold text-lg text-orange-500">
                             {stats.sport}
                         </p>
                     </div>
@@ -158,11 +158,11 @@ export default function AthleteDashboard({
                 <div className="mb-10">
                     <div className="flex items-center justify-between mb-5">
                         <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-[#ff4d00]" />
+                            <Target className="w-5 h-5 text-orange-500" />
                             Agenda Hari Ini
                         </h2>
                         {totalTasks > 0 && (
-                            <span className="px-3 py-1 bg-orange-50 text-[#ff4d00] border border-orange-100 rounded-md text-[10px] font-bold">
+                            <span className="px-3 py-1 bg-orange-50 text-orange-500 border border-orange-100 rounded-md text-[10px] font-bold">
                                 {totalTasks} Agenda Tersisa
                             </span>
                         )}
@@ -207,7 +207,7 @@ export default function AthleteDashboard({
                                         href={route(
                                             "admin.wellness-rpe.session-form", { date: today_date, mode: 'wellness' }
                                         )}
-                                        className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm ${has_wellness_today ? 'bg-white border-2 border-[#ff4d00] text-[#ff4d00] hover:bg-orange-50' : 'bg-gradient-to-r from-[#ff4d00] to-[#ff7a00] hover:from-[#e64500] hover:to-[#e66a00] hover:shadow-[#ff4d00]/30 text-white'}`}
+                                        className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm ${has_wellness_today ? 'bg-white border-2 border-orange-500 text-orange-500 hover:bg-orange-50' : 'bg-gradient-to-r from-orange-500 to-[#ff7a00] hover:from-orange-600 hover:to-[#e66a00] hover:shadow-orange-500/30 text-white'}`}
                                     >
                                         {has_wellness_today ? 'Lihat Data' : 'Isi Sekarang'} <ArrowRight size={16} />
                                     </Link>
@@ -236,7 +236,7 @@ export default function AthleteDashboard({
                                         href={route(
                                             "admin.wellness-rpe.session-form", { date: today_date, mode: 'rpe' }
                                         )}
-                                        className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm ${has_rpe_today ? 'bg-white border-2 border-[#ff4d00] text-[#ff4d00] hover:bg-orange-50' : 'bg-gradient-to-r from-[#ff4d00] to-[#ff7a00] hover:from-[#e64500] hover:to-[#e66a00] hover:shadow-[#ff4d00]/30 text-white'}`}
+                                        className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm ${has_rpe_today ? 'bg-white border-2 border-orange-500 text-orange-500 hover:bg-orange-50' : 'bg-gradient-to-r from-orange-500 to-[#ff7a00] hover:from-orange-600 hover:to-[#e66a00] hover:shadow-orange-500/30 text-white'}`}
                                     >
                                         {has_rpe_today ? 'Lihat / Edit Data' : 'Isi Sekarang'} <ArrowRight size={16} />
                                     </Link>
@@ -261,7 +261,7 @@ export default function AthleteDashboard({
                                     </div>
 
                                     <div className="relative z-10 flex items-start justify-between mb-4">
-                                        <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#ff4d00] flex items-center justify-center shrink-0">
+                                        <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
                                             {training.is_group ? (
                                                 <Users
                                                     size={24}
@@ -301,7 +301,7 @@ export default function AthleteDashboard({
 
                                         <Link
                                             href={training.route}
-                                            className="w-full flex items-center justify-center gap-2 bg-[#ff4d00] hover:bg-[#e64500] text-white py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-[#ff4d00]/30"
+                                            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-orange-500/30"
                                         >
                                             {training.is_group
                                                 ? "Lihat Grup"

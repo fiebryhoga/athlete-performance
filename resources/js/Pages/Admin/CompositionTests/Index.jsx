@@ -63,7 +63,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                         <Link
                             key={athlete.id}
                             href={route('admin.composition-tests.show', athlete.id)}
-                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#ff4d00] transition-all duration-300 flex flex-col shadow-sm hover:shadow-xl hover:shadow-[#ff4d00]/10"
+                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-orange-500 transition-all duration-300 flex flex-col shadow-sm hover:shadow-xl hover:shadow-orange-500/10"
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-4">
@@ -75,14 +75,14 @@ export default function Index({ athletes, filters, benchmarks }) {
                                                 className="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm"
                                             />
                                         ) : (
-                                            <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-[#ff4d00] font-bold border border-orange-100 text-lg shadow-sm">
+                                            <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 font-bold border border-orange-100 text-lg shadow-sm">
                                                 {getInitials(athlete.name)}
                                             </div>
                                         )}
                                         <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></div>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-800 group-hover:text-[#ff4d00] transition-colors text-base truncate max-w-[140px] sm:max-w-[160px]">
+                                        <h4 className="font-bold text-slate-800 group-hover:text-orange-500 transition-colors text-base truncate max-w-[140px] sm:max-w-[160px]">
                                             {athlete.name}
                                         </h4>
                                         <div className="flex items-center gap-1.5 mt-1">
@@ -93,7 +93,7 @@ export default function Index({ athletes, filters, benchmarks }) {
                                     </div>
                                 </div>
                                 
-                                <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#ff4d00] group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <div className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shadow-sm">
                                     <ChevronRight size={18} />
                                 </div>
                             </div>
@@ -113,8 +113,8 @@ export default function Index({ athletes, filters, benchmarks }) {
                                             <p className="text-[10px] font-bold text-slate-400">
                                                 Records
                                             </p>
-                                            <p className="text-sm font-bold text-[#ff4d00] mt-1 flex items-center justify-end gap-1.5">
-                                                <Scale size={14} className="text-[#ff4d00]" />
+                                            <p className="text-sm font-bold text-orange-500 mt-1 flex items-center justify-end gap-1.5">
+                                                <Scale size={14} className="text-orange-500" />
                                                 {athlete.total_tests} Tests
                                             </p>
                                         </div>

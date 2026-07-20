@@ -36,7 +36,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
         <div className="w-full bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
             <div className="p-4 md:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <h3 className="font-bold text-slate-800 flex items-center gap-2 text-base md:text-lg">
-                    <Activity className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/> Kalender Metrik Harian
+                    <Activity className="w-4 h-4 md:w-5 md:h-5 text-orange-500"/> Kalender Metrik Harian
                 </h3>
                 {totalActiveDays > 0 && <p className="text-xs md:text-sm text-slate-500 font-medium">Total Data: {totalActiveDays} Hari Aktif</p>}
             </div>
@@ -50,7 +50,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                             
                             <th className="hidden md:table-cell px-3 md:px-4 py-4 text-center">RHR</th>
                             <th className="hidden md:table-cell px-3 md:px-4 py-4 text-center">SpO2</th>
-                            <th className="hidden lg:table-cell px-3 md:px-4 py-4 text-center text-[#ff4d00]">Peak Power</th>
+                            <th className="hidden lg:table-cell px-3 md:px-4 py-4 text-center text-orange-500">Peak Power</th>
                             
                             <th className="px-3 md:px-4 py-4 text-center">Recovery</th>
                             
@@ -66,9 +66,9 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                 <td className="px-3 md:px-4 py-3 align-middle">
                                     <div className="font-bold text-slate-800 flex items-center gap-2 text-xs md:text-sm">
                                         {formatDateToIndo(item.record_date, 'short')}
-                                        {item.is_today && <span className="text-[8px] md:text-[9px] bg-[#ff4d00] text-white px-1.5 md:px-2 py-0.5 rounded-md shadow-sm">Hari Ini</span>}
+                                        {item.is_today && <span className="text-[8px] md:text-[9px] bg-orange-500 text-white px-1.5 md:px-2 py-0.5 rounded-md shadow-sm">Hari Ini</span>}
                                     </div>
-                                    <div className="text-[10px] md:text-[11px] text-[#ff4d00] font-bold mt-0.5">{item.week_label}</div>
+                                    <div className="text-[10px] md:text-[11px] text-orange-500 font-bold mt-0.5">{item.week_label}</div>
                                 </td>
                                 
                                 
@@ -113,7 +113,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                     <div className="flex items-center justify-end gap-1 md:gap-2">
                                         
                                         {item.data?.recovery_status !== 'KOSONG' && (
-                                            <button onClick={() => setDetailItem(item)} className="p-1.5 md:p-2 text-slate-400 hover:text-[#ff4d00] hover:bg-orange-50 rounded-lg transition-colors border border-transparent hover:border-orange-200" title="Lihat Detail Lengkap">
+                                            <button onClick={() => setDetailItem(item)} className="p-1.5 md:p-2 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-transparent hover:border-orange-200" title="Lihat Detail Lengkap">
                                                 <Eye className="w-4 h-4 md:w-4 md:h-4" />
                                             </button>
                                         )}
@@ -121,7 +121,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                         
                                         {!isAthlete && (
                                             <button onClick={() => openModal(item)} className={`flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1.5 md:py-1.5 rounded-xl shadow-sm transition-all whitespace-nowrap ${
-                                                item.data?.recovery_status === 'KOSONG' ? 'bg-[#ff4d00] text-white hover:bg-[#e64500]' : 'bg-white border border-slate-200 text-slate-500 hover:text-[#ff4d00] hover:bg-orange-50'
+                                                item.data?.recovery_status === 'KOSONG' ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white border border-slate-200 text-slate-500 hover:text-orange-500 hover:bg-orange-50'
                                             }`}>
                                                 {item.data?.recovery_status === 'KOSONG' ? <><Plus className="w-3 h-3" /> Isi Data</> : <><Edit3 className="w-3 h-3" /> Edit</>}
                                             </button>
@@ -148,7 +148,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                         <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                             <div className="flex items-center gap-3">
                                 
-                                <div className="p-2 bg-orange-100 text-[#ff4d00] rounded-xl">
+                                <div className="p-2 bg-orange-100 text-orange-500 rounded-xl">
                                     <Activity className="w-4 h-4 md:w-5 md:h-5" />
                                 </div>
                                 <div>
@@ -184,8 +184,8 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                 
                                 
                                 <div className="bg-orange-50 p-3 md:p-4 rounded-2xl border border-orange-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] mb-1">VO2Max</p>
-                                    <p className="font-bold text-[#e64500] text-lg md:text-xl">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
+                                    <p className="text-[9px] md:text-[10px] font-bold text-orange-500 mb-1">VO2Max</p>
+                                    <p className="font-bold text-orange-600 text-lg md:text-xl">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
                                 </div>
                                 <div className="bg-amber-50 p-3 md:p-4 rounded-2xl border border-amber-100">
                                     <p className="text-[9px] md:text-[10px] font-bold text-amber-500 mb-1 flex items-center gap-1"><Zap className="w-3 h-3"/> Power</p>
@@ -221,7 +221,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                         <FileText className="w-4 h-4" />
                                         <h4 className="text-[10px] md:text-xs font-bold">Catatan Tambahan</h4>
                                     </div>
-                                    <p className="text-xs md:text-sm text-slate-700 leading-relaxed italic border-l-2 border-[#ff4d00] pl-3 ml-1 whitespace-pre-wrap">
+                                    <p className="text-xs md:text-sm text-slate-700 leading-relaxed italic border-l-2 border-orange-500 pl-3 ml-1 whitespace-pre-wrap">
                                         "{detailItem.data.notes}"
                                     </p>
                                 </div>

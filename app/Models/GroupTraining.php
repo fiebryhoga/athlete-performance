@@ -22,6 +22,7 @@ class GroupTraining extends Model
         'is_group_paid',
         'is_coach_paid',
         'attendee_ids',
+        'is_extra',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class GroupTraining extends Model
         'is_group_paid' => 'boolean',
         'is_coach_paid' => 'boolean',
         'date' => 'date:Y-m-d',
+        'is_extra' => 'boolean',
     ];
 
     public function group()

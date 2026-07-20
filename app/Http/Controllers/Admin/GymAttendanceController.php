@@ -44,6 +44,7 @@ class GymAttendanceController extends Controller
             'latitude' => $settings['gym_latitude'] ?? null,
             'longitude' => $settings['gym_longitude'] ?? null,
             'radius' => $settings['gym_radius_meters'] ?? 50,
+            'fee' => $settings['gym_shift_fee'] ?? 0,
         ];
 
         // Today's attendance for current user (if coach)
@@ -259,12 +260,14 @@ class GymAttendanceController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'radius' => 'required|integer|min:10|max:1000',
+            'fee' => 'nullable|integer|min:0',
         ]);
 
         $settings = [
             'gym_latitude' => $request->latitude,
             'gym_longitude' => $request->longitude,
             'gym_radius_meters' => $request->radius,
+            'gym_shift_fee' => $request->fee ?? 0,
         ];
 
         foreach ($settings as $key => $value) {
@@ -297,10 +300,13 @@ class GymAttendanceController extends Controller
             ->whereNotNull('check_out_time')
             ->update(['is_paid' => true]);
 
+        $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+        $totalFee = $unpaidCount * $gymShiftFee;
+
         // Record payout
         CoachPayout::create([
             'user_id' => $user->id,
-            'amount' => 0, // Amount can be set manually or by config
+            'amount' => $totalFee,
             'paid_at' => now(),
             'notes' => "Pencairan gym guard: {$unpaidCount} kali jaga",
         ]);

@@ -6,7 +6,7 @@ export default function HeaderProfile({ athlete, selectedDate, setSelectedDate, 
             
             <div className="flex items-center gap-3 md:gap-5">
                 
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-xl md:text-2xl border-2 md:border-4 border-white shadow-sm shrink-0">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-xl md:text-2xl border-2 md:border-4 border-white shadow-sm shrink-0">
                     {athlete?.profile_photo_url ? (
                         <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                     ) : (
@@ -34,7 +34,7 @@ export default function HeaderProfile({ athlete, selectedDate, setSelectedDate, 
                             type="date" 
                             value={searchDate} 
                             onChange={e => setSearchDate(e.target.value)} 
-                            className="w-full sm:w-40 text-xs md:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/50 focus:border-[#ff4d00] transition-all bg-white text-slate-700 px-2.5 md:px-3 py-1.5 md:py-2"
+                            className="w-full sm:w-40 text-xs md:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white text-slate-700 px-2.5 md:px-3 py-1.5 md:py-2"
                         />
                         {searchDate && (
                             <button onClick={() => setSearchDate('')} className="bg-white border border-slate-200 text-slate-500 px-3 md:px-4 rounded-lg hover:bg-slate-50 transition-colors text-xs md:text-sm font-medium">Reset</button>
@@ -53,10 +53,10 @@ export default function HeaderProfile({ athlete, selectedDate, setSelectedDate, 
                             type="date" 
                             value={selectedDate} 
                             onChange={e => setSelectedDate(e.target.value)} 
-                            className="w-full sm:w-40 text-xs md:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/50 focus:border-[#ff4d00] transition-all bg-white text-slate-700 px-2.5 md:px-3 py-1.5 md:py-2"
+                            className="w-full sm:w-40 text-xs md:text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white text-slate-700 px-2.5 md:px-3 py-1.5 md:py-2"
                         />
                         
-                        <button onClick={() => openModal(selectedDate)} className="bg-[#ff4d00] text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-[#e64500] transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap">
+                        <button onClick={() => openModal(selectedDate)} className="bg-orange-500 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap">
                             <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" /> Input
                         </button>
                     </div>

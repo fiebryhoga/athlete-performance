@@ -16,7 +16,7 @@ export default function HistorySection({ historySessions, userName }) {
     return (
         <div className="mt-8 md:mt-16 border-t border-slate-200 pt-6 md:pt-10 w-full max-w-full">
             <div className="flex items-center gap-3 mb-4 md:mb-6">
-                <div className="p-2 md:p-2.5 bg-orange-50 rounded-xl text-[#ff4d00]">
+                <div className="p-2 md:p-2.5 bg-orange-50 rounded-xl text-orange-500">
                     <History className="w-5 h-5" />
                 </div>
                 <div>
@@ -31,7 +31,7 @@ export default function HistorySection({ historySessions, userName }) {
                 {historySessions.map(hist => {
                     const isOpen = openHistoryId === hist.id;
                     return (
-                        <div key={hist.id} className={`bg-white border rounded-xl overflow-hidden shadow-sm transition-all ${isOpen ? 'border-[#ff4d00]/30 ring-1 ring-[#ff4d00]/20' : 'border-slate-200'}`}>
+                        <div key={hist.id} className={`bg-white border rounded-xl overflow-hidden shadow-sm transition-all ${isOpen ? 'border-orange-500/30 ring-1 ring-orange-500/20' : 'border-slate-200'}`}>
                             
                             <div 
                                 className={`p-4 flex flex-col gap-3 touch-manipulation cursor-pointer ${isOpen ? 'bg-orange-50/10' : 'bg-white'}`} 
@@ -41,7 +41,7 @@ export default function HistorySection({ historySessions, userName }) {
                                     <div className="flex items-center gap-1.5 font-bold text-slate-700 text-xs">
                                         <Calendar className="w-3.5 h-3.5 text-slate-400"/> {formatDate(hist.date)}
                                     </div>
-                                    <span className="text-[9px] font-bold text-[#ff4d00] bg-orange-50 px-2 py-1 rounded-md border border-orange-100">
+                                    <span className="text-[9px] font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-md border border-orange-100">
                                         Sesi {hist.session_number}
                                     </span>
                                 </div>
@@ -52,7 +52,7 @@ export default function HistorySection({ historySessions, userName }) {
                                         </span>
                                         <span className="font-bold text-slate-800 text-sm truncate max-w-[200px]">{hist.training_type}</span>
                                     </div>
-                                    <button className={`text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${isOpen ? 'bg-[#ff4d00] text-white' : 'bg-slate-100 text-slate-600'}`}>
+                                    <button className={`text-[10px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${isOpen ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
                                         {isOpen ? <><ChevronUp className="w-3 h-3"/> Tutup</> : <><ChevronDown className="w-3 h-3"/> Detail</>}
                                     </button>
                                 </div>
@@ -103,7 +103,7 @@ export default function HistorySection({ historySessions, userName }) {
                                         <td className="px-6 py-4 font-bold text-slate-700">
                                             {formatDate(hist.date)}
                                         </td>
-                                        <td className="px-6 py-4 text-center font-bold text-[#ff4d00]">Sesi {hist.session_number}</td>
+                                        <td className="px-6 py-4 text-center font-bold text-orange-500">Sesi {hist.session_number}</td>
                                         <td className="px-6 py-4 font-bold text-slate-800">
                                             <div className="flex items-center gap-2">
                                                 <Activity className="w-4 h-4 text-slate-400" /> {hist.training_type}
@@ -115,7 +115,7 @@ export default function HistorySection({ historySessions, userName }) {
                                                     e.stopPropagation(); 
                                                     toggleHistory(hist.id);
                                                 }}
-                                                className={`text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 ml-auto ${openHistoryId === hist.id ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                                className={`text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 ml-auto ${openHistoryId === hist.id ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                                             >
                                                 {openHistoryId === hist.id ? <><ChevronUp className="w-4 h-4"/> Tutup</> : <><ChevronDown className="w-4 h-4"/> Buka Log</>}
                                             </button>

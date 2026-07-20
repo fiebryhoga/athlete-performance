@@ -20,7 +20,7 @@ export default function Index({ athletes }) {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                 
                 <div className="relative z-10 w-full lg:w-auto">
-                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 border border-orange-100 px-3 py-1 rounded-full mb-2.5 md:mb-3 inline-block shadow-sm">
+                    <span className="text-[10px] font-bold text-orange-500 bg-orange-50 border border-orange-100 px-3 py-1 rounded-full mb-2.5 md:mb-3 inline-block shadow-sm">
                         Wellness & Readiness
                     </span>
                     <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
@@ -37,7 +37,7 @@ export default function Index({ athletes }) {
                             placeholder="Cari nama atlet..." 
                             value={searchQuery} 
                             onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" 
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm" 
                         />
                     </div>
                 </div>
@@ -54,7 +54,7 @@ export default function Index({ athletes }) {
                         >
                             <div className="flex items-center gap-3 md:gap-4 min-w-0 pr-4">
                                 
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-lg md:text-xl shrink-0 border-2 border-slate-100 shadow-sm group-hover:border-orange-200 transition-colors">
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-lg md:text-xl shrink-0 border-2 border-slate-100 shadow-sm group-hover:border-orange-200 transition-colors">
                                     {athlete.profile_photo_url ? (
                                         <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                                     ) : (
@@ -63,7 +63,7 @@ export default function Index({ athletes }) {
                                 </div>
                                 
                                 <div className="min-w-0">
-                                    <h3 className="font-bold text-slate-800 text-base md:text-lg group-hover:text-[#ff4d00] transition-colors truncate">
+                                    <h3 className="font-bold text-slate-800 text-base md:text-lg group-hover:text-orange-500 transition-colors truncate">
                                         {athlete.name}
                                     </h3>
                                     <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mt-1">
@@ -77,7 +77,7 @@ export default function Index({ athletes }) {
                                 </div>
                             </div>
                             
-                            <div className="p-1.5 md:p-2 rounded-lg text-slate-300 group-hover:text-[#ff4d00] group-hover:bg-orange-50 transition-all group-hover:translate-x-1 shrink-0">
+                            <div className="p-1.5 md:p-2 rounded-lg text-slate-300 group-hover:text-orange-500 group-hover:bg-orange-50 transition-all group-hover:translate-x-1 shrink-0">
                                 <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                             </div>
                         </Link>

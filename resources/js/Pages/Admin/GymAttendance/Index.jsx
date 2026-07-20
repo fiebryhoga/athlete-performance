@@ -6,6 +6,7 @@ import {
     CheckCircle2, Calendar, Settings, LogIn, LogOut,
     Navigation, Shield, Banknote, CircleDollarSign, Smartphone, FileText, Edit3
 } from 'lucide-react';
+import PageHeader from '@/Components/Layout/PageHeader';
 
 // ─── Haversine Distance (meters) ───
 function haversineDistance(lat1, lng1, lat2, lng2) {
@@ -67,11 +68,11 @@ export default function Index({
     const [activeModal, setActiveModal] = useState(null); // 'checkout', 'location', 'selectedDay'
     const [selectedDay, setSelectedDay] = useState(null);
 
-    // ─── LOCATION FORM ───
     const locationForm = useForm({
         latitude: gymLocation.latitude || '',
         longitude: gymLocation.longitude || '',
         radius: gymLocation.radius || 50,
+        fee: gymLocation.fee || 0,
     });
 
     const submitLocation = (e) => {
@@ -172,27 +173,27 @@ export default function Index({
         }
     };
 
-    // ─── PAYOUT ───
-    const handlePayout = (userId, userName) => {
-        if (confirm(`Cairkan semua shift yang belum dibayar untuk ${userName}? Counter akan di-reset ke 0.`)) {
-            router.post(route('admin.gym-attendance.pay', userId));
-        }
-    };
+    // Note: Payout is now handled in Reports -> Session Recap
 
     return (
-        <AppLayout
-            header={<h2 className="font-bold text-xl text-slate-800 leading-tight flex items-center gap-2"><Building2 className="w-6 h-6 text-[#ff4d00]" /> Manajemen Jaga Gym</h2>}
-        >
+        <AppLayout title="Manajemen Jaga Gym">
             <Head title="Manajemen Jaga Gym" />
+            
+            <PageHeader 
+                title="Manajemen Jaga Gym"
+                subtitle="Kelola dan pantau absensi shift gym untuk para pelatih."
+                badge="Absensi"
+                icon={Building2}
+            />
 
-            <div className="py-8 bg-slate-50 min-h-screen">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="pb-8 bg-slate-50 min-h-screen">
+                <div className="mx-auto space-y-6">
 
                     {/* ─── COACH: TODAY'S PANEL ─── */}
                     {isCoach && (
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
                             <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2 mb-4">
-                                <Shield className="w-5 h-5 text-[#ff4d00]" />
+                                <Shield className="w-5 h-5 text-orange-500" />
                                 Panel Absensi Hari Ini
                             </h3>
 
@@ -207,7 +208,7 @@ export default function Index({
                                     <button
                                         onClick={handleCheckIn}
                                         disabled={gpsStatus === 'loading'}
-                                        className="w-full max-w-sm mx-auto py-3 rounded-lg bg-[#ff4d00] text-white font-bold text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="w-full max-w-sm mx-auto py-3 rounded-lg bg-orange-500 text-white font-bold text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {gpsStatus === 'loading' ? (
                                             <><Navigation className="w-4 h-4 animate-pulse" /> Memverifikasi Lokasi...</>
@@ -260,7 +261,7 @@ export default function Index({
                             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                 <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                                     <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                        <Calendar className="w-5 h-5 text-[#ff4d00]" />
+                                        <Calendar className="w-5 h-5 text-orange-500" />
                                         Jadwal Jaga {monthNames[currentMonth - 1]} {currentYear}
                                     </h3>
                                     <div className="flex gap-2">
@@ -279,7 +280,7 @@ export default function Index({
                                             const dayAtts = getAttendancesForDay(day);
                                             const status = getDayStatus(dayAtts);
                                             
-                                            let bgClass = "bg-white hover:border-[#ff4d00]";
+                                            let bgClass = "bg-white hover:border-orange-500";
                                             let badgeColor = "bg-slate-200";
                                             if (status === 'on_time') { bgClass = "bg-emerald-50/30"; badgeColor = "bg-emerald-400"; }
                                             
@@ -289,9 +290,9 @@ export default function Index({
                                                 <button
                                                     key={idx}
                                                     onClick={() => { setSelectedDay(day); setActiveModal('selectedDay'); }}
-                                                    className={`relative aspect-square border ${isToday ? 'border-[#ff4d00] ring-1 ring-[#ff4d00]' : 'border-slate-200'} rounded-lg p-1.5 flex flex-col items-center justify-start transition-all group ${bgClass}`}
+                                                    className={`relative aspect-square border ${isToday ? 'border-orange-500 ring-1 ring-orange-500' : 'border-slate-200'} rounded-lg p-1.5 flex flex-col items-center justify-start transition-all group ${bgClass}`}
                                                 >
-                                                    <span className={`text-xs font-bold ${isToday ? 'text-[#ff4d00]' : 'text-slate-600'}`}>{day}</span>
+                                                    <span className={`text-xs font-bold ${isToday ? 'text-orange-500' : 'text-slate-600'}`}>{day}</span>
                                                     {dayAtts.length > 0 && (
                                                         <div className="mt-auto flex flex-wrap gap-1 justify-center">
                                                             {dayAtts.slice(0, 3).map((a, i) => (
@@ -331,14 +332,15 @@ export default function Index({
                                             <div className="flex justify-between"><span>Latitude:</span> <span className="font-mono font-medium">{gymLocation.latitude || '-'}</span></div>
                                             <div className="flex justify-between"><span>Longitude:</span> <span className="font-mono font-medium">{gymLocation.longitude || '-'}</span></div>
                                             <div className="flex justify-between"><span>Radius Maks:</span> <span className="font-medium text-slate-800">{gymLocation.radius || 50} meter</span></div>
+                                            <div className="flex justify-between"><span>Fee Jaga (Rp):</span> <span className="font-medium text-emerald-600">{Number(gymLocation.fee || 0).toLocaleString('id-ID')}</span></div>
                                         </div>
                                     </div>
 
-                                    {/* Payout Recap */}
+                                    {/* Recap Only */}
                                     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
                                         <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2 mb-4">
-                                            <Banknote className="w-4 h-4 text-emerald-500" />
-                                            Rekap & Pencairan Coach
+                                            <Shield className="w-4 h-4 text-emerald-500" />
+                                            Rekap Jaga Gym
                                         </h3>
                                         <div className="space-y-4">
                                             {recapData?.map(guard => (
@@ -346,25 +348,18 @@ export default function Index({
                                                     <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-6 h-6 rounded-full bg-slate-200 overflow-hidden">
-                                                                {guard.profile_photo ? <img src={guard.profile_photo} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full bg-[#ff4d00]/20 flex items-center justify-center text-[10px] font-bold text-[#ff4d00]">{guard.name.charAt(0)}</div>}
+                                                                {guard.profile_photo ? <img src={guard.profile_photo} alt="" className="w-full h-full object-cover"/> : <div className="w-full h-full bg-orange-500/20 flex items-center justify-center text-[10px] font-bold text-orange-500">{guard.name.charAt(0)}</div>}
                                                             </div>
                                                             <span className="text-xs font-bold text-slate-800">{guard.name}</span>
                                                         </div>
-                                                        <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">{guard.total_shifts} Total</span>
+                                                        <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">{guard.total_shifts} Total Hari</span>
                                                     </div>
                                                     
                                                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200/60">
                                                         <div>
-                                                            <div className="text-[10px] text-slate-500">Belum dibayar</div>
+                                                            <div className="text-[10px] text-slate-500">Belum dicairkan (honor)</div>
                                                             <div className="text-sm font-black text-rose-500">{guard.unpaid_shifts} Hari</div>
                                                         </div>
-                                                        <button 
-                                                            onClick={() => handlePayout(guard.id, guard.name)}
-                                                            disabled={guard.unpaid_shifts === 0}
-                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-800 text-white text-[10px] font-bold hover:bg-slate-700 disabled:opacity-30 transition-colors"
-                                                        >
-                                                            <CircleDollarSign className="w-3.5 h-3.5" /> Cairkan
-                                                        </button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -385,7 +380,7 @@ export default function Index({
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
                         <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2"><LogOut className="w-4 h-4 text-[#ff4d00]" /> Check-out & Catatan</h3>
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2"><LogOut className="w-4 h-4 text-orange-500" /> Check-out & Catatan</h3>
                             <button onClick={() => setActiveModal(null)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
                         </div>
                         <form onSubmit={submitCheckout} className="p-5 space-y-4">
@@ -395,7 +390,7 @@ export default function Index({
                                 <textarea
                                     value={checkoutForm.data.notes}
                                     onChange={e => checkoutForm.setData('notes', e.target.value)}
-                                    className="w-full border-slate-200 rounded-lg text-sm focus:ring-[#ff4d00] focus:border-[#ff4d00] h-24"
+                                    className="w-full border-slate-200 rounded-lg text-sm focus:ring-orange-500 focus:border-orange-500 h-24"
                                     required
                                     placeholder="Contoh: Merapikan barbel, mendampingi member baru, dan membersihkan treadmill."
                                 />
@@ -403,7 +398,7 @@ export default function Index({
 
                             <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
                                 <button type="button" onClick={() => setActiveModal(null)} className="flex-1 py-2 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition-colors">Batal</button>
-                                <button type="submit" disabled={checkoutForm.processing || gpsStatus === 'loading'} className="flex-1 py-2 rounded-lg bg-[#ff4d00] text-white font-bold text-xs hover:bg-[#e64500] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="submit" disabled={checkoutForm.processing || gpsStatus === 'loading'} className="flex-1 py-2 rounded-lg bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                                     {gpsStatus === 'loading' || checkoutForm.processing ? (
                                         <><Navigation className="w-3.5 h-3.5 animate-pulse" /> Memproses...</>
                                     ) : (
@@ -422,7 +417,7 @@ export default function Index({
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
                             <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-[#ff4d00]" />
+                                <Calendar className="w-5 h-5 text-orange-500" />
                                 Detail Absensi - {selectedDay} {monthNames[currentMonth - 1]} {currentYear}
                             </h3>
                             <button onClick={() => setActiveModal(null)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
@@ -445,7 +440,7 @@ export default function Index({
                                             )}
 
                                             <div className="flex items-center gap-2 mb-3">
-                                                <div className="w-8 h-8 rounded-full bg-[#ff4d00]/10 flex items-center justify-center text-[#ff4d00] font-bold text-xs uppercase">{att.user?.name?.substring(0,2)}</div>
+                                                <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 font-bold text-xs uppercase">{att.user?.name?.substring(0,2)}</div>
                                                 <div>
                                                     <div className="text-xs font-bold text-slate-800">{att.user?.name}</div>
                                                     <div className="text-[10px] text-slate-500">
@@ -496,9 +491,13 @@ export default function Index({
                                 <label className="block text-xs font-bold text-slate-700 mb-1">Radius Toleransi (Meter)</label>
                                 <input type="number" value={locationForm.data.radius} onChange={e => locationForm.setData('radius', e.target.value)} className="w-full border-slate-200 rounded-lg text-sm" min="10" required />
                             </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 mb-1">Fee Sekali Jaga (Rp)</label>
+                                <input type="number" value={locationForm.data.fee} onChange={e => locationForm.setData('fee', e.target.value)} className="w-full border-slate-200 rounded-lg text-sm" min="0" required />
+                            </div>
                             <div className="flex gap-3 pt-2">
                                 <button type="button" onClick={() => setActiveModal(null)} className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-lg font-bold text-xs hover:bg-slate-200">Batal</button>
-                                <button type="submit" disabled={locationForm.processing} className="flex-1 py-2 bg-[#ff4d00] text-white rounded-lg font-bold text-xs hover:bg-[#e64500]">Simpan</button>
+                                <button type="submit" disabled={locationForm.processing} className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-bold text-xs hover:bg-orange-600">Simpan</button>
                             </div>
                         </form>
                     </div>

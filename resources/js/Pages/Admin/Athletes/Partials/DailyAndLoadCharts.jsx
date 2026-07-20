@@ -14,7 +14,7 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                 
                 <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
                     <h3 className="text-xs font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <div className="p-1.5 bg-orange-50 rounded-md text-[#ff4d00]"><Battery className="w-4 h-4" /></div>
+                        <div className="p-1.5 bg-orange-50 rounded-md text-orange-500"><Battery className="w-4 h-4" /></div>
                         Training Load Trend (30 Days)
                     </h3>
                     <div className="flex-1 min-h-[300px]">
@@ -24,13 +24,13 @@ export default function DailyAndLoadCharts({ daily_metrics, training_loads }) {
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} dy={10} />
                                     <YAxis yAxisId="left" tick={{ fontSize: 10, fill: '#fb923c', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: '#ff4d00', fontWeight: 600 }} axisLine={false} tickLine={false} domain={[0, 40]}/>
+                                    <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'orange-500', fontWeight: 600 }} axisLine={false} tickLine={false} domain={[0, 40]}/>
                                     <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px', fontWeight: 'bold' }} iconType="circle" />
                                     
                                     
                                     <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="#fed7aa" radius={[4, 4, 0, 0]} barSize={20} />
-                                    <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="#ff4d00" strokeWidth={3} dot={{r: 4, fill: '#fff', strokeWidth: 2}} activeDot={{r: 6, strokeWidth: 0, fill: '#ff4d00'}} />
+                                    <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="orange-500" strokeWidth={3} dot={{r: 4, fill: '#fff', strokeWidth: 2}} activeDot={{r: 6, strokeWidth: 0, fill: 'orange-500'}} />
                                 </ComposedChart>
                             </ResponsiveContainer>
                         ) : (

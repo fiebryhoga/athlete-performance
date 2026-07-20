@@ -373,7 +373,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                     
                                     <div className="divide-y divide-slate-100 ">
                                         {assessments.length > 0 ? assessments.map((item, idx) => (
-                                            <div key={idx} className="p-4 md:px-6 flex items-center justify-between hover:bg-slate-50/50 :bg-[#ff4d00]/30 transition-colors group">
+                                            <div key={idx} className="p-4 md:px-6 flex items-center justify-between hover:bg-slate-50/50 :bg-orange-500/30 transition-colors group">
                                                 <div>
                                                     <p className="text-sm font-bold text-slate-900 ">
                                                         {new Date(item.assessment_date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}

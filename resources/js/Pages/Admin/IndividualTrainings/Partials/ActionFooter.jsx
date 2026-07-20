@@ -31,10 +31,20 @@ export default function ActionFooter({
                 <button
                     type="submit"
                     disabled={processing}
-                    className="flex justify-center items-center gap-2 px-6 py-2.5 bg-[#ff4d00] text-white border border-transparent rounded-xl text-sm font-bold hover:bg-[#e64500] transition-all shadow-md shadow-[#ff4d00]/20 disabled:opacity-50"
+                    className="flex justify-center items-center gap-2 px-6 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
                 >
                     <Save size={16} /> Simpan Update RPE
                 </button>
+                {!isCompleted && (
+                    <button
+                        type="button"
+                        disabled={processing}
+                        onClick={onComplete}
+                        className="flex justify-center items-center gap-2 px-6 py-2.5 bg-green-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/20 disabled:opacity-50"
+                    >
+                        <CheckCircle size={16} /> Selesaikan Latihan
+                    </button>
+                )}
             </div>
         );
     }
@@ -98,7 +108,7 @@ export default function ActionFooter({
                         type="button"
                         disabled={processing}
                         onClick={onComplete}
-                        className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-[#ff4d00] text-white border border-transparent rounded-xl text-sm font-bold hover:bg-[#e64500] transition-all shadow-md shadow-[#ff4d00]/20 disabled:opacity-50"
+                        className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
                     >
                         Selesaikan Latihan <ArrowRight size={16} />
                     </button>

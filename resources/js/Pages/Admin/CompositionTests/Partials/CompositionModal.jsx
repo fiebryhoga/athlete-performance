@@ -96,7 +96,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                     
                     <div className="sticky top-0 z-20 px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-white shadow-sm">
                         <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
-                            <Scale className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/> Record Composition
+                            <Scale className="w-4 h-4 md:w-5 md:h-5 text-orange-500"/> Record Composition
                         </h3>
                         <button onClick={onClose} className="p-1.5 md:p-2 text-slate-400 hover:bg-slate-100 rounded-lg transition-colors"><X className="w-5 h-5"/></button>
                     </div>
@@ -107,23 +107,23 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1">
                                 <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Tanggal Tes</label>
-                                <input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
+                                <input type="date" value={data.date} onChange={e=>setData('date', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm" required/>
                             </div>
                             <div className="col-span-1">
                                 <label className="text-[10px] font-bold text-slate-400 mb-1.5 block">Usia Biologis</label>
-                                <input type="number" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" required/>
+                                <input type="number" value={data.age} onChange={e=>setData('age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm" required/>
                             </div>
                         </div>
                         
                         
                         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6">
                             <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
-                                <label className="text-[10px] font-bold text-[#ff4d00] mb-1 block">Berat (KG)</label>
-                                <input type="number" step="0.01" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="0.00"/>
+                                <label className="text-[10px] font-bold text-orange-500 mb-1 block">Berat (KG)</label>
+                                <input type="number" step="0.01" value={data.weight} onChange={e=>setData('weight', e.target.value)} className="w-full rounded-lg border-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="0.00"/>
                             </div>
                             <div className="col-span-1 p-3 sm:p-4 bg-orange-50/50 rounded-lg border border-orange-100 shadow-sm">
-                                <label className="text-[10px] font-bold text-[#ff4d00] mb-1 block">Tinggi (Meter)</label>
-                                <input type="number" step="0.01" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full rounded-lg border-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="1.70"/>
+                                <label className="text-[10px] font-bold text-orange-500 mb-1 block">Tinggi (Meter)</label>
+                                <input type="number" step="0.01" value={data.height} onChange={e=>setData('height', e.target.value)} className="w-full rounded-lg border-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 text-base md:text-lg font-bold shadow-sm outline-none transition-all text-slate-800" required placeholder="1.70"/>
                             </div>
                         </div>
 
@@ -131,37 +131,37 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 border-t border-slate-100 pt-5">
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Bodyfat %</label>
-                                <input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" step="0.1" value={data.body_fat_percentage} onChange={e=>setData('body_fat_percentage', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Muscle Mass</label>
-                                <input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" step="0.1" value={data.muscle_mass} onChange={e=>setData('muscle_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Bone Mass</label>
-                                <input type="number" step="0.1" value={data.bone_mass} onChange={e=>setData('bone_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" step="0.1" value={data.bone_mass} onChange={e=>setData('bone_mass', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Visceral Fat</label>
-                                <input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" step="0.1" value={data.visceral_fat} onChange={e=>setData('visceral_fat', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">BMR (Kcal)</label>
-                                <input type="number" value={data.bmr} onChange={e=>setData('bmr', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" value={data.bmr} onChange={e=>setData('bmr', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div>
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">TBW % (Air)</label>
-                                <input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
+                                <input type="number" step="0.1" value={data.total_body_water} onChange={e=>setData('total_body_water', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm"/>
                             </div>
                             <div className="col-span-2 sm:col-span-3 lg:col-span-1">
                                 <label className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1.5 block">Metabolic Age</label>
-                                <input type="number" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] bg-slate-50 focus:bg-white transition-all outline-none shadow-sm" placeholder="Opsional"/>
+                                <input type="number" value={data.metabolic_age} onChange={e=>setData('metabolic_age', e.target.value)} className="w-full rounded-lg border-slate-200 text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 bg-slate-50 focus:bg-white transition-all outline-none shadow-sm" placeholder="Opsional"/>
                             </div>
                         </div>
 
                         
                         <div className="pt-6 md:pt-8 mt-auto border-t border-slate-100 hidden xl:block">
-                            <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70">
+                            <button type="submit" disabled={processing} className="w-full py-3 md:py-4 bg-orange-500 text-white font-bold rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70">
                                 {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
                                 {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}
                             </button>
@@ -309,7 +309,7 @@ export default function CompositionModal({ isOpen, onClose, data, setData, submi
                                 type="button"
                                 onClick={(e) => { e.preventDefault(); submit(e); }} 
                                 disabled={processing} 
-                                className="w-full py-4 bg-[#ff4d00] text-white font-bold rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70"
+                                className="w-full py-4 bg-orange-500 text-white font-bold rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all flex justify-center items-center gap-2 text-sm disabled:opacity-70"
                             >
                                 {processing ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Save className="w-4 h-4"/>} 
                                 {processing ? 'Menyimpan...' : 'Simpan Rekaman Tes'}

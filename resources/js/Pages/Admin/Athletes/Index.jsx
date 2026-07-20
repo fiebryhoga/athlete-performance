@@ -45,28 +45,28 @@ export default function Index({ athletes, filters }) {
                         <div 
                             key={athlete.id} 
                             onClick={() => handleCardClick(athlete.id)}
-                            className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-[#ff4d00]/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative flex flex-col"
+                            className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative flex flex-col"
                         >
                             {/* Premium Card Header */}
-                            <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-[#ff4d00]/10 to-transparent"></div>
+                            <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-orange-500/10 to-transparent"></div>
                             
                             <div className="absolute top-4 right-4 p-2 bg-white/60 backdrop-blur-md rounded-xl opacity-0 group-hover:opacity-100 transition-opacity border border-slate-100 shadow-sm">
-                                <ChevronRight className="w-4 h-4 text-[#ff4d00]" />
+                                <ChevronRight className="w-4 h-4 text-orange-500" />
                             </div>
 
                             <div className="p-6 flex flex-col items-center justify-center relative z-10 border-b border-slate-50">
-                                <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl shadow-[#ff4d00]/10 mb-4 bg-[#ff4d00] flex items-center justify-center overflow-hidden shrink-0">
+                                <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl shadow-orange-500/10 mb-4 bg-orange-500 flex items-center justify-center overflow-hidden shrink-0">
                                     {athlete.profile_photo_url ? (
                                         <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                                     ) : (
                                         <span className="text-3xl font-bold text-white">{athlete.name.charAt(0).toUpperCase()}</span>
                                     )}
                                 </div>
-                                <h3 className="font-bold text-slate-800 text-lg group-hover:text-[#ff4d00] transition-colors text-center line-clamp-1">{athlete.name}</h3>
+                                <h3 className="font-bold text-slate-800 text-lg group-hover:text-orange-500 transition-colors text-center line-clamp-1">{athlete.name}</h3>
                                 <p className="text-xs font-medium text-slate-400 mb-4">{athlete.username}</p>
                                 
                                 {athlete.sport ? (
-                                    <span className="text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full border border-orange-100 flex items-center gap-1.5">
+                                    <span className="text-[10px] font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full border border-orange-100 flex items-center gap-1.5">
                                         <Target className="w-3 h-3" /> {athlete.sport.name}
                                     </span>
                                 ) : (
@@ -154,7 +154,7 @@ export default function Index({ athletes, filters }) {
                                 disabled={!link.url}
                                 className={`px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all ${
                                     link.active 
-                                    ? 'bg-[#ff4d00] text-white shadow-md shadow-[#ff4d00]/20' 
+                                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
                                     : link.url 
                                         ? 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' 
                                         : 'text-slate-300 cursor-not-allowed'

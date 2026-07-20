@@ -189,7 +189,7 @@ export default function Show({ sport, categories }) {
                 
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6 mb-6 md:mb-8">
                     <div className="w-full lg:w-auto">
-                        <Link href={route('admin.sports.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] transition-colors mb-2 md:mb-3 group touch-manipulation py-1">
+                        <Link href={route('admin.sports.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-orange-500 transition-colors mb-2 md:mb-3 group touch-manipulation py-1">
                             <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1.5 transition-transform group-hover:-translate-x-1" /> 
                             Back to Sports
                         </Link>
@@ -201,7 +201,7 @@ export default function Show({ sport, categories }) {
                     
                     
                     <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 flex items-start gap-3 w-full lg:max-w-sm shadow-sm shrink-0">
-                        <div className="p-2 bg-white rounded-lg text-[#ff4d00] shadow-sm shrink-0">
+                        <div className="p-2 bg-white rounded-lg text-orange-500 shadow-sm shrink-0">
                             <Info className="w-4 h-4 md:w-5 md:h-5" />
                         </div>
                         <div>
@@ -220,12 +220,12 @@ export default function Show({ sport, categories }) {
                             
                             <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                 <h3 className="font-bold text-slate-800 flex items-center gap-2 text-xs md:text-sm">
-                                    <div className="w-2 h-2 rounded-full bg-[#ff4d00]"></div>
+                                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
                                     {category.name}
                                 </h3>
                                 <button 
                                     onClick={() => openAddModal(category)}
-                                    className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-white border border-slate-200 text-slate-400 hover:border-[#ff4d00] hover:bg-[#ff4d00] hover:text-white transition-all shadow-sm flex items-center justify-center touch-manipulation"
+                                    className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-white border border-slate-200 text-slate-400 hover:border-orange-500 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center justify-center touch-manipulation"
                                     title="Add Item"
                                 >
                                     <Plus className="w-4 h-4 md:w-5 md:h-5" />
@@ -268,7 +268,7 @@ export default function Show({ sport, categories }) {
                                                         {PARAM_CONFIG[test.parameter_type]?.label || test.parameter_type}
                                                     </span>
                                                     
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] md:text-[10px] font-bold bg-orange-50 text-orange-500 border border-orange-100">
                                                         <Target className="w-3 h-3" />
                                                         Target: {Number(test.target_value)} {test.unit}
                                                     </span>
@@ -305,7 +305,7 @@ export default function Show({ sport, categories }) {
                                     {modalMode === 'create' ? 'Add New Item' : 'Edit Test Item'}
                                 </h3>
                                 <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">
-                                    Category: <span className="text-[#ff4d00] font-bold ml-1">{selectedCategory?.name}</span>
+                                    Category: <span className="text-orange-500 font-bold ml-1">{selectedCategory?.name}</span>
                                 </p>
                             </div>
                             <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-rose-500 bg-white border border-slate-200 hover:bg-rose-50 rounded-full transition-all touch-manipulation">
@@ -323,7 +323,7 @@ export default function Show({ sport, categories }) {
                                         type="text" 
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
-                                        className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-sm font-medium outline-none shadow-sm touch-manipulation"
+                                        className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm font-medium outline-none shadow-sm touch-manipulation"
                                         placeholder="e.g. 100m Sprint"
                                         autoFocus
                                     />
@@ -336,7 +336,7 @@ export default function Show({ sport, categories }) {
                                         <select 
                                             value={data.parameter_type}
                                             onChange={e => setData('parameter_type', e.target.value)}
-                                            className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-sm font-medium appearance-none outline-none shadow-sm touch-manipulation"
+                                            className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm font-medium appearance-none outline-none shadow-sm touch-manipulation"
                                         >
                                             {Object.entries(PARAM_CONFIG).map(([key, config]) => (
                                                 <option key={key} value={key}>{config.label}</option>
@@ -353,20 +353,20 @@ export default function Show({ sport, categories }) {
                                 </div>
 
                                 <div className="bg-orange-50/50 p-4 md:p-5 rounded-xl border border-orange-100 space-y-2">
-                                    <label className="block text-[10px] font-bold text-[#ff4d00] ml-1">
+                                    <label className="block text-[10px] font-bold text-orange-500 ml-1">
                                         Target Benchmark (100%)
                                     </label>
                                     
                                     <div className="relative group">
                                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                            <Target className="h-4 w-4 md:h-5 md:w-5 text-orange-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                            <Target className="h-4 w-4 md:h-5 md:w-5 text-orange-400 group-focus-within:text-orange-500 transition-colors" />
                                         </div>
                                         <input 
                                             type="number" 
                                             step={activeConfig.step}
                                             value={data.target_value}
                                             onChange={e => setData('target_value', e.target.value)}
-                                            className="w-full pl-11 pr-16 py-3.5 md:py-3 rounded-lg border border-orange-200 bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-sm text-[#ff4d00] font-bold placeholder-orange-200 outline-none shadow-sm touch-manipulation"
+                                            className="w-full pl-11 pr-16 py-3.5 md:py-3 rounded-lg border border-orange-200 bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-sm text-orange-500 font-bold placeholder-orange-200 outline-none shadow-sm touch-manipulation"
                                             placeholder={activeConfig.placeholder}
                                         />
                                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -391,7 +391,7 @@ export default function Show({ sport, categories }) {
                                                 checked={data.is_lower_better}
                                                 onChange={e => setData('is_lower_better', e.target.checked)}
                                             />
-                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ff4d00]"></div>
+                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-xs font-bold text-slate-800">Semakin kecil nilai semakin bagus?</p>
@@ -413,7 +413,7 @@ export default function Show({ sport, categories }) {
                                     <button 
                                         type="submit" 
                                         disabled={processing} 
-                                        className="flex-[2] px-4 py-3 md:py-2.5 bg-[#ff4d00] text-white font-bold text-xs md:text-sm rounded-lg hover:bg-[#e64500] transition-colors shadow-lg shadow-[#ff4d00]/20 active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 touch-manipulation"
+                                        className="flex-[2] px-4 py-3 md:py-2.5 bg-orange-500 text-white font-bold text-xs md:text-sm rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 touch-manipulation"
                                     >
                                         {processing ? (
                                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

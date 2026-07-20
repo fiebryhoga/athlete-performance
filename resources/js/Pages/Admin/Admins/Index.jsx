@@ -116,7 +116,7 @@ export default function Index({ admins, filters }) {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
                     
                     <div className="relative z-10 w-full lg:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-[#ff4d00] bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
                         <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                             Admin Management
                         </h2>
@@ -131,12 +131,12 @@ export default function Index({ admins, filters }) {
                                 placeholder="Search by name or ID..." 
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm touch-manipulation" 
+                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm touch-manipulation" 
                             />
                         </div>
                         <button 
                             onClick={openCreateModal}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all active:scale-95 touch-manipulation shrink-0"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95 touch-manipulation shrink-0"
                         >
                             <Plus className="w-4 h-4 md:w-5 md:h-5" /> Add Admin
                         </button>
@@ -149,16 +149,16 @@ export default function Index({ admins, filters }) {
                     {admins.data.length > 0 ? (
                         admins.data.map((user) => (
                             <div key={user.id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-[#ff4d00] blur-2xl opacity-5 rounded-full pointer-events-none"></div>
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-orange-500 blur-2xl opacity-5 rounded-full pointer-events-none"></div>
                                 
                                 <div className="flex justify-between items-start mb-3">
-                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-bold bg-orange-50 text-[#ff4d00] border border-orange-100">
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-bold bg-orange-50 text-orange-500 border border-orange-100">
                                         <Shield className="w-3 h-3"/> Administrator
                                     </span>
                                 </div>
 
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-lg border border-orange-100 shadow-sm overflow-hidden">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-lg border border-orange-100 shadow-sm overflow-hidden">
                                         {user.profile_photo_url ? (
                                             <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
@@ -217,14 +217,14 @@ export default function Index({ admins, filters }) {
                                         <tr key={user.id} className="hover:bg-slate-50 transition-colors group">
                                             <td className="px-6 py-4 align-middle">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-sm border border-orange-100 shadow-sm overflow-hidden">
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-sm border border-orange-100 shadow-sm overflow-hidden">
                                                         {user.profile_photo_url ? (
                                                             <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                                         ) : (
                                                             user.name.substring(0, 2).toUpperCase()
                                                         )}
                                                     </div>
-                                                    <span className="font-bold text-slate-800 text-sm group-hover:text-[#ff4d00] transition-colors">{user.name}</span>
+                                                    <span className="font-bold text-slate-800 text-sm group-hover:text-orange-500 transition-colors">{user.name}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 align-middle font-mono text-slate-500 text-xs font-medium">
@@ -283,7 +283,7 @@ export default function Index({ admins, filters }) {
                         <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <div>
                                 <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
-                                    <UserCog className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]" />
+                                    <UserCog className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                                     {modalMode === 'create' ? 'Add New Admin' : 'Edit Admin'}
                                 </h3>
                                 <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">
@@ -302,7 +302,7 @@ export default function Index({ admins, filters }) {
                             <div className="flex flex-col items-center mb-2">
                                 <div 
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed border-slate-300 hover:border-[#ff4d00] bg-slate-50 hover:bg-orange-50/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all group shadow-sm touch-manipulation"
+                                    className="relative w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed border-slate-300 hover:border-orange-500 bg-slate-50 hover:bg-orange-50/50 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all group shadow-sm touch-manipulation"
                                 >
                                     {photoPreview ? (
                                         <>
@@ -312,7 +312,7 @@ export default function Index({ admins, filters }) {
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
+                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
                                             <UploadCloud className="w-5 h-5 md:w-6 md:h-6 mb-1" />
                                             <span className="text-[9px] md:text-[10px] font-bold mt-0.5 md:mt-1">Photo</span>
                                         </div>
@@ -327,11 +327,11 @@ export default function Index({ admins, filters }) {
                                 <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Full Name</label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <User className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                        <User className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                     </div>
                                     <input 
                                         type="text" 
-                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
+                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
                                         placeholder="e.g. John Doe"
@@ -345,7 +345,7 @@ export default function Index({ admins, filters }) {
                                 <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Login ID (Username)</label>
                                 <input 
                                     type="text" 
-                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all text-xs md:text-sm font-mono text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation"
+                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-xs md:text-sm font-mono text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation"
                                     value={data.username}
                                     onChange={e => setData('username', e.target.value)}
                                     placeholder="e.g. admin_01"
@@ -362,11 +362,11 @@ export default function Index({ admins, filters }) {
                                 </label>
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors" />
+                                        <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                     </div>
                                     <input 
                                         type="password" 
-                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
+                                        className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation"
                                         value={data.password}
                                         onChange={e => setData('password', e.target.value)}
                                         placeholder="••••••••"
@@ -378,7 +378,7 @@ export default function Index({ admins, filters }) {
                             <div>
                                 <label className="block text-[10px] font-bold text-slate-500 mb-1.5">Role / Jabatan</label>
                                 <select
-                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-[#ff4d00] focus:ring-2 focus:ring-[#ff4d00]/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm"
+                                    className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm"
                                     value={data.role}
                                     onChange={e => setData('role', e.target.value)}
                                 >
@@ -400,7 +400,7 @@ export default function Index({ admins, filters }) {
                                 <button 
                                     type="submit" 
                                     disabled={processing}
-                                    className="flex-[2] px-4 py-3 md:py-2.5 bg-[#ff4d00] text-white font-bold text-xs md:text-sm rounded-lg shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
+                                    className="flex-[2] px-4 py-3 md:py-2.5 bg-orange-500 text-white font-bold text-xs md:text-sm rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                                 >
                                     {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                     {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Buat Akun' : 'Simpan Perubahan')}

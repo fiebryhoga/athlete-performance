@@ -75,7 +75,7 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
         { value: 'red', label: 'Red (Danger)' },
     ];
 
-    const inputClass = "flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d00]/20 focus-visible:border-[#ff4d00]";
+    const inputClass = "flex h-9 w-full rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/20 focus-visible:border-orange-500";
     const labelClass = "text-xs font-bold text-slate-600 mb-1.5 block";
 
     return (
@@ -86,7 +86,7 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0 bg-white z-10 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl -mr-10 -mt-10 opacity-70 pointer-events-none"></div>
                     <div className="flex items-center gap-4 relative z-10">
-                        <div className="p-2.5 bg-orange-50 rounded-xl border border-orange-100 shadow-sm text-[#ff4d00]">
+                        <div className="p-2.5 bg-orange-50 rounded-xl border border-orange-100 shadow-sm text-orange-500">
                             <Settings2 size={20} />
                         </div>
                         <div>
@@ -122,11 +122,11 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                                             isActive 
-                                                ? 'bg-white text-[#ff4d00] shadow-sm border border-slate-200 ring-1 ring-black/5' 
+                                                ? 'bg-white text-orange-500 shadow-sm border border-slate-200 ring-1 ring-black/5' 
                                                 : 'text-slate-500 hover:bg-white hover:text-slate-800 border border-transparent hover:shadow-sm'
                                         }`}
                                     >
-                                        <tab.icon size={16} className={isActive ? 'text-[#ff4d00]' : 'text-slate-400'} />
+                                        <tab.icon size={16} className={isActive ? 'text-orange-500' : 'text-slate-400'} />
                                         {tab.label}
                                     </button>
                                 );
@@ -138,7 +138,7 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
                     <div className="flex-1 overflow-y-auto p-5 md:p-6 custom-scrollbar bg-slate-50/30">
                         <div className="space-y-4">
                             {Object.entries(activeCategoryData).map(([key, item]) => (
-                                <div key={key} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative transition-all hover:border-[#ff4d00]/30 hover:shadow-md">
+                                <div key={key} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative transition-all hover:border-orange-500/30 hover:shadow-md">
                                     
                                     {/* Card Header */}
                                     <div className="mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
@@ -214,7 +214,7 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
                     <button
                         type="submit"
                         disabled={processing}
-                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 bg-[#ff4d00] text-white shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] h-10 px-6 gap-2"
+                        className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 h-10 px-6 gap-2"
                     >
                         <Save size={16} />
                         Save Configuration

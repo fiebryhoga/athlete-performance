@@ -96,12 +96,12 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                         placeholder="Cari nama grup..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] transition-all outline-none shadow-sm" 
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm" 
                     />
                 </div>
                 <button 
                     onClick={openCreateModal}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] transition-all"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all"
                 >
                     <Plus className="w-4 h-4 md:w-5 md:h-5" /> Buat Grup
                 </button>
@@ -116,14 +116,14 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                 {group.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{group.description}</p>}
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={() => openEditModal(group)} className="text-slate-400 hover:text-[#ff4d00] transition-colors"><Edit3 size={16} /></button>
+                                <button onClick={() => openEditModal(group)} className="text-slate-400 hover:text-orange-500 transition-colors"><Edit3 size={16} /></button>
                                 <button onClick={() => handleDelete(group.id)} className="text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-3 mt-4">
                             <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                <Package size={16} className="text-[#ff4d00]" />
+                                <Package size={16} className="text-orange-500" />
                                 <span className="font-medium">{group.package?.name || 'Belum ada paket'}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -152,7 +152,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                 type="text"
                                 value={data.name}
                                 onChange={e => setData('name', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 required
                             />
                             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -164,7 +164,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                 <select
                                     value={data.subscription_package_id}
                                     onChange={e => setData('subscription_package_id', e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 >
                                     <option value="">-- Tidak Ada / Kosongkan --</option>
                                     {packages?.map(pkg => (
@@ -179,7 +179,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                     type="date"
                                     value={data.expiration_date}
                                     onChange={e => setData('expiration_date', e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                    className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 />
                                 {errors.expiration_date && <p className="text-red-500 text-xs mt-1">{errors.expiration_date}</p>}
                             </div>
@@ -190,7 +190,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                             <textarea
                                 value={data.description}
                                 onChange={e => setData('description', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-[#ff4d00] focus:border-[#ff4d00] text-sm"
+                                className="w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
                                 rows="2"
                             />
                         </div>
@@ -204,13 +204,13 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                         onClick={() => toggleMember(athlete.id)}
                                         className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                                             data.member_ids.includes(athlete.id) 
-                                            ? 'border-[#ff4d00] bg-orange-50' 
-                                            : 'border-slate-200 bg-white hover:border-[#ff4d00]/30 hover:bg-orange-50/30'
+                                            ? 'border-orange-500 bg-orange-50' 
+                                            : 'border-slate-200 bg-white hover:border-orange-500/30 hover:bg-orange-50/30'
                                         }`}
                                     >
                                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                                             data.member_ids.includes(athlete.id)
-                                            ? 'bg-[#ff4d00] border-[#ff4d00]'
+                                            ? 'bg-orange-500 border-orange-500'
                                             : 'border-slate-300'
                                         }`}>
                                             {data.member_ids.includes(athlete.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
@@ -233,13 +233,13 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                         onClick={() => toggleCoach(coach.id)}
                                         className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
                                             data.coach_ids.includes(coach.id) 
-                                            ? 'border-[#ff4d00] bg-orange-50' 
-                                            : 'border-slate-200 bg-white hover:border-[#ff4d00]/30 hover:bg-orange-50/30'
+                                            ? 'border-orange-500 bg-orange-50' 
+                                            : 'border-slate-200 bg-white hover:border-orange-500/30 hover:bg-orange-50/30'
                                         }`}
                                     >
                                         <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                                             data.coach_ids.includes(coach.id)
-                                            ? 'bg-[#ff4d00] border-[#ff4d00]'
+                                            ? 'bg-orange-500 border-orange-500'
                                             : 'border-slate-300'
                                         }`}>
                                             {data.coach_ids.includes(coach.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
@@ -262,7 +262,7 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                             </button>
                             <button
                                 type="submit"
-                                className="px-5 py-2.5 text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#ff4d00]/90 rounded-lg shadow-sm shadow-[#ff4d00]/20"
+                                className="px-5 py-2.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-500/90 rounded-lg shadow-sm shadow-orange-500/20"
                             >
                                 Simpan Grup
                             </button>

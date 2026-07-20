@@ -82,7 +82,7 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
             {onAddRecord && (
                 <button
                     onClick={onAddRecord}
-                    className="inline-flex flex-[2] md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-all bg-[#ff4d00] text-white hover:bg-[#e64500] shadow-lg shadow-[#ff4d00]/20 h-10 px-6 focus:outline-none focus:ring-2 focus:ring-[#ff4d00] focus:ring-offset-2"
+                    className="inline-flex flex-[2] md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-all bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 h-10 px-6 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
                     <Plus size={16} className="mr-1.5 sm:mr-1.5" />
                     <span className="hidden sm:inline">{"Add Data"}</span>

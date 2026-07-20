@@ -81,7 +81,7 @@ export default function Show({ athlete, dailyHistory }) {
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6 mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6">
                     <div className="flex items-center gap-4 md:gap-5">
                         {/* Avatar menggunakan warna Orange */}
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-orange-50 text-[#ff4d00] flex items-center justify-center font-bold text-xl md:text-2xl border-4 border-white shadow-sm shrink-0">
+                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-xl md:text-2xl border-4 border-white shadow-sm shrink-0">
                             {athlete?.profile_photo_url ? (
                                 <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                             ) : (
@@ -116,7 +116,7 @@ export default function Show({ athlete, dailyHistory }) {
                                     type="date" 
                                     value={formStartDate.data.training_start_date} 
                                     onChange={e => formStartDate.setData('training_start_date', e.target.value)} 
-                                    className="w-full text-xs md:text-sm font-medium text-slate-700 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#ff4d00]/50 focus:border-[#ff4d00] transition-all bg-white px-3 py-2" 
+                                    className="w-full text-xs md:text-sm font-medium text-slate-700 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white px-3 py-2" 
                                     required
                                 />
                             </div>
@@ -137,28 +137,28 @@ export default function Show({ athlete, dailyHistory }) {
                         onClick={() => setActiveTab('analytics')} 
                         className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 text-[11px] md:text-sm font-medium transition-all relative whitespace-nowrap ${
                             activeTab === 'analytics' 
-                                ? 'text-[#ff4d00]' 
+                                ? 'text-orange-500' 
                                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-t-lg'
                         }`}
                     >
                         <Activity className="w-3.5 h-3.5 md:w-4 md:h-4" /> 
                         Dashboard Analitik
                         {activeTab === 'analytics' && (
-                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#ff4d00] rounded-t-full"></span>
+                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full"></span>
                         )}
                     </button>
                     <button 
                         onClick={() => setActiveTab('history')} 
                         className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 text-[11px] md:text-sm font-medium transition-all relative whitespace-nowrap ${
                             activeTab === 'history' 
-                                ? 'text-[#ff4d00]' 
+                                ? 'text-orange-500' 
                                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-t-lg'
                         }`}
                     >
                         <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" /> 
                         Kalender Input
                         {activeTab === 'history' && (
-                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#ff4d00] rounded-t-full"></span>
+                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full"></span>
                         )}
                     </button>
                 </div>
@@ -225,7 +225,7 @@ export default function Show({ athlete, dailyHistory }) {
                                     type="button" 
                                     onClick={submitStartDate} 
                                     disabled={formStartDate.processing} 
-                                    className="px-3 md:px-4 py-2 bg-[#ff4d00] text-white font-medium text-xs md:text-sm rounded-lg shadow-sm hover:bg-[#e64500] transition-colors flex items-center gap-1.5 md:gap-2"
+                                    className="px-3 md:px-4 py-2 bg-orange-500 text-white font-medium text-xs md:text-sm rounded-lg shadow-sm hover:bg-orange-600 transition-colors flex items-center gap-1.5 md:gap-2"
                                 >
                                     {formStartDate.processing ? <span className="w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Check className="w-3.5 h-3.5 md:w-4 md:h-4" />}
                                     Simpan Perubahan

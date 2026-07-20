@@ -47,7 +47,7 @@ export default function Index({ app_name, app_logo }) {
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-in fade-in duration-300">
                     
                     <div className="px-5 md:px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
-                        <MonitorSmartphone className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]" />
+                        <MonitorSmartphone className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
                         <h3 className="font-bold text-base md:text-lg text-slate-800">Branding & Identity</h3>
                     </div>
 
@@ -61,7 +61,7 @@ export default function Index({ app_name, app_logo }) {
                                 value={data.app_name}
                                 onChange={e => setData('app_name', e.target.value)}
                                 
-                                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] font-medium text-sm transition-all outline-none touch-manipulation"
+                                className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 font-medium text-sm transition-all outline-none touch-manipulation"
                                 placeholder="Masukkan nama aplikasi..."
                             />
                             {errors.app_name && <p className="text-rose-500 text-[10px] md:text-xs mt-1.5 font-bold">{errors.app_name}</p>}
@@ -76,7 +76,7 @@ export default function Index({ app_name, app_logo }) {
                                 
                                 <div 
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="shrink-0 w-28 h-28 md:w-32 md:h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden relative cursor-pointer group hover:border-[#ff4d00] hover:bg-orange-50/50 transition-all touch-manipulation"
+                                    className="shrink-0 w-28 h-28 md:w-32 md:h-32 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden relative cursor-pointer group hover:border-orange-500 hover:bg-orange-50/50 transition-all touch-manipulation"
                                 >
                                     {preview ? (
                                         <>
@@ -86,7 +86,7 @@ export default function Index({ app_name, app_logo }) {
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-[#ff4d00]">
+                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
                                             <UploadCloud className="w-6 h-6 md:w-8 md:h-8 mb-1" />
                                             <span className="text-[9px] md:text-[10px] font-bold">Upload</span>
                                         </div>
@@ -121,7 +121,7 @@ export default function Index({ app_name, app_logo }) {
                                     
                                     {progress && (
                                         <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden border border-slate-200">
-                                            <div className="bg-[#ff4d00] h-full rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
+                                            <div className="bg-orange-500 h-full rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
                                         </div>
                                     )}
                                 </div>
@@ -133,7 +133,7 @@ export default function Index({ app_name, app_logo }) {
                             <button 
                                 type="submit" 
                                 disabled={processing}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#ff4d00] text-white px-8 py-3.5 md:py-3 rounded-lg md:rounded-xl font-bold hover:bg-[#e64500] transition-all shadow-lg shadow-[#ff4d00]/20 active:scale-95 disabled:opacity-70 text-sm touch-manipulation"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-8 py-3.5 md:py-3 rounded-lg md:rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 active:scale-95 disabled:opacity-70 text-sm touch-manipulation"
                             >
                                 {processing && <span className="w-4 h-4 md:w-5 md:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
                                 {!processing && <Save className="w-4 h-4 md:w-5 md:h-5" />}

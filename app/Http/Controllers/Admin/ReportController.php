@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\IndividualTraining;
 use App\Models\GroupTraining;
 use App\Models\TrainingGroup;
+use App\Models\GymAttendance;
+use App\Models\Setting;
 use Carbon\Carbon;
 
 class ReportController extends Controller
@@ -35,10 +37,10 @@ class ReportController extends Controller
                 $athlete->total_sessions = $trainings->count();
                 $athlete->completed_sessions = $trainings->where('status', 'completed')->count();
                 $athlete->scheduled_sessions = $trainings->whereNotIn('status', ['completed'])->count();
-                $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
+                $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
 
                 // Session list for drill-down (hanya yang belum dibayar)
-                $athlete->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
+                $athlete->sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -85,10 +87,10 @@ class ReportController extends Controller
                 $group->members_count = $group->members->count();
                 $group->total_sessions = $trainings->count();
                 $group->completed_sessions = $trainings->where('status', 'completed')->count();
-                $group->unpaid_sessions = $trainings->where('is_group_paid', false)->count();
+                $group->unpaid_sessions = $trainings->where('is_group_paid', false)->where('is_extra', false)->count();
 
                 // Session list for drill-down (hanya yang belum dibayar)
-                $group->sessions = $trainings->where('is_group_paid', false)->map(function ($t) {
+                $group->sessions = $trainings->where('is_group_paid', false)->where('is_extra', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -143,17 +145,17 @@ class ReportController extends Controller
                 $groupCount = $groupTrainings->count();
 
                 // Unpaid individual sessions
-                $unpaidIndividual = $individualTrainings->filter(function ($session) use ($coach) {
+                $unpaidIndividual = $individualTrainings->where('is_extra', false)->filter(function ($session) use ($coach) {
                     $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
                     $paidIds = $paidIds ?? [];
                     return !in_array($coach->id, $paidIds) && !in_array((string)$coach->id, $paidIds);
                 });
 
                 // Unpaid group sessions
-                $unpaidGroup = $groupTrainings->where('is_coach_paid', false);
+                $unpaidGroup = $groupTrainings->where('is_coach_paid', false)->where('is_extra', false);
                 $unpaidEarnings = 0;
 
-                foreach ($individualTrainings as $session) {
+                foreach ($individualTrainings->where('is_extra', false) as $session) {
                     $fee = $session->user?->package?->coach_fee_per_session ?? 0;
 
                     $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
@@ -163,7 +165,7 @@ class ReportController extends Controller
                     }
                 }
 
-                foreach ($groupTrainings as $session) {
+                foreach ($groupTrainings->where('is_extra', false) as $session) {
                     $fee = $session->group?->package?->coach_fee_per_session ?? 0;
 
                     if (!$session->is_coach_paid) {
@@ -171,11 +173,22 @@ class ReportController extends Controller
                     }
                 }
 
+                // Unpaid gym shifts
+                $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+                $unpaidGymShifts = GymAttendance::where('user_id', $coach->id)
+                    ->where('is_paid', false)
+                    ->whereNotNull('check_in_time')
+                    ->whereNotNull('check_out_time')
+                    ->get();
+                
+                $unpaidEarnings += ($unpaidGymShifts->count() * $gymShiftFee);
+
                 $lastPayout = \App\Models\CoachPayout::where('user_id', $coach->id)->latest('paid_at')->first();
 
                 $coach->individual_sessions = $unpaidIndividual->count();
                 $coach->group_sessions = $unpaidGroup->count();
-                $coach->total_sessions = $unpaidIndividual->count() + $unpaidGroup->count();
+                $coach->gym_sessions = $unpaidGymShifts->count();
+                $coach->total_sessions = $unpaidIndividual->count() + $unpaidGroup->count() + $unpaidGymShifts->count();
                 $coach->unpaid_sessions = $coach->total_sessions;
                 $coach->last_payout_amount = $lastPayout ? $lastPayout->amount : 0;
                 $coach->unpaid_earnings = $unpaidEarnings;
@@ -204,6 +217,21 @@ class ReportController extends Controller
                         'status' => $session->status,
                         'type' => 'Grup',
                         'fee' => $session->group?->package?->coach_fee_per_session ?? 0
+                    ]);
+                }
+
+                foreach ($unpaidGymShifts as $shift) {
+                    $checkIn = $shift->check_in_time ? Carbon::parse($shift->check_in_time)->format('H:i') : '';
+                    $checkOut = $shift->check_out_time ? Carbon::parse($shift->check_out_time)->format('H:i') : '';
+                    $coachSessions->push([
+                        'id' => 'gym_'.$shift->id,
+                        'date' => $shift->date,
+                        'name' => "Jaga Gym ($checkIn - $checkOut)",
+                        'session_number' => null,
+                        'status' => 'completed',
+                        'type' => 'Jaga Gym',
+                        'fee' => $gymShiftFee,
+                        'notes' => $shift->notes
                     ]);
                 }
 
@@ -263,6 +291,20 @@ class ReportController extends Controller
             $unpaidEarnings += $session->group?->package?->coach_fee_per_session ?? 0;
             $session->is_coach_paid = true;
             $session->save();
+        }
+
+        // Mark gym shifts as paid for this coach
+        $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+        $unpaidGymShifts = GymAttendance::where('user_id', $user->id)
+            ->where('is_paid', false)
+            ->whereNotNull('check_in_time')
+            ->whereNotNull('check_out_time')
+            ->get();
+
+        foreach ($unpaidGymShifts as $shift) {
+            $unpaidEarnings += $gymShiftFee;
+            $shift->is_paid = true;
+            $shift->save();
         }
 
         if ($unpaidEarnings > 0) {

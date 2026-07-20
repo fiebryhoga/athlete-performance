@@ -90,16 +90,16 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
 
             
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
-                <Link href={route('admin.performance.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-[#ff4d00] mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
+                <Link href={route('admin.performance.index')} className="inline-flex items-center text-[10px] md:text-xs font-bold text-slate-400 hover:text-orange-500 mb-3 md:mb-4 group transition-colors touch-manipulation py-1">
                 <ArrowLeft className="w-3.5 h-3.5 mr-1.5 transition-transform group-hover:-translate-x-1" /> Back to History list
                 </Link>
                 <div className="flex w-full sm:w-auto gap-2">
                     {!isAthlete && (
-                        <Link href={route('admin.performance.edit', test.id)} className="flex-1 sm:flex-none justify-center bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-orange-50 hover:text-[#ff4d00] hover:border-orange-200 transition-colors shadow-sm">
+                        <Link href={route('admin.performance.edit', test.id)} className="flex-1 sm:flex-none justify-center bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200 transition-colors shadow-sm">
                             <Edit3 className="w-4 h-4" /> Edit
                         </Link>
                     )}
-                    <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center bg-[#ff4d00] text-white px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg shadow-[#ff4d00]/20 hover:bg-[#e64500] hover:shadow-xl transition-all active:scale-95">
+                    <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center bg-orange-500 text-white px-5 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:shadow-xl transition-all active:scale-95">
                         <Printer className="w-4 h-4" /> Print PDF
                     </button>
                 </div>
@@ -122,12 +122,12 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                         />
                         <div>
                             <h1 className="text-xl md:text-2xl text-slate-800 font-bold tracking-tight">Performance Report</h1>
-                            <p className="text-[10px] md:text-xs text-[#ff4d00] font-bold mt-0.5">{appName}</p> 
+                            <p className="text-[10px] md:text-xs text-orange-500 font-bold mt-0.5">{appName}</p> 
                         </div>
                     </div>
                     <div className="text-left md:text-right w-full md:w-auto bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-lg">
                         <div className="inline-block px-2 py-0.5 bg-white md:bg-orange-50 rounded border border-slate-200 md:border-orange-100 mb-1">
-                            <p className="text-[9px] md:text-[10px] font-bold text-[#ff4d00]">Official Document</p>
+                            <p className="text-[9px] md:text-[10px] font-bold text-orange-500">Official Document</p>
                         </div>
                         <p className="text-[10px] md:text-xs text-slate-400 font-mono mt-1 font-bold">REF ID: {test.name}</p>
                     </div>
@@ -139,24 +139,24 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                         <div className="space-y-1.5">
                             <p className="text-[10px] text-slate-400 font-bold">Athlete Name</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
-                                <User className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.name}
+                                <User className="w-4 h-4 text-orange-500" /> {test.athlete.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
                             <p className="text-[10px] text-slate-400 font-bold">Sport Category</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
-                                <Trophy className="w-4 h-4 text-[#ff4d00]" /> {test.athlete.sport.name}
+                                <Trophy className="w-4 h-4 text-orange-500" /> {test.athlete.sport.name}
                             </div>
                         </div>
                         <div className="space-y-1.5">
                             <p className="text-[10px] text-slate-400 font-bold">Assessment Date</p>
                             <div className="flex items-center gap-2 text-slate-800 font-bold text-sm md:text-base">
-                                <Calendar className="w-4 h-4 text-[#ff4d00]" /> {test.date}
+                                <Calendar className="w-4 h-4 text-orange-500" /> {test.date}
                             </div>
                         </div>
                         <div className="space-y-1.5 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-200 mt-2 sm:mt-0">
-                            <p className="text-[10px] text-[#ff4d00] font-bold">Total Avg Score</p>
-                            <div className="flex items-center gap-2 text-[#ff4d00]">
+                            <p className="text-[10px] text-orange-500 font-bold">Total Avg Score</p>
+                            <div className="flex items-center gap-2 text-orange-500">
                                 <span className="text-2xl md:text-3xl font-bold tracking-tight">{formatPercent(current_score)}</span>
                             </div>
                         </div>
@@ -174,7 +174,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} />
                                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                     <Radar name="Target" dataKey="B" stroke="#cbd5e1" strokeWidth={1} fill="#f8fafc" fillOpacity={0.5} strokeDasharray="3 3" />
-                                    <Radar name="Athlete" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.3} />
+                                    <Radar name="Athlete" dataKey="A" stroke="orange-500" strokeWidth={2} fill="orange-500" fillOpacity={0.3} />
                                     <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                                 </RadarChart>
                             </ResponsiveContainer>
@@ -188,14 +188,14 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                 <AreaChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.4}/>
-                                            <stop offset="95%" stopColor="#ff4d00" stopOpacity={0}/>
+                                            <stop offset="5%" stopColor="orange-500" stopOpacity={0.4}/>
+                                            <stop offset="95%" stopColor="orange-500" stopOpacity={0}/>
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} axisLine={false} tickLine={false} dy={10} />
                                     <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                    <Area type="monotone" dataKey="score" stroke="#ff4d00" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" activeDot={{r: 5, fill: '#ff4d00', strokeWidth: 0}} />
+                                    <Area type="monotone" dataKey="score" stroke="orange-500" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" activeDot={{r: 5, fill: 'orange-500', strokeWidth: 0}} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -232,7 +232,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                 })}
 
                                 
-                                <Bar name="Current Test" dataKey="score" fill="#ff4d00" radius={[4, 4, 0, 0]} barSize={12} />
+                                <Bar name="Current Test" dataKey="score" fill="orange-500" radius={[4, 4, 0, 0]} barSize={12} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -297,7 +297,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
                                     <td colSpan="100%" className="px-4 md:px-6 py-4">
                                         <div className="flex justify-end items-center gap-4">
                                             <span className="font-bold text-slate-500 text-[10px] md:text-xs">Total Average Score :</span>
-                                            <span className="font-bold text-2xl md:text-3xl text-[#ff4d00]">{formatPercent(current_score)}</span>
+                                            <span className="font-bold text-2xl md:text-3xl text-orange-500">{formatPercent(current_score)}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -308,7 +308,7 @@ export default function Show({ test, current_score, radar_data, item_analysis, h
 
                 
                 <div className="bg-slate-50 rounded-lg p-5 md:p-6 border border-slate-100 print:bg-transparent print:border-slate-300" style={{ pageBreakInside: 'avoid' }}>
-                    <h4 className="text-[10px] md:text-xs font-bold text-[#ff4d00] mb-3 flex items-center gap-2">
+                    <h4 className="text-[10px] md:text-xs font-bold text-orange-500 mb-3 flex items-center gap-2">
                         <FileText className="w-4 h-4" /> Coach Notes & Evaluation
                     </h4>
                     <p className="text-xs md:text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-line text-justify">

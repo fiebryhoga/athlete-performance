@@ -69,14 +69,22 @@ class GroupTrainingController extends Controller
             'location' => 'required|string|max:255',
             'coach_ids' => 'nullable|array',
             'blocks' => 'array',
+            'is_extra' => 'boolean',
         ]);
 
-        $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
-            ->where('is_group_paid', false)
-            ->orderBy('session_number', 'desc')
-            ->first();
+        $isExtra = $request->input('is_extra', false);
 
-        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        if ($isExtra) {
+            $session_number = null;
+        } else {
+            $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
+                ->where('is_group_paid', false)
+                ->where('is_extra', false)
+                ->orderBy('session_number', 'desc')
+                ->first();
+
+            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        }
 
         $training = GroupTraining::create([
             'training_group_id' => $group->id,
@@ -84,6 +92,7 @@ class GroupTrainingController extends Controller
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'session_number' => $session_number,
+            'is_extra' => $isExtra,
             'name' => $request->name,
             'training_type' => $request->training_type,
             'location' => $request->location,
@@ -264,7 +273,30 @@ class GroupTrainingController extends Controller
             'location' => 'required|string|max:255',
             'coach_ids' => 'nullable|array',
             'blocks' => 'array',
+            'is_extra' => 'boolean',
         ]);
+
+        $isExtra = $request->input('is_extra', false);
+
+        if ($training->is_extra !== $isExtra) {
+            if ($isExtra) {
+                $oldSessionNumber = $training->session_number;
+                if ($oldSessionNumber) {
+                    \App\Models\GroupTraining::where('training_group_id', $training->training_group_id)
+                        ->where('is_group_paid', $training->is_group_paid)
+                        ->where('session_number', '>', $oldSessionNumber)
+                        ->decrement('session_number');
+                }
+                $training->session_number = null;
+            } else {
+                $lastUnpaidSession = GroupTraining::where('training_group_id', $training->training_group_id)
+                    ->where('is_group_paid', false)
+                    ->where('is_extra', false)
+                    ->orderBy('session_number', 'desc')
+                    ->first();
+                $training->session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+            }
+        }
 
         $training->update([
             'date' => $request->date,
@@ -272,6 +304,7 @@ class GroupTrainingController extends Controller
             'training_type' => $request->training_type,
             'location' => $request->location,
             'coach_ids' => $request->coach_ids ?? [],
+            'is_extra' => $isExtra,
         ]);
 
         // Process blocks
@@ -408,15 +441,21 @@ class GroupTrainingController extends Controller
         $group = $training->group;
 
         // Calculate new session_number
-        $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
-            ->where('is_group_paid', false)
-            ->orderBy('session_number', 'desc')
-            ->first();
-        $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        if ($training->is_extra) {
+            $session_number = null;
+        } else {
+            $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
+                ->where('is_group_paid', false)
+                ->where('is_extra', false)
+                ->orderBy('session_number', 'desc')
+                ->first();
+            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        }
 
         // Duplicate the training record
         $newTraining = $training->replicate(['attendee_ids']);
         $newTraining->date = $request->target_date;
+        $newTraining->is_extra = $training->is_extra;
         $newTraining->session_number = $session_number;
         $newTraining->status = 'scheduled';
         $newTraining->attendee_ids = [];

@@ -62,7 +62,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center text-center h-full relative overflow-hidden">
                         <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-orange-500/10 to-transparent"></div>
                         
-                        <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 bg-[#ff4d00] rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-[#ff4d00]/20 border-4 border-white overflow-hidden shrink-0">
+                        <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 bg-orange-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-xl shadow-orange-500/20 border-4 border-white overflow-hidden shrink-0">
                             {user.profile_photo_url ? (
                                 <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                             ) : (
@@ -74,7 +74,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                         <p className="text-xs md:text-sm text-slate-500 font-medium mb-3">{user.username || '-'}</p>
                         
                         <div className="flex gap-2 mb-6">
-                            <span className="px-3 py-1 bg-orange-50 text-[#ff4d00] rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1 border border-orange-100">
+                            <span className="px-3 py-1 bg-orange-50 text-orange-500 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1 border border-orange-100">
                                 <Trophy className="w-3 h-3" /> {stats.sport}
                             </span>
                             <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] md:text-xs font-bold border border-slate-200">
@@ -112,7 +112,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                     <div className="lg:col-span-2 flex flex-col gap-6 min-w-0 w-full">
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
                             <StatCard label="Total Sesi" value={stats.sessions} icon={Activity} color="text-slate-800" />
-                            <StatCard label="Rata-rata Skor" value={stats.avg_score} icon={Target} color="text-[#ff4d00]" />
+                            <StatCard label="Rata-rata Skor" value={stats.avg_score} icon={Target} color="text-orange-500" />
                             <StatCard label="Skor Tertinggi" value={stats.max_score} icon={TrendingUp} color="text-emerald-600" />
                             <StatCard label="Terbaik" value={stats.best_category} icon={Zap} color="text-amber-500" isText />
                         </div>
@@ -121,7 +121,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                             
                             <div className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col min-w-0 w-full">
                                 <h3 className="text-xs md:text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-                                    <span className="w-1.5 h-4 bg-[#ff4d00] rounded-full"></span> Peta Kemampuan vs Target
+                                    <span className="w-1.5 h-4 bg-orange-500 rounded-full"></span> Peta Kemampuan vs Target
                                 </h3>
                                 <div className="flex-1 w-full min-h-[250px] relative">
                                     {/* <ResponsiveContainer width="100%" minHeight={250}>
@@ -130,7 +130,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 10, fontWeight: 'bold' }} />
                                             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                                             <Radar name="Target Cabor" dataKey="B" stroke="#fbbf24" strokeWidth={2} fill="#fbbf24" fillOpacity={0.15} />
-                                            <Radar name="Performa Saya" dataKey="A" stroke="#ff4d00" strokeWidth={2} fill="#ff4d00" fillOpacity={0.5} />
+                                            <Radar name="Performa Saya" dataKey="A" stroke="orange-500" strokeWidth={2} fill="orange-500" fillOpacity={0.5} />
                                             <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
                                             <RechartsTooltip contentStyle={{borderRadius:'8px', fontSize: '12px'}} />
                                         </RadarChart>
@@ -234,7 +234,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                         <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
                                         <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
                                         
-                                        <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="#ff4d00" fillOpacity={0.6} radius={[4, 4, 0, 0]} barSize={20} />
+                                        <Bar yAxisId="left" name="Daily Load" dataKey="daily_load" fill="orange-500" fillOpacity={0.6} radius={[4, 4, 0, 0]} barSize={20} />
                                         <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (Max 40)" stroke="#475569" strokeWidth={3} dot={{r: 3}} activeDot={{r: 5}} />
                                     </ComposedChart>
                                 </ResponsiveContainer> */ null
@@ -284,7 +284,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                 {/* Comprehensive Athlete Profiling Metrics */}
                 <div className="mb-6 md:mb-8">
                     <h3 className="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-[#ff4d00]" />
+                        <Target className="w-4 h-4 text-orange-500" />
                         Athlete Profiling Metrics
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
@@ -344,8 +344,8 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                         </div>
                                     </div>
                                     <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
-                                        <span className="text-sm text-[#ff4d00] font-bold">Daily Load (AU)</span>
-                                        <span className="text-xl font-bold text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
+                                        <span className="text-sm text-orange-500 font-bold">Daily Load (AU)</span>
+                                        <span className="text-xl font-bold text-orange-500">{latest_wellness.daily_load ?? '-'}</span>
                                     </div>
                                 </div>
                             ) : (
@@ -417,7 +417,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                     </div>
                                     <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-1">
                                         <span className="text-[10px] font-bold text-slate-400">Skor Akhir</span>
-                                        <span className="font-bold text-[#ff4d00] text-lg">{Number(session.score).toFixed(1)}</span>
+                                        <span className="font-bold text-orange-500 text-lg">{Number(session.score).toFixed(1)}</span>
                                     </div>
                                 </div>
                             ))
@@ -450,7 +450,7 @@ export default function AthleteProfiling({ user, stats, radarData, history, tren
                                                 <td className="px-6 py-4 text-center text-slate-500 text-xs">{session.items_count} Tes</td>
                                                 <td className="px-6 py-4 text-center">
                                                     
-                                                    <span className="font-bold text-[#ff4d00] text-lg">{Number(session.score).toFixed(1)}</span>
+                                                    <span className="font-bold text-orange-500 text-lg">{Number(session.score).toFixed(1)}</span>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold border ${session.status.color}`}>

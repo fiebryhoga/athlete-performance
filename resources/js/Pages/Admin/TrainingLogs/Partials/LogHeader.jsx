@@ -24,11 +24,11 @@ export default function LogHeader({ session }) {
                 
                 <div className="flex-1 min-w-0 relative z-10">
                     <div className="flex flex-wrap items-center gap-2 mb-2 md:mb-2.5">
-                        <span className="bg-[#ff4d00] text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-md shadow-sm shadow-[#ff4d00]/20">
+                        <span className="bg-orange-500 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-md shadow-sm shadow-orange-500/20">
                             Sesi {session.session_number}
                         </span>
                         <span className="text-[10px] md:text-xs font-bold text-slate-400 flex items-center gap-1.5 bg-slate-50 border border-slate-100 px-3 py-1 rounded-md">
-                            <Activity className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#ff4d00]" /> Program Latihan
+                            <Activity className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-500" /> Program Latihan
                         </span>
                     </div>
                     
@@ -66,7 +66,7 @@ export default function LogHeader({ session }) {
 
                 
                 <div className="p-4 md:p-5 flex items-center gap-3">
-                    <div className="p-2 bg-white border border-slate-200 rounded-lg text-[#ff4d00] shadow-sm shrink-0">
+                    <div className="p-2 bg-white border border-slate-200 rounded-lg text-orange-500 shadow-sm shrink-0">
                         <Calendar className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">

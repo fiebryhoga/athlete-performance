@@ -30,6 +30,7 @@ export default function CreateSession({
         location: "",
         coach_ids: [],
         blocks: [],
+        is_extra: false,
     });
 
     const [isExModalOpen, setIsExModalOpen] = useState(false);
@@ -158,7 +159,7 @@ export default function CreateSession({
                 {/* Basic Info */}
                 <div className="bg-white p-6 md:p-8 border border-slate-200 rounded-2xl shadow-sm">
                     <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-[#ff4d00]" />
+                        <Activity className="w-5 h-5 text-orange-500" />
                         Informasi Dasar
                     </h3>
 
@@ -173,7 +174,7 @@ export default function CreateSession({
                                 onChange={(e) =>
                                     setData("date", e.target.value)
                                 }
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none transition-all"
+                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
                             />
                             {errors.date && (
                                 <div className="text-rose-500 text-xs mt-1 font-bold">
@@ -194,7 +195,7 @@ export default function CreateSession({
                                     setData("name", e.target.value)
                                 }
                                 placeholder="Contoh: Recovery Training"
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none transition-all placeholder-slate-400"
+                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400"
                                 required
                             />
                             {errors.name && (
@@ -215,7 +216,7 @@ export default function CreateSession({
                                     setData("training_type", e.target.value)
                                 }
                                 placeholder="e.g. Strength, Recovery..."
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none transition-all placeholder-slate-400"
+                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400"
                             />
                         </div>
 
@@ -230,13 +231,28 @@ export default function CreateSession({
                                     setData("location", e.target.value)
                                 }
                                 placeholder="e.g. Gym A..."
-                                className={`w-full py-2.5 px-4 bg-slate-50 border rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#ff4d00]/20 focus:border-[#ff4d00] outline-none transition-all placeholder-slate-400 ${errors.location ? "border-rose-300" : "border-slate-200"}`}
+                                className={`w-full py-2.5 px-4 bg-slate-50 border rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400 ${errors.location ? "border-rose-300" : "border-slate-200"}`}
                             />
                             {errors.location && (
                                 <div className="text-rose-500 text-xs mt-1 font-bold">
                                     {errors.location}
                                 </div>
                             )}
+                        </div>
+
+                        <div className="md:col-span-2 lg:col-span-3">
+                            <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer" onClick={() => setData('is_extra', !data.is_extra)}>
+                                <input
+                                    type="checkbox"
+                                    checked={data.is_extra}
+                                    onChange={(e) => setData('is_extra', e.target.checked)}
+                                    className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
+                                />
+                                <label className="text-sm font-semibold text-slate-800 cursor-pointer">
+                                    Sesi Tambahan (Turnamen / PR / Latihan Mandiri)
+                                    <span className="block text-xs text-slate-500 mt-0.5">Sesi ini tidak akan memotong kuota paket latihan.</span>
+                                </label>
+                            </div>
                         </div>
 
                         <div className="md:col-span-2 lg:col-span-3">
@@ -248,7 +264,7 @@ export default function CreateSession({
                                     coaches.map((coach) => (
                                         <label
                                             key={coach.id}
-                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all ${data.coach_ids.includes(coach.id) ? "bg-orange-50 border-[#ff4d00] text-[#ff4d00] shadow-sm" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"}`}
+                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all ${data.coach_ids.includes(coach.id) ? "bg-orange-50 border-orange-500 text-orange-500 shadow-sm" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"}`}
                                         >
                                             <input
                                                 type="checkbox"
@@ -287,7 +303,7 @@ export default function CreateSession({
                                                 {coach.name}
                                             </span>
                                             <span
-                                                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md font-bold ${data.coach_ids.includes(coach.id) ? "bg-[#ff4d00]/10 text-[#ff4d00]" : "bg-slate-100 text-slate-500"}`}
+                                                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md font-bold ${data.coach_ids.includes(coach.id) ? "bg-orange-500/10 text-orange-500" : "bg-slate-100 text-slate-500"}`}
                                             >
                                                 {coach.role.replace("_", " ")}
                                             </span>
@@ -308,7 +324,7 @@ export default function CreateSession({
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                     <div className="p-5 bg-white border-b border-slate-200 flex justify-between items-center sticky top-0 z-40">
                         <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <Dumbbell className="w-5 h-5 text-[#ff4d00]" />
+                            <Dumbbell className="w-5 h-5 text-orange-500" />
                             Skema & Program Latihan
                         </h3>
                     </div>
@@ -435,7 +451,7 @@ export default function CreateSession({
                             <button
                                 type="button"
                                 onClick={addTextBlock}
-                                className="text-sm font-bold bg-orange-50 border border-orange-200 text-[#ff4d00] px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md"
+                                className="text-sm font-bold bg-orange-50 border border-orange-200 text-orange-500 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md"
                             >
                                 <Type size={16} className="text-orange-500" />{" "}
                                 Tambah Catatan Teks
@@ -443,7 +459,7 @@ export default function CreateSession({
                             <button
                                 type="button"
                                 onClick={addPhaseBlock}
-                                className="text-sm font-bold bg-[#ff4d00] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-[#e64500] shadow-md shadow-[#ff4d00]/20 hover:shadow-lg"
+                                className="text-sm font-bold bg-orange-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-600 shadow-md shadow-orange-500/20 hover:shadow-lg"
                             >
                                 <Activity size={16} /> Tambah Fase Latihan
                             </button>
@@ -454,7 +470,7 @@ export default function CreateSession({
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-8 py-3.5 text-sm font-bold text-white bg-[#ff4d00] hover:bg-[#e64500] rounded-xl transition-all shadow-lg shadow-[#ff4d00]/20 disabled:opacity-50 flex items-center gap-2"
+                            className="px-8 py-3.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50 flex items-center gap-2"
                         >
                             {processing
                                 ? "MENYIMPAN..."

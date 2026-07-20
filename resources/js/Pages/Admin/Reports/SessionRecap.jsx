@@ -48,7 +48,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
             text: `Anda akan menandai ${athlete.unpaid_sessions} sesi belum bayar milik ${athlete.name} sebagai lunas.`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ff4d00',
+            confirmButtonColor: 'orange-500',
             cancelButtonColor: '#94a3b8',
             confirmButtonText: 'Ya, Tandai Lunas!'
         }).then((result) => {
@@ -64,7 +64,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
             text: `Anda akan menandai ${group.unpaid_sessions} sesi belum bayar milik grup ${group.name} sebagai lunas.`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ff4d00',
+            confirmButtonColor: 'orange-500',
             cancelButtonColor: '#94a3b8',
             confirmButtonText: 'Ya, Tandai Lunas!'
         }).then((result) => {
@@ -105,7 +105,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
         }
         
         const percent = Math.min(100, Math.round((completed / total) * 100));
-        let colorClass = "bg-[#ff4d00]";
+        let colorClass = "bg-orange-500";
         if (percent >= 100) colorClass = "bg-green-500";
         else if (percent > 60) colorClass = "bg-orange-500";
         
@@ -145,7 +145,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                             <p className="text-xs font-bold text-slate-500 mb-1">Total Sesi Individu</p>
                             <h3 className="text-3xl font-bold text-slate-800">{totalAthleteSessions}</h3>
                         </div>
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-[#ff4d00] shadow-inner">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-orange-500 shadow-inner">
                             <UserCheck className="w-6 h-6" />
                         </div>
                     </div>
@@ -193,7 +193,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                 <button
                     onClick={() => setActiveTab('individual')}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
-                        activeTab === 'individual' ? 'bg-[#ff4d00] text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                        activeTab === 'individual' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                 >
                     <UserCheck size={16} /> Klien Individu
@@ -201,7 +201,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                 <button
                     onClick={() => setActiveTab('group')}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
-                        activeTab === 'group' ? 'bg-[#ff4d00] text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                        activeTab === 'group' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                 >
                     <Users size={16} /> Grup Latihan
@@ -278,7 +278,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                             <button
                                                                 onClick={() => handlePayAthlete(athlete)}
                                                                 disabled={processing}
-                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                                                             >
                                                                 <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
                                                             </button>
@@ -421,7 +421,7 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                             <button
                                                                 onClick={() => handlePayGroup(group)}
                                                                 disabled={processing}
-                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#ff4d00]/10 text-[#ff4d00] hover:bg-[#ff4d00] hover:text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                                                             >
                                                                 <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
                                                             </button>
@@ -503,7 +503,8 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500">Nama Pelatih</th>
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Sesi Individu</th>
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Sesi Grup</th>
-                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Total Sesi (All)</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Jaga Gym</th>
+                                            <th className="px-5 py-3 text-xs font-bold text-slate-500 text-center">Total (All)</th>
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Pencairan Terakhir</th>
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Belum Dicairkan</th>
                                             <th className="px-5 py-3 text-xs font-bold text-slate-500 text-right">Aksi</th>
@@ -534,6 +535,11 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                     <td className="px-5 py-4 text-center">
                                                         <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
                                                             {coach.group_sessions}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-center">
+                                                        <span className="inline-flex min-w-[2.5rem] px-2 py-1 rounded bg-slate-100 text-slate-600 font-bold text-sm border border-slate-200">
+                                                            {coach.gym_sessions || 0}
                                                         </span>
                                                     </td>
                                                     <td className="px-5 py-4 text-center">
@@ -584,13 +590,24 @@ export default function SessionRecap({ athletes, groups, coaches }) {
                                                                                         {session.date ? new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                                                                     </td>
                                                                                     <td className="px-4 py-3 w-24 text-center">
-                                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${session.type === 'Grup' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
+                                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${session.type === 'Grup' ? 'bg-orange-50 text-orange-600 border border-orange-100' : session.type === 'Jaga Gym' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
                                                                                             {session.type}
                                                                                         </span>
                                                                                     </td>
                                                                                     <td className="px-4 py-3">
-                                                                                        <span className="font-bold text-slate-800 mr-2">Sesi {session.session_number}:</span>
-                                                                                        <span className="text-slate-600">{session.name}</span>
+                                                                                        <div className="flex items-center">
+                                                                                            {session.session_number ? (
+                                                                                                <span className="font-bold text-slate-800 mr-2">Sesi {session.session_number}:</span>
+                                                                                            ) : (
+                                                                                                <span className="font-bold text-slate-800 mr-2">•</span>
+                                                                                            )}
+                                                                                            <span className="text-slate-600">{session.name}</span>
+                                                                                        </div>
+                                                                                        {session.notes && (
+                                                                                            <div className="text-[11px] text-slate-500 mt-1 italic pl-3 border-l-2 border-slate-200">
+                                                                                                {session.notes}
+                                                                                            </div>
+                                                                                        )}
                                                                                     </td>
                                                                                     <td className="px-4 py-3 w-28">
                                                                                         {session.status === 'completed' ? (
