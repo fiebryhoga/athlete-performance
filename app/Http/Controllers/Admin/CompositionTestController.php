@@ -139,6 +139,8 @@ class CompositionTestController extends Controller
             'extracellular_water' => 'nullable|numeric',
             'phase_angle'         => 'nullable|numeric',
             'bmr'                 => 'nullable|integer',
+            'activity_level'      => 'nullable|numeric',
+            'tdee'                => 'nullable|integer',
             'other_mass'          => 'nullable|numeric',
         ]);
 
@@ -175,6 +177,8 @@ class CompositionTestController extends Controller
             'extracellular_water' => 'nullable|numeric',
             'phase_angle'         => 'nullable|numeric',
             'bmr'                 => 'nullable|integer',
+            'activity_level'      => 'nullable|numeric',
+            'tdee'                => 'nullable|integer',
             'other_mass'          => 'nullable|numeric',
         ]);
 

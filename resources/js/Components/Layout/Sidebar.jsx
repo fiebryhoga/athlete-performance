@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3, Package
+    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3, Package, Flame, Building2
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -70,6 +70,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             title: 'Sistem & Laporan',
             items: [
                 { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: Shield, roles: ['superadmin', 'coach'] },
+                { name: 'Absensi Gym', route: 'admin.gym-attendance.index', checkPath: '/admin/gym-attendance', icon: Building2, roles: ['superadmin', 'coach'], condition: () => userRole === 'superadmin' || props.auth.user.is_gym_guard },
                 { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: BarChart3, roles: ['superadmin'] },
                 { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
             ]
@@ -117,7 +118,11 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             {/* Menu List */}
             <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-6 px-3 space-y-6">
                 {menuGroups.map((group, groupIdx) => {
-                    const filteredItems = group.items.filter(item => item.roles.includes(userRole));
+                    const filteredItems = group.items.filter(item => {
+                        if (!item.roles.includes(userRole)) return false;
+                        if (item.condition && !item.condition()) return false;
+                        return true;
+                    });
                     if (filteredItems.length === 0) return null;
 
                     return (

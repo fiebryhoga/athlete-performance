@@ -142,7 +142,7 @@ export default function BenchmarkSettingsModal({ isOpen, onClose, currentBenchma
                                     
                                     {/* Card Header */}
                                     <div className="mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
-                                        <h4 className="text-sm font-extrabold text-slate-800 capitalize tracking-tight">
+                                        <h4 className="text-sm font-bold text-slate-800 capitalize tracking-tight">
                                             {key.replace(/_/g, ' ')}
                                         </h4>
                                         <div className={`w-3 h-3 rounded-full shadow-inner bg-${item.color}-500 ring-4 ring-${item.color}-500/20`} title={`Color: ${item.color}`}></div>

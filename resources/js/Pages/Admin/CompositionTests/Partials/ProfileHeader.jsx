@@ -25,7 +25,7 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
             
             <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-2.5 mb-2">
-                    <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 leading-none capitalize">
+                    <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-slate-900 leading-none capitalize">
                         {player.name}
                     </h2>
                     {player.position && (
@@ -38,22 +38,22 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
                 <div className="grid grid-cols-2 gap-y-3 gap-x-6 sm:flex sm:flex-wrap sm:items-center sm:gap-3 md:gap-4 text-xs md:text-sm mt-3 sm:mt-0">
                     <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Age"}</span>
-                        <span className="font-extrabold text-slate-800">{player.age || latestTest?.age || '-'} <span className="font-semibold text-slate-500">yrs</span></span>
+                        <span className="font-bold text-slate-800">{player.age || latestTest?.age || '-'} <span className="font-semibold text-slate-500">yrs</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Height"}</span>
-                        <span className="font-extrabold text-slate-800">{player.height || latestTest?.height || '-'} <span className="font-medium text-slate-500">cm</span></span>
+                        <span className="font-bold text-slate-800">{player.height || latestTest?.height || '-'} <span className="font-medium text-slate-500">cm</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Latest Weight"}</span>
-                        <span className="font-extrabold text-slate-800">{latestTest?.weight || player.weight || '-'} <span className="font-semibold text-slate-500">kg</span></span>
+                        <span className="font-bold text-slate-800">{latestTest?.weight || player.weight || '-'} <span className="font-semibold text-slate-500">kg</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Total Tests"}</span>
-                        <span className="font-extrabold text-slate-800">{totalTests} <span className="font-semibold text-slate-500">records</span></span>
+                        <span className="font-bold text-slate-800">{totalTests} <span className="font-semibold text-slate-500">records</span></span>
                     </div>
                 </div>
             </div>

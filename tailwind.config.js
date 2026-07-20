@@ -13,8 +13,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                // Ganti font menjadi Barlow yang sangat sporty dan dinamis
-                sans: ['"Barlow"', ...defaultTheme.fontFamily.sans],
+                // Menggunakan font Plus Jakarta Sans yang sangat premium dan modern
+                sans: ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 // Opsional: Kita definisikan warna brand biar konsisten

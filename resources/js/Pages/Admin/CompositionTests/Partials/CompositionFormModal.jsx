@@ -39,6 +39,35 @@ const InputField = memo(({ label, id, type ="number", step ="0.1", placeholder =
  );
 });
 
+const SelectField = memo(({ label, id, value, onChange, error, tooltip, options }) => {
+    const handleChange = (e) => onChange(id, e.target.value);
+    
+    return (
+        <div className="space-y-1.5">
+            <div className="flex items-center h-5">
+                <label htmlFor={id} className="text-xs font-bold text-slate-700">
+                    {label}
+                </label>
+                {tooltip && <InfoTooltip text={tooltip} />}
+            </div>
+            <select
+                id={id}
+                value={value ?? ''}
+                onChange={handleChange}
+                className={`flex h-9 w-full rounded-md border bg-slate-50/50 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d00]/20 focus-visible:border-[#ff4d00] ${
+                    error ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/50' : 'border-slate-200'
+                }`}
+            >
+                <option value="">- Select -</option>
+                {options.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+            </select>
+            {error && <p className="text-[10px] text-red-500 font-medium">{error}</p>}
+        </div>
+    );
+});
+
 export default function CompositionFormModal({ isOpen, onClose, player, record = null }) {
  const isEditing = !!record;
  const isMale = player?.gender === 'male' || player?.gender === 'L' || !player?.gender;
@@ -71,6 +100,8 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  phase_angle: '',
  metabolic_age: '',
  bmr: '',
+ activity_level: '',
+ tdee: '',
  other_mass: '',
  };
  };
@@ -97,7 +128,15 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  }, [isOpen, record, player]);
 
  const handleDataChange = useCallback((id, value) => {
- setData(id, value);
+    setData(prev => {
+        const next = { ...prev, [id]: value };
+        if (id === 'activity_level' && next.bmr && value) {
+            next.tdee = Math.round(next.bmr * parseFloat(value));
+        } else if (id === 'activity_level' && !value) {
+            next.tdee = '';
+        }
+        return next;
+    });
  }, [setData]);
 
  const handleMeasurementChange = useCallback((id, value) => {
@@ -134,6 +173,9 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  if (w > 0 && h > 0 && a > 0) {
  const bmr = (10 * w) + (6.25 * h) - (5 * a) + (isMale ? 5 : -161);
  updates.bmr = Math.round(bmr);
+ if (data.activity_level) {
+    updates.tdee = Math.round(bmr * parseFloat(data.activity_level));
+ }
  }
 
  if (w > 0 && h > 0 && a > 0) {
@@ -189,7 +231,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                 
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
                     <div>
-                        <h2 className="text-lg font-extrabold tracking-tight text-slate-900">
+                        <h2 className="text-lg font-bold tracking-tight text-slate-900">
                             {isEditing ? 'Edit Body Composition' : 'Add New Record'}
                         </h2>
                         <p className="text-sm font-medium text-slate-500 mt-0.5">
@@ -208,7 +250,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                             <Calculator className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
-                            <p className="text-sm font-extrabold text-orange-950">{"Smart Calculation Engine"}</p>
+                            <p className="text-sm font-bold text-orange-950">{"Smart Calculation Engine"}</p>
                             <p className="text-xs font-medium text-orange-900/80 leading-relaxed">
                                 {"Fill in"} <strong>{"Weight, Height, Age"}</strong>. If without BIA tool, fill in <strong>{"Neck & Waist Circumference"}</strong> then click the button to instantly extract 10+ anatomy metrics.
                             </p>
@@ -281,6 +323,14 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  <InputField label="Extracellular Water (L)" id="extracellular_water" value={data.extracellular_water} onChange={handleDataChange} tooltip="Water OUTSIDE cells / blood plasma (Estimated 35% of TBW)." />
  <InputField label="Metabolic Age" id="metabolic_age" type="number" step="1" value={data.metabolic_age} onChange={handleDataChange} tooltip="Cellular metabolic age. Influenced by BMR and muscle/fat percentage." />
  <InputField label="Phase Angle (°)" id="phase_angle" value={data.phase_angle} onChange={handleDataChange} placeholder={"BIA required"} tooltip="Phase Angle (Arctan Xc/R). Measures cell membrane wall strength. Required from BIA tool (InBody)." />
+ <SelectField label="Activity Level" id="activity_level" value={data.activity_level} onChange={handleDataChange} options={[
+                                    { value: 1.2, label: "Sedentary (office job)" },
+                                    { value: 1.375, label: "Light Exercise (1-2 days/week)" },
+                                    { value: 1.55, label: "Moderate Exercise (3-5 days/week)" },
+                                    { value: 1.725, label: "Heavy Exercise (6-7 days/week)" },
+                                    { value: 1.9, label: "Athlete (2x per day)" }
+                                ]} tooltip="Used to calculate TDEE (Total Daily Energy Expenditure)." />
+ <InputField label="TDEE (Kcal)" id="tdee" type="number" step="1" value={data.tdee} onChange={handleDataChange} tooltip="Total Daily Energy Expenditure. Calculated as BMR x Activity Level." />
  </div>
  </div>
  </div>

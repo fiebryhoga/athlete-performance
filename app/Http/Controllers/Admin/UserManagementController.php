@@ -97,6 +97,10 @@ class UserManagementController extends Controller
             $rules['coach_ids.*'] = 'exists:users,id';
         }
 
+        if ($request->role === 'coach') {
+            $rules['is_gym_guard'] = 'nullable|boolean';
+        }
+
         $request->validate($rules);
 
         $data = [
@@ -117,6 +121,10 @@ class UserManagementController extends Controller
         }
 
         $user = User::create($data);
+
+        if ($request->role === 'coach') {
+            $user->update(['is_gym_guard' => (bool) $request->is_gym_guard]);
+        }
 
         if ($request->role === 'athlete' && $request->has('coach_ids')) {
             $user->coaches()->sync($request->coach_ids);
@@ -170,6 +178,10 @@ class UserManagementController extends Controller
             $rules['coach_ids.*'] = 'exists:users,id';
         }
 
+        if ($request->role === 'coach') {
+            $rules['is_gym_guard'] = 'nullable|boolean';
+        }
+
         $request->validate($rules);
 
         $data = [
@@ -194,6 +206,10 @@ class UserManagementController extends Controller
         }
 
         $user->update($data);
+
+        if ($request->role === 'coach') {
+            $user->update(['is_gym_guard' => (bool) $request->is_gym_guard]);
+        }
 
         if ($request->role === 'athlete' && $request->has('coach_ids')) {
             $user->coaches()->sync($request->coach_ids);

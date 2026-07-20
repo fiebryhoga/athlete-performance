@@ -36,7 +36,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                 <div className="flex items-center gap-2 md:gap-3">
                     
                     <Calendar className="w-4 h-4 md:w-5 md:h-5 text-[#ff4d00]"/>
-                    <h3 className="font-extrabold text-slate-800 text-base md:text-lg">Periode: {week.label}</h3>
+                    <h3 className="font-bold text-slate-800 text-base md:text-lg">Periode: {week.label}</h3>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
                     
@@ -97,7 +97,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
             
             <div className="overflow-x-auto w-full">
                 <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-white border-b border-slate-100 text-slate-400 text-[9px] md:text-[10px] font-extrabold">
+                    <thead className="bg-white border-b border-slate-100 text-slate-400 text-[9px] md:text-[10px] font-bold">
                         <tr>
                             <th className="px-4 md:px-6 py-3 md:py-4">Hari</th>
                             
@@ -297,14 +297,14 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                     <div className="space-y-2 md:space-y-2.5">
                         {physicalPrepTypes.map(t => (
                             <div key={t} className="flex justify-between text-xs md:text-sm border-b border-slate-200/50 pb-1">
-                                <span className="text-slate-600">{t}</span><span className="font-extrabold text-slate-800">{week.metrics.frequency[t]}</span>
+                                <span className="text-slate-600">{t}</span><span className="font-bold text-slate-800">{week.metrics.frequency[t]}</span>
                             </div>
                         ))}
                     </div>
                     <div className="space-y-2 md:space-y-2.5">
                         {[...skillTypes, ...matchTypes, ...travelTypes].map(t => (
                             <div key={t} className="flex justify-between text-xs md:text-sm border-b border-slate-200/50 pb-1">
-                                <span className="text-slate-600">{t}</span><span className="font-extrabold text-slate-800">{week.metrics.frequency[t]}</span>
+                                <span className="text-slate-600">{t}</span><span className="font-bold text-slate-800">{week.metrics.frequency[t]}</span>
                             </div>
                         ))}
                     </div>
@@ -317,7 +317,7 @@ export default function WeeklyGroup({ week, formatDateToIndo, openModal, session
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
                             <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Total Training Sessions</span>
-                            <span className="text-sm md:text-base font-extrabold text-slate-800">{week.metrics.totals.training}</span>
+                            <span className="text-sm md:text-base font-bold text-slate-800">{week.metrics.totals.training}</span>
                         </div>
                         <div className="flex justify-between items-center pb-2 md:pb-2.5 border-b border-slate-100">
                             <span className="text-[9px] md:text-[10px] font-bold text-slate-500 pr-2">Num. Physical Prep</span>

@@ -109,6 +109,7 @@ export default function Show({ sport, categories }) {
         parameter_type: 'points',
         unit: 'pts',
         target_value: '',
+        is_lower_better: false,
     });
 
     useEffect(() => {
@@ -127,7 +128,8 @@ export default function Show({ sport, categories }) {
             name: '',
             parameter_type: 'points',
             unit: 'pts',
-            target_value: ''
+            target_value: '',
+            is_lower_better: false
         });
         setIsModalOpen(true);
     };
@@ -142,7 +144,8 @@ export default function Show({ sport, categories }) {
             name: item.name,
             parameter_type: item.parameter_type,
             unit: item.unit,
-            target_value: item.target_value
+            target_value: item.target_value,
+            is_lower_better: Boolean(item.is_lower_better)
         });
         setIsModalOpen(true);
     };
@@ -377,6 +380,26 @@ export default function Show({ sport, categories }) {
                                     </p>
                                     
                                     {errors.target_value && <p className="text-rose-500 text-[10px] md:text-xs font-bold ml-1">{errors.target_value}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-3 cursor-pointer p-4 border border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100/50 transition-colors">
+                                        <div className="relative inline-flex items-center cursor-pointer shrink-0">
+                                            <input 
+                                                type="checkbox" 
+                                                className="sr-only peer" 
+                                                checked={data.is_lower_better}
+                                                onChange={e => setData('is_lower_better', e.target.checked)}
+                                            />
+                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ff4d00]"></div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-xs font-bold text-slate-800">Semakin kecil nilai semakin bagus?</p>
+                                            <p className="text-[10px] text-slate-500 mt-0.5 font-medium leading-tight">
+                                                Aktifkan jika parameter ini dinilai lebih baik saat nilainya lebih rendah (contoh: waktu tempuh, sprint).
+                                            </p>
+                                        </div>
+                                    </label>
                                 </div>
 
                                 <div className="flex gap-2 md:gap-3 pt-5 border-t border-slate-100">

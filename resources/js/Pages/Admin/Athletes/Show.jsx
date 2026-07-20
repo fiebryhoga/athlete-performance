@@ -252,7 +252,7 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 <div className="space-y-6 flex-1">
                                     <div>
                                         <p className="text-sm text-slate-500 font-medium mb-1">Status PHV</p>
-                                        <p className="text-2xl font-black text-emerald-600 tracking-tight">{latest_phv.phv_status}</p>
+                                        <p className="text-2xl font-bold text-emerald-600 tracking-tight">{latest_phv.phv_status}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
@@ -287,16 +287,16 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                     <div className="flex justify-between items-end border-b border-slate-100 pb-4">
                                         <div>
                                             <p className="text-sm text-slate-500 font-medium mb-1">Skor Wellness</p>
-                                            <p className="text-3xl font-black text-emerald-600 tracking-tight">{latest_wellness.daily_wellness_score} <span className="text-sm text-slate-400 font-medium">/ 30</span></p>
+                                            <p className="text-3xl font-bold text-emerald-600 tracking-tight">{latest_wellness.daily_wellness_score} <span className="text-sm text-slate-400 font-medium">/ 30</span></p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-slate-500 font-medium mb-1">Session RPE</p>
-                                            <p className="text-3xl font-black text-orange-500 tracking-tight">{latest_wellness.session_rpe ?? '-'} <span className="text-sm text-slate-400 font-medium">/ 10</span></p>
+                                            <p className="text-3xl font-bold text-orange-500 tracking-tight">{latest_wellness.session_rpe ?? '-'} <span className="text-sm text-slate-400 font-medium">/ 10</span></p>
                                         </div>
                                     </div>
                                     <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex justify-between items-center">
                                         <span className="text-sm text-[#ff4d00] font-bold">Daily Load (AU)</span>
-                                        <span className="text-xl font-black text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
+                                        <span className="text-xl font-bold text-[#ff4d00]">{latest_wellness.daily_load ?? '-'}</span>
                                     </div>
                                 </div>
                             ) : (
@@ -320,12 +320,12 @@ export default function Show({ athlete, stats, radar_data, comparison_data, item
                                 <div className="space-y-6 flex-1">
                                     <div>
                                         <p className="text-sm text-slate-500 font-medium mb-1">Status DPA</p>
-                                        <p className="text-2xl font-black text-indigo-600 tracking-tight">Assessed</p>
+                                        <p className="text-2xl font-bold text-indigo-600 tracking-tight">Assessed</p>
                                     </div>
                                     <div className="grid grid-cols-1 gap-4">
                                         <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-center justify-between">
                                             <p className="text-sm text-indigo-500 font-bold">Total Kompensasi</p>
-                                            <p className="text-xl font-black text-indigo-600">{latest_dpa.total_score} <span className="text-xs text-indigo-400 font-medium">temuan</span></p>
+                                            <p className="text-xl font-bold text-indigo-600">{latest_dpa.total_score} <span className="text-xs text-indigo-400 font-medium">temuan</span></p>
                                         </div>
                                     </div>
                                 </div>

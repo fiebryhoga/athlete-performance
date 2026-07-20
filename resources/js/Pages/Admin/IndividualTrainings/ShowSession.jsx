@@ -471,7 +471,7 @@ export default function ShowSession({
                                 </span>
                             </div>
                             
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
                                 {training.name || 'Program Latihan'}
                             </h1>
                             

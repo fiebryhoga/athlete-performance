@@ -10,6 +10,7 @@ import AnalyticsDashboard from './Partials/AnalyticsDashboard';
 import SmartInsights from './Partials/SmartInsights';
 import HistoryTable from './Partials/HistoryTable';
 import CompositionFormModal from './Partials/CompositionFormModal';
+import TdeeSummary from './Partials/TdeeSummary';
 
 export default function Show({ auth, player, history, benchmarks }) {
  const { permissions } = usePage().props;
@@ -265,6 +266,8 @@ export default function Show({ auth, player, history, benchmarks }) {
                                 <SmartInsights test={latestTest} player={player} benchmarks={benchmarks} />
                             </div>
                         </div>
+
+                        <TdeeSummary test={latestTest} player={player} />
                     </>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 p-12 text-center shadow-sm transition-colors mt-6 relative overflow-hidden">
@@ -273,7 +276,7 @@ export default function Show({ auth, player, history, benchmarks }) {
                         <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-5 shadow-sm relative z-10">
                             <Activity size={32} className="text-[#ff4d00]" />
                         </div>
-                        <h3 className="text-xl font-extrabold tracking-tight text-slate-900 mb-2 relative z-10">
+                        <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2 relative z-10">
                             {"No Analytics Data"}
                         </h3>
                         <p className="text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed relative z-10">

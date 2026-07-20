@@ -43,7 +43,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
             
             <div className="overflow-x-auto w-full">
                 <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-white border-b border-slate-100 text-slate-500 text-[9px] md:text-[10px] font-extrabold">
+                    <thead className="bg-white border-b border-slate-100 text-slate-500 text-[9px] md:text-[10px] font-bold">
                         <tr>
                             <th className="px-3 md:px-4 py-4">Waktu (WIB)</th>
                             
@@ -87,7 +87,7 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                 </td>
                                 
                                 <td className="px-3 md:px-4 py-3 text-center align-middle">
-                                    <span className={`inline-flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-[9px] md:text-[10px] font-extrabold rounded-xl border shadow-sm ${
+                                    <span className={`inline-flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-[9px] md:text-[10px] font-bold rounded-xl border shadow-sm ${
                                         item.data?.recovery_status === 'RECOVERY BAIK' ? 'bg-green-50 text-green-700 border-green-200' : 
                                         item.data?.recovery_status === 'RECOVERY CUKUP' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
                                         item.data?.recovery_status === 'RECOVERY KURANG' ? 'bg-red-50 text-red-700 border-red-200' : 

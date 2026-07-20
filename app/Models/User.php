@@ -17,6 +17,7 @@ class User extends Authenticatable
         'username',
         'password',
         'role',
+        'is_gym_guard',
         'sport_id',
         'age',
         'gender',
@@ -53,6 +54,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_gym_guard' => 'boolean',
         ];
     }
 
@@ -107,5 +109,20 @@ class User extends Authenticatable
     public function dpaAssessments()
     {
         return $this->hasMany(DpaAssessment::class);
+    }
+
+    public function gymSchedules()
+    {
+        return $this->hasMany(GymSchedule::class);
+    }
+
+    public function gymAttendances()
+    {
+        return $this->hasMany(GymAttendance::class);
+    }
+
+    public function scopeGymGuards($query)
+    {
+        return $query->where('role', 'coach')->where('is_gym_guard', true);
     }
 }

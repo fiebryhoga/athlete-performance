@@ -42,49 +42,16 @@ class TestItem extends Model
 
         $score = 0;
 
-        switch ($this->parameter_type) {
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-            case 'second': 
-                if ($actual <= 0) $score = 0;
-                else $score = ($target / $actual) * 100;
-                break;
-
-            case 'minute': 
-                $score = ($actual / $target) * 100;
-                break;
-
-            case 'reps':
-            case 'cm':
-            case 'meter':
-            case 'vo2max':
-            case 'points':
-            default: 
-                $score = ($actual / $target) * 100;
-                break;
+        if ($this->is_lower_better) {
+            // Semakin kecil nilai semakin bagus (misal: waktu tempuh lari)
+            if ($actual <= 0) {
+                $score = 0;
+            } else {
+                $score = ($target / $actual) * 100;
+            }
+        } else {
+            // Semakin besar nilai semakin bagus (misal: jumlah push up)
+            $score = ($actual / $target) * 100;
         }
 
         

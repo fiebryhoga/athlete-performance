@@ -1,7 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package
+    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package, Building2
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import GroupList from './Components/GroupList';
@@ -22,6 +22,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         password: '',
         profile_photo: null,
         role: activeTab,
+        is_gym_guard: false,
         sport_id: '',
         gender: 'L',
         age: '',
@@ -88,6 +89,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             password: '',
             profile_photo: null,
             role: activeTab,
+            is_gym_guard: false,
             sport_id: '',
             gender: 'L',
             age: '',
@@ -112,6 +114,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             password: '', 
             profile_photo: null,
             role: user.role,
+            is_gym_guard: user.is_gym_guard || false,
             sport_id: user.sport_id || '',
             gender: user.gender || 'L',
             age: user.age || '',
@@ -308,6 +311,11 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                 }`}>
                                                     <Shield className="w-3 h-3"/> {user.role}
                                                 </span>
+                                                {user.role === 'coach' && user.is_gym_guard && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border bg-amber-50 text-amber-600 border-amber-100 mt-1">
+                                                        <Building2 className="w-3 h-3" /> Penjaga Gym
+                                                    </span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 align-middle text-right">
                                                 <div className="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -567,6 +575,35 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                         </div>
                                         {errors.password && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.password}</p>}
                                     </div>
+
+                                    {/* Gym Guard Toggle (Only for Coach) */}
+                                    {data.role === 'coach' && (
+                                        <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-200">
+                                            <label 
+                                                className={`flex items-center gap-3 ${auth.user.role === 'superadmin' ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+                                                onClick={() => auth.user.role === 'superadmin' && setData('is_gym_guard', !data.is_gym_guard)}
+                                            >
+                                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                                    data.is_gym_guard 
+                                                        ? 'bg-[#ff4d00] border-[#ff4d00]' 
+                                                        : 'border-slate-300 bg-white'
+                                                }`}>
+                                                    {data.is_gym_guard && (
+                                                        <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
+                                                            <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Building2 className="w-4 h-4 text-slate-500" />
+                                                        <span className="text-xs font-bold text-slate-700">Bertugas sebagai Penjaga Gym</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 ml-6">Coach ini akan bisa dijadwalkan untuk piket jaga gym</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    )}
 
                                     {data.role === 'athlete' && (
                                         <>

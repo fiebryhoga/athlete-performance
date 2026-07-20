@@ -175,9 +175,11 @@ Route::middleware([
         Route::get('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'index'])->name('admin.composition-tests.index');
 
         Route::post('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
+        Route::put('/admin/composition/{compositionTest}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'update'])->name('admin.composition-tests.update');
         Route::delete('/admin/composition/{compositionTest}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'destroy'])->name('admin.composition-tests.destroy');
         
         Route::post('/admin/composition/benchmarks', [\App\Http\Controllers\Admin\CompositionTestController::class, 'saveBenchmarks'])->name('admin.composition-tests.save-benchmarks');
+        Route::post('/admin/composition/ai-analysis', [\App\Http\Controllers\Admin\AiNutritionController::class, 'analyze'])->name('admin.composition.ai-analysis');
         Route::get('/admin/composition/{user}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'show'])->name('admin.composition-tests.show');
 
         Route::post('/admin/athletes/{user}/gallery', [App\Http\Controllers\Admin\AthleteController::class, 'storeGallery'])->name('admin.athletes.gallery.store');
@@ -205,6 +207,7 @@ Route::middleware([
         Route::get('/admin/phv-calculator/edit/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'edit'])->name('admin.phv-calculator.edit');
         Route::put('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'update'])->name('admin.phv-calculator.update');
         Route::delete('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'destroy'])->name('admin.phv-calculator.destroy');        
+        
         Route::resource('/admin/users', UserManagementController::class)->names('admin.users');
 
         Route::get('/admin/sports', [SportController::class, 'index'])->name('admin.sports.index');
@@ -258,6 +261,8 @@ Route::middleware([
         // Master Exercises
         Route::get('/admin/exercises', [\App\Http\Controllers\Admin\ExerciseController::class, 'index'])->name('admin.exercises.index');
         Route::get('/admin/exercises/create', [\App\Http\Controllers\Admin\ExerciseController::class, 'create'])->name('admin.exercises.create');
+        Route::get('/admin/exercises/api/categories', [\App\Http\Controllers\Admin\ExerciseController::class, 'apiCategories'])->name('admin.exercises.api.categories');
+        Route::post('/admin/exercises/quick-store', [\App\Http\Controllers\Admin\ExerciseController::class, 'quickStore'])->name('admin.exercises.quick-store');
         Route::get('/admin/exercises/bulk-create', [\App\Http\Controllers\Admin\ExerciseController::class, 'bulkCreate'])->name('admin.exercises.bulk-create');
         Route::post('/admin/exercises/bulk', [\App\Http\Controllers\Admin\ExerciseController::class, 'bulkStore'])->name('admin.exercises.bulk-store');
         Route::post('/admin/exercises', [\App\Http\Controllers\Admin\ExerciseController::class, 'store'])->name('admin.exercises.store');
@@ -289,6 +294,20 @@ Route::middleware([
         Route::delete('/admin/group-trainings/session/{training}', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'destroySession'])->name('admin.group-trainings.session.destroy');
         Route::post('/admin/group-trainings/session/{training}/duplicate', [\App\Http\Controllers\Admin\GroupTrainingController::class, 'duplicateSession'])->name('admin.group-trainings.session.duplicate');
         // -----------------------
+
+        // ─── Gym Attendance ───
+        Route::get('/admin/gym-attendance', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'index'])->name('admin.gym-attendance.index');
+
+        // Check-in/out (coach owner only)
+        Route::post('/admin/gym-attendance/check-in', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'checkIn'])->name('admin.gym-attendance.check-in');
+        Route::post('/admin/gym-attendance/check-out', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'checkOut'])->name('admin.gym-attendance.check-out');
+        Route::delete('/admin/gym-attendance/record/{attendance}', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'destroy'])->name('admin.gym-attendance.destroy');
+
+        // Location setting (superadmin only)
+        Route::post('/admin/gym-attendance/location', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'updateLocation'])->name('admin.gym-attendance.location.update');
+
+        // Payout (superadmin only)
+        Route::post('/admin/gym-attendance/pay/{user}', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'payGuard'])->name('admin.gym-attendance.pay');
     });
 });
 

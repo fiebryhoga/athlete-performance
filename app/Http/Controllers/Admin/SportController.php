@@ -65,6 +65,7 @@ class SportController extends Controller
             'parameter_type' => ['required', Rule::in(array_keys(TestItem::PARAMS))], 
             'unit' => 'nullable|string', 
             'target_value' => 'required|numeric|min:0', 
+            'is_lower_better' => 'boolean',
         ]);
 
         $sport->testItems()->create([
@@ -72,7 +73,8 @@ class SportController extends Controller
             'name' => $request->name,
             'parameter_type' => $request->parameter_type,
             'unit' => $request->unit,
-            'target_value' => $request->target_value
+            'target_value' => $request->target_value,
+            'is_lower_better' => $request->boolean('is_lower_better')
         ]);
 
         return back()->with('message', 'Item latihan berhasil ditambahkan.');
@@ -86,13 +88,15 @@ class SportController extends Controller
             'parameter_type' => ['required', Rule::in(array_keys(TestItem::PARAMS))],
             'target_value' => 'required|numeric|min:0',
             'unit' => 'nullable|string',
+            'is_lower_better' => 'boolean',
         ]);
 
         $testItem->update([
             'name' => $request->name,
             'parameter_type' => $request->parameter_type,
             'target_value' => $request->target_value,
-            'unit' => $request->unit
+            'unit' => $request->unit,
+            'is_lower_better' => $request->boolean('is_lower_better')
         ]);
 
         return back()->with('message', 'Item latihan diperbarui.');
@@ -123,7 +127,8 @@ class SportController extends Controller
                     'name' => $item->name,
                     'parameter_type' => $item->parameter_type,
                     'unit' => $item->unit,
-                    'target_value' => $item->target_value
+                    'target_value' => $item->target_value,
+                    'is_lower_better' => $item->is_lower_better
                 ]);
             }
         });

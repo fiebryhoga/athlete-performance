@@ -106,6 +106,47 @@ class ExerciseController extends Controller
         return redirect()->route('admin.exercises.index')->with('success', 'Latihan berhasil dibuat.');
     }
 
+    public function apiCategories()
+    {
+        $categories = ExerciseCategory::orderBy('name', 'asc')->get();
+        return response()->json($categories);
+    }
+
+    public function quickStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:exercises,name',
+            'description' => 'nullable|string',
+            'exercise_category_id' => 'nullable|exists:exercise_categories,id',
+            'images.*' => 'nullable|image|max:5120',
+        ]);
+        
+        $data = $request->only('name', 'description', 'exercise_category_id');
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('exercises', 'public');
+                $imagePaths[] = '/storage/' . $path;
+            }
+        }
+        $data['images'] = $imagePaths;
+
+        $videos = [];
+        if ($request->videos) {
+            $videosData = is_string($request->videos) ? json_decode($request->videos, true) : $request->videos;
+            if (is_array($videosData)) {
+                $videos = array_values(array_filter($videosData));
+            }
+        }
+        $data['videos'] = $videos;
+
+        $exercise = Exercise::create($data);
+        
+        // Return JSON response for AJAX quick creation
+        return response()->json($exercise);
+    }
+
     public function edit(Exercise $exercise)
     {
         $categories = ExerciseCategory::orderBy('name', 'asc')->get();

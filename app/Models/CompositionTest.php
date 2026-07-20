@@ -14,7 +14,7 @@ class CompositionTest extends Model
         'body_fat_percentage', 'fat_free_mass', 'muscle_mass', 'skeletal_muscle_mass', 
         'bone_mass', 'essential_fat_mass', 'storage_fat_mass', 'visceral_fat', 
         'total_body_water', 'intracellular_water', 'extracellular_water', 
-        'phase_angle', 'bmr', 'other_mass',
+        'phase_angle', 'bmr', 'activity_level', 'tdee', 'other_mass',
     ];
 
     protected $casts = [
@@ -34,6 +34,7 @@ class CompositionTest extends Model
         'intracellular_water' => 'float',
         'extracellular_water' => 'float',
         'phase_angle' => 'float',
+        'activity_level' => 'float',
         'other_mass' => 'float',
     ];
 
