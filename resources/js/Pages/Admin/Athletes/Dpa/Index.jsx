@@ -37,16 +37,16 @@ export default function DpaIndex({ auth, players }) {
     };
 
     return (
-        <AppLayout title="DPA Analysis">
-            <Head title="DPA Analysis" />
+        <AppLayout title="Analisis DPA">
+            <Head title="Analisis DPA" />
 
             <div className="pb-12 space-y-6">
             <PageHeader 
-                title="Analysis DPA"
-                subtitle={t("Evaluate dynamic postural patterns and muscle compensations.")}
-                badge="DPA Assessment"
+                title="Analisis DPA"
+                subtitle={t("Evaluasi pola postur dinamis dan kompensasi otot.")}
+                badge="Evaluasi DPA"
                 icon={Users}
-                searchPlaceholder={t("Search player or position...")}
+                searchPlaceholder={t("Cari klien atau posisi...")}
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
             />
@@ -56,7 +56,7 @@ export default function DpaIndex({ auth, players }) {
                         <Link
                             key={player.id}
                             href={route("admin.athletes.dpa.show", player.id)}
-                            className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-400 :border-slate-600 transition-all duration-200 flex flex-col shadow-sm"
+                            className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-200 flex flex-col shadow-sm"
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
@@ -80,15 +80,15 @@ export default function DpaIndex({ auth, players }) {
                                     </div>
 
                                     <div>
-                                        <h4 className="font-semibold text-slate-900 group-hover:underline decoration-1 underline-offset-2 line-clamp-1">
+                                        <h4 className="font-semibold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
                                             {player.name}
                                         </h4>
                                         <p className="text-xs text-slate-500 font-medium mt-0.5">
-                                            {player.position || "Player"}
+                                            {player.position || "Klien"}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="w-8 h-8 rounded-md bg-transparent flex items-center justify-center text-slate-400 group-hover:text-slate-900 :text-slate-100 transition-colors">
+                                <div className="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
                                     <ChevronRight size={18} />
                                 </div>
                             </div>
@@ -96,12 +96,12 @@ export default function DpaIndex({ auth, players }) {
                             <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5">
-                                        <Activity size={12} /> {t("History")}
+                                        <Activity size={12} /> {t("Riwayat")}
                                     </span>
                                     <span className="text-sm font-semibold text-slate-900 ">
                                         {player.total_records || 0}{" "}
                                         <span className="text-xs font-normal text-slate-500">
-                                            {t("Tests")}
+                                            {t("Tes")}
                                         </span>
                                     </span>
                                 </div>
@@ -118,8 +118,8 @@ export default function DpaIndex({ auth, players }) {
                                         }`}
                                     >
                                         {player.total_records > 0
-                                            ? "Assessed"
-                                            : "No Data"}
+                                            ? "Telah Dievaluasi"
+                                            : "Belum Ada Data"}
                                     </span>
                                 </div>
                             </div>
@@ -135,11 +135,10 @@ export default function DpaIndex({ auth, players }) {
                                 />
                             </div>
                             <h4 className="font-semibold text-slate-900 mb-1">
-                                {t("No Players Found")}
+                                {t("Klien Tidak Ditemukan")}
                             </h4>
                             <p className="text-slate-500 text-sm">
-                                Search for "{searchQuery}" did not return any
-                                results.
+                                Pencarian untuk "{searchQuery}" tidak menemukan hasil.
                             </p>
                         </div>
                     )}

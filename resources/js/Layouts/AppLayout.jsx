@@ -39,7 +39,7 @@ export default function AppLayout({ children, title }) {
             )}
 
             {/* MAIN CONTENT WRAPPER */}
-            <div className={`flex flex-col flex-1 min-w-0 min-h-screen transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-[260px]'}`}>
+            <div className={`flex flex-col flex-1 min-w-0 min-h-screen transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'lg:pl-[76px]' : 'lg:pl-[250px]'}`}>
                 
                 {/* NAVBAR */}
                 <Navbar 
@@ -48,7 +48,7 @@ export default function AppLayout({ children, title }) {
 
                 {/* CONTENT PAGE */}
                 <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar">
-                    <div className="w-full max-w-[1920px] mx-auto p-4 md:p-6 lg:p-8 animate-in fade-in duration-500">
+                    <div className="w-full max-w-[1920px] mx-auto p-4 md:p-6 lg:p-4 animate-in fade-in duration-500">
                         {children}
                     </div>
                 </main>

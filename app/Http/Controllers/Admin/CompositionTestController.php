@@ -146,7 +146,9 @@ class CompositionTestController extends Controller
 
         $height = $validated['height'];
         $weight = $validated['weight'];
-        $bmi = ($height > 0) ? round($weight / ($height * $height), 2) : 0;
+        
+        $heightInMeters = $height / 100;
+        $bmi = ($heightInMeters > 0) ? round($weight / ($heightInMeters * $heightInMeters), 2) : 0;
 
         CompositionTest::create(array_merge($validated, ['bmi' => $bmi]));
 
@@ -182,7 +184,8 @@ class CompositionTestController extends Controller
             'other_mass'          => 'nullable|numeric',
         ]);
 
-        $bmi = ($validated['height'] > 0) ? round($validated['weight'] / ($validated['height'] * $validated['height']), 2) : 0;
+        $heightInMeters = $validated['height'] / 100;
+        $bmi = ($heightInMeters > 0) ? round($validated['weight'] / ($heightInMeters * $heightInMeters), 2) : 0;
 
         $test->update(array_merge($validated, ['bmi' => $bmi]));
 

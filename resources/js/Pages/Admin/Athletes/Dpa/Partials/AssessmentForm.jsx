@@ -48,18 +48,17 @@ export default function AssessmentForm({
                             </div>
                             <h3 className="text-lg font-semibold tracking-tight text-slate-900 flex items-center gap-2">
                                 {isEditMode
-                                    ? "Update DPA Record"
-                                    : "New DPA Assessment"}
+                                    ? "Perbarui Data DPA"
+                                    : "Evaluasi DPA Baru"}
                                 {isEditMode && (
                                     <span className="px-2 py-0.2 rounded-lg bg-slate-200 text-[10px] font-bold text-slate-600 ">
-                                        {t("Edit Mode")}
+                                        {t("Mode Edit")}
                                     </span>
                                 )}
                             </h3>
                         </div>
                         <p className="text-sm text-slate-500 ">
-                            Check all applicable movement compensations observed
-                            on the athlete.
+                            Centang semua kompensasi gerakan yang diamati pada atlet.
                         </p>
                     </div>
                 </div>
@@ -69,7 +68,7 @@ export default function AssessmentForm({
                         <div className="space-y-2 max-w-sm">
                             <label className="text-xs font-semibold text-slate-900 flex items-center gap-2">
                                 <History size={14} className="text-slate-500" />{" "}
-                                Assessment Date
+                                {t("Tanggal Evaluasi")}
                             </label>
                             <input
                                 type="date"
@@ -133,7 +132,7 @@ export default function AssessmentForm({
                                                                 </span>
                                                             </div>
                                                             <span className="text-[10px] uppercase font-bold tracking-wider">
-                                                                {t("No Image")}
+                                                                {t("Tanpa Gambar")}
                                                             </span>
                                                         </div>
                                                     )}
@@ -169,14 +168,14 @@ export default function AssessmentForm({
 
                     <div className="space-y-2">
                         <label className="text-xs font-semibold text-slate-900 ">
-                            {t("Observations & Additional Notes")}
+                            {t("Observasi & Catatan Tambahan")}
                         </label>
                         <textarea
                             value={data.notes || ""}
                             onChange={(e) => setData("notes", e.target.value)}
                             rows="3"
                             className="flex w-full rounded-md border border-slate-200 bg-transparent px-3 py-2 text-sm text-slate-900 shadow-sm transition-colors placeholder:text-slate-400 :text-slate-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 :ring-slate-300 resize-y"
-                            placeholder={t("Note any movement compensations or pain complaints...")}
+                            placeholder={t("Catat kompensasi gerakan atau keluhan nyeri...")}
                         />
                     </div>
                 </div>
@@ -188,7 +187,7 @@ export default function AssessmentForm({
                             onClick={cancelEdit}
                             className="w-full md:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 :ring-slate-300 disabled:pointer-events-none disabled:opacity-50 border border-slate-200 bg-white hover:bg-slate-100 :bg-slate-800 text-slate-900 h-9 px-4 py-2 gap-2 shadow-sm"
                         >
-                            <X size={16} /> {t("Cancel Changes")}
+                            <X size={16} /> {t("Batal Ubah")}
                         </button>
                     )}
                     <button
@@ -197,7 +196,7 @@ export default function AssessmentForm({
                         className="w-full md:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 :ring-slate-300 disabled:pointer-events-none disabled:opacity-50 bg-orange-500 text-slate-50 hover:bg-orange-500/90 :bg-slate-50/90 shadow h-9 px-6 py-2 gap-2"
                     >
                         <Save size={16} />
-                        {isEditMode ? "Update Data" : "Save Assessment"}
+                        {isEditMode ? t("Perbarui Data") : t("Simpan Evaluasi")}
                     </button>
                 </div>
             </form>

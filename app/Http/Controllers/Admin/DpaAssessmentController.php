@@ -15,7 +15,18 @@ class DpaAssessmentController extends Controller
 {
     public function index()
     {
-        $athletes = User::where('role', 'athlete')->with('sport')->get();
+        $currentUser = Auth::user();
+        if ($currentUser->role === 'athlete') {
+            return redirect()->route('admin.athletes.dpa.show', $currentUser->id);
+        }
+
+        $query = User::where('role', 'athlete')->with('sport');
+        if ($currentUser->role === 'coach') {
+            $query->whereHas('coaches', function($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id);
+            });
+        }
+        $athletes = $query->orderBy('name')->get();
 
         return Inertia::render('Admin/Athletes/Dpa/Index', [
             'players' => $athletes

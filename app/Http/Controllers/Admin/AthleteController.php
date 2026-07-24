@@ -17,7 +17,7 @@ class AthleteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches']);
+        $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches', 'package', 'groups.package']);
 
         if (auth()->user()->role === 'coach') {
             $query->whereHas('coaches', function($q) {
@@ -35,13 +35,16 @@ class AthleteController extends Controller
         $coaches = User::where('role', 'coach')->get(['id', 'name']);
 
         return Inertia::render('Admin/Athletes/Index', [
-            'athletes' => $query->latest()->paginate(10)->through(function ($athlete) {
-                $athlete->profile_photo_url = $athlete->profile_photo_url;
-                $athlete->latest_phv = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
-                $athlete->latest_composition = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
-                $athlete->latest_wellness = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
-                return $athlete;
-            })->withQueryString(),
+            'athletes' => $query->orderBy('name', 'asc')->get()->map(function ($athlete) {
+                $data = $athlete->toArray();
+                $data['profile_photo_url'] = $athlete->profile_photo_url;
+                $data['latest_phv'] = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+                $data['latest_composition'] = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
+                $data['latest_wellness'] = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
+                $data['package'] = $athlete->package;
+                $data['groups'] = $athlete->groups;
+                return $data;
+            }),
             
             'sports' => Sport::all(),
             'coachesList' => $coaches,

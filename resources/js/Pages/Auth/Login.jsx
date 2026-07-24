@@ -13,6 +13,7 @@ export default function Login({ status, canResetPassword }) {
     const { app_settings } = usePage().props;
     const appName = app_settings?.name || "Sistem Performa";
     const appLogo = app_settings?.logo;
+    const loginBg = app_settings?.login_background || '/assets/images/bg-login.jpg';
 
     const { data, setData, post, processing, errors, reset } = useForm({
         username: "",
@@ -41,7 +42,7 @@ export default function Login({ status, canResetPassword }) {
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 animate-slow-zoom opacity-40"
                     style={{
-                        backgroundImage: "url('/assets/images/bg-login.jpg')",
+                        backgroundImage: `url('${loginBg}')`,
                     }}
                 ></div>
 
@@ -81,29 +82,7 @@ export default function Login({ status, canResetPassword }) {
                         dan member.
                     </p>
 
-                    <div className="flex items-center gap-6">
-                        <div className="flex -space-x-4">
-                            <div className="w-12 h-12 rounded-full border-2 border-slate-800 bg-slate-200 flex items-center justify-center overflow-hidden">
-                                <img
-                                    src={`https://ui-avatars.com/api/?name=Coach&background=F97316&color=fff`}
-                                    alt="User"
-                                />
-                            </div>
-                            <div className="w-12 h-12 rounded-full border-2 border-slate-800 bg-slate-300 flex items-center justify-center overflow-hidden">
-                                <img
-                                    src={`https://ui-avatars.com/api/?name=Admin&background=F59E0B&color=fff`}
-                                    alt="User"
-                                />
-                            </div>
-                            <div className="w-12 h-12 rounded-full border-2 border-slate-800 bg-slate-800 flex items-center justify-center text-xs font-bold text-white shadow-inner shadow-slate-900/50">
-                                +2k
-                            </div>
-                        </div>
-                        <div className="text-sm font-medium text-slate-300 leading-relaxed max-w-[200px]">
-                            Mulai sesi latihan dan pantau perkembangan Anda hari
-                            ini.
-                        </div>
-                    </div>
+
                 </div>
             </div>
 

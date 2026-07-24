@@ -27,8 +27,22 @@ export default {
                     500: '#4882e8',
                     600: '#3266db',
                     700: '#2a52c7',
-                    800: '#00488b', // Warna Utama Anda
+                    800: '#00488b',
                     900: '#233b8a',
+                },
+                // Override default orange with the requested brand color #ed4e18
+                orange: {
+                    50: '#fdf4f1',
+                    100: '#fce6df',
+                    200: '#f7c8b8',
+                    300: '#f2a38b',
+                    400: '#eb7555',
+                    500: '#ed4e18', // User's requested primary brand color
+                    600: '#da3e0f',
+                    700: '#b52f0a',
+                    800: '#90260c',
+                    900: '#73210d',
+                    950: '#3e0e04',
                 }
             }
         },

@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
         }
         
         $logoPath = $settings['app_logo'] ?? null;
+        $loginBgPath = $settings['login_background'] ?? null;
 
         
         return array_merge(parent::share($request), [
@@ -53,6 +54,7 @@ class HandleInertiaRequests extends Middleware
             'app_settings' => [
                 'name' => $settings['app_name'] ?? 'Zakiyudin Analytics', 
                 'logo' => $logoPath ? asset('storage/' . $logoPath) : null,
+                'login_background' => $loginBgPath ? asset('storage/' . $loginBgPath) : null,
             ],
 
             

@@ -79,9 +79,12 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  let playerHeight = player?.height || '';
  if (playerHeight && playerHeight < 3) playerHeight = playerHeight * 100;
 
+ const today = new Date();
+ const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
  return {
  user_id: player?.id || '',
- date: new Date().toISOString().split('T')[0],
+ date: localDate,
  age: playerAge,
  weight: player?.weight || '',
  height: playerHeight,
@@ -227,7 +230,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-2xl w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
                 
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
                     <div>

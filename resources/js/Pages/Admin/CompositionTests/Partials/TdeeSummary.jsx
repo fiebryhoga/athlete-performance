@@ -57,125 +57,117 @@ export default function TdeeSummary({ test }) {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Header & Tabs */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border-b border-slate-200 bg-slate-50/50 gap-4">
+                <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-orange-100 text-orange-600 rounded-md">
+                        <Calculator className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900">Target Kalori & Makro</h3>
+                        <p className="text-xs text-slate-500">Estimasi Katch-McArdle</p>
+                    </div>
+                </div>
+
+                <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200 w-full sm:w-auto">
+                    {['maintenance', 'cutting', 'bulking'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold capitalize rounded-md transition-all ${
+                                activeTab === tab 
+                                ? 'bg-white text-orange-600 shadow-sm border border-slate-200/50' 
+                                : 'text-slate-500 hover:text-slate-700'
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                
                 {/* Left Side: Summary & Table */}
-                <div className="lg:col-span-5 space-y-6">
-                    <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center transition-all duration-300">
-                        <h3 className="text-zinc-500 font-bold capitalize text-sm mb-4">Target Kalori {activeTab}</h3>
-                        
-                        <div className="flex items-baseline justify-center gap-2 mb-2">
-                            <span className="text-4xl font-black text-zinc-900 tracking-tight">{goalCalories.toLocaleString()}</span>
+                <div className="md:col-span-5 p-4 sm:p-5 flex flex-col h-full bg-slate-50/30">
+                    <div className="mb-5 flex items-end justify-between">
+                        <div>
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Harian</div>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-black text-slate-900">{goalCalories.toLocaleString()}</span>
+                                <span className="text-xs font-semibold text-slate-500">kkal</span>
+                            </div>
                         </div>
-                        <span className="text-zinc-500 font-semibold mb-6">kalori per hari</span>
-                        
-                        <div className="flex items-center gap-2 text-zinc-900 font-bold text-xl mb-1">
-                            {(goalCalories * 7).toLocaleString()} 
+                        <div className="text-right">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Mingguan</div>
+                            <div className="text-sm font-bold text-slate-700">{(goalCalories * 7).toLocaleString()} kkal</div>
                         </div>
-                        <span className="text-zinc-500 font-medium text-sm">kalori per minggu</span>
                     </div>
 
-                    <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Info className="w-5 h-5 text-blue-500" />
-                            <h4 className="font-bold text-zinc-900">Estimasi Katch-McArdle</h4>
-                        </div>
-                        <p className="text-sm text-zinc-600 leading-relaxed mb-6">
-                            Berdasarkan data Anda, estimasi terbaik untuk target kalori {activeTab} Anda adalah <span className="font-bold text-zinc-900">{goalCalories.toLocaleString()} kalori</span> per hari. Tabel di bawah menunjukkan target harian jika tingkat aktivitas Anda berbeda.
-                        </p>
-
-                        <div className="space-y-2">
-                            {ACTIVITY_MULTIPLIERS.map((act, idx) => {
-                                const baseMaintenance = Math.round(bmr * act.value);
-                                let cals = baseMaintenance;
-                                if (act.label !== 'Tingkat Metabolisme Basal (BMR)') {
-                                    if (activeTab === 'cutting') cals -= 500;
-                                    if (activeTab === 'bulking') cals += 500;
-                                }
-                                return (
-                                    <div key={idx} className="flex justify-between items-center py-2.5 border-b border-zinc-200/60 last:border-0 transition-colors">
-                                        <span className="text-sm font-semibold text-zinc-700">{act.label}</span>
-                                        <span className="text-sm font-bold text-zinc-900">{cals.toLocaleString()} <span className="text-zinc-400 font-normal text-xs">kkal/hari</span></span>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                    <div className="text-xs font-semibold text-slate-900 mb-3 flex items-center gap-1.5">
+                        <Info className="w-3.5 h-3.5 text-slate-400" />
+                        Estimasi Berdasarkan Aktivitas
+                    </div>
+                    
+                    <div className="flex-1 space-y-0.5">
+                        {ACTIVITY_MULTIPLIERS.map((act, idx) => {
+                            const baseMaintenance = Math.round(bmr * act.value);
+                            let cals = baseMaintenance;
+                            if (act.label !== 'Tingkat Metabolisme Basal (BMR)') {
+                                if (activeTab === 'cutting') cals -= 500;
+                                if (activeTab === 'bulking') cals += 500;
+                            }
+                            return (
+                                <div key={idx} className="flex justify-between items-center py-2 px-2.5 rounded-md hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
+                                    <span className="text-[11px] font-medium text-slate-600">{act.label}</span>
+                                    <span className="text-xs font-bold text-slate-900">{cals.toLocaleString()}</span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Right Side: Macros & Goals */}
-                <div className="lg:col-span-7">
-                    <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm overflow-hidden">
-                        
-                        {/* Tabs */}
-                        <div className="flex border-b border-zinc-200">
-                            {['maintenance', 'cutting', 'bulking'].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`flex-1 py-4 text-sm font-bold capitalize transition-colors relative ${
-                                        activeTab === tab 
-                                        ? 'text-blue-600 bg-blue-50/50' 
-                                        : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50'
-                                    }`}
-                                >
-                                    {tab}
-                                    {activeTab === tab && (
-                                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600" />
-                                    )}
-                                </button>
-                            ))}
-                        </div>
+                {/* Right Side: Macros */}
+                <div className="md:col-span-7 p-4 sm:p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <Utensils className="w-3.5 h-3.5 text-orange-500" />
+                        <h4 className="text-xs font-bold text-slate-900">Distribusi Makronutrisi <span className="text-slate-500 font-normal ml-1">({activeTab})</span></h4>
+                    </div>
 
-                        <div className="p-6">
-                            <div className="mb-8">
-                                <h3 className="text-xl font-bold text-zinc-900 mb-2 capitalize flex items-center gap-2">
-                                    <Utensils className="w-5 h-5 text-zinc-400" />
-                                    Makronutrisi ({activeTab})
-                                </h3>
-                                <p className="text-zinc-600 text-sm leading-relaxed">
-                                    <span className="font-semibold text-zinc-800">30/35/35</span> berarti 30% Protein, 35% Lemak, 35% Karbohidrat. Nilai ini dihitung berdasarkan target kalori {activeTab} Anda sebesar <span className="font-bold text-zinc-900">{goalCalories.toLocaleString()}</span> per hari <span className="text-zinc-500">{getGoalDescription(activeTab)}</span>.
-                                </p>
-                            </div>
-
-                            <div className="space-y-6">
-                                {MACRO_SPLITS.map((split, idx) => {
-                                    const macros = calculateMacros(goalCalories, split.ratios);
-                                    return (
-                                        <div key={idx} className="bg-zinc-50 rounded-xl p-5 border border-zinc-200/70">
-                                            <h4 className="font-bold text-zinc-900 mb-4">{split.name} <span className="text-zinc-500 font-medium text-sm ml-1">({split.desc})</span></h4>
-                                            
-                                            <div className="grid grid-cols-3 gap-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Protein</span>
-                                                    <div className="flex items-baseline gap-1">
-                                                        <span className="text-xl font-black text-blue-600">{macros.protein}</span>
-                                                        <span className="text-sm font-bold text-zinc-400">g</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Lemak</span>
-                                                    <div className="flex items-baseline gap-1">
-                                                        <span className="text-xl font-black text-amber-500">{macros.fats}</span>
-                                                        <span className="text-sm font-bold text-zinc-400">g</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Karbohidrat</span>
-                                                    <div className="flex items-baseline gap-1">
-                                                        <span className="text-xl font-black text-emerald-500">{macros.carbs}</span>
-                                                        <span className="text-sm font-bold text-zinc-400">g</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    <div className="space-y-3">
+                        {MACRO_SPLITS.map((split, idx) => {
+                            const macros = calculateMacros(goalCalories, split.ratios);
+                            return (
+                                <div key={idx} className="border border-slate-200 rounded-lg p-3 hover:border-orange-200 transition-colors bg-white">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-slate-900">{split.name}</span>
+                                            <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">{split.desc}</span>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="bg-slate-50 rounded border border-slate-100 p-2 text-center">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Protein</div>
+                                            <div className="text-sm font-bold text-slate-800">{macros.protein}<span className="text-[10px] text-slate-500 ml-0.5">g</span></div>
+                                        </div>
+                                        <div className="bg-slate-50 rounded border border-slate-100 p-2 text-center">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Lemak</div>
+                                            <div className="text-sm font-bold text-slate-800">{macros.fats}<span className="text-[10px] text-slate-500 ml-0.5">g</span></div>
+                                        </div>
+                                        <div className="bg-slate-50 rounded border border-slate-100 p-2 text-center">
+                                            <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Karbo</div>
+                                            <div className="text-sm font-bold text-slate-800">{macros.carbs}<span className="text-[10px] text-slate-500 ml-0.5">g</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
+
             </div>
         </div>
     );

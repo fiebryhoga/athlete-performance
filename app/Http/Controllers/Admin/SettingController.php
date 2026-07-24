@@ -18,6 +18,7 @@ class SettingController extends Controller
         return Inertia::render('Admin/Settings/Index', [
             'app_name' => $settings['app_name'] ?? 'My App',
             'app_logo' => $settings['app_logo'] ? asset('storage/' . $settings['app_logo']) : null,
+            'login_background' => ($settings['login_background'] ?? null) ? asset('storage/' . $settings['login_background']) : null,
         ]);
     }
 
@@ -26,6 +27,7 @@ class SettingController extends Controller
         $request->validate([
             'app_name' => 'required|string|max:50',
             'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048', 
+            'login_background' => 'nullable|image|mimes:jpeg,png,jpg|max:10240', 
         ]);
 
         
@@ -48,6 +50,20 @@ class SettingController extends Controller
             Setting::updateOrCreate(
                 ['key' => 'app_logo'],
                 ['value' => $path]
+            );
+        }
+
+        if ($request->hasFile('login_background')) {
+            $oldBg = Setting::where('key', 'login_background')->value('value');
+            if ($oldBg && Storage::disk('public')->exists($oldBg)) {
+                Storage::disk('public')->delete($oldBg);
+            }
+
+            $pathBg = $request->file('login_background')->store('settings', 'public');
+            
+            Setting::updateOrCreate(
+                ['key' => 'login_background'],
+                ['value' => $pathBg]
             );
         }
 

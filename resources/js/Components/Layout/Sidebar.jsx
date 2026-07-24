@@ -33,7 +33,15 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
     const appName = appSettings?.name || 'Sistem Performa';
     const appLogo = appSettings?.logo;
 
-    const isActive = (path) => url.startsWith(path);
+    const isActive = (path) => {
+        if (path === '/admin/athletes/dpa') {
+            return url.startsWith('/admin/athletes/dpa') || (url.startsWith('/admin/athletes/') && url.includes('/dpa'));
+        }
+        if (path === '/admin/athletes') {
+            return url.startsWith('/admin/athletes') && !url.includes('/dpa');
+        }
+        return url.startsWith(path);
+    };
 
     const handleMouseEnter = (e, text) => {
         if (!isCollapsed) return;
@@ -174,7 +182,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                                             onMouseLeave={handleMouseLeave}
                                             onClick={() => { if(window.innerWidth < 1024) onMobileClose() }}
                                             className={`
-                                                flex items-center rounded-xl transition-all duration-200
+                                                relative flex items-center rounded-xl transition-all duration-200
                                                 ${isCollapsed ? 'justify-center p-2.5 mx-auto w-11 h-11' : 'justify-start px-3 py-2.5 gap-3 w-full'}
                                                 ${active 
                                                     ? 'bg-orange-50 text-orange-600 font-bold' 
@@ -189,7 +197,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
 
                                             {/* Indikator Aktif Kiri (hanya di mode expand) */}
                                             {active && !isCollapsed && (
-                                                <div className="absolute left-0 w-1 h-5 bg-orange-500 rounded-r-full"></div>
+                                                <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-5 bg-orange-500 rounded-r-full"></div>
                                             )}
                                         </Link>
                                     </div>

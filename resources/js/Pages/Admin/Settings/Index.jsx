@@ -4,20 +4,31 @@ import { Settings, Save, Upload, UploadCloud, MonitorSmartphone, X, Image as Ima
 import { useState, useRef } from 'react';
 import PageHeader from '@/Components/Layout/PageHeader';
 
-export default function Index({ app_name, app_logo }) {
+export default function Index({ app_name, app_logo, login_background }) {
     const { data, setData, post, processing, errors, progress } = useForm({
         app_name: app_name || '',
         app_logo: null, 
+        login_background: null,
     });
 
     const [preview, setPreview] = useState(app_logo);
+    const [previewBg, setPreviewBg] = useState(login_background);
     const fileInputRef = useRef(null);
+    const bgFileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setData('app_logo', file);
             setPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleBgFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('login_background', file);
+            setPreviewBg(URL.createObjectURL(file));
         }
     };
 
@@ -124,6 +135,61 @@ export default function Index({ app_name, app_logo }) {
                                             <div className="bg-orange-500 h-full rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Login Background */}
+                        <div>
+                            <label className="block text-[10px] font-bold text-slate-500 mb-3">Background Halaman Login</label>
+                            
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 md:gap-6">
+                                {/* Preview Background */}
+                                <div 
+                                    onClick={() => bgFileInputRef.current?.click()}
+                                    className="shrink-0 w-full sm:w-64 h-36 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden relative cursor-pointer group hover:border-orange-500 hover:bg-orange-50/50 transition-all touch-manipulation"
+                                >
+                                    {previewBg ? (
+                                        <>
+                                            <img src={previewBg} alt="Background Preview" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <ImageIcon className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
+                                            <ImageIcon className="w-6 h-6 md:w-8 md:h-8 mb-1" />
+                                            <span className="text-[9px] md:text-[10px] font-bold">Upload BG</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Upload Action Background */}
+                                <div className="flex-1 w-full text-center sm:text-left">
+                                    <button 
+                                        type="button"
+                                        onClick={() => bgFileInputRef.current?.click()}
+                                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all text-xs md:text-sm font-bold text-slate-600 mb-3 shadow-sm w-full sm:w-auto touch-manipulation"
+                                    >
+                                        <Upload className="w-4 h-4 text-slate-400" /> Pilih Background Baru
+                                    </button>
+                                    <input 
+                                        type="file" 
+                                        ref={bgFileInputRef}
+                                        className="hidden" 
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onChange={handleBgFileChange}
+                                    />
+                                    
+                                    <div className="bg-slate-50 p-3.5 md:p-4 rounded-xl border border-slate-100 text-left">
+                                        <p className="text-[11px] md:text-xs text-slate-500 font-medium leading-relaxed">
+                                            Format didukung: <strong className="text-slate-700">PNG, JPG, JPEG</strong> (Maks: 5MB). <br className="hidden sm:block"/>
+                                            Disarankan menggunakan gambar ukuran resolusi tinggi (misal 1920x1080) agar tampilan memukau.
+                                        </p>
+                                    </div>
+                                    
+                                    {errors.login_background && <p className="text-rose-500 text-[10px] md:text-xs mt-2 font-bold text-left">{errors.login_background}</p>}
+                                    
                                 </div>
                             </div>
                         </div>

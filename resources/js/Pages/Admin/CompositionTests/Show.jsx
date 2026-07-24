@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, usePage } from '@inertiajs/react';
-import { Activity, Plus } from 'lucide-react';
+import { Head, usePage, Link } from '@inertiajs/react';
+import { Activity, Plus, Scale, ChevronLeft, Download, Loader2, User } from 'lucide-react';
 
-import ProfileHeader from './Partials/ProfileHeader';
+import PageHeader from '@/Components/Layout/PageHeader';
 import TrendHighlights from './Partials/TrendHighlights';
 import CompositionAnatomy from './Partials/CompositionAnatomy';
 import AnalyticsDashboard from './Partials/AnalyticsDashboard';
@@ -244,13 +244,35 @@ export default function Show({ auth, player, history, benchmarks }) {
 
             <div className="mx-auto pb-12 space-y-6">
                 
-                <ProfileHeader 
-                    player={player} 
-                    latestTest={latestTest} 
-                    totalTests={history.length} 
-                    onAddRecord={!isAthlete ? handleAddRecord : null}
-                    onExport={() => {}}
-                    isExporting={isExporting}
+                <PageHeader 
+                    title={`Analisis Komposisi Tubuh ${player.name}`}
+                    subtitle={`Analisis detail tentang komposisi tubuh untuk ${player.name}.`}
+                    badge="Detail Evaluasi"
+                    icon={Scale}
+                    actions={
+                        <>
+                            {!isAthlete && (
+                                <Link 
+                                    href={route('admin.composition-tests.index')}
+                                    className="inline-flex flex-1 md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 h-10 px-5 shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2"
+                                >
+                                    <ChevronLeft size={16} className="mr-1.5" />
+                                    {"Kembali"}
+                                </Link>
+                            )}
+
+                            {!isAthlete && (
+                                <button
+                                    onClick={handleAddRecord}
+                                    className="inline-flex flex-[2] md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-all bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 h-10 px-6 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                >
+                                    <Plus size={16} className="mr-1.5 sm:mr-1.5" />
+                                    <span className="hidden sm:inline">{"Tambah Data"}</span>
+                                    <span className="sm:hidden">{"Tambah"}</span>
+                                </button>
+                            )}
+                        </>
+                    }
                 />
 
                 {latestTest ? (

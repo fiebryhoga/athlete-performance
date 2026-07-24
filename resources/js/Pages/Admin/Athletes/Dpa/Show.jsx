@@ -9,6 +9,7 @@ import AssessmentForm from './Partials/AssessmentForm';
 export default function DpaShow({ auth, player, assessments, compensations }) {
     const t = (text) => text;
     const isAuthorized = auth?.user?.role === 'superadmin' || auth?.user?.role === 'coach';
+    const isAthlete = auth?.user?.role === 'athlete';
     const canCreate = isAuthorized;
     const canUpdate = isAuthorized;
     const canDelete = isAuthorized;
@@ -35,7 +36,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this DPA assessment data?')) {
+        if (confirm('Apakah Anda yakin ingin menghapus data evaluasi DPA ini?')) {
             router.delete(route('admin.athletes.dpa.destroy', id), { preserveScroll: true });
         }
     };
@@ -62,7 +63,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
     // Derived analysis
     const analysis = useMemo(() => {
         if (!latest) return null;
-        const comps = latest.details.map(d => d.compensation).filter(Boolean);
+        const comps = latest.details.map(d => d.compensation).filter(Boolean).sort((a, b) => a.name.localeCompare(b.name));
         
         const result = {
             compensations: comps,
@@ -100,35 +101,47 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
             <div className="space-y-6">
                 
             <PageHeader 
-                title={player.name}
-                subtitle={`Position: ${player.position || 'Player'}`}
-                badge="DPA Analysis"
+                title={`Analisis DPA ${player.name}`}
+                subtitle={`Analisis detail tentang Dynamic Posture Assessment (DPA) untuk ${player.name}.`}
+                badge="Detail Evaluasi"
+                icon={Activity}
                 actions={
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button 
-                                onClick={cancelEdit}
-                                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-xs font-bold capitalize transition-all duration-200 ease-out ${
-                                    activeTab === 'analysis' 
-                                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50 ' 
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                                }`}
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        {!isAthlete && (
+                            <Link 
+                                href={route('admin.athletes.dpa.index')}
+                                className="inline-flex flex-1 md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 h-10 px-5 shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2"
                             >
-                                <Activity size={14} /> {t("Analysis")}
-                            </button>
-                            {canCreate && (
+                                <ChevronLeft size={16} className="mr-1.5" />
+                                {"Kembali"}
+                            </Link>
+                        )}
+                        {isAuthorized && (
+                            <div className="flex items-center bg-slate-100 p-1 rounded-xl w-full sm:w-auto h-10">
                                 <button 
-                                    onClick={() => { setActiveTab('input'); setIsEditMode(false); reset(); }}
-                                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-xs font-bold capitalize transition-all duration-200 ease-out ${
-                                        activeTab === 'input' && !isEditMode 
-                                        ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/50 ' 
+                                    onClick={cancelEdit}
+                                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
+                                        activeTab === 'analysis' 
+                                        ? 'bg-white text-orange-500 shadow-sm ring-1 ring-slate-900/5' 
                                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                                     }`}
                                 >
-                                    <Plus size={14} strokeWidth={3} /> {t("Input Assessment")}
+                                    <Activity size={16} /> {t("Analisis")}
                                 </button>
-                            )}
-                        </div>
+                                {canCreate && (
+                                    <button 
+                                        onClick={() => { setActiveTab('input'); setIsEditMode(false); reset(); }}
+                                        className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
+                                            activeTab === 'input' && !isEditMode 
+                                            ? 'bg-white text-orange-500 shadow-sm ring-1 ring-slate-900/5' 
+                                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                        }`}
+                                    >
+                                        <Plus size={16} strokeWidth={3} /> {t("Input Evaluasi")}
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 }
             />
@@ -141,9 +154,9 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                                     <div className="border-b border-slate-200 p-5 bg-slate-50 ">
                                         <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                            <Activity size={18} className="text-slate-500" /> {t("Overall Imbalance Profile")}
+                                            <Activity size={18} className="text-slate-500" /> {t("Profil Ketidakseimbangan Keseluruhan")}
                                         </h3>
-                                        <p className="text-xs text-slate-500 mt-1">{t("Aggregated muscles and injury risks across all detected compensations.")}</p>
+                                        <p className="text-xs text-slate-500 mt-1">{t("Agregasi otot dan risiko cedera dari semua kompensasi yang terdeteksi.")}</p>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200 ">
                                         <div className="p-6">
@@ -151,7 +164,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                 <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
                                                     <Activity size={14} />
                                                 </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Overactive")}</h4>
+                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Otot Overactive")}</h4>
                                             </div>
                                             <ul className="space-y-2">
                                                 {analysis.overactive.map((m, idx) => (
@@ -160,7 +173,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         {m}
                                                     </li>
                                                 ))}
-                                                {analysis.overactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("None")}</span>}
+                                                {analysis.overactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
                                             </ul>
                                         </div>
                                         <div className="p-6">
@@ -168,7 +181,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                 <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
                                                     <Dumbbell size={14} />
                                                 </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Underactive")}</h4>
+                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Otot Underactive")}</h4>
                                             </div>
                                             <ul className="space-y-2">
                                                 {analysis.underactive.map((m, idx) => (
@@ -177,7 +190,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         {m}
                                                     </li>
                                                 ))}
-                                                {analysis.underactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("None")}</span>}
+                                                {analysis.underactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
                                             </ul>
                                         </div>
                                         <div className="p-6">
@@ -185,7 +198,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                 <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
                                                     <ShieldAlert size={14} />
                                                 </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Risks")}</h4>
+                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Risiko Cedera")}</h4>
                                             </div>
                                             <ul className="space-y-2">
                                                 {analysis.injuries.map((m, idx) => (
@@ -194,7 +207,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         {m}
                                                     </li>
                                                 ))}
-                                                {analysis.injuries.length === 0 && <span className="text-slate-400 text-sm italic">{t("None")}</span>}
+                                                {analysis.injuries.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
                                             </ul>
                                         </div>
                                     </div>
@@ -203,21 +216,21 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                 {/* PER COMPENSATION ANALYSIS */}
                                 <div className="space-y-6">
                                     <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 px-2">
-                                        <Target size={18} className="text-slate-500" /> {t("Specific Compensations Analysis")}
+                                        <Target size={18} className="text-slate-500" /> {t("Analisis Kompensasi Spesifik")}
                                     </h3>
                                     
                                     {analysis.compensations.map((comp, idx) => (
-                                        <div key={idx} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                                            <div className="bg-slate-50 p-5 border-b border-slate-200 flex items-center justify-between">
+                                        <div key={idx} className="bg-white border border-slate-200 hover:border-orange-500 transition-colors rounded-2xl shadow-sm overflow-hidden group">
+                                            <div className="bg-gradient-to-r from-slate-50 to-white p-5 border-b border-slate-100 flex items-center justify-between">
                                                 <div>
-                                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{comp.category}</span>
-                                                    <h4 className="text-lg font-bold text-slate-900 mt-1">{comp.name}</h4>
+                                                    <span className="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full uppercase tracking-wider">{comp.category}</span>
+                                                    <h4 className="text-lg font-bold text-slate-900 mt-2">{comp.name}</h4>
                                                 </div>
                                             </div>
                                             
-                                            <div className="p-5 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                            <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                                                 {/* Imbalances for this comp */}
-                                                <div className="lg:col-span-4 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-200 pb-6 lg:pb-0 lg:pr-8">
+                                                <div className="lg:col-span-4 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-100 pb-6 lg:pb-0 lg:pr-8">
                                                     {comp.image_path && (
                                                         <div className="bg-white border border-slate-200/80 rounded-xl p-2 shadow-sm">
                                                             <img 
@@ -229,47 +242,48 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                     )}
 
                                                     <div>
-                                                        <h5 className="text-xs font-bold text-slate-800 uppercase mb-3">{t("Overactive")}</h5>
-                                                        <ul className="space-y-1.5 text-sm text-slate-600 ">
+                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Otot Overactive")}</h5>
+                                                        <div className="flex flex-wrap gap-1.5">
                                                             {splitItems(comp.overactive_muscles).map((m, i) => (
-                                                                <li key={i} className="flex gap-2"><span className="text-slate-400">-</span> {m}</li>
+                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">{m}</span>
                                                             ))}
-                                                        </ul>
+                                                        </div>
                                                     </div>
                                                     <div>
-                                                        <h5 className="text-xs font-bold text-slate-800 uppercase mb-3">{t("Underactive")}</h5>
-                                                        <ul className="space-y-1.5 text-sm text-slate-600 ">
+                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Otot Underactive")}</h5>
+                                                        <div className="flex flex-wrap gap-1.5">
                                                             {splitItems(comp.underactive_muscles).map((m, i) => (
-                                                                <li key={i} className="flex gap-2"><span className="text-slate-400">-</span> {m}</li>
+                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">{m}</span>
                                                             ))}
-                                                        </ul>
+                                                        </div>
                                                     </div>
                                                     <div>
-                                                        <h5 className="text-xs font-bold text-slate-800 uppercase mb-3">{t("Possible Injuries")}</h5>
-                                                        <ul className="space-y-1.5 text-sm text-slate-600 ">
+                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Kemungkinan Cedera")}</h5>
+                                                        <div className="flex flex-wrap gap-1.5">
                                                             {splitItems(comp.possible_injuries).map((m, i) => (
-                                                                <li key={i} className="flex gap-2"><span className="text-slate-400">-</span> {m}</li>
+                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">{m}</span>
                                                             ))}
-                                                        </ul>
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 {/* Corrective Exercises for this comp */}
                                                 <div className="lg:col-span-8 space-y-6">
                                                     <h5 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                                        <Zap size={16} className="text-slate-500" /> {t("Corrective Exercise Continuum")}
+                                                        <Zap size={16} className="text-slate-500" /> {t("Latihan Korektif")}
                                                     </h5>
                                                     
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                         {/* Phase 1 */}
-                                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">1</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Inhibit (SMR)")}</h6>
+                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">1</span>
+                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 1: Inhibit (SMR)")}</h6>
                                                             </div>
-                                                            <ul className="space-y-3">
+                                                            <ul className="space-y-2">
                                                                 {splitItems(comp.exercises_smr).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 ">
+                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
                                                                         {m}
                                                                     </li>
                                                                 ))}
@@ -280,14 +294,15 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         </div>
 
                                                         {/* Phase 2 */}
-                                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">2</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Lengthen (Stretch)")}</h6>
+                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">2</span>
+                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 2: Lengthen (Peregangan)")}</h6>
                                                             </div>
-                                                            <ul className="space-y-3">
+                                                            <ul className="space-y-2">
                                                                 {splitItems(comp.exercises_stretching).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 ">
+                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
                                                                         {m}
                                                                     </li>
                                                                 ))}
@@ -298,14 +313,15 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         </div>
 
                                                         {/* Phase 3 */}
-                                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">3</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Activate")}</h6>
+                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">3</span>
+                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 3: Activate")}</h6>
                                                             </div>
-                                                            <ul className="space-y-3">
+                                                            <ul className="space-y-2">
                                                                 {splitItems(comp.exercises_isometrics).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 ">
+                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
                                                                         {m}
                                                                     </li>
                                                                 ))}
@@ -316,14 +332,15 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                                         </div>
 
                                                         {/* Phase 4 */}
-                                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold flex items-center justify-center">4</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Integrate")}</h6>
+                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">4</span>
+                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 4: Integrate")}</h6>
                                                             </div>
-                                                            <ul className="space-y-3">
+                                                            <ul className="space-y-2">
                                                                 {splitItems(comp.exercises_integrated).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 ">
+                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
                                                                         {m}
                                                                     </li>
                                                                 ))}
@@ -341,8 +358,8 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                     {analysis.compensations.length === 0 && (
                                         <div className="p-10 text-center flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl shadow-sm">
                                             <Activity size={32} className="text-slate-300 mb-3" />
-                                            <p className="text-sm font-bold text-slate-900 ">{t("No Compensations")}</p>
-                                            <p className="text-xs text-slate-500 mt-1">{t("Player shows excellent postural alignment.")}</p>
+                                            <p className="text-sm font-bold text-slate-900 ">{t("Tidak Ada Kompensasi")}</p>
+                                            <p className="text-xs text-slate-500 mt-1">{t("Postur tubuh pemain sangat baik.")}</p>
                                         </div>
                                     )}
                                 </div>
@@ -354,7 +371,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                             <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 ">
                                                 <FileText size={14} />
                                             </div>
-                                            <h3 className="text-sm font-bold text-slate-900 ">{t("Clinical Notes / Remarks")}</h3>
+                                            <h3 className="text-sm font-bold text-slate-900 ">{t("Catatan Klinis")}</h3>
                                         </div>
                                         <div 
                                             className="text-sm text-slate-600 leading-relaxed pl-1 prose prose-slate max-w-none"
@@ -367,19 +384,19 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-8">
                                     <div className="p-5 border-b border-slate-200 bg-slate-50 ">
                                         <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                            <History size={18} className="text-slate-500" /> {t("Assessment Records")}
+                                            <History size={18} className="text-slate-500" /> {t("Riwayat Evaluasi")}
                                         </h3>
                                     </div>
                                     
                                     <div className="divide-y divide-slate-100 ">
                                         {assessments.length > 0 ? assessments.map((item, idx) => (
-                                            <div key={idx} className="p-4 md:px-6 flex items-center justify-between hover:bg-slate-50/50 :bg-orange-500/30 transition-colors group">
+                                            <div key={idx} className="p-4 md:px-6 flex items-center justify-between hover:bg-slate-50/50 hover:bg-orange-50 transition-colors group">
                                                 <div>
                                                     <p className="text-sm font-bold text-slate-900 ">
-                                                        {new Date(item.assessment_date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                        {new Date(item.assessment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                     </p>
                                                     <div className="text-xs text-slate-500 mt-0.5">
-                                                        {item.details.length} Compensations detected
+                                                        {item.details.length} Kompensasi terdeteksi
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
@@ -398,7 +415,7 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                         )) : (
                                             <div className="p-10 text-center flex flex-col items-center justify-center">
                                                 <History size={24} className="text-slate-300 mb-2" />
-                                                <p className="text-xs font-bold text-slate-500 ">{t("No Records")}</p>
+                                                <p className="text-xs font-bold text-slate-500 ">{t("Belum ada riwayat evaluasi")}</p>
                                             </div>
                                         )}
                                     </div>
@@ -407,8 +424,8 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                         ) : (
                             <div className="p-10 text-center flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl shadow-sm h-full">
                                 <Activity size={32} className="text-slate-300 mb-3" />
-                                <p className="text-sm font-bold text-slate-900 ">{t("No Analysis Available")}</p>
-                                <p className="text-xs text-slate-500 mt-1">{t("Please add a new DPA assessment first.")}</p>
+                                <p className="text-sm font-bold text-slate-900 ">{t("Tidak Ada Data Analisis")}</p>
+                                <p className="text-xs text-slate-500 mt-1">{t("Silakan tambahkan evaluasi DPA baru terlebih dahulu.")}</p>
                             </div>
                         )}
                     </div>

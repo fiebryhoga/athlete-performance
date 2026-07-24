@@ -83,6 +83,7 @@ class UserManagementController extends Controller
             'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string|min:6',
             'role' => 'required|in:superadmin,coach,athlete',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ];
 
         if ($request->role === 'athlete') {
@@ -103,11 +104,17 @@ class UserManagementController extends Controller
 
         $request->validate($rules);
 
+        $photoPath = null;
+        if ($request->hasFile('profile_photo')) {
+            $photoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
+
         $data = [
             'name' => $request->name,
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'profile_photo' => $photoPath,
         ];
 
         if ($request->role === 'athlete') {
@@ -164,6 +171,7 @@ class UserManagementController extends Controller
             'username' => ['required', 'string', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6',
             'role' => 'required|in:superadmin,coach,athlete',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
         ];
 
         if ($request->role === 'athlete') {
@@ -189,6 +197,13 @@ class UserManagementController extends Controller
             'username' => $request->username,
             'role' => $request->role,
         ];
+
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo);
+            }
+            $data['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
 
         if ($request->role === 'athlete') {
             $data['sport_id'] = $request->sport_id;
