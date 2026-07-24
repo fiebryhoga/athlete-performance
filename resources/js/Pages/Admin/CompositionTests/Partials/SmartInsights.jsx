@@ -8,6 +8,7 @@ import {
     Zap,
     Activity,
     HeartPulse,
+    Brain,
 } from "lucide-react";
 
 export default function SmartInsights({ test, player, benchmarks }) {
@@ -23,29 +24,29 @@ export default function SmartInsights({ test, player, benchmarks }) {
             insights.push({
                 type: "warning",
                 icon: Activity,
-                title: "Underweight (BMI)",
-                desc: "BMI is below normal. Caloric surplus and hypertrophy training needed to increase muscle mass.",
+                title: "Kekurangan Berat Badan (BMI)",
+                desc: "BMI di bawah batas normal. Diperlukan surplus kalori dan latihan hipertrofi untuk meningkatkan massa otot.",
             });
         } else if (bmi >= 18.5 && bmi < 25) {
             insights.push({
                 type: "info",
                 icon: CheckCircle2,
-                title: "Proportional BMI",
-                desc: "Weight to height ratio is within ideal and healthy limits.",
+                title: "BMI Proporsional",
+                desc: "Rasio berat dan tinggi badan berada dalam batas ideal dan sehat.",
             });
         } else if (bmi >= 25 && bmi < 30) {
             insights.push({
                 type: "warning",
                 icon: Activity,
-                title: "Overweight (BMI)",
-                desc: "High BMI. Ensure this weight comes from muscle mass (normal for athletes), not fat accumulation.",
+                title: "Kelebihan Berat Badan (BMI)",
+                desc: "BMI tinggi. Pastikan berat ini berasal dari massa otot (wajar untuk atlet), bukan penumpukan lemak.",
             });
         } else if (bmi >= 30) {
             insights.push({
                 type: "danger",
                 icon: AlertTriangle,
-                title: "Obesity Indication (BMI)",
-                desc: "Very high BMI level. Immediate diet adjustment and caloric deficit program required.",
+                title: "Indikasi Obesitas (BMI)",
+                desc: "Tingkat BMI sangat tinggi. Segera perbaiki pola makan dan jalani program defisit kalori.",
             });
         }
     }
@@ -60,8 +61,8 @@ export default function SmartInsights({ test, player, benchmarks }) {
                 insights.push({
                     type: "danger",
                     icon: HeartPulse,
-                    title: "Very High Fat",
-                    desc: "Risk of burdening knee/ankle joints and drastically reducing agility.",
+                    title: "Lemak Sangat Tinggi",
+                    desc: "Risiko membebani sendi lutut/pergelangan kaki dan secara drastis mengurangi kelincahan.",
                 });
             } else if (
                 bf >= bfRef.acceptable?.min &&
@@ -70,22 +71,22 @@ export default function SmartInsights({ test, player, benchmarks }) {
                 insights.push({
                     type: "warning",
                     icon: HeartPulse,
-                    title: "Average Fat Level",
-                    desc: "Normal for non-athletes, but needs to be reduced by 3-5% to reach competitive soccer level.",
+                    title: "Kadar Lemak Rata-rata",
+                    desc: "Normal untuk non-atlet, tetapi perlu dikurangi 3-5% untuk mencapai level kompetitif.",
                 });
             } else if (bf >= bfRef.fitness?.min && bf <= bfRef.athlete?.max) {
                 insights.push({
                     type: "success",
                     icon: CheckCircle2,
-                    title: "Ideal Athlete Body Fat",
-                    desc: "Optimal muscle and fat composition. Power-to-weight ratio is at peak condition.",
+                    title: "Lemak Tubuh Ideal Atlet",
+                    desc: "Komposisi otot dan lemak optimal. Rasio tenaga terhadap berat (power-to-weight) berada di kondisi puncak.",
                 });
             } else if (bf <= bfRef.essential?.max) {
                 insights.push({
                     type: "info",
                     icon: Info,
-                    title: "Essential Fat",
-                    desc: "Very low fat percentage. Beware of immune system decline or hormonal disruption if maintained for too long.",
+                    title: "Lemak Esensial",
+                    desc: "Persentase lemak sangat rendah. Waspadai penurunan sistem imun atau gangguan hormonal jika dipertahankan terlalu lama.",
                 });
             }
         }
@@ -98,22 +99,22 @@ export default function SmartInsights({ test, player, benchmarks }) {
             insights.push({
                 type: "danger",
                 icon: Droplets,
-                title: "Clinical Dehydration",
-                desc: `Total body water (${tbw}%) is lacking. Highly prone to muscle cramps. Increase fluid and electrolyte intake.`,
+                title: "Dehidrasi Klinis",
+                desc: `Total air dalam tubuh (${tbw}%) kurang. Sangat rentan mengalami kram otot. Tingkatkan asupan cairan dan elektrolit.`,
             });
         } else if (tbw >= minTbw && tbw <= 65) {
             insights.push({
                 type: "success",
                 icon: Droplets,
-                title: "Optimal Hydration",
-                desc: "Muscle cells are well hydrated, strongly supporting flexibility and endurance during matches.",
+                title: "Hidrasi Optimal",
+                desc: "Sel-sel otot terhidrasi dengan baik, sangat mendukung kelenturan dan daya tahan selama pertandingan.",
             });
         } else {
             insights.push({
                 type: "info",
                 icon: Droplets,
-                title: "High Hydration",
-                desc: "Total body water is quite high. Generally indicates large muscle mass because muscles store a lot of water.",
+                title: "Hidrasi Tinggi",
+                desc: "Total air dalam tubuh cukup tinggi. Umumnya menandakan massa otot yang besar karena otot menyimpan banyak air.",
             });
         }
     }
@@ -124,22 +125,22 @@ export default function SmartInsights({ test, player, benchmarks }) {
             insights.push({
                 type: "info",
                 icon: CheckCircle2,
-                title: "Safe Organ Fat",
-                desc: `Visceral fat at Level ${visc} is very healthy. Internal organs (heart/lungs) are free from bad fat accumulation.`,
+                title: "Lemak Organ Aman",
+                desc: `Lemak viseral di Level ${visc} sangat sehat. Organ dalam (jantung/paru-paru) terbebas dari tumpukan lemak jahat.`,
             });
         } else if (visc >= 10 && visc < 15) {
             insights.push({
                 type: "warning",
                 icon: HeartPulse,
-                title: "Elevated Visceral Fat",
-                desc: "Organ fat accumulation starting. Limit simple sugars/fried foods and increase cardio intensity.",
+                title: "Lemak Organ Meningkat",
+                desc: "Penumpukan lemak organ mulai terjadi. Batasi asupan gula sederhana/gorengan dan tingkatkan intensitas kardio.",
             });
         } else if (visc >= 15) {
             insights.push({
                 type: "danger",
                 icon: AlertTriangle,
-                title: "Dangerous Visceral Fat",
-                desc: "Organ fat level in red zone. This will severely hamper VO2Max capacity and player stamina.",
+                title: "Lemak Organ Berbahaya",
+                desc: "Level lemak organ berada di zona merah. Hal ini akan sangat menghambat kapasitas VO2Max dan stamina pemain.",
             });
         }
     }
@@ -151,22 +152,22 @@ export default function SmartInsights({ test, player, benchmarks }) {
             insights.push({
                 type: "warning",
                 icon: Zap,
-                title: "Metabolic Decline",
-                desc: `Cellular age (${metAge} yrs) detected older than actual age. Improve rest patterns, nutrition, and reduce stress.`,
+                title: "Penurunan Metabolisme",
+                desc: `Usia seluler (${metAge} th) terdeteksi lebih tua dari usia sebenarnya. Perbaiki pola istirahat, nutrisi, dan kurangi stres.`,
             });
         } else if (metAge < actualAge) {
             insights.push({
                 type: "success",
                 icon: Zap,
-                title: "Prime Metabolism",
-                desc: `Excellent! Biological cell age (${metAge} yrs) is younger than calendar age. Physical recovery will be very fast.`,
+                title: "Metabolisme Prima",
+                desc: `Luar biasa! Usia biologis sel (${metAge} th) lebih muda dari usia sebenarnya. Pemulihan fisik akan berjalan sangat cepat.`,
             });
         } else {
             insights.push({
                 type: "info",
                 icon: CheckCircle2,
-                title: "Stable Metabolism",
-                desc: "Cellular age matches chronological age. Muscle regeneration function runs normally for this age.",
+                title: "Metabolisme Stabil",
+                desc: "Usia seluler sesuai dengan usia sebenarnya. Fungsi regenerasi otot berjalan normal.",
             });
         }
     }
@@ -177,22 +178,22 @@ export default function SmartInsights({ test, player, benchmarks }) {
             insights.push({
                 type: "danger",
                 icon: Zap,
-                title: "Overtraining Indication",
-                desc: "Phase Angle is very low. Cell membrane damaged/inflamed. Mandatory full recovery for 48-72 hours.",
+                title: "Indikasi Overtraining",
+                desc: "Phase Angle sangat rendah. Membran sel rusak/meradang. Wajib pemulihan penuh selama 48-72 jam.",
             });
         } else if (pa >= 5.5 && pa < 7.0) {
             insights.push({
                 type: "info",
                 icon: Activity,
-                title: "Normal Cell Integrity",
-                desc: "Health condition and muscle cell endurance are within reasonable limits.",
+                title: "Integritas Sel Normal",
+                desc: "Kondisi kesehatan dan daya tahan sel otot berada dalam batas wajar.",
             });
         } else if (pa >= 7.0) {
             insights.push({
                 type: "success",
                 icon: CheckCircle2,
-                title: "Very Strong Cellular",
-                desc: "High phase angle. Body cells are very fit and ready for maximum intensity training loads.",
+                title: "Sel Sangat Kuat",
+                desc: "Phase angle tinggi. Sel-sel tubuh sangat bugar dan siap menerima beban latihan intensitas maksimal.",
             });
         }
     }
@@ -201,8 +202,8 @@ export default function SmartInsights({ test, player, benchmarks }) {
         insights.push({
             type: "info",
             icon: Lightbulb,
-            title: "No Conclusions Yet",
-            desc: "Please complete the body composition form to get an automatic health summary.",
+            title: "Belum Ada Kesimpulan",
+            desc: "Silakan lengkapi form komposisi tubuh untuk mendapatkan rangkuman kesehatan otomatis.",
         });
     }
 
@@ -249,12 +250,11 @@ export default function SmartInsights({ test, player, benchmarks }) {
             <div className="px-6 py-5 border-b border-zinc-200  flex items-center justify-between bg-zinc-50/50  transition-colors">
                 <div className="space-y-1">
                     <h3 className="text-base font-semibold tracking-tight text-zinc-950  flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4 text-amber-500" />
-                        {"Conclusions & Recommendations"}
+                        <Brain className="w-4 h-4 text-amber-500" />
+                        {"Smart Insights"}
                     </h3>
                     <p className="text-xs text-zinc-500  font-semibold">
-                        Summary of player's physical status from the latest test
-                        data.
+                        Analisis cerdas dan deteksi masalah dari seluruh matrik komposisi tubuh
                     </p>
                 </div>
             </div>

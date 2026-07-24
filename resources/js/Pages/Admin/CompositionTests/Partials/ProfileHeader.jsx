@@ -37,23 +37,23 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
                 
                 <div className="grid grid-cols-2 gap-y-3 gap-x-6 sm:flex sm:flex-wrap sm:items-center sm:gap-3 md:gap-4 text-xs md:text-sm mt-3 sm:mt-0">
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Age"}</span>
-                        <span className="font-bold text-slate-800">{player.age || latestTest?.age || '-'} <span className="font-semibold text-slate-500">yrs</span></span>
+                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Usia"}</span>
+                        <span className="font-bold text-slate-800">{player.age || latestTest?.age || '-'} <span className="font-semibold text-slate-500">thn</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Height"}</span>
+                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Tinggi"}</span>
                         <span className="font-bold text-slate-800">{player.height || latestTest?.height || '-'} <span className="font-medium text-slate-500">cm</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Latest Weight"}</span>
+                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Berat Terakhir"}</span>
                         <span className="font-bold text-slate-800">{latestTest?.weight || player.weight || '-'} <span className="font-semibold text-slate-500">kg</span></span>
                     </div>
                     <div className="w-px h-6 bg-slate-200 hidden sm:block"></div>
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Total Tests"}</span>
-                        <span className="font-bold text-slate-800">{totalTests} <span className="font-semibold text-slate-500">records</span></span>
+                        <span className="text-[10px] font-bold text-slate-400 mb-0.5">{"Total Tes"}</span>
+                        <span className="font-bold text-slate-800">{totalTests} <span className="font-semibold text-slate-500">rekam</span></span>
                     </div>
                 </div>
             </div>
@@ -66,14 +66,14 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
                 className="inline-flex flex-1 md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 h-10 px-5 shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2"
             >
                 <ChevronLeft size={16} className="mr-1.5" />
-                {"Back"}
+                {"Kembali"}
             </Link>
             {onExport && (
                 <button
                     onClick={onExport}
                     disabled={isExporting}
                     className="inline-flex flex-1 md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 h-10 px-5 shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 disabled:opacity-50"
-                    title="Export to PDF"
+                    title="Ekspor ke PDF"
                 >
                     {isExporting ? <Loader2 size={16} className="mr-1.5 animate-spin" /> : <Download size={16} className="mr-1.5" />}
                     PDF
@@ -85,8 +85,8 @@ export default function ProfileHeader({ player, latestTest, totalTests, onAddRec
                     className="inline-flex flex-[2] md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-all bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 h-10 px-6 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                 >
                     <Plus size={16} className="mr-1.5 sm:mr-1.5" />
-                    <span className="hidden sm:inline">{"Add Data"}</span>
-                    <span className="sm:hidden">{"Add"}</span>
+                    <span className="hidden sm:inline">{"Tambah Data"}</span>
+                    <span className="sm:hidden">{"Tambah"}</span>
                 </button>
             )}
         </div>

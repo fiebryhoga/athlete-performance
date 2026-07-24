@@ -177,7 +177,7 @@ export default function Navbar({ onMobileMenuClick, isSidebarCollapsed, toggleSi
                                         </div>
                                         
                                         <div className="hidden md:block text-left mr-1">
-                                            <p className="text-sm font-bold text-slate-700 leading-none group-hover:text-[#ff4d00] transition-colors truncate max-w-[120px]">
+                                            <p className="text-sm font-bold text-slate-700 leading-tight group-hover:text-[#ff4d00] transition-colors truncate max-w-[120px] pb-0.5">
                                                 {user.name}
                                             </p>
                                             <p className="text-xs font-semibold text-slate-400 capitalize mt-0.5">

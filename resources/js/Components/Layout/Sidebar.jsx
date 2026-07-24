@@ -41,24 +41,36 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                 { name: 'Dashboard', route: 'dashboard', checkPath: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Profilling', route: 'admin.athletes.index', checkPath: '/admin/athletes', icon: Users, roles: ['superadmin', 'coach'] },
                 { name: 'Profil Fisik', route: 'athlete.profiling', checkPath: '/profiling', icon: Target, roles: ['athlete'] },
+                { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Absensi Gym', route: 'admin.gym-attendance.index', checkPath: '/admin/gym-attendance', icon: Building2, roles: ['superadmin', 'coach'] },
             ]
         },
-        
         {
-            title: 'Tes & Pantauan',
+            title: 'Tes',
             items: [
-                { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Analisis Beban', route: 'admin.load-analysis.index', checkPath: '/admin/load-analysis', icon: BarChart3, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: ClipboardList, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Komposisi Tubuh', route: 'admin.composition-tests.index', checkPath: '/admin/composition', icon: Scale, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Kalkulator PHV', route: 'admin.phv-calculator.index', checkPath: '/admin/phv-calculator', icon: HeartPulse, roles: ['superadmin', 'coach'] },
                 { name: 'Analysis DPA', route: 'admin.athletes.dpa.index', checkPath: '/admin/athletes/dpa', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Wellness & Beban', route: 'admin.wellness-rpe.index', checkPath: '/admin/wellness-rpe', icon: HeartPulse, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Pantauan Harian', route: 'admin.daily-metrics.index', checkPath: '/admin/daily-metrics', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
             ]
         },
         {
-            title: 'Master Data & Latihan',
+            title: 'Nutrisi & Diet',
+            items: [
+                { name: 'Rencana Makan', route: 'admin.meal-plans.index', checkPath: '/admin/meal-plans', icon: Flame, roles: ['superadmin', 'coach', 'athlete'] },
+            ]
+        },
+        {
+            title: 'Recovery Tracking',
+            items: [
+                { name: 'Wellness & Beban', route: 'admin.wellness-rpe.index', checkPath: '/admin/wellness-rpe', icon: HeartPulse, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Recovery Strategi', route: 'admin.recovery-strategies.index', checkPath: '/admin/recovery-strategies', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Pantauan Harian', route: 'admin.daily-metrics.index', checkPath: '/admin/daily-metrics', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Analisis Beban', route: 'admin.load-analysis.index', checkPath: '/admin/load-analysis', icon: BarChart3, roles: ['superadmin', 'coach', 'athlete'] },
+            ]
+        },
+        {
+            title: 'Master Data',
             items: [
                 { name: 'Kategori Olahraga', route: 'admin.sports.index', checkPath: '/admin/sports', icon: Trophy, roles: ['superadmin', 'coach'] },
                 { name: 'Master Exercise', route: 'admin.exercises.index', checkPath: '/admin/exercises', icon: Dumbbell, roles: ['superadmin', 'coach'] },
@@ -67,10 +79,9 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             ]
         },
         {
-            title: 'Sistem & Laporan',
+            title: 'Setting',
             items: [
                 { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: Shield, roles: ['superadmin', 'coach'] },
-                { name: 'Absensi Gym', route: 'admin.gym-attendance.index', checkPath: '/admin/gym-attendance', icon: Building2, roles: ['superadmin', 'coach'], condition: () => userRole === 'superadmin' || props.auth.user.is_gym_guard },
                 { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: BarChart3, roles: ['superadmin'] },
                 { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
             ]

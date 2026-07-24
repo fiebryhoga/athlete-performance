@@ -4,228 +4,219 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class AiNutritionController extends Controller
 {
+    // Meal Templates (Local Database)
+    private $breakfasts = [
+        "Oatmeal & Telur Rebus",
+        "Roti Gandum & Selai Kacang",
+        "Smoothie Protein & Pisang",
+        "Omelet Sayur & Roti Gandum",
+        "Nasi Merah & Telur Mata Sapi"
+    ];
+
+    private $lunches = [
+        "Nasi Merah & Dada Ayam Bakar",
+        "Pasta Gandum & Daging Sapi Cincang",
+        "Kentang Rebus & Ikan Nila Bakar",
+        "Nasi Putih & Sate Ayam Tanpa Bumbu Kacang",
+        "Salad Sayur & Tuna Kaleng"
+    ];
+
+    private $dinners = [
+        "Salad Sayur & Dada Ayam Rebus",
+        "Nasi Putih Sedikit & Ikan Salmon",
+        "Ubi Jalar & Tempe Tahu Bakar",
+        "Sup Sayur Bening & Fillet Ikan",
+        "Quinoa & Daging Sapi Tumis Kecap"
+    ];
+
+    private $snacks = [
+        "Buah Apel",
+        "Kacang Almond",
+        "Yogurt Greek",
+        "Whey Protein Shake",
+        "Pisang & Selai Kacang",
+        "Protein Bar",
+        "Edamame Rebus"
+    ];
+
     public function analyze(Request $request)
     {
         $request->validate([
             'composition_data' => 'required|array',
+            'goal' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'daily_splits' => 'nullable|array',
         ]);
 
         $data = $request->input('composition_data');
-        $apiKey = config('services.gemini.api_key');
-
-        if (!$apiKey) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gemini API key is not configured.',
-            ], 500);
-        }
-
-        $prompt = $this->buildPrompt($data);
-
-        $models = [
-            'gemini-2.0-flash',
-            'gemini-2.0-flash-lite',
-        ];
+        $goal = $request->input('goal', 'maintenance');
+        $startDate = $request->input('start_date');
+        $dailySplits = $request->input('daily_splits');
 
         try {
-            $response = null;
-            $lastError = null;
-
-            foreach ($models as $model) {
-                for ($attempt = 1; $attempt <= 3; $attempt++) {
-                    $response = Http::timeout(60)->post(
-                        "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
-                        [
-                            'contents' => [
-                                [
-                                    'parts' => [
-                                        ['text' => $prompt]
-                                    ]
-                                ]
-                            ],
-                            'generationConfig' => [
-                                'temperature' => 0.7,
-                                'topP' => 0.9,
-                                'maxOutputTokens' => 8192,
-                                'responseMimeType' => 'application/json',
-                            ],
-                        ]
-                    );
-
-                    if ($response->successful()) {
-                        break 2; // Success — exit both loops
-                    }
-
-                    $lastError = "Model {$model} attempt {$attempt}: HTTP {$response->status()}";
-                    Log::warning("Gemini API retry", ['error' => $lastError, 'body' => substr($response->body(), 0, 500)]);
-
-                    if ($response->status() === 429) {
-                        // Rate limited — wait before retry
-                        sleep($attempt * 2); // 2s, 4s, 6s
-                    } else {
-                        break; // Non-429 error — try next model
-                    }
-                }
-            }
-
-            if (!$response || !$response->successful()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'AI service unavailable. ' . ($lastError ?? 'Please try again in a moment.'),
-                ], 500);
-            }
-
-            $result = $response->json();
-            $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? null;
-
-            if (!$text) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Empty response from AI.',
-                ], 500);
-            }
-
-            $aiData = json_decode($text, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                // Try to extract JSON from the response
-                preg_match('/\{[\s\S]*\}/', $text, $matches);
-                if (!empty($matches[0])) {
-                    $aiData = json_decode($matches[0], true);
-                }
-                
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to parse AI response.',
-                        'raw' => $text,
-                    ], 500);
-                }
-            }
+            $generatedData = $this->generateLocalPlan($data, $goal, $startDate, $dailySplits);
 
             return response()->json([
                 'success' => true,
-                'data' => $aiData,
+                'data' => $generatedData,
             ]);
         } catch (\Exception $e) {
-            Log::error('Gemini API exception', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'AI service error: ' . $e->getMessage(),
+                'message' => 'Gagal membuat rencana makan secara lokal: ' . $e->getMessage(),
             ], 500);
         }
     }
 
-    private function buildPrompt(array $data): string
+    private function generateLocalPlan(array $data, string $goal, ?string $startDate, ?array $dailySplits)
     {
-        $name = $data['name'] ?? 'Athlete';
-        $gender = $data['gender'] ?? 'male';
-        $age = $data['age'] ?? 0;
-        $weight = $data['weight'] ?? 0;
-        $height = $data['height'] ?? 0;
-        $bmi = $data['bmi'] ?? 0;
-        $bodyFat = $data['body_fat_percentage'] ?? 0;
-        $muscleMass = $data['muscle_mass'] ?? 0;
-        $skeletalMuscle = $data['skeletal_muscle_mass'] ?? 0;
-        $boneMass = $data['bone_mass'] ?? 0;
-        $visceralFat = $data['visceral_fat'] ?? 0;
-        $totalBodyWater = $data['total_body_water'] ?? 0;
-        $phaseAngle = $data['phase_angle'] ?? 0;
-        $metabolicAge = $data['metabolic_age'] ?? 0;
-        $bmr = $data['bmr'] ?? 0;
-        $tdee = $data['tdee'] ?? 0;
-        $activityLevel = $data['activity_level'] ?? 0;
+        $tdee = (float) ($data['tdee'] ?? 2000);
+        
+        // Target Kalori
+        if ($goal === 'cutting') {
+            $targetCals = $tdee - 500;
+            $overall = "Berdasarkan data komposisi tubuh, atlet direkomendasikan untuk melakukan defisit kalori guna mengurangi persentase lemak tubuh tanpa mengorbankan massa otot.";
+        } elseif ($goal === 'bulking') {
+            $targetCals = $tdee + 500;
+            $overall = "Atlet disarankan untuk melakukan surplus kalori (bulking) demi mendukung pembentukan massa otot baru dan pemulihan optimal setelah latihan intens.";
+        } else {
+            $targetCals = $tdee;
+            $overall = "Rencana makan difokuskan pada pemeliharaan (maintenance) untuk menjaga komposisi tubuh saat ini dan memastikan ketersediaan energi harian.";
+        }
 
-        return <<<PROMPT
-You are an expert sports nutritionist and exercise physiologist AI assistant. Analyze the following athlete's body composition data and provide a comprehensive, personalized nutrition recommendation.
+        $targetCals = max(1200, round($targetCals)); // minimal 1200 kalori
+        $weight = (float) ($data['weight'] ?? 70);
 
-## ATHLETE DATA:
-- Name: {$name}
-- Gender: {$gender}
-- Age: {$age} years
-- Weight: {$weight} kg
-- Height: {$height} cm
-- BMI: {$bmi}
-- Body Fat Percentage: {$bodyFat}%
-- Muscle Mass: {$muscleMass} kg
-- Skeletal Muscle Mass: {$skeletalMuscle} kg
-- Bone Mass: {$boneMass} kg
-- Visceral Fat Level: {$visceralFat}
-- Total Body Water: {$totalBodyWater}%
-- Phase Angle: {$phaseAngle}°
-- Metabolic Age: {$metabolicAge} years
-- BMR: {$bmr} kcal/day
-- TDEE: {$tdee} kcal/day
-- Activity Level Multiplier: {$activityLevel}
+        // Jika start_date atau dailySplits kosong, buat default 7 hari
+        if (!$dailySplits || count($dailySplits) === 0) {
+            $dailySplits = [];
+            for ($i = 0; $i < 7; $i++) {
+                $dailySplits[] = [
+                    'label' => 'Hari ' . ($i + 1),
+                    'split' => 'Moderate Carb'
+                ];
+            }
+        }
 
-## INSTRUCTIONS:
-Provide your analysis in the following JSON structure. Be very specific and personalized. Use actual numbers from the data. Make all recommendations data-driven and actionable.
+        $weeklyPlan = [];
 
-{
-  "overall_assessment": "A 2-3 sentence overall assessment of the athlete's current body composition status.",
-  "recommendation": "cutting" | "maintenance" | "bulking",
-  "recommendation_reason": "Detailed explanation of why this recommendation (2-3 sentences).",
-  "confidence_level": "high" | "medium" | "low",
-  "body_composition_analysis": {
-    "strengths": ["List 2-3 specific strengths based on the data"],
-    "concerns": ["List 2-3 specific concerns or areas for improvement"],
-    "risk_factors": ["List any health risk factors, or empty array if none"]
-  },
-  "calorie_targets": {
-    "deficit": { "calories": number, "description": "Brief description" },
-    "maintenance": { "calories": number, "description": "Brief description" },
-    "surplus": { "calories": number, "description": "Brief description" }
-  },
-  "macro_plan": {
-    "protein": { "grams": number, "per_kg": number, "reasoning": "Why this amount" },
-    "fats": { "grams": number, "pct": number, "reasoning": "Why this amount" },
-    "carbs": { "grams": number, "pct": number, "reasoning": "Why this amount" }
-  },
-  "weekly_meal_plan": [
-    {
-      "day": "Monday",
-      "meals": [
-        { "time": "07:00", "type": "Breakfast", "menu": "Specific meal name", "protein": number, "carbs": number, "fats": number, "calories": number },
-        { "time": "10:00", "type": "Snack", "menu": "Specific snack name", "protein": number, "carbs": number, "fats": number, "calories": number },
-        { "time": "13:00", "type": "Lunch", "menu": "Specific meal name", "protein": number, "carbs": number, "fats": number, "calories": number },
-        { "time": "16:00", "type": "Snack", "menu": "Specific snack name", "protein": number, "carbs": number, "fats": number, "calories": number },
-        { "time": "19:30", "type": "Dinner", "menu": "Specific meal name", "protein": number, "carbs": number, "fats": number, "calories": number }
-      ]
+        foreach ($dailySplits as $split) {
+            $splitType = $split['split'] ?? 'Moderate Carb';
+            $ratios = $this->getMacrosRatio($splitType);
+
+            // Hitung target makronutrisi harian dalam gram
+            $dayProtein = round(($targetCals * $ratios['p']) / 4);
+            $dayFats = round(($targetCals * $ratios['f']) / 9);
+            $dayCarbs = round(($targetCals * $ratios['c']) / 4);
+
+            $meals = [
+                $this->createMeal("07:00", "Breakfast", $this->getRandom($this->breakfasts), 0.25, $targetCals, $dayProtein, $dayCarbs, $dayFats),
+                $this->createMeal("10:00", "Snack", $this->getRandom($this->snacks), 0.10, $targetCals, $dayProtein, $dayCarbs, $dayFats),
+                $this->createMeal("13:00", "Lunch", $this->getRandom($this->lunches), 0.30, $targetCals, $dayProtein, $dayCarbs, $dayFats),
+                $this->createMeal("16:00", "Snack", $this->getRandom($this->snacks), 0.10, $targetCals, $dayProtein, $dayCarbs, $dayFats),
+                $this->createMeal("19:30", "Dinner", $this->getRandom($this->dinners), 0.25, $targetCals, $dayProtein, $dayCarbs, $dayFats),
+            ];
+
+            $weeklyPlan[] = [
+                "day" => $split['label'] ?? "Hari",
+                "meals" => $meals
+            ];
+        }
+
+        // Susun JSON response sesuai ekspektasi frontend
+        return [
+            "overall_assessment" => $overall,
+            "recommendation" => $goal,
+            "recommendation_reason" => "Dipilih berdasarkan pengaturan manual oleh pelatih/admin.",
+            "confidence_level" => "high",
+            "body_composition_analysis" => [
+                "strengths" => ["Otomatis dikalkulasi dari data TDEE dan Berat Badan"],
+                "concerns" => [],
+                "risk_factors" => []
+            ],
+            "calorie_targets" => [
+                $goal => [
+                    "calories" => $targetCals,
+                    "description" => "Target kalori utama untuk program $goal"
+                ]
+            ],
+            // Ambil sample makro dari hari pertama (opsional, karena setiap hari bisa beda, tapi frontend baca ini untuk ringkasan)
+            "macro_plan" => [
+                "protein" => [
+                    "grams" => round(($targetCals * 0.3) / 4), // Default ringkasan Moderate
+                    "per_kg" => round((($targetCals * 0.3) / 4) / ($weight ?: 1), 1),
+                    "reasoning" => "Penting untuk pemulihan dan sintesis protein otot."
+                ],
+                "fats" => [
+                    "grams" => round(($targetCals * 0.35) / 9),
+                    "pct" => 35,
+                    "reasoning" => "Dibutuhkan untuk produksi hormon dan energi."
+                ],
+                "carbs" => [
+                    "grams" => round(($targetCals * 0.35) / 4),
+                    "pct" => 35,
+                    "reasoning" => "Bahan bakar utama untuk intensitas tinggi."
+                ]
+            ],
+            "weekly_meal_plan" => $weeklyPlan,
+            "hydration" => [
+                "daily_water_liters" => round($weight * 0.04, 1), // 40ml per kg
+                "pre_training" => "500ml air 2 jam sebelum latihan.",
+                "during_training" => "200ml setiap 15-20 menit selama latihan.",
+                "post_training" => "Ganti 150% dari berat badan yang hilang dengan cairan."
+            ],
+            "supplements" => [
+                [
+                    "name" => "Whey Protein",
+                    "dosage" => "1 scoop (25g protein)",
+                    "timing" => "Segera setelah latihan",
+                    "reason" => "Mempercepat pemulihan otot."
+                ]
+            ],
+            "training_nutrition_tips" => [
+                "Pastikan makan karbohidrat kompleks 2-3 jam sebelum latihan berat.",
+                "Hindari lemak tinggi sebelum bertanding untuk mencegah masalah pencernaan."
+            ],
+            "weekly_goals" => [
+                "Capai target kalori harian minimal 6 hari dalam seminggu.",
+                "Tingkatkan konsumsi sayuran hijau di setiap makan utama."
+            ],
+            "warnings" => []
+        ];
     }
-  ],
-  "hydration": {
-    "daily_water_liters": number,
-    "pre_training": "Specific hydration advice",
-    "during_training": "Specific hydration advice",
-    "post_training": "Specific hydration advice"
-  },
-  "supplements": [
-    { "name": "Supplement name", "dosage": "Specific dosage", "timing": "When to take", "reason": "Why recommended" }
-  ],
-  "training_nutrition_tips": [
-    "Specific tip 1 related to training and nutrition timing",
-    "Specific tip 2",
-    "Specific tip 3"
-  ],
-  "weekly_goals": [
-    "Specific measurable goal 1 for this week",
-    "Specific measurable goal 2",
-    "Specific measurable goal 3"
-  ],
-  "warnings": ["Any important warnings or contraindications based on the data"]
-}
 
-IMPORTANT: 
-- Generate exactly 7 days of meal plans (Monday through Sunday).
-- Make meal suggestions realistic and varied (mix Asian, Western, Mediterranean cuisines).
-- All macros in the meal plan should approximately sum up to the daily target.
-- Base protein recommendation on g/kg bodyweight (1.6-2.2g/kg for athletes).
-- Respond ONLY with valid JSON, no markdown or extra text.
-PROMPT;
+    private function getMacrosRatio(string $splitType)
+    {
+        // format: [protein, fat, carb]
+        switch (strtolower($splitType)) {
+            case 'lower carb':
+                return ['p' => 0.40, 'f' => 0.40, 'c' => 0.20]; // 40/40/20
+            case 'higher carb':
+                return ['p' => 0.30, 'f' => 0.20, 'c' => 0.50]; // 30/20/50
+            case 'moderate carb':
+            default:
+                return ['p' => 0.30, 'f' => 0.35, 'c' => 0.35]; // 30/35/35
+        }
+    }
+
+    private function getRandom(array $array)
+    {
+        return $array[array_rand($array)];
+    }
+
+    private function createMeal($time, $type, $menu, $percentage, $totalCals, $totalP, $totalC, $totalF)
+    {
+        return [
+            "time" => $time,
+            "type" => $type,
+            "menu" => $menu . " (Porsi Disesuaikan)",
+            "protein" => round($totalP * $percentage),
+            "carbs" => round($totalC * $percentage),
+            "fats" => round($totalF * $percentage),
+            "calories" => round($totalCals * $percentage)
+        ];
     }
 }

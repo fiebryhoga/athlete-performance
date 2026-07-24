@@ -27,7 +27,7 @@ class CheckRole
         }
 
         if (! in_array($request->user()->role, $roles)) {
-            abort(403, 'Akses Ditolak. Anda tidak memiliki izin untuk halaman ini.');
+            abort(403, 'Akses Ditolak. Anda tidak memiliki izin untuk halaman ini. (CheckRole Middleware)');
         }
 
         return $next($request);

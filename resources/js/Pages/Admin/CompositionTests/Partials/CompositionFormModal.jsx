@@ -232,10 +232,10 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                 <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 shrink-0 bg-slate-50/50">
                     <div>
                         <h2 className="text-lg font-bold tracking-tight text-slate-900">
-                            {isEditing ? 'Edit Body Composition' : 'Add New Record'}
+                            {isEditing ? 'Edit Komposisi Tubuh' : 'Tambah Rekam Data'}
                         </h2>
                         <p className="text-sm font-medium text-slate-500 mt-0.5">
-                            {player?.name} • {player?.position || 'Position not set'}
+                            {player?.name} {player?.position ? `• ${player.position}` : ''}
                         </p>
                     </div>
                     <button onClick={onClose} className="rounded-xl p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-900 transition-colors">
@@ -250,9 +250,9 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                             <Calculator className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
-                            <p className="text-sm font-bold text-orange-950">{"Smart Calculation Engine"}</p>
+                            <p className="text-sm font-bold text-orange-950">{"Mesin Kalkulasi Pintar"}</p>
                             <p className="text-xs font-medium text-orange-900/80 leading-relaxed">
-                                {"Fill in"} <strong>{"Weight, Height, Age"}</strong>. If without BIA tool, fill in <strong>{"Neck & Waist Circumference"}</strong> then click the button to instantly extract 10+ anatomy metrics.
+                                {"Isi"} <strong>{"Berat Badan, Tinggi Badan, Usia"}</strong>. Jika tanpa alat BIA, isi <strong>{"Lingkar Leher & Pinggang"}</strong> lalu klik tombol untuk mengekstrak otomatis 10+ metrik anatomi.
                             </p>
                         </div>
                     </div>
@@ -261,7 +261,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                         onClick={handleAutoCalculate}
                         className="inline-flex items-center justify-center shrink-0 rounded-xl text-sm font-bold transition-all bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 h-10 px-5 gap-2 w-full sm:w-auto relative z-10"
                     >
-                        <Wand2 className="w-4 h-4" /> {"Auto Calculate"}
+                        <Wand2 className="w-4 h-4" /> {"Kalkulasi Otomatis"}
                     </button>
                 </div>
 
@@ -270,25 +270,25 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  
  <div className="space-y-4">
                             <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
- {"Basic Patient Data (Required)"}
+ {"Data Dasar Pasien (Wajib)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
- <InputField label="Test Date" id="date" type="date" value={data.date} onChange={handleDataChange} error={errors.date} tooltip="Physical sample collection date." />
- <InputField label="Age (Years)" id="age" value={data.age} onChange={handleDataChange} error={errors.age} tooltip="Biological (chronological) age at the time of testing." />
- <InputField label="Weight (Kg)" id="weight" value={data.weight} onChange={handleDataChange} error={errors.weight} tooltip="Total body weight using a digital scale." />
- <InputField label="Height (cm)" id="height" value={data.height} onChange={handleDataChange} error={errors.height} tooltip="Actual body height barefoot." />
+ <InputField label="Tanggal Tes" id="date" type="date" value={data.date} onChange={handleDataChange} error={errors.date} tooltip="Tanggal pengambilan sampel fisik." />
+ <InputField label="Usia (Tahun)" id="age" value={data.age} onChange={handleDataChange} error={errors.age} tooltip="Usia biologis (kronologis) saat pengetesan." />
+ <InputField label="Berat (Kg)" id="weight" value={data.weight} onChange={handleDataChange} error={errors.weight} tooltip="Berat badan total menggunakan timbangan digital." />
+ <InputField label="Tinggi (cm)" id="height" value={data.height} onChange={handleDataChange} error={errors.height} tooltip="Tinggi badan aktual tanpa alas kaki." />
  </div>
  </div>
 
  <div className="space-y-4">
  <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
- {"Circumference Metrics (Optional - For Manual Calc)"}
+ {"Metrik Lingkar (Opsional - Untuk Kalkulasi Manual)"}
  </h3>
  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
- <InputField label="Neck Circ. (cm)" id="neck" value={measurements.neck} onChange={handleMeasurementChange} placeholder={"Optional"} tooltip="Measured just below the larynx using a measuring tape. (US Navy Formula)" />
- <InputField label="Waist Circ. (cm)" id="waist" value={measurements.waist} onChange={handleMeasurementChange} placeholder={"Optional"} tooltip="Measured right around the navel during normal exhalation." />
+ <InputField label="Lingkar Leher (cm)" id="neck" value={measurements.neck} onChange={handleMeasurementChange} placeholder={""} tooltip="Diukur tepat di bawah laring menggunakan pita ukur. (Formula US Navy)" />
+ <InputField label="Lingkar Pinggang (cm)" id="waist" value={measurements.waist} onChange={handleMeasurementChange} placeholder={""} tooltip="Diukur tepat di sekitar pusar saat ekshalasi normal." />
  {!isMale && (
- <InputField label="Hip Circ. (cm)" id="hip" value={measurements.hip} onChange={handleMeasurementChange} placeholder={"Women Only"} tooltip="Measured at the widest part of the hips." />
+ <InputField label="Lingkar Pinggul (cm)" id="hip" value={measurements.hip} onChange={handleMeasurementChange} placeholder={"Khusus Wanita"} tooltip="Diukur pada bagian terlebar dari pinggul." />
  )}
  </div>
  </div>
@@ -296,17 +296,17 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
  <div className="space-y-4">
  <h3 className="text-[11px] font-bold text-slate-500 flex items-center gap-2 border-b border-slate-100 pb-2">
- {"Body Anatomy Distribution"}
+ {"Distribusi Anatomi Tubuh"}
  </h3>
  <div className="grid grid-cols-2 gap-4">
- <InputField label="Body Fat (%)" id="body_fat_percentage" value={data.body_fat_percentage} onChange={handleDataChange} error={errors.body_fat_percentage} tooltip="Percentage of fat mass to total body weight." />
- <InputField label="Muscle Mass (kg)" id="muscle_mass" value={data.muscle_mass} onChange={handleDataChange} error={errors.muscle_mass} tooltip="Estimated total muscle mass. Formula: (Weight - Fat - Bone - Organ)" />
- <InputField label="Fat-Free Mass (kg)" id="fat_free_mass" value={data.fat_free_mass} onChange={handleDataChange} error={errors.fat_free_mass} tooltip="Pure body weight without fat (Muscle + Bone + Water). Formula: Weight - Total Fat" />
- <InputField label="Bone Mass (kg)" id="bone_mass" value={data.bone_mass} onChange={handleDataChange} error={errors.bone_mass} tooltip="Estimated weight of pure bone mineral. Average 2.5kg - 3.2kg." />
- <InputField label="Essential Fat (kg)" id="essential_fat_mass" value={data.essential_fat_mass} onChange={handleDataChange} tooltip="Fat required for nerve/hormone function (Men: ~3%, Women: ~12%)." />
- <InputField label="Storage Fat (kg)" id="storage_fat_mass" value={data.storage_fat_mass} onChange={handleDataChange} tooltip="Energy reserve fat accumulation (non-essential) under the skin." />
- <InputField label="Skeletal Muscle (kg)" id="skeletal_muscle_mass" value={data.skeletal_muscle_mass} onChange={handleDataChange} tooltip="Specifically muscles attached to bones (can be trained/enlarged)." />
- <InputField label="Other / Organ (kg)" id="other_mass" value={data.other_mass} onChange={handleDataChange} tooltip="Weight of internal organs, blood, and other tissues (Estimated ~25% weight)." />
+ <InputField label="Body Fat (%)" id="body_fat_percentage" value={data.body_fat_percentage} onChange={handleDataChange} error={errors.body_fat_percentage} tooltip="Persentase massa lemak terhadap berat badan total." />
+ <InputField label="Muscle Mass (kg)" id="muscle_mass" value={data.muscle_mass} onChange={handleDataChange} error={errors.muscle_mass} tooltip="Estimasi total massa otot. Formula: (Berat - Lemak - Tulang - Organ)" />
+ <InputField label="Fat-Free Mass (kg)" id="fat_free_mass" value={data.fat_free_mass} onChange={handleDataChange} error={errors.fat_free_mass} tooltip="Berat badan murni tanpa lemak (Otot + Tulang + Air). Formula: Berat - Total Lemak" />
+ <InputField label="Bone Mass (kg)" id="bone_mass" value={data.bone_mass} onChange={handleDataChange} error={errors.bone_mass} tooltip="Estimasi berat mineral tulang murni. Rata-rata 2.5kg - 3.2kg." />
+ <InputField label="Essential Fat (kg)" id="essential_fat_mass" value={data.essential_fat_mass} onChange={handleDataChange} tooltip="Lemak yang dibutuhkan untuk fungsi saraf/hormon (Pria: ~3%, Wanita: ~12%)." />
+ <InputField label="Storage Fat (kg)" id="storage_fat_mass" value={data.storage_fat_mass} onChange={handleDataChange} tooltip="Lemak cadangan energi (non-esensial) di bawah kulit." />
+ <InputField label="Skeletal Muscle (kg)" id="skeletal_muscle_mass" value={data.skeletal_muscle_mass} onChange={handleDataChange} tooltip="Otot yang melekat pada tulang (bisa dilatih/diperbesar)." />
+ <InputField label="Other / Organ (kg)" id="other_mass" value={data.other_mass} onChange={handleDataChange} tooltip="Berat organ dalam, darah, dan jaringan lain (Estimasi ~25% dari berat)." />
  </div>
  </div>
 
@@ -315,22 +315,22 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
  {"Metabolism & Cellular Level"}
  </h3>
  <div className="grid grid-cols-2 gap-4">
- <InputField label="BMI" id="bmi" value={data.bmi} onChange={handleDataChange} tooltip="Body Mass Index. Formula: Weight(kg) / Height(m) squared." />
- <InputField label="BMR (Kcal)" id="bmr" type="number" step="1" value={data.bmr} onChange={handleDataChange} tooltip="Basal Metabolic Rate. Minimum daily calories for organ function at rest (Mifflin-St Jeor)." />
- <InputField label="TBW / Total Water (%)" id="total_body_water" value={data.total_body_water} onChange={handleDataChange} tooltip="Total Body Water. Percentage of fluid in the body. Calculated via Watson Formula." />
- <InputField label="Visceral Fat Level" id="visceral_fat" type="number" step="1" value={data.visceral_fat} onChange={handleDataChange} tooltip="Fat index covering internal organs (heart/liver). (Normal: < 10)." />
- <InputField label="Intracellular Water (L)" id="intracellular_water" value={data.intracellular_water} onChange={handleDataChange} tooltip="Water INSIDE cells (Estimated 65% of TBW)." />
- <InputField label="Extracellular Water (L)" id="extracellular_water" value={data.extracellular_water} onChange={handleDataChange} tooltip="Water OUTSIDE cells / blood plasma (Estimated 35% of TBW)." />
- <InputField label="Metabolic Age" id="metabolic_age" type="number" step="1" value={data.metabolic_age} onChange={handleDataChange} tooltip="Cellular metabolic age. Influenced by BMR and muscle/fat percentage." />
- <InputField label="Phase Angle (°)" id="phase_angle" value={data.phase_angle} onChange={handleDataChange} placeholder={"BIA required"} tooltip="Phase Angle (Arctan Xc/R). Measures cell membrane wall strength. Required from BIA tool (InBody)." />
- <SelectField label="Activity Level" id="activity_level" value={data.activity_level} onChange={handleDataChange} options={[
-                                    { value: 1.2, label: "Sedentary (office job)" },
-                                    { value: 1.375, label: "Light Exercise (1-2 days/week)" },
-                                    { value: 1.55, label: "Moderate Exercise (3-5 days/week)" },
-                                    { value: 1.725, label: "Heavy Exercise (6-7 days/week)" },
-                                    { value: 1.9, label: "Athlete (2x per day)" }
-                                ]} tooltip="Used to calculate TDEE (Total Daily Energy Expenditure)." />
- <InputField label="TDEE (Kcal)" id="tdee" type="number" step="1" value={data.tdee} onChange={handleDataChange} tooltip="Total Daily Energy Expenditure. Calculated as BMR x Activity Level." />
+ <InputField label="BMI" id="bmi" value={data.bmi} onChange={handleDataChange} tooltip="Indeks Massa Tubuh. Formula: Berat(kg) / Tinggi(m) kuadrat." />
+ <InputField label="BMR (Kcal)" id="bmr" type="number" step="1" value={data.bmr} onChange={handleDataChange} tooltip="Laju Metabolik Basal. Kalori harian minimum untuk fungsi organ saat istirahat (Mifflin-St Jeor)." />
+ <InputField label="TBW / Total Water (%)" id="total_body_water" value={data.total_body_water} onChange={handleDataChange} tooltip="Total Air Tubuh. Persentase cairan dalam tubuh. Dihitung via Formula Watson." />
+ <InputField label="Visceral Fat Level" id="visceral_fat" type="number" step="1" value={data.visceral_fat} onChange={handleDataChange} tooltip="Indeks lemak yang menyelimuti organ dalam (jantung/hati). (Normal: < 10)." />
+ <InputField label="Intracellular Water (L)" id="intracellular_water" value={data.intracellular_water} onChange={handleDataChange} tooltip="Air DI DALAM sel (Estimasi 65% dari TBW)." />
+ <InputField label="Extracellular Water (L)" id="extracellular_water" value={data.extracellular_water} onChange={handleDataChange} tooltip="Air DI LUAR sel / plasma darah (Estimasi 35% dari TBW)." />
+ <InputField label="Metabolic Age" id="metabolic_age" type="number" step="1" value={data.metabolic_age} onChange={handleDataChange} tooltip="Usia metabolik seluler. Dipengaruhi oleh BMR dan persentase otot/lemak." />
+ <InputField label="Phase Angle (°)" id="phase_angle" value={data.phase_angle} onChange={handleDataChange} placeholder={"BIA required"} tooltip="Sudut Fase (Arctan Xc/R). Mengukur kekuatan dinding membran sel. Membutuhkan alat BIA (InBody)." />
+ <SelectField label="Tingkat Aktivitas" id="activity_level" value={data.activity_level} onChange={handleDataChange} options={[
+                                    { value: 1.2, label: "Sedentary (pekerjaan kantor)" },
+                                    { value: 1.375, label: "Olahraga Ringan (1-2 hari/minggu)" },
+                                    { value: 1.55, label: "Olahraga Sedang (3-5 hari/minggu)" },
+                                    { value: 1.725, label: "Olahraga Berat (6-7 hari/minggu)" },
+                                    { value: 1.9, label: "Atlet (2x per hari)" }
+                                ]} tooltip="Digunakan untuk menghitung TDEE (Total Pengeluaran Energi Harian)." />
+ <InputField label="TDEE (Kkal)" id="tdee" type="number" step="1" value={data.tdee} onChange={handleDataChange} tooltip="Total Pengeluaran Energi Harian. Dihitung sebagai BMR x Tingkat Aktivitas." />
  </div>
  </div>
  </div>
@@ -344,7 +344,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                         onClick={onClose} 
                         className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 h-10 px-5"
                     >
-                        {"Cancel"}
+                        {"Batal"}
                     </button>
                     <button 
                         type="submit" 
@@ -353,7 +353,7 @@ export default function CompositionFormModal({ isOpen, onClose, player, record =
                         className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-50 bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600 h-10 px-6 gap-2"
                     >
                         <Save className="w-4 h-4" />
-                        {processing ? 'Saving...' : (isEditing ? 'Save Changes' : 'Save Analysis')}
+                        {processing ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Simpan Analisis')}
                     </button>
                 </div>
 

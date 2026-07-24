@@ -36,40 +36,86 @@ class ExerciseController extends Controller
     public function bulkCreate()
     {
         $categories = ExerciseCategory::orderBy('name', 'asc')->get();
+        $packages = \App\Models\ExercisePackage::orderBy('name', 'asc')->get();
         return Inertia::render('Admin/Exercises/BulkCreate', [
-            'categories' => $categories
+            'categories' => $categories,
+            'packages' => $packages
         ]);
     }
 
     public function bulkStore(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('reached bulkStore', $request->all());
+        
         $request->validate([
-            'names' => 'required|string',
-            'exercise_category_id' => 'nullable|exists:exercise_categories,id',
+            'exercises' => 'required|array|min:1',
+            'exercises.*.name' => 'required|string|max:255',
+            'exercises.*.video_link' => 'nullable|string|url',
+            'exercises.*.category_id' => 'nullable|exists:exercise_categories,id',
+            'exercises.*.image' => 'nullable|image|max:5120',
+            'insert_to_package' => 'nullable|boolean',
+            'exercise_package_id' => 'nullable|required_if:insert_to_package,true|exists:exercise_packages,id',
         ]);
 
-        $names = explode("\n", str_replace("\r", "", $request->names));
-        $names = array_filter(array_map('trim', $names));
+        $createdExerciseIds = [];
+        $count = 0;
 
-        $insertData = [];
-        $now = now();
-        foreach ($names as $name) {
-            if (!empty($name)) {
-                $insertData[] = [
-                    'name' => $name,
-                    'exercise_category_id' => $request->exercise_category_id,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
+        foreach ($request->exercises as $exerciseData) {
+            $name = trim($exerciseData['name'] ?? '');
+            if (empty($name)) continue;
+
+            $data = [
+                'name' => $name,
+                'exercise_category_id' => $exerciseData['category_id'] ?? null,
+            ];
+
+            // Handle image upload
+            $imagePaths = [];
+            if (isset($exerciseData['image']) && $exerciseData['image'] instanceof \Illuminate\Http\UploadedFile) {
+                $path = $exerciseData['image']->store('exercises', 'public');
+                $imagePaths[] = '/storage/' . $path;
+            }
+            $data['images'] = $imagePaths;
+
+            // Handle video link
+            $videos = [];
+            if (!empty($exerciseData['video_link'])) {
+                $videos[] = trim($exerciseData['video_link']);
+            }
+            $data['videos'] = $videos;
+
+            // Optional: check if name already exists to prevent duplicate (or just let it insert, wait name is unique)
+            // The validation doesn't enforce unique per row because it's hard with arrays without distinct.
+            // But table has unique constraint. We should check.
+            $existing = Exercise::where('name', $name)->first();
+            if (!$existing) {
+                $exercise = Exercise::create($data);
+                $createdExerciseIds[] = $exercise->id;
+                $count++;
+            } else {
+                // If it exists and they want it in a package, we still need its ID
+                $createdExerciseIds[] = $existing->id;
             }
         }
 
-        if (count($insertData) > 0) {
-            Exercise::insert($insertData);
-            return redirect()->route('admin.exercises.index')->with('success', count($insertData) . ' Latihan berhasil dibuat secara massal.');
+        // Attach to package if requested
+        if ($request->insert_to_package && $request->exercise_package_id && count($createdExerciseIds) > 0) {
+            $package = \App\Models\ExercisePackage::find($request->exercise_package_id);
+            if ($package) {
+                // syncWithoutDetaching to avoid removing existing exercises in package
+                $package->exercises()->syncWithoutDetaching($createdExerciseIds);
+            }
         }
 
-        return redirect()->back()->with('error', 'Tidak ada nama latihan yang valid.');
+        if ($count > 0) {
+            return redirect()->route('admin.exercises.index')->with('success', $count . ' Latihan berhasil dibuat secara massal.');
+        }
+
+        if (count($createdExerciseIds) > 0) {
+            return redirect()->route('admin.exercises.index')->with('success', 'Latihan sudah ada, berhasil dimasukkan ke paket.');
+        }
+
+        return redirect()->back()->with('error', 'Tidak ada nama latihan yang valid untuk dibuat.');
     }
 
     public function store(Request $request)

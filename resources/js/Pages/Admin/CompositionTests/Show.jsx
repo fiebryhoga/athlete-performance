@@ -13,6 +13,7 @@ import CompositionFormModal from './Partials/CompositionFormModal';
 import TdeeSummary from './Partials/TdeeSummary';
 
 export default function Show({ auth, player, history, benchmarks }) {
+ const isAthlete = auth.user.role === 'athlete';
  const { permissions } = usePage().props;
  const canCreate = permissions?.body_composition?.create ?? false;
  const canUpdate = permissions?.body_composition?.update ?? false;
@@ -236,8 +237,8 @@ export default function Show({ auth, player, history, benchmarks }) {
 
     return (
         <AppLayout
-            title={"Body Composition Analytics"}
-            description={"Detailed analysis of body composition, muscle mass, fat percentage, and cellular performance."}
+            title={"Analisis Komposisi Tubuh"}
+            description={"Analisis detail tentang komposisi tubuh, massa otot, persentase lemak, dan performa seluler."}
         >
             <Head title={`Composition - ${player.name}`} />
 
@@ -247,7 +248,7 @@ export default function Show({ auth, player, history, benchmarks }) {
                     player={player} 
                     latestTest={latestTest} 
                     totalTests={history.length} 
-                    onAddRecord={true ? handleAddRecord : null}
+                    onAddRecord={!isAthlete ? handleAddRecord : null}
                     onExport={() => {}}
                     isExporting={isExporting}
                 />
@@ -277,25 +278,25 @@ export default function Show({ auth, player, history, benchmarks }) {
                             <Activity size={32} className="text-orange-500" />
                         </div>
                         <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-2 relative z-10">
-                            {"No Analytics Data"}
+                            {"Tidak Ada Data Analisis"}
                         </h3>
                         <p className="text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed relative z-10">
-                            {"This player doesn't have any body composition history records yet. Add the first data to generate the analytics dashboard and smart insights."}
+                            {"Atlet ini belum memiliki riwayat komposisi tubuh. Tambahkan data pertama untuk melihat dashboard analisis dan wawasan pintar."}
                         </p>
-                        {true && (
+                        {!isAthlete && (
                             <button
                                 onClick={handleAddRecord}
                                 className="inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all bg-orange-500 text-white hover:bg-orange-600 h-10 px-6 shadow-lg shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 relative z-10"
                             >
                                 <Plus size={16} className="mr-2" /> 
-                                {"Input Data Now"}
+                                {"Input Data Sekarang"}
                             </button>
                         )}
                     </div>
                 )}
 
                 <div className="pt-2">
-                    <HistoryTable history={history} onEdit={true ? handleEdit : null} canDelete={true} />
+                    <HistoryTable history={history} onEdit={!isAthlete ? handleEdit : null} canDelete={!isAthlete} />
                 </div>
             </div>
 

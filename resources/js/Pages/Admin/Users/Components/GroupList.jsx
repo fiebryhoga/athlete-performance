@@ -126,9 +126,31 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                 <Package size={16} className="text-orange-500" />
                                 <span className="font-medium">{group.package?.name || 'Belum ada paket'}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                <Users size={16} className="text-blue-500" />
-                                <span className="font-medium">{group.members?.length || 0} Klien terdaftar</span>
+                            <div className="flex flex-col gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div className="flex items-center gap-2 text-sm text-slate-600">
+                                    <Users size={16} className="text-blue-500" />
+                                    <span className="font-bold">{group.members?.length || 0} Klien terdaftar</span>
+                                </div>
+                                {group.members?.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-1 border-t border-slate-200 pt-2">
+                                        <span className="w-full text-[10px] font-bold text-slate-400 mb-0.5">Anggota Grup:</span>
+                                        {group.members.map(member => (
+                                            <span key={member.id} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white border border-slate-200 text-slate-600 shadow-sm">
+                                                {member.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                {group.coaches?.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-1 border-t border-slate-200 pt-2">
+                                        <span className="w-full text-[10px] font-bold text-slate-400 mb-0.5">Coach Pendamping:</span>
+                                        {group.coaches.map(coach => (
+                                            <span key={coach.id} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 border border-emerald-100 text-emerald-600 shadow-sm">
+                                                {coach.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

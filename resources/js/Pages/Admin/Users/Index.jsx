@@ -34,7 +34,14 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         _method: 'POST',     
     });
 
+    const isInitialMount = useRef(true);
+
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        
         const timer = setTimeout(() => {
             router.get(route('admin.users.index'), { search, tab: activeTab }, { preserveState: true, replace: true });
         }, 300);
@@ -439,7 +446,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                             {users.links.map((link, index) => (
                                 <button
                                     key={index}
-                                    onClick={() => link.url && router.get(link.url)}
+                                    onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
                                     disabled={!link.url}
                                     className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-bold rounded-md transition-all ${
                                         link.active 

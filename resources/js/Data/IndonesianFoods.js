@@ -5,42 +5,72 @@ export const INDONESIAN_FOODS = {
         { name: "Nasi Jagung", portion: "100g", protein: 3, carbs: 32, fats: 1, cals: 150 },
         { name: "Nasi Uduk", portion: "100g", protein: 3, carbs: 30, fats: 4, cals: 165 },
         { name: "Nasi Goreng", portion: "100g", protein: 5, carbs: 25, fats: 8, cals: 190 },
+        { name: "Nasi Kuning", portion: "150g", protein: 4, carbs: 40, fats: 2, cals: 200 },
+        { name: "Nasi Bakar", portion: "150g", protein: 5, carbs: 42, fats: 6, cals: 250 },
+        { name: "Nasi Liwet", portion: "150g", protein: 4, carbs: 40, fats: 4, cals: 220 },
+        { name: "Nasi Shirataki", portion: "150g", protein: 0.1, carbs: 3, fats: 0.1, cals: 15 },
         { name: "Lontong / Ketupat", portion: "100g", protein: 2.5, carbs: 31, fats: 0.2, cals: 140 },
         { name: "Bubur Ayam (Tanpa Kuah)", portion: "200g", protein: 5, carbs: 36, fats: 2, cals: 180 },
         { name: "Kentang Rebus", portion: "100g", protein: 1.9, carbs: 20, fats: 0.1, cals: 87 },
         { name: "Kentang Goreng", portion: "100g", protein: 3, carbs: 41, fats: 15, cals: 312 },
+        { name: "Mashed Potato (Kentang Tumbuk)", portion: "150g", protein: 3, carbs: 20, fats: 4, cals: 130 },
         { name: "Ubi Jalar Rebus", portion: "100g", protein: 1.6, carbs: 20, fats: 0.1, cals: 86 },
         { name: "Singkong Rebus", portion: "100g", protein: 1.4, carbs: 38, fats: 0.3, cals: 160 },
         { name: "Talas Rebus", portion: "100g", protein: 1.5, carbs: 26, fats: 0.2, cals: 112 },
         { name: "Oatmeal (Mentah)", portion: "40g", protein: 5.3, carbs: 27, fats: 2.6, cals: 155 },
         { name: "Roti Gandum", portion: "2 lembar (60g)", protein: 7, carbs: 26, fats: 2, cals: 150 },
         { name: "Roti Putih", portion: "2 lembar (60g)", protein: 5, carbs: 30, fats: 2, cals: 160 },
+        { name: "Roti Tawar Gandum Panggang", portion: "60g", protein: 7, carbs: 26, fats: 2, cals: 150 },
         { name: "Mie Telur (Rebus)", portion: "100g", protein: 4.5, carbs: 25, fats: 1.2, cals: 138 },
         { name: "Mie Goreng", portion: "100g", protein: 5, carbs: 32, fats: 12, cals: 250 },
         { name: "Bihun Goreng", portion: "100g", protein: 3, carbs: 40, fats: 8, cals: 240 },
         { name: "Bihun Jagung (Mentah)", portion: "50g", protein: 0.5, carbs: 40, fats: 0, cals: 175 },
         { name: "Kwetiau Goreng", portion: "100g", protein: 4, carbs: 35, fats: 10, cals: 245 },
         { name: "Misoa (Mentah)", portion: "50g", protein: 5, carbs: 37, fats: 1, cals: 178 },
+        { name: "Soun Goreng", portion: "100g", protein: 2, carbs: 40, fats: 4, cals: 200 },
         { name: "Jagung Manis Rebus", portion: "100g", protein: 3.3, carbs: 19, fats: 1.4, cals: 86 },
         { name: "Makaroni Gandum", portion: "50g", protein: 6, carbs: 35, fats: 1, cals: 175 },
         { name: "Pasta Spaghetti (Rebus)", portion: "100g", protein: 5, carbs: 30, fats: 1, cals: 158 },
+        { name: "Ketan Putih (Kukus)", portion: "100g", protein: 3, carbs: 38, fats: 1, cals: 180 },
+        { name: "Ketan Hitam", portion: "100g", protein: 4, carbs: 40, fats: 1, cals: 190 },
+        { name: "Perkedel Kentang", portion: "50g", protein: 3, carbs: 10, fats: 4, cals: 90 },
+        { name: "Perkedel Jagung", portion: "50g", protein: 3, carbs: 12, fats: 5, cals: 100 }
     ],
     proteins: [
         { name: "Dada Ayam (Rebus/Panggang)", portion: "100g", protein: 31, carbs: 0, fats: 3.6, cals: 165 },
         { name: "Paha Ayam Tnp Kulit", portion: "100g", protein: 24, carbs: 0, fats: 8, cals: 177 },
         { name: "Ayam Goreng Paha", portion: "100g", protein: 22, carbs: 4, fats: 14, cals: 230 },
+        { name: "Ayam Bakar Taliwang", portion: "100g", protein: 25, carbs: 2, fats: 8, cals: 180 },
+        { name: "Ayam Pop", portion: "100g", protein: 26, carbs: 1, fats: 7, cals: 170 },
+        { name: "Ayam Betutu", portion: "100g", protein: 25, carbs: 2, fats: 6, cals: 165 },
+        { name: "Dada Ayam Filet Tepung (Katsu)", portion: "100g", protein: 20, carbs: 15, fats: 12, cals: 260 },
+        { name: "Gulai Ayam", portion: "100g", protein: 20, carbs: 4, fats: 14, cals: 220 },
         { name: "Sate Ayam (Tanpa Bumbu Kacang)", portion: "5 tusuk (100g)", protein: 26, carbs: 2, fats: 6, cals: 170 },
+        { name: "Sate Lilit Ayam", portion: "100g", protein: 20, carbs: 5, fats: 8, cals: 170 },
         { name: "Bebek Goreng", portion: "100g", protein: 18, carbs: 3, fats: 25, cals: 305 },
+        { name: "Bebek Bakar", portion: "100g", protein: 20, carbs: 2, fats: 18, cals: 250 },
         { name: "Telur Ayam Rebus", portion: "1 butir (50g)", protein: 6, carbs: 0.6, fats: 5, cals: 78 },
         { name: "Telur Ceplok (Mata Sapi)", portion: "1 butir (50g)", protein: 6, carbs: 0.5, fats: 7, cals: 90 },
         { name: "Telur Dadar", portion: "1 butir (50g)", protein: 6, carbs: 1, fats: 8, cals: 95 },
-        { name: "Putih Telur", portion: "100g", protein: 11, carbs: 0.7, fats: 0.2, cals: 52 },
+        { name: "Putih Telur", portion: "1 butir (30g)", protein: 3.3, carbs: 0.2, fats: 0.1, cals: 15 },
         { name: "Telur Asin", portion: "1 butir (60g)", protein: 8, carbs: 1, fats: 9, cals: 120 },
         { name: "Telur Puyuh Rebus", portion: "5 butir (50g)", protein: 6, carbs: 0.2, fats: 5.5, cals: 80 },
+        { name: "Telur Balado", portion: "1 butir (60g)", protein: 6, carbs: 3, fats: 8, cals: 110 },
+        { name: "Telur Bumbu Rujak", portion: "1 butir (60g)", protein: 6, carbs: 4, fats: 7, cals: 105 },
+        { name: "Telur Orak-Arik", portion: "60g", protein: 7, carbs: 1, fats: 10, cals: 120 },
+        { name: "Telur Puyuh Balado", portion: "50g", protein: 6, carbs: 2, fats: 7, cals: 100 },
         { name: "Daging Sapi (Has Dalam/Tenderloin)", portion: "100g", protein: 26, carbs: 0, fats: 7, cals: 170 },
         { name: "Daging Sapi (Cincang)", portion: "100g", protein: 25, carbs: 0, fats: 15, cals: 240 },
         { name: "Rendang Sapi", portion: "100g", protein: 22, carbs: 10, fats: 25, cals: 350 },
+        { name: "Sop Daging Sapi", portion: "150g", protein: 15, carbs: 5, fats: 7, cals: 150 },
+        { name: "Empal Goreng", portion: "50g", protein: 15, carbs: 4, fats: 9, cals: 160 },
+        { name: "Dendeng Balado", portion: "50g", protein: 14, carbs: 6, fats: 10, cals: 180 },
+        { name: "Semur Daging Sapi", portion: "100g", protein: 16, carbs: 8, fats: 9, cals: 180 },
+        { name: "Rawon Daging Sapi", portion: "150g", protein: 15, carbs: 5, fats: 10, cals: 170 },
         { name: "Sate Kambing", portion: "5 tusuk (100g)", protein: 24, carbs: 2, fats: 9, cals: 190 },
+        { name: "Sate Padang", portion: "100g", protein: 18, carbs: 10, fats: 9, cals: 190 },
+        { name: "Tongseng Kambing", portion: "150g", protein: 18, carbs: 6, fats: 14, cals: 220 },
+        { name: "Gulai Kambing", portion: "150g", protein: 16, carbs: 5, fats: 16, cals: 240 },
         { name: "Ikan Nila Panggang", portion: "100g", protein: 26, carbs: 0, fats: 2.7, cals: 128 },
         { name: "Ikan Lele Bakar", portion: "100g", protein: 18, carbs: 0, fats: 2.9, cals: 105 },
         { name: "Ikan Lele Goreng", portion: "100g", protein: 16, carbs: 4, fats: 12, cals: 185 },
@@ -49,15 +79,26 @@ export const INDONESIAN_FOODS = {
         { name: "Ikan Kembung", portion: "100g", protein: 19, carbs: 0, fats: 4.5, cals: 120 },
         { name: "Ikan Gurame Bakar", portion: "100g", protein: 18, carbs: 0, fats: 3, cals: 115 },
         { name: "Ikan Patin", portion: "100g", protein: 16, carbs: 0, fats: 5, cals: 115 },
+        { name: "Ikan Bandeng Bakar", portion: "100g", protein: 22, carbs: 0, fats: 8, cals: 160 },
+        { name: "Ikan Bawal Bakar", portion: "100g", protein: 20, carbs: 0, fats: 6, cals: 140 },
+        { name: "Ikan Dori Panggang", portion: "100g", protein: 20, carbs: 0, fats: 1, cals: 90 },
+        { name: "Ikan Salmon Panggang", portion: "100g", protein: 22, carbs: 0, fats: 12, cals: 200 },
+        { name: "Ikan Kakap Asam Manis", portion: "100g", protein: 18, carbs: 10, fats: 7, cals: 180 },
         { name: "Bandeng Presto", portion: "100g", protein: 20, carbs: 0, fats: 8, cals: 155 },
         { name: "Teri Medan Kering", portion: "50g", protein: 16, carbs: 0, fats: 3, cals: 95 },
         { name: "Udang Rebus", portion: "100g", protein: 24, carbs: 0.2, fats: 0.3, cals: 99 },
+        { name: "Udang Balado", portion: "100g", protein: 20, carbs: 4, fats: 5, cals: 130 },
+        { name: "Udang Goreng Mentega", portion: "100g", protein: 18, carbs: 2, fats: 12, cals: 190 },
         { name: "Cumi-cumi", portion: "100g", protein: 15.6, carbs: 3, fats: 1.4, cals: 92 },
+        { name: "Cumi Saus Tiram", portion: "100g", protein: 16, carbs: 5, fats: 4, cals: 120 },
         { name: "Kerang Dara Rebus", portion: "100g", protein: 14, carbs: 4, fats: 1, cals: 80 },
         { name: "Tempe (Kukus/Panggang)", portion: "100g", protein: 19, carbs: 9, fats: 11, cals: 192 },
         { name: "Tempe Goreng", portion: "100g", protein: 17, carbs: 12, fats: 18, cals: 270 },
+        { name: "Tempe Bacem", portion: "50g", protein: 8, carbs: 10, fats: 4, cals: 110 },
+        { name: "Tempe Orek", portion: "50g", protein: 9, carbs: 12, fats: 6, cals: 130 },
         { name: "Tahu Putih (Kukus)", portion: "100g", protein: 8, carbs: 2, fats: 5, cals: 76 },
         { name: "Tahu Goreng", portion: "100g", protein: 7, carbs: 4, fats: 12, cals: 150 },
+        { name: "Tahu Bacem", portion: "50g", protein: 5, carbs: 8, fats: 3, cals: 80 },
         { name: "Susu Protein / Whey", portion: "1 scoop (30g)", protein: 24, carbs: 3, fats: 1.5, cals: 120 },
         { name: "Susu Sapi Cair Full Cream", portion: "200ml", protein: 6, carbs: 10, fats: 7, cals: 122 },
         { name: "Susu Sapi Cair Low Fat", portion: "200ml", protein: 6, carbs: 11, fats: 2, cals: 85 },
@@ -66,8 +107,10 @@ export const INDONESIAN_FOODS = {
     vegetables: [
         { name: "Bayam Rebus", portion: "100g", protein: 2.9, carbs: 3.6, fats: 0.4, cals: 23 },
         { name: "Bayam Bening", portion: "150g", protein: 2.5, carbs: 4, fats: 0.5, cals: 30 },
+        { name: "Bening Bayam Jagung", portion: "150g", protein: 2, carbs: 8, fats: 0.5, cals: 45 },
         { name: "Kangkung Tumis Air", portion: "100g", protein: 2.6, carbs: 3.1, fats: 0.2, cals: 19 },
         { name: "Cah Kangkung Saus Tiram", portion: "100g", protein: 2.5, carbs: 5, fats: 3, cals: 55 },
+        { name: "Plecing Kangkung", portion: "100g", protein: 2, carbs: 4, fats: 1, cals: 40 },
         { name: "Brokoli Kukus", portion: "100g", protein: 2.8, carbs: 7, fats: 0.4, cals: 34 },
         { name: "Kembang Kol Rebus", portion: "100g", protein: 2, carbs: 5, fats: 0.3, cals: 25 },
         { name: "Wortel Rebus", portion: "100g", protein: 0.9, carbs: 10, fats: 0.2, cals: 41 },
@@ -75,22 +118,40 @@ export const INDONESIAN_FOODS = {
         { name: "Tumis Kacang Panjang", portion: "100g", protein: 2, carbs: 7, fats: 3, cals: 60 },
         { name: "Sawi Hijau", portion: "100g", protein: 1.5, carbs: 2.2, fats: 0.2, cals: 13 },
         { name: "Sawi Putih", portion: "100g", protein: 1.2, carbs: 3, fats: 0.2, cals: 16 },
+        { name: "Tumis Sawi Putih Bakso", portion: "150g", protein: 5, carbs: 6, fats: 4, cals: 80 },
+        { name: "Tumis Pakcoy Bawang Putih", portion: "100g", protein: 2, carbs: 4, fats: 1, cals: 35 },
         { name: "Tauge Rebus", portion: "100g", protein: 3, carbs: 6, fats: 0.2, cals: 30 },
         { name: "Tomat Segar", portion: "100g", protein: 0.9, carbs: 3.9, fats: 0.2, cals: 18 },
         { name: "Timun Segar", portion: "100g", protein: 0.6, carbs: 3.6, fats: 0.1, cals: 15 },
         { name: "Kubis / Kol Rebus", portion: "100g", protein: 1.3, carbs: 5.8, fats: 0.1, cals: 25 },
         { name: "Daun Singkong Rebus", portion: "100g", protein: 6.8, carbs: 13, fats: 1.2, cals: 73 },
+        { name: "Tumis Daun Singkong", portion: "100g", protein: 4, carbs: 8, fats: 2, cals: 60 },
+        { name: "Gulai Daun Singkong", portion: "150g", protein: 5, carbs: 10, fats: 8, cals: 130 },
         { name: "Daun Pepaya Rebus", portion: "100g", protein: 8, carbs: 11, fats: 2, cals: 79 },
+        { name: "Tumis Bunga Pepaya", portion: "100g", protein: 2, carbs: 6, fats: 2, cals: 50 },
         { name: "Pare Rebus", portion: "100g", protein: 1, carbs: 4, fats: 0.2, cals: 17 },
+        { name: "Tumis Pare Belut", portion: "100g", protein: 2, carbs: 5, fats: 2.5, cals: 50 },
         { name: "Oyong Rebus", portion: "100g", protein: 1, carbs: 4, fats: 0.2, cals: 19 },
+        { name: "Sop Oyong Sohun", portion: "150g", protein: 2, carbs: 10, fats: 1, cals: 60 },
         { name: "Labu Siam Kukus", portion: "100g", protein: 0.6, carbs: 4, fats: 0.1, cals: 16 },
         { name: "Terong Balado (sedikit minyak)", portion: "100g", protein: 1, carbs: 6, fats: 3, cals: 60 },
         { name: "Sayur Sop (Wortel, Buncis, Kol)", portion: "150g", protein: 2, carbs: 9, fats: 1, cals: 50 },
+        { name: "Sop Kimlo", portion: "150g", protein: 6, carbs: 10, fats: 3, cals: 90 },
         { name: "Sayur Asem", portion: "150g", protein: 2, carbs: 12, fats: 1.5, cals: 65 },
         { name: "Sayur Lodeh", portion: "150g", protein: 3, carbs: 10, fats: 6, cals: 100 },
+        { name: "Sayur Nangka Muda (Gulai)", portion: "150g", protein: 3, carbs: 12, fats: 7, cals: 120 },
+        { name: "Sayur Rebung", portion: "100g", protein: 2, carbs: 6, fats: 1, cals: 40 },
         { name: "Capcay Kuah", portion: "150g", protein: 4, carbs: 12, fats: 3, cals: 85 },
         { name: "Gado-gado (Bumbu dipisah)", portion: "200g", protein: 8, carbs: 25, fats: 12, cals: 230 },
         { name: "Pecel Sayur", portion: "150g", protein: 7, carbs: 20, fats: 10, cals: 190 },
+        { name: "Karedok", portion: "150g", protein: 5, carbs: 15, fats: 6, cals: 120 },
+        { name: "Urap Sayur", portion: "100g", protein: 3, carbs: 8, fats: 4, cals: 80 },
+        { name: "Trancam", portion: "100g", protein: 3, carbs: 8, fats: 3, cals: 70 },
+        { name: "Asinan Sayur", portion: "150g", protein: 4, carbs: 18, fats: 1, cals: 90 },
+        { name: "Acar Kuning", portion: "100g", protein: 1, carbs: 8, fats: 3, cals: 60 },
+        { name: "Tumis Genjer", portion: "100g", protein: 2, carbs: 5, fats: 2, cals: 45 },
+        { name: "Tumis Jamur Kancing", portion: "100g", protein: 3, carbs: 5, fats: 1, cals: 40 },
+        { name: "Tumis Jamur Kuping", portion: "100g", protein: 2, carbs: 4, fats: 1, cals: 35 }
     ],
     fruits_snacks: [
         { name: "Pisang Ambon", portion: "1 buah (100g)", protein: 1.1, carbs: 23, fats: 0.3, cals: 89 },
@@ -114,74 +175,28 @@ export const INDONESIAN_FOODS = {
         { name: "Buah Naga Merah", portion: "100g", protein: 1.2, carbs: 12, fats: 0.6, cals: 50 },
         { name: "Air Kelapa Muda", portion: "250ml", protein: 1, carbs: 10, fats: 0.5, cals: 45 },
         { name: "Daging Kelapa Muda", portion: "100g", protein: 1, carbs: 7, fats: 3, cals: 55 },
+        { name: "Salad Buah", portion: "150g", protein: 2, carbs: 20, fats: 6, cals: 140 },
+        { name: "Rujak Buah", portion: "150g", protein: 1, carbs: 25, fats: 1, cals: 110 },
+        { name: "Asinan Buah", portion: "150g", protein: 1, carbs: 24, fats: 0.5, cals: 100 },
+        { name: "Pudding Susu", portion: "100g", protein: 3, carbs: 20, fats: 3, cals: 120 },
+        { name: "Pudding Coklat", portion: "100g", protein: 3, carbs: 22, fats: 3, cals: 130 },
         { name: "Kacang Tanah Sangrai", portion: "30g", protein: 7.7, carbs: 4.8, fats: 14, cals: 170 },
+        { name: "Kacang Almond", portion: "20g", protein: 4.2, carbs: 4.3, fats: 10, cals: 115 },
+        { name: "Kacang Mete Panggang", portion: "30g", protein: 5, carbs: 9, fats: 14, cals: 175 },
+        { name: "Kacang Kenari", portion: "30g", protein: 4, carbs: 4, fats: 19, cals: 190 },
+        { name: "Kuaci Bunga Matahari", portion: "30g", protein: 6, carbs: 6, fats: 14, cals: 170 },
         { name: "Kacang Hijau Rebus", portion: "100g", protein: 7, carbs: 19, fats: 0.4, cals: 105 },
         { name: "Bubur Kacang Hijau (Tanpa Santan)", portion: "150g", protein: 5, carbs: 25, fats: 1, cals: 130 },
-        { name: "Kacang Almond", portion: "20g", protein: 4.2, carbs: 4.3, fats: 10, cals: 115 },
+        { name: "Sari Kacang Hijau", portion: "250ml", protein: 6, carbs: 28, fats: 1, cals: 150 },
+        { name: "Susu Kedelai", portion: "250ml", protein: 8, carbs: 10, fats: 4, cals: 110 },
         { name: "Kacang Kedelai Goreng", portion: "30g", protein: 11, carbs: 9, fats: 6, cals: 140 },
         { name: "Edamame Rebus", portion: "100g", protein: 11, carbs: 9, fats: 5, cals: 121 },
-        { name: "Kurma", portion: "3 butir (24g)", protein: 0.6, carbs: 18, fats: 0.1, cals: 66 }
+        { name: "Kurma", portion: "3 butir (24g)", protein: 0.6, carbs: 18, fats: 0.1, cals: 66 },
+        { name: "Jus Alpukat", portion: "250ml", protein: 2, carbs: 25, fats: 10, cals: 200 },
+        { name: "Jus Jeruk", portion: "250ml", protein: 1, carbs: 26, fats: 0, cals: 110 },
+        { name: "Jus Apel", portion: "250ml", protein: 0, carbs: 28, fats: 0, cals: 120 },
+        { name: "Smoothie Pisang", portion: "250ml", protein: 5, carbs: 35, fats: 2, cals: 180 },
+        { name: "Oatmeal Cookies", portion: "50g", protein: 4, carbs: 30, fats: 10, cals: 220 },
+        { name: "Yogurt Buah", portion: "150g", protein: 5, carbs: 20, fats: 2, cals: 120 }
     ]
-};
-
-// Fungsi pseudo-random deterministik berdasarkan seed
-export const getSeededRandomItem = (array, seed) => {
-    const x = Math.sin(seed) * 10000;
-    const rand = x - Math.floor(x);
-    return array[Math.floor(rand * array.length)];
-};
-
-// Fungsi untuk membuat menu makan siang/malam (Karbo + Protein + Sayur)
-export const generateMainMeal = (seed) => {
-    const carb = getSeededRandomItem(INDONESIAN_FOODS.carbs, seed);
-    const protein = getSeededRandomItem(INDONESIAN_FOODS.proteins, seed + 1);
-    const veg = getSeededRandomItem(INDONESIAN_FOODS.vegetables, seed + 2);
-
-    return {
-        name: `${carb.name} + ${protein.name} + ${veg.name}`,
-        // Base macros (1 porsi dari database)
-        baseProtein: carb.protein + protein.protein + veg.protein,
-        baseCarbs: carb.carbs + protein.carbs + veg.carbs,
-        baseFats: carb.fats + protein.fats + veg.fats,
-        baseCals: carb.cals + protein.cals + veg.cals,
-    };
-};
-
-// Fungsi untuk membuat menu sarapan
-export const generateBreakfast = (seed) => {
-    // Variasi: Karbo ringan + Protein + Buah
-    const carbOptions = INDONESIAN_FOODS.carbs.filter(c => c.name.includes("Roti") || c.name.includes("Oat") || c.name.includes("Kentang") || c.name.includes("Ubi") || c.name.includes("Bubur"));
-    const proteinOptions = INDONESIAN_FOODS.proteins.filter(p => p.name.includes("Telur") || p.name.includes("Susu") || p.name.includes("Yogurt") || p.name.includes("Ayam"));
-    const fruitOptions = INDONESIAN_FOODS.fruits_snacks.filter(f => !f.name.includes("Kacang"));
-
-    const carb = getSeededRandomItem(carbOptions.length > 0 ? carbOptions : INDONESIAN_FOODS.carbs, seed);
-    const protein = getSeededRandomItem(proteinOptions.length > 0 ? proteinOptions : INDONESIAN_FOODS.proteins, seed + 1);
-    const fruit = getSeededRandomItem(fruitOptions.length > 0 ? fruitOptions : INDONESIAN_FOODS.fruits_snacks, seed + 2);
-
-    return {
-        name: `${carb.name} + ${protein.name} + ${fruit.name}`,
-        baseProtein: carb.protein + protein.protein + fruit.protein,
-        baseCarbs: carb.carbs + protein.carbs + fruit.carbs,
-        baseFats: carb.fats + protein.fats + fruit.fats,
-        baseCals: carb.cals + protein.cals + fruit.cals,
-    };
-};
-
-// Fungsi untuk membuat menu snack
-export const generateSnack = (seed) => {
-    const snack1 = getSeededRandomItem(INDONESIAN_FOODS.fruits_snacks, seed);
-    // 30% kesempatan ditambah protein nabati ringan / susu (menggunakan seed juga untuk deterministik)
-    const rand = Math.sin(seed + 5) * 10000;
-    const withProtein = (rand - Math.floor(rand)) > 0.7;
-    
-    const proteinOptions = INDONESIAN_FOODS.proteins.filter(p => p.name.includes("Susu") || p.name.includes("Yogurt") || p.name.includes("Kacang"));
-    const protein = withProtein ? getSeededRandomItem(proteinOptions.length > 0 ? proteinOptions : INDONESIAN_FOODS.proteins, seed + 1) : null;
-
-    return {
-        name: withProtein ? `${snack1.name} + ${protein.name}` : snack1.name,
-        baseProtein: snack1.protein + (protein?.protein || 0),
-        baseCarbs: snack1.carbs + (protein?.carbs || 0),
-        baseFats: snack1.fats + (protein?.fats || 0),
-        baseCals: snack1.cals + (protein?.cals || 0),
-    };
 };

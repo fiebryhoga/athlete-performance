@@ -125,6 +125,15 @@ Route::middleware([
             ->names('admin.daily-metrics')
             ->except(['show']);
 
+        Route::get('/admin/recovery-strategies', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'index'])->name('admin.recovery-strategies.index');
+        Route::get('/admin/recovery-strategies/athlete/{user}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'showAthlete'])->name('admin.recovery-strategies.show');
+        Route::get('/admin/recovery-strategies/group/{group}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'showGroup'])->name('admin.recovery-strategies.group.show');
+        Route::post('/admin/recovery-strategies/athlete/{user}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'store'])->name('admin.recovery-strategies.store');
+        Route::post('/admin/recovery-strategies/group/{group}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'storeGroup'])->name('admin.recovery-strategies.group.store');
+        Route::put('/admin/recovery-strategies/{strategy}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'update'])->name('admin.recovery-strategies.update');
+        Route::delete('/admin/recovery-strategies/{strategy}', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'destroy'])->name('admin.recovery-strategies.destroy');
+        Route::post('/admin/recovery-strategies/{strategy}/complete', [\App\Http\Controllers\Admin\RecoveryStrategyController::class, 'complete'])->name('admin.recovery-strategies.complete');
+
         Route::get('/admin/wellness-rpe', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'index'])->name('admin.wellness-rpe.index');
         Route::post('/admin/wellness-rpe/update-start-date', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'updateStartDate'])->name('admin.wellness-rpe.updateStartDate');
         Route::get('/admin/wellness-rpe/session-form', [\App\Http\Controllers\Admin\WellnessRpeController::class, 'sessionForm'])->name('admin.wellness-rpe.session-form');
@@ -181,6 +190,13 @@ Route::middleware([
         Route::post('/admin/composition/benchmarks', [\App\Http\Controllers\Admin\CompositionTestController::class, 'saveBenchmarks'])->name('admin.composition-tests.save-benchmarks');
         Route::post('/admin/composition/ai-analysis', [\App\Http\Controllers\Admin\AiNutritionController::class, 'analyze'])->name('admin.composition.ai-analysis');
         Route::get('/admin/composition/{user}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'show'])->name('admin.composition-tests.show');
+
+        // Meal Plans
+        Route::get('/admin/meal-plans', [\App\Http\Controllers\Admin\MealPlanController::class, 'index'])->name('admin.meal-plans.index');
+        Route::post('/admin/meal-plans', [\App\Http\Controllers\Admin\MealPlanController::class, 'store'])->name('admin.meal-plans.store');
+        Route::delete('/admin/meal-plans/{mealPlan}', [\App\Http\Controllers\Admin\MealPlanController::class, 'destroy'])->name('admin.meal-plans.destroy');
+        Route::get('/admin/meal-plans/{user}', [\App\Http\Controllers\Admin\MealPlanController::class, 'show'])->name('admin.meal-plans.show');
+
 
         Route::post('/admin/athletes/{user}/gallery', [App\Http\Controllers\Admin\AthleteController::class, 'storeGallery'])->name('admin.athletes.gallery.store');
         Route::delete('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'destroyGallery'])->name('admin.athletes.gallery.destroy');
@@ -264,7 +280,7 @@ Route::middleware([
         Route::get('/admin/exercises/api/categories', [\App\Http\Controllers\Admin\ExerciseController::class, 'apiCategories'])->name('admin.exercises.api.categories');
         Route::post('/admin/exercises/quick-store', [\App\Http\Controllers\Admin\ExerciseController::class, 'quickStore'])->name('admin.exercises.quick-store');
         Route::get('/admin/exercises/bulk-create', [\App\Http\Controllers\Admin\ExerciseController::class, 'bulkCreate'])->name('admin.exercises.bulk-create');
-        Route::post('/admin/exercises/bulk', [\App\Http\Controllers\Admin\ExerciseController::class, 'bulkStore'])->name('admin.exercises.bulk-store');
+        Route::post('/admin/exercises-bulk/store', [\App\Http\Controllers\Admin\ExerciseController::class, 'bulkStore'])->name('admin.exercises.bulk-store');
         Route::post('/admin/exercises', [\App\Http\Controllers\Admin\ExerciseController::class, 'store'])->name('admin.exercises.store');
         Route::get('/admin/exercises/{exercise}/edit', [\App\Http\Controllers\Admin\ExerciseController::class, 'edit'])->name('admin.exercises.edit');
         Route::post('/admin/exercises/{exercise}', [\App\Http\Controllers\Admin\ExerciseController::class, 'update'])->name('admin.exercises.update');
