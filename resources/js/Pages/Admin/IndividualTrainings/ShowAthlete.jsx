@@ -278,10 +278,30 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                 }
 
                                                 return (
-                                                <div 
+                                                                                                <div 
                                                     key={`${session.type}-${session.id}`} 
-                                                    className={`group/session relative p-2.5 rounded-md border text-left flex flex-col gap-2 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${bgColor} ${borderColor} ${hoverBorderColor}`}
+                                                    className={`group/session relative p-2.5 rounded-md border text-left flex flex-col gap-2 transition-all shadow-sm hover:-translate-y-0.5 ${session.is_absent ? 'opacity-60 bg-slate-50 border-slate-200 grayscale' : `hover:shadow-md ${bgColor} ${borderColor} ${hoverBorderColor}`}`}
                                                 >
+                                                    {session.is_absent ? (
+                                                        <div className="block w-full pointer-events-none">
+                                                            <div className="flex items-start justify-between mb-2">
+                                                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-500 border border-slate-300">
+                                                                    Sesi {session.session_number} (Absen)
+                                                                </span>
+                                                            </div>
+                                                            <div className="text-sm font-bold leading-snug line-clamp-2 text-slate-400">
+                                                                {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
+                                                            </div>
+                                                            <div className="mt-2 flex flex-col gap-1.5 opacity-60">
+                                                                {session.training_type && (
+                                                                    <div className="text-xs font-semibold flex items-center gap-1.5 text-slate-400">
+                                                                        <Dumbbell size={12} className="shrink-0" />
+                                                                        <span className="truncate">{session.training_type}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
                                                     <Link 
                                                         href={isGroup 
                                                             ? route('admin.group-trainings.session.show', session.id) + "?from=athlete&athlete_id=" + athlete.id
@@ -296,7 +316,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                                 </span>
                                                             ) : (
                                                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeBgColor}`}>
-                                                                    Sesi {session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
+                                                                    Sesi {session.display_session_number || session.session_number}/{isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}
                                                                 </span>
                                                             )}
                                                             <div className="flex items-center gap-1">
@@ -349,6 +369,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                         {/* Title */}
                                                         <div className={`text-sm font-bold leading-snug line-clamp-2 ${titleColor}`}>
                                                             {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
+                                                            {session.is_makeup && <span className="ml-1.5 text-[9px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider inline-block">GUEST</span>}
                                                         </div>
 
                                                         {/* Details */}
@@ -373,6 +394,7 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
                                                             )}
                                                         </div>
                                                     </Link>
+                                                    )}
                                                 </div>
                                                 );
                                             })}

@@ -2,18 +2,18 @@ import React, { useState, useMemo } from 'react';
 import { Info, Calculator, Utensils, ArrowRight } from 'lucide-react';
 
 const ACTIVITY_MULTIPLIERS = [
-    { label: 'Basal Metabolic Rate', value: 1 },
-    { label: 'Sedentary', value: 1.2 },
-    { label: 'Light Exercise', value: 1.375 },
-    { label: 'Moderate Exercise', value: 1.55 },
-    { label: 'Heavy Exercise', value: 1.725 },
-    { label: 'Athlete', value: 1.9 },
+    { label: 'Tingkat Metabolisme Basal (BMR)', value: 1 },
+    { label: 'Tidak Aktif (Sedentary)', value: 1.2 },
+    { label: 'Olahraga Ringan', value: 1.375 },
+    { label: 'Olahraga Sedang', value: 1.55 },
+    { label: 'Olahraga Berat', value: 1.725 },
+    { label: 'Atlet (Sangat Aktif)', value: 1.9 },
 ];
 
 const MACRO_SPLITS = [
-    { name: 'Moderate Carb', ratios: [0.30, 0.35, 0.35], desc: '30/35/35' },
-    { name: 'Lower Carb', ratios: [0.40, 0.40, 0.20], desc: '40/40/20' },
-    { name: 'Higher Carb', ratios: [0.30, 0.20, 0.50], desc: '30/20/50' },
+    { name: 'Karbo Sedang (Moderate)', ratios: [0.30, 0.35, 0.35], desc: '30/35/35' },
+    { name: 'Karbo Rendah (Lower)', ratios: [0.40, 0.40, 0.20], desc: '40/40/20' },
+    { name: 'Karbo Tinggi (Higher)', ratios: [0.30, 0.20, 0.50], desc: '30/20/50' },
 ];
 
 export default function TdeeSummary({ test }) {
@@ -42,9 +42,9 @@ export default function TdeeSummary({ test }) {
     const goalCalories = getGoalCalories(activeTab);
 
     const getGoalDescription = (goal) => {
-        if (goal === 'cutting') return `(-500 kcal from maintenance)`;
-        if (goal === 'bulking') return `(+500 kcal from maintenance)`;
-        return `(maintenance calories)`;
+        if (goal === 'cutting') return `(-500 kkal dari batas harian)`;
+        if (goal === 'bulking') return `(+500 kkal dari batas harian)`;
+        return `(kalori harian normal)`;
     };
 
     const calculateMacros = (cals, ratios) => {
@@ -61,36 +61,41 @@ export default function TdeeSummary({ test }) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Side: Summary & Table */}
                 <div className="lg:col-span-5 space-y-6">
-                    <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
-                        <h3 className="text-zinc-500 font-bold capitalize text-sm mb-4">Your Maintenance Calories</h3>
+                    <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center transition-all duration-300">
+                        <h3 className="text-zinc-500 font-bold capitalize text-sm mb-4">Target Kalori {activeTab}</h3>
                         
                         <div className="flex items-baseline justify-center gap-2 mb-2">
-                            <span className="text-4xl font-black text-zinc-900 tracking-tight">{maintenance.toLocaleString()}</span>
+                            <span className="text-4xl font-black text-zinc-900 tracking-tight">{goalCalories.toLocaleString()}</span>
                         </div>
-                        <span className="text-zinc-500 font-semibold mb-6">calories per day</span>
+                        <span className="text-zinc-500 font-semibold mb-6">kalori per hari</span>
                         
                         <div className="flex items-center gap-2 text-zinc-900 font-bold text-xl mb-1">
-                            {maintenanceWeekly.toLocaleString()} 
+                            {(goalCalories * 7).toLocaleString()} 
                         </div>
-                        <span className="text-zinc-500 font-medium text-sm">calories per week</span>
+                        <span className="text-zinc-500 font-medium text-sm">kalori per minggu</span>
                     </div>
 
                     <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-200">
                         <div className="flex items-center gap-2 mb-3">
                             <Info className="w-5 h-5 text-blue-500" />
-                            <h4 className="font-bold text-zinc-900">Estimates Based On Katch-McArdle Formula</h4>
+                            <h4 className="font-bold text-zinc-900">Estimasi Katch-McArdle</h4>
                         </div>
                         <p className="text-sm text-zinc-600 leading-relaxed mb-6">
-                            Based on your stats, the best estimate for your maintenance calories is <span className="font-bold text-zinc-900">{maintenance.toLocaleString()} calories</span> per day. The table below shows the difference if you select a different activity level.
+                            Berdasarkan data Anda, estimasi terbaik untuk target kalori {activeTab} Anda adalah <span className="font-bold text-zinc-900">{goalCalories.toLocaleString()} kalori</span> per hari. Tabel di bawah menunjukkan target harian jika tingkat aktivitas Anda berbeda.
                         </p>
 
                         <div className="space-y-2">
                             {ACTIVITY_MULTIPLIERS.map((act, idx) => {
-                                const cals = Math.round(bmr * act.value);
+                                const baseMaintenance = Math.round(bmr * act.value);
+                                let cals = baseMaintenance;
+                                if (act.label !== 'Tingkat Metabolisme Basal (BMR)') {
+                                    if (activeTab === 'cutting') cals -= 500;
+                                    if (activeTab === 'bulking') cals += 500;
+                                }
                                 return (
-                                    <div key={idx} className="flex justify-between items-center py-2.5 border-b border-zinc-200/60 last:border-0">
+                                    <div key={idx} className="flex justify-between items-center py-2.5 border-b border-zinc-200/60 last:border-0 transition-colors">
                                         <span className="text-sm font-semibold text-zinc-700">{act.label}</span>
-                                        <span className="text-sm font-bold text-zinc-900">{cals.toLocaleString()} <span className="text-zinc-400 font-normal text-xs">kcal/day</span></span>
+                                        <span className="text-sm font-bold text-zinc-900">{cals.toLocaleString()} <span className="text-zinc-400 font-normal text-xs">kkal/hari</span></span>
                                     </div>
                                 );
                             })}
@@ -126,10 +131,10 @@ export default function TdeeSummary({ test }) {
                             <div className="mb-8">
                                 <h3 className="text-xl font-bold text-zinc-900 mb-2 capitalize flex items-center gap-2">
                                     <Utensils className="w-5 h-5 text-zinc-400" />
-                                    Macronutrients ({activeTab})
+                                    Makronutrisi ({activeTab})
                                 </h3>
                                 <p className="text-zinc-600 text-sm leading-relaxed">
-                                    <span className="font-semibold text-zinc-800">30/35/35</span> means 30% protein, 35% fats, 35% carbs. These values reflect your {activeTab} calories of <span className="font-bold text-zinc-900">{goalCalories.toLocaleString()}</span> per day <span className="text-zinc-500">{getGoalDescription(activeTab)}</span>.
+                                    <span className="font-semibold text-zinc-800">30/35/35</span> berarti 30% Protein, 35% Lemak, 35% Karbohidrat. Nilai ini dihitung berdasarkan target kalori {activeTab} Anda sebesar <span className="font-bold text-zinc-900">{goalCalories.toLocaleString()}</span> per hari <span className="text-zinc-500">{getGoalDescription(activeTab)}</span>.
                                 </p>
                             </div>
 
@@ -149,14 +154,14 @@ export default function TdeeSummary({ test }) {
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Fats</span>
+                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Lemak</span>
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="text-xl font-black text-amber-500">{macros.fats}</span>
                                                         <span className="text-sm font-bold text-zinc-400">g</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Carbs</span>
+                                                    <span className="text-sm font-bold text-zinc-500 capitalize mb-1">Karbohidrat</span>
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="text-xl font-black text-emerald-500">{macros.carbs}</span>
                                                         <span className="text-sm font-bold text-zinc-400">g</span>

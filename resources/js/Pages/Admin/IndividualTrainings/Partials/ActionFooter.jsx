@@ -17,7 +17,7 @@ export default function ActionFooter({
 
     if (!isAthlete) {
         return (
-            <div className="p-4 sm:p-6 bg-slate-50/80 border-t border-slate-200 flex justify-end items-center gap-3">
+            <div className="sticky bottom-0 z-40 mt-8 p-4 sm:p-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 flex justify-end items-center gap-3 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-2xl">
                 {recentlySuccessful && (
                     <span className="text-sm font-bold text-slate-500 flex justify-center items-center gap-1">
                         <Check size={16} className="text-green-500" /> Tersimpan
@@ -52,7 +52,7 @@ export default function ActionFooter({
     const hasSavedDraft = training?.status === "in_progress" || isCompleted;
 
     return (
-        <div className="p-4 sm:p-6 bg-slate-50/80 border-t border-slate-200 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4">
+        <div className="sticky bottom-0 z-40 mt-8 p-4 sm:p-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-2xl">
             {isLocked ? (
                 <>
                     {recentlySuccessful && (

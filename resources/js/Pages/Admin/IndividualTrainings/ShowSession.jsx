@@ -457,63 +457,65 @@ export default function ShowSession({
 
             <div className="pb-12 mx-auto space-y-8 relative">
                 <div className="flex flex-col gap-6">
-                    <div className="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-start justify-between gap-6">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-70 pointer-events-none"></div>
-                        <div className="relative z-10 space-y-4 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <button type="button" onClick={() => window.history.back()} className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-semibold mr-2">
+                    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 md:p-10 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-start justify-between gap-6 text-white">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-500/20 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
+                        
+                        <div className="relative z-10 space-y-5 flex-1">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <button type="button" onClick={() => window.history.back()} className="flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors text-sm font-semibold mr-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-md">
                                     <ArrowLeft size={16} /> Kembali
                                 </button>
-                                <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                                <span className="text-xs font-bold text-white bg-orange-500/80 px-3 py-1.5 rounded-full backdrop-blur-md border border-orange-400/30 shadow-inner tracking-wide">
                                     Sesi {training.session_number}
                                 </span>
-                                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${training.status === 'completed' || training.is_completed ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
+                                <span className={`text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md border shadow-inner tracking-wide ${training.status === 'completed' || training.is_completed ? 'bg-emerald-500/30 text-emerald-50 border-emerald-400/30' : 'bg-white/10 text-slate-50 border-white/20'}`}>
                                     {training.status === 'completed' || training.is_completed ? 'Selesai' : 'Terjadwal'}
                                 </span>
                             </div>
                             
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
                                 {training.name || 'Program Latihan'}
                             </h1>
                             
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                                <div className="flex items-center gap-1.5">
-                                    <Calendar size={16} className="text-slate-400" />
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
+                                <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                                    <Calendar size={16} className="text-orange-400" />
                                     <span className="font-medium">{training.date}</span>
                                 </div>
                                 {training.training_type && (
-                                    <div className="flex items-center gap-1.5">
-                                        <Target size={16} className="text-slate-400" />
+                                    <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                                        <Target size={16} className="text-orange-400" />
                                         <span className="font-medium">{training.training_type}</span>
                                     </div>
                                 )}
                                 {training.location && (
-                                    <div className="flex items-center gap-1.5">
-                                        <MapPin size={16} className="text-slate-400" />
+                                    <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                                        <MapPin size={16} className="text-orange-400" />
                                         <span className="font-medium">{training.location}</span>
                                     </div>
                                 )}
                             </div>
                             
-                            <div className="pt-2 flex flex-wrap items-center gap-3">
+                            <div className="pt-3 flex flex-wrap items-center gap-3">
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Coach:</span>
                                 {coaches && coaches.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
                                         {coaches.map(c => (
-                                            <div key={c.id} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full py-1 pr-3 pl-1">
-                                                <div className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                                                    <User size={12} />
+                                            <div key={c.id} className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full py-1 pr-4 pl-1 shadow-sm">
+                                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-400 to-orange-500 text-white flex items-center justify-center shadow-inner">
+                                                    <User size={14} />
                                                 </div>
-                                                <span className="text-xs font-semibold text-slate-700">{c.name}</span>
+                                                <span className="text-xs font-bold text-white tracking-wide">{c.name}</span>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full py-1 pr-3 pl-1">
-                                        <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">
-                                            <User size={12} />
+                                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full py-1 pr-4 pl-1 shadow-sm">
+                                        <div className="w-7 h-7 rounded-full bg-white/20 text-slate-300 flex items-center justify-center shadow-inner">
+                                            <User size={14} />
                                         </div>
-                                        <span className="text-xs font-semibold text-slate-700">Admin</span>
+                                        <span className="text-xs font-bold text-white tracking-wide">Admin</span>
                                     </div>
                                 )}
                             </div>
@@ -522,16 +524,16 @@ export default function ShowSession({
                         <div className="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-end gap-3 md:pt-8 w-full md:w-auto">
                             <a 
                                 href={route("admin.individual-trainings.session.export-pdf", training.id)}
-                                className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 transition-all"
+                                className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white rounded-xl text-sm font-bold shadow-lg transition-all"
                             >
                                 <FileText size={18} /> Download PDF
                             </a>
                             {isCoachOrAdmin && (
                                 <Link
                                     href={route("admin.individual-trainings.session.edit", training.id)}
-                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-4 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold shadow-md shadow-orange-500/20 hover:bg-orange-600 transition-all"
+                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-5 py-3 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-extrabold shadow-xl hover:bg-orange-600 hover:scale-105 transition-all transform duration-200"
                                 >
-                                    <Edit2 size={18} /> Edit
+                                    <Edit2 size={18} /> Edit Sesi
                                 </Link>
                             )}
                         </div>
@@ -572,26 +574,36 @@ export default function ShowSession({
                         {/* Instructions */}
                         {training.blocks
                             .filter((block) => Number(block.step) === 1)
-                            .map((block, bIdx) => (
-                                <div
-                                    key={`inst-${bIdx}`}
-                                    className="space-y-2 px-1 pt-2"
-                                >
-                                    <div className="font-bold text-lg text-zinc-900">
-                                        {block.title ||
-                                            block.category
-                                                .replace("_", " ")
-                                                .replace(/\b\w/g, (l) =>
-                                                    l.toUpperCase(),
-                                                )}
+                            .map((block, bIdx) => {
+                                const isNB = block.category?.toLowerCase() === 'nb' || block.title?.toLowerCase() === 'nb';
+                                return (
+                                    <div
+                                        key={`inst-${bIdx}`}
+                                        className={`p-5 rounded-2xl border-l-4 shadow-sm mb-4 ${isNB ? 'bg-rose-50 border-rose-500' : 'bg-blue-50 border-blue-500'}`}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className={`mt-0.5 ${isNB ? 'text-rose-500' : 'text-blue-500'}`}>
+                                                <Info size={20} />
+                                            </div>
+                                            <div className="space-y-1.5 flex-1">
+                                                <div className={`font-extrabold text-sm uppercase tracking-wider ${isNB ? 'text-rose-700' : 'text-blue-700'}`}>
+                                                    {block.title ||
+                                                        block.category
+                                                            .replace("_", " ")
+                                                            .replace(/\b\w/g, (l) =>
+                                                                l.toUpperCase(),
+                                                            )}
+                                                </div>
+                                                <div className={`text-sm whitespace-pre-wrap leading-relaxed max-w-4xl font-medium ${isNB ? 'text-rose-900/80' : 'text-blue-900/80'}`}>
+                                                    {block.items?.[0]?.note ||
+                                                        block.description ||
+                                                        ""}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="text-base text-zinc-700 whitespace-pre-wrap leading-relaxed max-w-4xl">
-                                        {block.items?.[0]?.note ||
-                                            block.description ||
-                                            ""}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                         {isAdmin &&
                             (() => {
@@ -694,9 +706,9 @@ export default function ShowSession({
                         {/* Table */}
                         <form
                             onSubmit={submitRpe}
-                            className=" overflow-hidden rounded-xl shadow-sm mt-4"
+                            className=" rounded-xl shadow-sm mt-4 relative"
                         >
-                            <div className="flex flex-col gap-4 bg-zinc-50/50">
+                            <div className="flex flex-col gap-5 bg-transparent">
                                 {training.blocks
                                     .filter((block) => Number(block.step) === 2)
                                     .map((block, bIdx) => {
@@ -754,21 +766,21 @@ export default function ShowSession({
                                         return (
                                             <div
                                                 key={`block-${bIdx}`}
-                                                className="bg-white border border-zinc-200 rounded-2xl shadow-sm overflow-hidden flex flex-col"
+                                                className="bg-white border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col mb-8"
                                             >
-                                                <div className="bg-zinc-100/50 border-b border-zinc-200 px-4 py-3 flex flex-col gap-2">
+                                                <div className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-100 px-6 py-5 flex flex-col gap-3 relative">
+                                                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-orange-500 rounded-l-3xl"></div>
                                                     <div className="flex items-center justify-between">
-                                                        <h3 className="font-bold text-zinc-900 text-sm flex items-center gap-2">
-                                                            <Target
-                                                                size={16}
-                                                                className="text-zinc-500"
-                                                            />{" "}
+                                                        <h3 className="font-extrabold text-slate-800 text-lg flex items-center gap-3">
+                                                            <div className="bg-orange-100 p-1.5 rounded-lg text-orange-600">
+                                                                <Target size={18} strokeWidth={2.5} />
+                                                            </div>
                                                             {phaseLabel}
                                                         </h3>
                                                     </div>
                                                     {block.description && (
-                                                        <div className="bg-white/50 border-l-2 border-zinc-400 pl-3 py-2 ml-6 rounded-r">
-                                                            <p className="text-xs text-zinc-600 leading-relaxed whitespace-pre-wrap">
+                                                        <div className="bg-white border border-slate-100 shadow-sm pl-4 pr-3 py-3 rounded-xl ml-9">
+                                                            <p className="text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-wrap">
                                                                 {
                                                                     block.description
                                                                 }
@@ -776,7 +788,7 @@ export default function ShowSession({
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="divide-y divide-zinc-100 ">
+                                                <div className="divide-y divide-slate-100 ">
                                                     {block.items.map(
                                                         (item, iIdx) => {
                                                             const exercise =

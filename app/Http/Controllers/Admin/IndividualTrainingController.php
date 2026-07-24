@@ -93,13 +93,46 @@ class IndividualTrainingController extends Controller
 
         // Get group trainings where this athlete is a member of the group
         $groupIds = $user->groups()->pluck('training_groups.id');
-        $groupTrainings = \App\Models\GroupTraining::whereIn('training_group_id', $groupIds)
+        $groupTrainings = \App\Models\GroupTraining::where(function($query) use ($user, $groupIds) {
+                // If explicitly an attendee (Guest)
+                $query->whereJsonContains('attendee_ids', $user->id)
+                      // OR they are a member of the group
+                      ->orWhereIn('training_group_id', $groupIds);
+            })
             ->with(['coach', 'group.package', 'members_pivot' => function ($query) use ($user) {
                 $query->where('athlete_id', $user->id);
             }])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();
+
+        $missedSessionsQueue = [];
+        foreach ($groupTrainings as $training) {
+            $isGroupMember = $groupIds->contains($training->training_group_id);
+            $attendees = $training->attendee_ids ?: [];
+            
+            // Legacy fallback: if attendee_ids is empty/null, we assume all members attended.
+            $isLegacy = is_null($training->attendee_ids) || empty($training->attendee_ids);
+            $isAttending = in_array($user->id, $attendees) || ($isLegacy && $isGroupMember);
+            
+            if ($isGroupMember && !$isAttending) {
+                // Missed session
+                $training->is_absent = true;
+                $missedSessionsQueue[] = $training->session_number;
+            } elseif (!$isGroupMember && $isAttending) {
+                // Guest session (makeup)
+                $training->is_makeup = true;
+                if (count($missedSessionsQueue) > 0) {
+                    $makeupFor = array_shift($missedSessionsQueue);
+                    $training->display_session_number = $makeupFor;
+                } else {
+                    $training->display_session_number = $training->session_number; // fallback
+                }
+            } else {
+                $training->is_absent = false;
+                $training->is_makeup = false;
+            }
+        }
 
         $exercisesList = Exercise::with('category')->orderBy('name', 'asc')->get();
         $packagesList = \App\Models\ExercisePackage::with('exercises')->orderBy('name', 'asc')->get();
@@ -186,7 +219,7 @@ class IndividualTrainingController extends Controller
         // Create the training record
         $training = IndividualTraining::create([
             'user_id' => $user->id,
-            'coach_id' => Auth::id(),
+            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(),
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'day_number' => $day_number,
@@ -415,7 +448,7 @@ class IndividualTrainingController extends Controller
             ->whereNotIn('id', $existingBlockIds)
             ->delete();
 
-        return redirect()->route('admin.individual-trainings.session.show', $training->id)
+        return redirect()->route('admin.individual-trainings.show', $training->user_id)
             ->with('message', 'Sesi latihan berhasil diperbarui!');
     }
 

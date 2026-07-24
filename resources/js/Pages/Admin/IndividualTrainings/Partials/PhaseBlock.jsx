@@ -81,18 +81,18 @@ export default function PhaseBlock({
 
  const addItem = () => {
  const newItem = {
- exercise_id: "",
- note: "",
- load: "",
- load_unit: "kg",
- sets: "",
- reps: "",
- reps_unit: "reps",
- duration: "",
- tempo: "",
- rir: "",
- rest_per_set: "",
- intensity: "",
+ exercise_id:"",
+ note:"",
+ load:"",
+ load_unit:"kg",
+ sets:"",
+ reps:"",
+ reps_unit:"reps",
+ duration:"",
+ tempo:"",
+ rir:"",
+ rest_per_set:"",
+ intensity:"",
  };
  onChange("items", [...block.items, newItem]);
  };
@@ -102,17 +102,17 @@ export default function PhaseBlock({
  if (!pkg) return;
  const newItems = pkg.exercises.map((ex) => ({
  exercise_id: ex.id,
- note: "",
- load: "",
- load_unit: "kg",
- sets: "",
- reps: "",
- reps_unit: "reps",
- duration: "",
- tempo: "",
- rir: "",
- rest_per_set: "",
- intensity: "",
+ note:"",
+ load:"",
+ load_unit:"kg",
+ sets:"",
+ reps:"",
+ reps_unit:"reps",
+ duration:"",
+ tempo:"",
+ rir:"",
+ rest_per_set:"",
+ intensity:"",
  }));
  onChange("items", [...block.items, ...newItems]);
  setIsPackageModalOpen(false);
@@ -341,15 +341,15 @@ export default function PhaseBlock({
  const exData = exercises.find(
  (ex) => ex.id == item.exercise_id,
  );
-    const imagesRaw = exData?.images || [];
-    const images = typeof imagesRaw === 'string' ? (() => { try { return JSON.parse(imagesRaw); } catch(e) { return []; } })() : (Array.isArray(imagesRaw) ? imagesRaw : []);
+ const imagesRaw = exData?.images || [];
+ const images = typeof imagesRaw === 'string' ? (() => { try { return JSON.parse(imagesRaw); } catch(e) { return []; } })() : (Array.isArray(imagesRaw) ? imagesRaw : []);
 
-    const getImageUrl = (path) => {
-        if (!path) return '';
-        if (path.startsWith('http')) return path;
-        if (path.startsWith('/storage/')) return path;
-        return `/storage/${path}`;
-    };
+ const getImageUrl = (path) => {
+ if (!path) return '';
+ if (path.startsWith('http')) return path;
+ if (path.startsWith('/storage/')) return path;
+ return `/storage/${path}`;
+ };
  const videos =
  exData?.videos?.filter(
  (v) => v && v.trim() !=="",
@@ -372,42 +372,30 @@ export default function PhaseBlock({
  .style
  }
  >
- {/* Top Main Row: Exercise Info */}
- <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 p-4 bg-zinc-50/50 border-b border-zinc-100 rounded-t-xl">
- <div className="flex items-center gap-3 lg:w-1/3">
- <div
- {...provided.dragHandleProps}
- className="cursor-grab text-zinc-400 hover:text-zinc-600 active:cursor-grabbing"
- >
- <GripVertical
- size={
- 20
- }
- />
- </div>
- <div className="flex-1">
- <ExerciseSelect
- value={
- item.exercise_id
- }
- options={
- exercises
- }
- onChange={(
- val,
- ) =>
- updateItem(
- iIndex,"exercise_id",
- val,
- )
- }
- />
- </div>
- </div>
+                                                        {/* Top Main Row: Exercise Info */}
+                                                        <div className="flex flex-col lg:flex-row items-end gap-4 p-4 bg-zinc-50/50 border-b border-zinc-100 rounded-t-xl">
+                                                            <div className="flex items-end gap-3 lg:w-[35%] w-full">
+                                                                <div
+                                                                    {...provided.dragHandleProps}
+                                                                    className="cursor-grab text-zinc-400 hover:text-zinc-600 active:cursor-grabbing pb-2"
+                                                                >
+                                                                    <GripVertical size={20} />
+                                                                </div>
+                                                                <div className="flex-1 flex flex-col gap-1">
+                                                                    <span className="text-[10px] font-bold text-zinc-500">Exercise</span>
+                                                                    <ExerciseSelect
+                                                                        value={item.exercise_id}
+                                                                        options={exercises}
+                                                                        onChange={(val) =>
+                                                                            updateItem(iIndex, "exercise_id", val)
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
 
- <div className="flex flex-1 flex-wrap lg:flex-nowrap items-center gap-3">
- {/* Visuals */}
- <div className="flex items-center gap-2">
+                                                            <div className="flex flex-1 w-full flex-wrap lg:flex-nowrap items-end gap-3">
+                                                                {/* Visuals */}
+                                                                <div className="flex flex-col gap-1 w-12 items-center justify-end h-full">
  {images.length >
  0 ? (
  <div className="flex -space-x-2">
@@ -503,25 +491,25 @@ export default function PhaseBlock({
  />
  </div>
 
- <div className="flex items-center pt-5">
- <button
- type="button"
- onClick={() =>
- removeItem(
- iIndex,
- )
- }
- className="p-2 text-zinc-400 hover:text-red-500 hover:bg-zinc-100 :bg-zinc-800 rounded-lg transition-colors"
- >
- <Trash2
- size={
- 16
- }
- />
- </button>
- </div>
- </div>
- </div>
+                                                                <div className="flex items-center pb-1">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            removeItem(
+                                                                                iIndex,
+                                                                            )
+                                                                        }
+                                                                        className="p-2 text-zinc-400 hover:text-red-500 hover:bg-zinc-100 :bg-zinc-800 rounded-lg transition-colors"
+                                                                    >
+                                                                        <Trash2
+                                                                            size={
+                                                                                16
+                                                                            }
+                                                                        />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
  {/* Expanded Row: Sets */}
  {(currentCat.columns ==="full" ||
@@ -1051,7 +1039,7 @@ export default function PhaseBlock({
  </div>
  <div className="flex flex-col gap-1.5">
  <span className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
- {["interval", "cardio"].includes(block.category) ? "RPE" : "RIR"}
+ {["interval","cardio"].includes(block.category) ?"RPE" :"RIR"}
  {setIdx ===
  0 && (
  <button
@@ -1104,7 +1092,7 @@ export default function PhaseBlock({
  </div>
  </>
  )}
- {(currentCat.columns === "full" || currentCat.columns === "medium") && (
+ {(currentCat.columns ==="full" || currentCat.columns ==="medium") && (
  <div className="flex flex-col gap-1.5">
  <span className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
  Rest
@@ -1195,15 +1183,15 @@ export default function PhaseBlock({
  )}
  </div>
 
- <div className="p-4 bg-white border-t border-zinc-200 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-xl relative">
+ <div className="p-4 bg-white border-t border-zinc-200 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-xl relative">
  {currentCat.columns !=="note_only" && (
  <div className="flex gap-2 w-full sm:w-auto">
  <button
  type="button"
  onClick={addItem}
- className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900 :bg-zinc-800 :text-zinc-50 :ring-zinc-300 h-9 px-3 flex-1 sm:flex-none shadow-sm"
+ className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900 h-9 px-4 flex-1 sm:flex-none shadow-sm"
  >
- <Plus size={14} className="mr-2" /> {"Add Exercise"}
+ <Plus size={14} className="mr-2 text-zinc-400" /> {"Add Exercise"}
  </button>
  <div
  className="relative flex-1 sm:flex-none flex"
@@ -1214,9 +1202,9 @@ export default function PhaseBlock({
  onClick={() =>
  setIsPackageModalOpen(!isPackageModalOpen)
  }
- className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900 :bg-zinc-800 :text-zinc-50 :ring-zinc-300 h-9 px-3 flex-1 sm:flex-none shadow-sm relative w-full"
+ className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-900 h-9 px-4 flex-1 sm:flex-none shadow-sm relative w-full"
  >
- <Plus size={14} className="mr-2" /> Add From
+ <Plus size={14} className="mr-2 text-zinc-400" /> Add From
  Package
  </button>
 
@@ -1281,9 +1269,9 @@ export default function PhaseBlock({
  <button
  type="button"
  onClick={onOpenExerciseModal}
- className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-100 hover:text-zinc-900 :bg-zinc-800 :text-zinc-50 :ring-zinc-300 h-9 px-3 w-full sm:w-auto text-zinc-500"
+ className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 h-9 px-4 w-full sm:w-auto"
  >
- <Dumbbell size={14} className="mr-2" /> {"Global Library"}
+ <Dumbbell size={14} className="mr-2 text-zinc-400" /> {"Global Library"}
  </button>
  </div>
  </div>

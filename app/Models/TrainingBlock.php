@@ -17,6 +17,10 @@ class TrainingBlock extends Model
         'sort_order',
     ];
 
+    protected $casts = [
+        'athlete_ids' => 'array',
+    ];
+
     public function training()
     {
         return $this->belongsTo(IndividualTraining::class, 'individual_training_id');

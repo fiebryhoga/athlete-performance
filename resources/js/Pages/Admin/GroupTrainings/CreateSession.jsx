@@ -7,6 +7,7 @@ import {
     Activity,
     Type,
     ClipboardEdit,
+    X,
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import PhaseBlock from "../IndividualTrainings/Partials/PhaseBlock";
@@ -22,115 +23,138 @@ export default function CreateSession({
     coaches = [],
     date,
     nextSessionNumber,
+    availableAthletes,
 }) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         date: date || "",
         name: "",
         training_type: "",
         location: "",
         coach_ids: [],
-        blocks: [],
+        attendee_ids: group?.members?.map(m => m.id) || [],
+        programs: [{ name: "Program Utama", athlete_ids: null, blocks: [] }],
         is_extra: false,
     });
 
+    
+    transform((data) => ({
+        ...data,
+        programs: hasSecondaryProgram ? data.programs : [{ ...data.programs[0], athlete_ids: null }]
+    }));
+
     const [isExModalOpen, setIsExModalOpen] = useState(false);
+        const [activeProgramIndex, setActiveProgramIndex] = useState(0);
+    const [hasSecondaryProgram, setHasSecondaryProgram] = useState(
+        data.programs && data.programs.length > 1
+    );
 
     const submitSession = (e) => {
         e.preventDefault();
-        post(route("admin.group-trainings.session.store", group.id));
+        
+        // Fix up athlete_ids before sending
+        const submitData = { ...data };
+        if (!hasSecondaryProgram) {
+            submitData.programs = [{ ...submitData.programs[0], athlete_ids: null }];
+        }
+        
+        post(route("admin.group-trainings.session.store", group.id), {
+            data: submitData
+        });
     };
 
     const onDragEnd = (result) => {
-        if (!result.destination) return;
         const { source, destination, type } = result;
+        if (!destination) return;
+
+        const newPrograms = [...data.programs];
+        const activeBlocks = newPrograms[activeProgramIndex].blocks;
 
         if (type === "block") {
-            const items = Array.from(data.blocks);
-            const [reorderedItem] = items.splice(source.index, 1);
-            items.splice(destination.index, 0, reorderedItem);
-            setData("blocks", items);
+            const [reorderedBlock] = activeBlocks.splice(source.index, 1);
+            activeBlocks.splice(destination.index, 0, reorderedBlock);
         } else if (type === "exercise") {
             const sourceBlockIndex = parseInt(source.droppableId.split("-")[2]);
-            const destBlockIndex = parseInt(
-                destination.droppableId.split("-")[2],
-            );
+            const destBlockIndex = parseInt(destination.droppableId.split("-")[2]);
 
-            const newBlocks = [...data.blocks];
-            const sourceItems = Array.from(newBlocks[sourceBlockIndex].items);
+            const sourceItems = Array.from(activeBlocks[sourceBlockIndex].items);
             const [reorderedItem] = sourceItems.splice(source.index, 1);
 
             if (sourceBlockIndex === destBlockIndex) {
                 sourceItems.splice(destination.index, 0, reorderedItem);
-                newBlocks[sourceBlockIndex].items = sourceItems;
+                activeBlocks[sourceBlockIndex].items = sourceItems;
             } else {
-                const destItems = Array.from(newBlocks[destBlockIndex].items);
+                const destItems = Array.from(activeBlocks[destBlockIndex].items);
                 destItems.splice(destination.index, 0, reorderedItem);
-                newBlocks[sourceBlockIndex].items = sourceItems;
-                newBlocks[destBlockIndex].items = destItems;
+                activeBlocks[sourceBlockIndex].items = sourceItems;
+                activeBlocks[destBlockIndex].items = destItems;
             }
-            setData("blocks", newBlocks);
         }
+        setData("programs", newPrograms);
     };
 
     const addTextBlock = () => {
-        setData("blocks", [
-            ...data.blocks,
-            {
-                step: 1,
-                category: "instruction",
-                title: "",
-                items: [{ note: "" }],
-            },
-        ]);
+        const newPrograms = [...data.programs];
+        newPrograms[activeProgramIndex].blocks.push({
+            step: 1,
+            category: "instruction",
+            title: "",
+            items: [{ note: "" }],
+        });
+        setData("programs", newPrograms);
     };
 
     const addPhaseBlock = () => {
-        setData("blocks", [
-            ...data.blocks,
-            {
-                step: 2,
-                category: "warm_up",
-                title: "",
-                description: "",
-                items: [
-                    {
-                        exercise_id: "",
-                        note: "",
-                        load: "",
-                        load_unit: "kg",
-                        sets: "",
-                        reps: "",
-                        reps_unit: "reps",
-                        duration: "",
-                        tempo: "",
-                        rir: "",
-                        rest_per_set: "",
-                        intensity: "",
-                    },
-                ],
-            },
-        ]);
+        const newPrograms = [...data.programs];
+        newPrograms[activeProgramIndex].blocks.push({
+            step: 2,
+            category: "warm_up",
+            title: "",
+            description: "",
+            items: [
+                {
+                    exercise_id: "",
+                    note: "",
+                    load: "",
+                    load_unit: "kg",
+                    sets: "",
+                    reps: "",
+                    reps_unit: "reps",
+                    duration: "",
+                    tempo: "",
+                    rir: "",
+                    rest_per_set: "",
+                    intensity: "",
+                },
+            ],
+        });
+        setData("programs", newPrograms);
     };
 
     const updateBlock = (index, field, value) => {
-        const newBlocks = [...data.blocks];
-        newBlocks[index][field] = value;
-        setData("blocks", newBlocks);
+        const newPrograms = [...data.programs];
+        newPrograms[activeProgramIndex].blocks[index][field] = value;
+        setData("programs", newPrograms);
     };
 
     const removeBlock = (index) => {
         if (confirm("Yakin ingin menghapus blok ini?")) {
-            const newBlocks = [...data.blocks];
-            newBlocks.splice(index, 1);
-            setData("blocks", newBlocks);
+            const newPrograms = [...data.programs];
+            newPrograms[activeProgramIndex].blocks.splice(index, 1);
+            setData("programs", newPrograms);
         }
     };
 
     const duplicateBlock = (index) => {
-        const newBlocks = [...data.blocks];
-        const blockToCopy = JSON.parse(JSON.stringify(newBlocks[index]));
-        newBlocks.splice(index + 1, 0, blockToCopy);
-        setData("blocks", newBlocks);
+        const newPrograms = [...data.programs];
+        const blockToCopy = JSON.parse(JSON.stringify(newPrograms[activeProgramIndex].blocks[index]));
+        if (blockToCopy.items) {
+            blockToCopy.items = blockToCopy.items.map(item => {
+                const newItem = { ...item };
+                return newItem;
+            });
+        }
+        newPrograms[activeProgramIndex].blocks.splice(index + 1, 0, blockToCopy);
+        setData("programs", newPrograms);
     };
 
     return (
@@ -317,19 +341,166 @@ export default function CreateSession({
                                 )}
                             </div>
                         </div>
+
+                        <div className="md:col-span-2 lg:col-span-3">
+                            <label className="block text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-widest">
+                                Peserta Sesi (Checklist Kehadiran)
+                            </label>
+                            <p className="text-xs text-slate-500 mb-3 -mt-1">
+                                Hapus centang pada atlet yang <strong>tidak hadir / absen</strong> pada sesi ini agar mereka tidak dimasukkan ke dalam catatan sesi.
+                            </p>
+                            <div className="flex flex-wrap gap-3">
+                                {group?.members && group.members.length > 0 ? (
+                                    group.members.map((member) => (
+                                        <label
+                                            key={member.id}
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all ${data.attendee_ids.includes(member.id) ? "bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"}`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                className="hidden"
+                                                checked={data.attendee_ids.includes(member.id)}
+                                                onChange={(e) => {
+                                                    let newIds = [...data.attendee_ids];
+                                                    if (e.target.checked) {
+                                                        newIds.push(member.id);
+                                                    } else {
+                                                        newIds = newIds.filter(id => id !== member.id);
+                                                    }
+                                                    
+                                                    let newData = { ...data, attendee_ids: newIds };
+                                                    
+                                                    if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                        const newProgs = [...data.programs];
+                                                        if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                            newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+                                                        }
+                                                        if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                            newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                        }
+                                                        newData.programs = newProgs;
+                                                    }
+                                                    
+                                                    setData(newData);
+                                                }}
+                                            />
+                                            <span className="text-xs font-bold">{member.name}</span>
+                                        </label>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-slate-500 italic py-2">
+                                        Belum ada anggota di grup ini.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Editor */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                    <div className="p-5 bg-white border-b border-slate-200 flex justify-between items-center sticky top-0 z-40">
-                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <Dumbbell className="w-5 h-5 text-orange-500" />
-                            Skema & Program Latihan
-                        </h3>
+                    <div className="p-5 bg-white border-b border-slate-200 sticky top-0 z-40">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <Dumbbell className="w-5 h-5 text-orange-500" />
+                                Skema & Program Latihan
+                            </h3>
+                            <label className="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition-all">
+                                <input 
+                                    type="checkbox" 
+                                    className="rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+                                    checked={hasSecondaryProgram}
+                                    onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        setHasSecondaryProgram(isChecked);
+                                        
+                                        const newProgs = [...data.programs];
+                                        if (isChecked) {
+                                            if (newProgs.length < 2) {
+                                                newProgs.push({ name: "Program Sekunder", athlete_ids: [], blocks: [] });
+                                            }
+                                            newProgs[0].athlete_ids = [...data.attendee_ids];
+                                            if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                newProgs[0].athlete_ids = data.attendee_ids.filter(id => !newProgs[1].athlete_ids.includes(id));
+                                            }
+                                        } else {
+                                            setActiveProgramIndex(0);
+                                            newProgs[0].athlete_ids = null;
+                                        }
+                                        setData("programs", newProgs);
+                                    }}
+                                />
+                                Buat 2 Program Berbeda?
+                            </label>
+                        </div>
+                        
+                        {hasSecondaryProgram && (
+                            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveProgramIndex(0)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeProgramIndex === 0 ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                >
+                                    {data.programs[0].name}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveProgramIndex(1)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeProgramIndex === 1 ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                >
+                                    {data.programs[1]?.name || 'Program Sekunder'}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="p-6 md:p-8">
+                        {/* Program Settings (Audience) */}
+                        {hasSecondaryProgram && activeProgramIndex === 1 && (
+                            <div className="mb-6 bg-white p-4 rounded-xl border border-zinc-200">
+                                <label className="block text-sm font-bold text-zinc-700 mb-1">Pilih Atlet untuk Program Sekunder</label>
+                                <p className="text-xs text-zinc-500 mb-3">Atlet yang dipilih akan menjalankan program ini dan TIDAK menjalankan Program Utama.</p>
+                                <div className="flex flex-wrap gap-2 pt-3 border-t border-zinc-100">
+                                    {data.attendee_ids.map(attId => {
+                                        const athlete = (typeof availableAthletes !== 'undefined' ? availableAthletes.find(a => a.id === attId) : null) || (typeof group !== 'undefined' ? group?.members?.find(m => m.id === attId) : null);
+                                        if (!athlete) return null;
+                                        const isSelected = data.programs[1]?.athlete_ids?.includes(attId);
+                                        return (
+                                            <label key={attId} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all ${isSelected ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-50'}`}>
+                                                <input 
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                        const newProgs = [...data.programs];
+                                                        if (!newProgs[1]) newProgs[1] = { name: "Program Sekunder", athlete_ids: [], blocks: [] };
+                                                        let newIds = newProgs[1].athlete_ids ? [...newProgs[1].athlete_ids] : [];
+                                                        if (e.target.checked) newIds.push(attId);
+                                                        else newIds = newIds.filter(id => id !== attId);
+                                                        newProgs[1].athlete_ids = newIds;
+                                                        
+                                                        // Automatically update Program Utama's athlete_ids
+                                                        const allIds = data.attendee_ids;
+                                                        newProgs[0].athlete_ids = allIds.filter(id => !newIds.includes(id));
+                                                        
+                                                        setData("programs", newProgs);
+                                                    }}
+                                                />
+                                                <span className="text-xs font-bold">{athlete?.name || 'Atlet'}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {hasSecondaryProgram && activeProgramIndex === 0 && (
+                            <div className="mb-6 bg-orange-50 p-4 rounded-xl border border-orange-200">
+                                <p className="text-sm font-bold text-orange-800">Informasi Program Utama</p>
+                                <p className="text-xs text-orange-600 mt-1">Program ini akan diterapkan ke semua atlet dalam sesi ini, <strong>KECUALI</strong> atlet yang sudah Anda centang di tab <strong>Program Sekunder</strong>.</p>
+                            </div>
+                        )}
+
                         <DragDropContext onDragEnd={onDragEnd}>
                             <Droppable droppableId="blocks" type="block">
                                 {(provided) => (
@@ -338,7 +509,7 @@ export default function CreateSession({
                                         ref={provided.innerRef}
                                         className="space-y-6"
                                     >
-                                        {data.blocks.map((block, index) => (
+                                        {data.programs[activeProgramIndex].blocks.map((block, index) => (
                                             <Draggable
                                                 key={`block-${index}`}
                                                 draggableId={`block-${index}`}
@@ -428,7 +599,7 @@ export default function CreateSession({
                             </Droppable>
                         </DragDropContext>
 
-                        {data.blocks.length === 0 && (
+                        {data.programs[activeProgramIndex].blocks.length === 0 && (
                             <div className="text-center py-16 bg-white border-2 border-slate-200 border-dashed rounded-xl mt-4">
                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-inner">
                                     <Dumbbell

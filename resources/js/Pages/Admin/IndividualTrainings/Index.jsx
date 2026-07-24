@@ -156,6 +156,15 @@ export default function Index({ athletes, groups }) {
                                             <p className="text-xs text-slate-500 font-semibold mt-1">
                                                 {group.package?.name || 'Tidak ada paket'}
                                             </p>
+                                            {group.members && group.members.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5 mt-4">
+                                                    {group.members.map(member => (
+                                                        <span key={member.id} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                                                            {member.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 relative z-10">
                                             <div>

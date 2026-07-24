@@ -36,6 +36,8 @@ class GroupTrainingController extends Controller
 
     public function createSession(Request $request, TrainingGroup $group)
     {
+        $group->load('members');
+        
         $dateStr = $request->query('date', Carbon::today()->format('Y-m-d'));
         
         $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
@@ -49,6 +51,7 @@ class GroupTrainingController extends Controller
         $packagesList = \App\Models\ExercisePackage::with('exercises')->orderBy('name', 'asc')->get();
         
         $coaches = $group->coaches()->orderBy('name', 'asc')->get();
+        $allAthletes = \App\Models\User::where('role', 'athlete')->orderBy('name', 'asc')->get();
 
         return Inertia::render('Admin/GroupTrainings/CreateSession', [
             'group' => $group,
@@ -57,6 +60,7 @@ class GroupTrainingController extends Controller
             'coaches' => $coaches,
             'date' => $dateStr,
             'nextSessionNumber' => $nextSessionNumber,
+            'availableAthletes' => $allAthletes,
         ]);
     }
 
@@ -68,6 +72,7 @@ class GroupTrainingController extends Controller
             'training_type' => 'nullable|string|max:255',
             'location' => 'required|string|max:255',
             'coach_ids' => 'nullable|array',
+            'attendee_ids' => 'required|array',
             'blocks' => 'array',
             'is_extra' => 'boolean',
         ]);
@@ -88,7 +93,7 @@ class GroupTrainingController extends Controller
 
         $training = GroupTraining::create([
             'training_group_id' => $group->id,
-            'coach_id' => Auth::id(), // Primary creator
+            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(), // Fallback to current user if no coach selected
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'session_number' => $session_number,
@@ -97,63 +102,66 @@ class GroupTrainingController extends Controller
             'training_type' => $request->training_type,
             'location' => $request->location,
             'status' => 'scheduled',
-            'attendee_ids' => [], // Start with empty attendees, marked during completion
+            'attendee_ids' => $request->attendee_ids,
         ]);
 
         // Save blocks in ISMS-style hierarchical structure
-        if (!empty($request->blocks)) {
-            foreach ($request->blocks as $blockIndex => $blockData) {
-                $block = \App\Models\TrainingBlock::create([
-                    'group_training_id' => $training->id,
-                    'step' => $blockData['step'] ?? 2,
-                    'category' => $blockData['category'] ?? 'warm_up',
-                    'title' => $blockData['title'] ?? null,
-                    'description' => $blockData['description'] ?? null,
-                    'sort_order' => $blockIndex,
-                    'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
-                ]);
+        if (!empty($request->programs)) {
+            $globalBlockIndex = 0;
+            foreach ($request->programs as $program) {
+                foreach ($program['blocks'] as $blockData) {
+                    $block = \App\Models\TrainingBlock::create([
+                        'group_training_id' => $training->id,
+                        'step' => $blockData['step'] ?? 2,
+                        'category' => $blockData['category'] ?? 'warm_up',
+                        'title' => $blockData['title'] ?? null,
+                        'description' => $blockData['description'] ?? null,
+                        'program_name' => $program['name'] ?? 'Program Utama',
+                        'athlete_ids' => $program['athlete_ids'] ?? null,
+                        'sort_order' => $globalBlockIndex++,
+                        'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
+                    ]);
 
-                if (!empty($blockData['items'])) {
-                    foreach ($blockData['items'] as $itemIndex => $itemData) {
-                        \App\Models\TrainingBlockItem::create([
-                            'training_block_id' => $block->id,
-                            'exercise_id' => $itemData['exercise_id'] ?? null,
-                            'note' => $itemData['note'] ?? null,
-                            'load' => $itemData['load'] ?? null,
-                            'load_unit' => $itemData['load_unit'] ?? 'kg',
-                            'sets' => $itemData['sets'] ?? null,
-                            'reps' => $itemData['reps'] ?? null,
-                            'reps_unit' => $itemData['reps_unit'] ?? 'reps',
-                            'duration' => $itemData['duration'] ?? null,
-                            'tempo' => $itemData['tempo'] ?? null,
-                            'rir' => $itemData['rir'] ?? null,
-                            'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
-                            'intensity' => $itemData['intensity'] ?? null,
-                            'reps_array' => $itemData['reps_array'] ?? null,
-                            'load_array' => $itemData['load_array'] ?? null,
-                            'distance_array' => $itemData['distance_array'] ?? null,
-                            'minutes_array' => $itemData['minutes_array'] ?? null,
-                            'tempo_array' => $itemData['tempo_array'] ?? null,
-                            'rir_array' => $itemData['rir_array'] ?? null,
-                            'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
-                            'sort_order' => $itemIndex,
-                        ]);
+                    if (!empty($blockData['items'])) {
+                        foreach ($blockData['items'] as $itemIndex => $itemData) {
+                            \App\Models\TrainingBlockItem::create([
+                                'training_block_id' => $block->id,
+                                'exercise_id' => $itemData['exercise_id'] ?? null,
+                                'note' => $itemData['note'] ?? null,
+                                'load' => $itemData['load'] ?? null,
+                                'load_unit' => $itemData['load_unit'] ?? 'kg',
+                                'sets' => $itemData['sets'] ?? null,
+                                'reps' => $itemData['reps'] ?? null,
+                                'reps_unit' => $itemData['reps_unit'] ?? 'reps',
+                                'duration' => $itemData['duration'] ?? null,
+                                'tempo' => $itemData['tempo'] ?? null,
+                                'rir' => $itemData['rir'] ?? null,
+                                'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
+                                'intensity' => $itemData['intensity'] ?? null,
+                                'reps_array' => $itemData['reps_array'] ?? null,
+                                'load_array' => $itemData['load_array'] ?? null,
+                                'distance_array' => $itemData['distance_array'] ?? null,
+                                'minutes_array' => $itemData['minutes_array'] ?? null,
+                                'tempo_array' => $itemData['tempo_array'] ?? null,
+                                'rir_array' => $itemData['rir_array'] ?? null,
+                                'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
+                                'sort_order' => $itemIndex,
+                            ]);
+                        }
                     }
                 }
             }
         }
-
-        return redirect()->route('admin.group-trainings.show', $group->id)
-            ->with('message', 'Sesi latihan grup berhasil ditambahkan!');
-    }
-
-    public function showSession(GroupTraining $training)
-    {
         $training->load(['group.members', 'members_pivot', 'rpe_records', 'coach', 'blocks.items.exercise.category']);
+        
+        $availableAthletes = \App\Models\User::where('role', 'athlete')
+            ->select('id', 'name')
+            ->get();
             
         return Inertia::render('Admin/GroupTrainings/ShowSession', [
             'training' => $training,
             'group' => $training->group,
+            'availableAthletes' => $availableAthletes,
         ]);
     }
 
@@ -245,15 +253,39 @@ class GroupTrainingController extends Controller
 
     public function editSession(GroupTraining $training)
     {
-        $training->load('group', 'coach');
-        $training->blocks = \App\Models\TrainingBlock::where('group_training_id', $training->id)
+        $training->load('group.members', 'coach');
+        $blocks = \App\Models\TrainingBlock::where('group_training_id', $training->id)
             ->with(['items.exercise'])
             ->orderBy('sort_order')
             ->get();
             
+        $programsMap = [];
+        foreach ($blocks as $block) {
+            $pName = $block->program_name ?: 'Program Utama';
+            if (!isset($programsMap[$pName])) {
+                $programsMap[$pName] = [
+                    'name' => $pName,
+                    'athlete_ids' => is_array($block->athlete_ids) ? $block->athlete_ids : null,
+                    'blocks' => []
+                ];
+            }
+            $programsMap[$pName]['blocks'][] = $block;
+        }
+        
+        // If empty, provide a default
+        if (empty($programsMap)) {
+            $programsMap['Program Utama'] = [
+                'name' => 'Program Utama',
+                'athlete_ids' => null,
+                'blocks' => []
+            ];
+        }
+        
+        $training->programs = array_values($programsMap);
         $exercises = Exercise::all();
         $exercisePackages = \App\Models\ExercisePackage::with('exercises')->get();
         $coaches = $training->group->coaches()->orderBy('name', 'asc')->get();
+        $allAthletes = \App\Models\User::where('role', 'athlete')->orderBy('name', 'asc')->get();
         
         return Inertia::render('Admin/GroupTrainings/EditSession', [
             'training' => $training,
@@ -261,6 +293,7 @@ class GroupTrainingController extends Controller
             'packagesList' => $exercisePackages,
             'coachesList' => $coaches,
             'group' => $training->group,
+            'availableAthletes' => $allAthletes,
         ]);
     }
 
@@ -272,7 +305,8 @@ class GroupTrainingController extends Controller
             'training_type' => 'nullable|string|max:255',
             'location' => 'required|string|max:255',
             'coach_ids' => 'nullable|array',
-            'blocks' => 'array',
+            'attendee_ids' => 'required|array',
+            'programs' => 'array',
             'is_extra' => 'boolean',
         ]);
 
@@ -303,91 +337,102 @@ class GroupTrainingController extends Controller
             'name' => $request->name,
             'training_type' => $request->training_type,
             'location' => $request->location,
-            'coach_ids' => $request->coach_ids ?? [],
-            'is_extra' => $isExtra,
         ]);
+
+        $training->coach_ids = $request->coach_ids ?? [];
+        $training->attendee_ids = $request->attendee_ids;
+        $training->is_extra = $isExtra;
+        $training->save();
 
         // Process blocks
         $existingBlockIds = [];
         $existingItemIds = [];
 
-        if (!empty($request->blocks)) {
-            foreach ($request->blocks as $blockIndex => $blockData) {
-                if (!empty($blockData['id'])) {
-                    $block = \App\Models\TrainingBlock::find($blockData['id']);
-                    $block->update([
-                        'step' => $blockData['step'] ?? 2,
-                        'category' => $blockData['category'] ?? 'warm_up',
-                        'title' => $blockData['title'] ?? null,
-                        'description' => $blockData['description'] ?? null,
-                        'sort_order' => $blockIndex,
-                        'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
-                    ]);
-                } else {
-                    $block = \App\Models\TrainingBlock::create([
-                        'group_training_id' => $training->id,
-                        'step' => $blockData['step'] ?? 2,
-                        'category' => $blockData['category'] ?? 'warm_up',
-                        'title' => $blockData['title'] ?? null,
-                        'description' => $blockData['description'] ?? null,
-                        'sort_order' => $blockIndex,
-                        'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
-                    ]);
-                }
-                $existingBlockIds[] = $block->id;
+        if (!empty($request->programs)) {
+            $globalBlockIndex = 0;
+            foreach ($request->programs as $program) {
+                if (empty($program['blocks'])) continue;
+                foreach ($program['blocks'] as $blockData) {
+                    if (!empty($blockData['id'])) {
+                        $block = \App\Models\TrainingBlock::find($blockData['id']);
+                        $block->update([
+                            'step' => $blockData['step'] ?? 2,
+                            'category' => $blockData['category'] ?? 'warm_up',
+                            'title' => $blockData['title'] ?? null,
+                            'description' => $blockData['description'] ?? null,
+                            'program_name' => $program['name'] ?? 'Program Utama',
+                            'athlete_ids' => $program['athlete_ids'] ?? null,
+                            'sort_order' => $globalBlockIndex++,
+                            'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
+                        ]);
+                    } else {
+                        $block = \App\Models\TrainingBlock::create([
+                            'group_training_id' => $training->id,
+                            'step' => $blockData['step'] ?? 2,
+                            'category' => $blockData['category'] ?? 'warm_up',
+                            'title' => $blockData['title'] ?? null,
+                            'description' => $blockData['description'] ?? null,
+                            'program_name' => $program['name'] ?? 'Program Utama',
+                            'athlete_ids' => $program['athlete_ids'] ?? null,
+                            'sort_order' => $globalBlockIndex++,
+                            'target_filled_by' => $blockData['target_filled_by'] ?? 'admin',
+                        ]);
+                    }
+                    $existingBlockIds[] = $block->id;
 
-                if (!empty($blockData['items'])) {
-                    foreach ($blockData['items'] as $itemIndex => $itemData) {
-                        if (!empty($itemData['id'])) {
-                            $item = \App\Models\TrainingBlockItem::find($itemData['id']);
-                            $item->update([
-                                'exercise_id' => $itemData['exercise_id'] ?? null,
-                                'note' => $itemData['note'] ?? null,
-                                'load' => $itemData['load'] ?? null,
-                                'load_unit' => $itemData['load_unit'] ?? 'kg',
-                                'sets' => $itemData['sets'] ?? null,
-                                'reps' => $itemData['reps'] ?? null,
-                                'reps_unit' => $itemData['reps_unit'] ?? 'reps',
-                                'duration' => $itemData['duration'] ?? null,
-                                'tempo' => $itemData['tempo'] ?? null,
-                                'rir' => $itemData['rir'] ?? null,
-                                'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
-                                'intensity' => $itemData['intensity'] ?? null,
-                                'reps_array' => $itemData['reps_array'] ?? null,
-                                'load_array' => $itemData['load_array'] ?? null,
-                                'distance_array' => $itemData['distance_array'] ?? null,
-                                'minutes_array' => $itemData['minutes_array'] ?? null,
-                                'tempo_array' => $itemData['tempo_array'] ?? null,
-                                'rir_array' => $itemData['rir_array'] ?? null,
-                                'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
-                                'sort_order' => $itemIndex,
-                            ]);
-                        } else {
-                            $item = \App\Models\TrainingBlockItem::create([
-                                'training_block_id' => $block->id,
-                                'exercise_id' => $itemData['exercise_id'] ?? null,
-                                'note' => $itemData['note'] ?? null,
-                                'load' => $itemData['load'] ?? null,
-                                'load_unit' => $itemData['load_unit'] ?? 'kg',
-                                'sets' => $itemData['sets'] ?? null,
-                                'reps' => $itemData['reps'] ?? null,
-                                'reps_unit' => $itemData['reps_unit'] ?? 'reps',
-                                'duration' => $itemData['duration'] ?? null,
-                                'tempo' => $itemData['tempo'] ?? null,
-                                'rir' => $itemData['rir'] ?? null,
-                                'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
-                                'intensity' => $itemData['intensity'] ?? null,
-                                'reps_array' => $itemData['reps_array'] ?? null,
-                                'load_array' => $itemData['load_array'] ?? null,
-                                'distance_array' => $itemData['distance_array'] ?? null,
-                                'minutes_array' => $itemData['minutes_array'] ?? null,
-                                'tempo_array' => $itemData['tempo_array'] ?? null,
-                                'rir_array' => $itemData['rir_array'] ?? null,
-                                'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
-                                'sort_order' => $itemIndex,
-                            ]);
+                    if (!empty($blockData['items'])) {
+                        foreach ($blockData['items'] as $itemIndex => $itemData) {
+                            if (!empty($itemData['id'])) {
+                                $item = \App\Models\TrainingBlockItem::find($itemData['id']);
+                                $item->update([
+                                    'exercise_id' => $itemData['exercise_id'] ?? null,
+                                    'note' => $itemData['note'] ?? null,
+                                    'load' => $itemData['load'] ?? null,
+                                    'load_unit' => $itemData['load_unit'] ?? 'kg',
+                                    'sets' => $itemData['sets'] ?? null,
+                                    'reps' => $itemData['reps'] ?? null,
+                                    'reps_unit' => $itemData['reps_unit'] ?? 'reps',
+                                    'duration' => $itemData['duration'] ?? null,
+                                    'tempo' => $itemData['tempo'] ?? null,
+                                    'rir' => $itemData['rir'] ?? null,
+                                    'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
+                                    'intensity' => $itemData['intensity'] ?? null,
+                                    'reps_array' => $itemData['reps_array'] ?? null,
+                                    'load_array' => $itemData['load_array'] ?? null,
+                                    'distance_array' => $itemData['distance_array'] ?? null,
+                                    'minutes_array' => $itemData['minutes_array'] ?? null,
+                                    'tempo_array' => $itemData['tempo_array'] ?? null,
+                                    'rir_array' => $itemData['rir_array'] ?? null,
+                                    'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
+                                    'sort_order' => $itemIndex,
+                                ]);
+                            } else {
+                                $item = \App\Models\TrainingBlockItem::create([
+                                    'training_block_id' => $block->id,
+                                    'exercise_id' => $itemData['exercise_id'] ?? null,
+                                    'note' => $itemData['note'] ?? null,
+                                    'load' => $itemData['load'] ?? null,
+                                    'load_unit' => $itemData['load_unit'] ?? 'kg',
+                                    'sets' => $itemData['sets'] ?? null,
+                                    'reps' => $itemData['reps'] ?? null,
+                                    'reps_unit' => $itemData['reps_unit'] ?? 'reps',
+                                    'duration' => $itemData['duration'] ?? null,
+                                    'tempo' => $itemData['tempo'] ?? null,
+                                    'rir' => $itemData['rir'] ?? null,
+                                    'rest_per_set' => $itemData['rest_per_set'] ?? ($itemData['rest'] ?? null),
+                                    'intensity' => $itemData['intensity'] ?? null,
+                                    'reps_array' => $itemData['reps_array'] ?? null,
+                                    'load_array' => $itemData['load_array'] ?? null,
+                                    'distance_array' => $itemData['distance_array'] ?? null,
+                                    'minutes_array' => $itemData['minutes_array'] ?? null,
+                                    'tempo_array' => $itemData['tempo_array'] ?? null,
+                                    'rir_array' => $itemData['rir_array'] ?? null,
+                                    'rest_per_set_array' => $itemData['rest_per_set_array'] ?? null,
+                                    'sort_order' => $itemIndex,
+                                ]);
+                            }
+                            $existingItemIds[] = $item->id;
                         }
-                        $existingItemIds[] = $item->id;
                     }
                 }
             }
@@ -406,7 +451,7 @@ class GroupTrainingController extends Controller
             ->whereNotIn('id', $existingBlockIds)
             ->delete();
 
-        return redirect()->route('admin.group-trainings.session.show', $training->id)
+        return redirect()->route('admin.group-trainings.show', $training->training_group_id)
             ->with('message', 'Sesi latihan berhasil diperbarui!');
     }
 

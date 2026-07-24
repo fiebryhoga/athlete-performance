@@ -41,11 +41,28 @@ class LoadAnalysisController extends Controller
 
             // Count group training sessions with load data
             $groupIds = $user->groups()->pluck('training_groups.id');
-            $groupCount = GroupTraining::whereIn('training_group_id', $groupIds)
-                ->whereHas('blocks.items', function ($q) {
-                    $q->whereNotNull('load')->where('load', '!=', '');
-                })
-                ->count();
+            $groupTrainingsRaw = GroupTraining::where(function($query) use ($user, $groupIds) {
+                $query->whereJsonContains('attendee_ids', $user->id)
+                      ->orWhereIn('training_group_id', $groupIds);
+            })
+            ->whereHas('blocks.items', function ($q) {
+                $q->whereNotNull('load')->where('load', '!=', '');
+            })
+            ->get();
+            
+            $validGroupCount = 0;
+            foreach ($groupTrainingsRaw as $training) {
+                $isGroupMember = $groupIds->contains($training->training_group_id);
+                $attendees = $training->attendee_ids ?: [];
+                $isLegacy = is_null($training->attendee_ids) || empty($training->attendee_ids);
+                $isAttending = in_array($user->id, $attendees) || ($isLegacy && $isGroupMember);
+                
+                if (!($isGroupMember && !$isAttending)) {
+                    // Not absent
+                    $validGroupCount++;
+                }
+            }
+            $groupCount = $validGroupCount;
 
             $user->load_session_count = $individualCount + $groupCount;
             return $user;
@@ -75,16 +92,33 @@ class LoadAnalysisController extends Controller
 
         // 2. Get group training sessions where this athlete participates
         $groupIds = $user->groups()->pluck('training_groups.id');
-        $groupTrainings = GroupTraining::whereIn('training_group_id', $groupIds)
+        $groupTrainingsRaw = GroupTraining::where(function($query) use ($user, $groupIds) {
+                $query->whereJsonContains('attendee_ids', $user->id)
+                      ->orWhereIn('training_group_id', $groupIds);
+            })
             ->with(['blocks.items.exercise.category', 'group'])
             ->orderBy('date', 'asc')
+            ->orderBy('session_number', 'asc')
             ->get();
+            
+        // Filter out absent sessions
+        $groupTrainings = collect();
+        foreach ($groupTrainingsRaw as $training) {
+            $isGroupMember = $groupIds->contains($training->training_group_id);
+            $attendees = $training->attendee_ids ?: [];
+            $isLegacy = is_null($training->attendee_ids) || empty($training->attendee_ids);
+            $isAttending = in_array($user->id, $attendees) || ($isLegacy && $isGroupMember);
+            
+            if (!($isGroupMember && !$isAttending)) {
+                $groupTrainings->push($training);
+            }
+        }
 
         // 3. Calculate volume load per session
         $sessionsData = collect();
 
         foreach ($individualTrainings as $training) {
-            $sessionLoad = $this->calculateSessionLoad($training->blocks);
+            $sessionLoad = $this->calculateSessionLoad($training->blocks, $user->id);
             if ($sessionLoad['total_volume'] > 0) {
                 $sessionsData->push([
                     'id' => $training->id,
@@ -102,7 +136,7 @@ class LoadAnalysisController extends Controller
         }
 
         foreach ($groupTrainings as $training) {
-            $sessionLoad = $this->calculateSessionLoad($training->blocks);
+            $sessionLoad = $this->calculateSessionLoad($training->blocks, $user->id);
             if ($sessionLoad['total_volume'] > 0) {
                 $sessionsData->push([
                     'id' => $training->id,
@@ -278,7 +312,7 @@ class LoadAnalysisController extends Controller
     /**
      * Calculate total volume load for a set of training blocks
      */
-    private function calculateSessionLoad($blocks)
+    private function calculateSessionLoad($blocks, $athleteId = null)
     {
         $totalVolume = 0;
         $exercises = [];
@@ -286,6 +320,12 @@ class LoadAnalysisController extends Controller
         $exerciseCount = 0;
 
         foreach ($blocks as $block) {
+            // Filter out blocks not assigned to this athlete
+            if ($athleteId && is_array($block->athlete_ids) && count($block->athlete_ids) > 0) {
+                if (!in_array($athleteId, $block->athlete_ids)) {
+                    continue;
+                }
+            }
             foreach ($block->items as $item) {
                 if (!$item->exercise) continue;
 
