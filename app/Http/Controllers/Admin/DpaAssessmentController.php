@@ -20,7 +20,7 @@ class DpaAssessmentController extends Controller
             return redirect()->route('admin.athletes.dpa.show', $currentUser->id);
         }
 
-        $query = User::where('role', 'athlete')->with('sport');
+        $query = User::where('role', 'athlete')->with('sport')->withCount('dpaAssessments as total_records');
         if ($currentUser->role === 'coach') {
             $query->whereHas('coaches', function($q) use ($currentUser) {
                 $q->where('coach_id', $currentUser->id);

@@ -99,6 +99,9 @@ class MealPlanController extends Controller
         $data = $request->all();
         $data['coach_id'] = Auth::id();
 
+        // Hapus rencana makan lama agar terganti dengan yang baru
+        MealPlan::where('user_id', $data['user_id'])->delete();
+
         MealPlan::create($data);
 
         return redirect()->back()->with('success', 'Rencana Makan berhasil disimpan.');

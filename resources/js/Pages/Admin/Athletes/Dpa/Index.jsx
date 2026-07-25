@@ -51,76 +51,61 @@ export default function DpaIndex({ auth, players }) {
                 onSearchChange={setSearchQuery}
             />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
                     {filteredPlayers.map((player) => (
                         <Link
                             key={player.id}
                             href={route("admin.athletes.dpa.show", player.id)}
-                            className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-lg hover:shadow-orange-500/10 transition-all duration-200 flex flex-col shadow-sm"
+                            className="relative bg-white rounded-xl border border-slate-200 p-5 hover:border-orange-500 hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4 overflow-hidden group"
                         >
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="relative">
-                                        {player.profile_photo ||
-                                        player.photo_url ? (
-                                            <img
-                                                src={
-                                                    player.profile_photo
-                                                        ? `/storage/${player.profile_photo}`
-                                                        : player.photo_url
-                                                }
-                                                alt={player.name}
-                                                className="w-12 h-12 rounded-full object-cover border border-slate-200 "
-                                            />
-                                        ) : (
-                                            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-900 font-semibold border border-slate-200 tracking-tight text-sm">
-                                                {getInitials(player.name)}
-                                            </div>
-                                        )}
-                                    </div>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-500/10 to-transparent rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-                                    <div>
-                                        <h4 className="font-semibold text-slate-900 group-hover:text-orange-600 transition-colors line-clamp-1">
-                                            {player.name}
-                                        </h4>
-                                        <p className="text-xs text-slate-500 font-medium mt-0.5">
-                                            {player.position || "Klien"}
-                                        </p>
-                                    </div>
+                            <div className="relative flex items-center gap-4 z-10">
+                                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-orange-100 border-2 border-white shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+                                    {player.profile_photo || player.photo_url ? (
+                                        <img
+                                            src={player.profile_photo ? `/storage/${player.profile_photo}` : player.photo_url}
+                                            alt={player.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-xl font-bold text-orange-500">{getInitials(player.name)}</span>
+                                    )}
                                 </div>
-                                <div className="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                    <ChevronRight size={18} />
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="font-bold text-slate-800 text-base md:text-lg truncate group-hover:text-orange-500 transition-colors">
+                                        {player.name}
+                                    </h3>
+                                    <span className="text-[10px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-block mt-1 truncate max-w-full">
+                                        {player.position || "Klien"}
+                                    </span>
+                                </div>
+                                
+                                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shrink-0">
+                                    <ChevronRight size={16} />
                                 </div>
                             </div>
-
-                            <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5">
-                                        <Activity size={12} /> {t("Riwayat")}
-                                    </span>
-                                    <span className="text-sm font-semibold text-slate-900 ">
-                                        {player.total_records || 0}{" "}
-                                        <span className="text-xs font-normal text-slate-500">
-                                            {t("Tes")}
-                                        </span>
-                                    </span>
+                            
+                            <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 mt-auto relative z-10">
+                                <div className="text-center">
+                                    <div className="text-[10px] text-slate-400 font-medium mb-0.5 flex items-center justify-center gap-1">
+                                        <Activity size={10} /> {t("Riwayat")}
+                                    </div>
+                                    <div className="font-semibold text-slate-700 text-xs">
+                                        {player.total_records > 0 ? `${player.total_records} Tes` : '-'}
+                                    </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5">
-                                        <Stethoscope size={12} /> {t("Status")}
-                                    </span>
-
-                                    <span
-                                        className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${
-                                            player.total_records > 0
-                                                ? "bg-orange-500 text-slate-50 "
-                                                : "bg-slate-100 text-slate-500 border border-slate-200 "
-                                        }`}
-                                    >
-                                        {player.total_records > 0
-                                            ? "Telah Dievaluasi"
-                                            : "Belum Ada Data"}
-                                    </span>
+                                <div className="text-center border-l border-slate-100">
+                                    <div className="text-[10px] text-slate-400 font-medium mb-0.5 flex items-center justify-center gap-1">
+                                        <Stethoscope size={10} /> {t("Status")}
+                                    </div>
+                                    <div className="font-semibold text-xs truncate px-1">
+                                        {player.total_records > 0 ? (
+                                            <span className="text-orange-600">Terdata</span>
+                                        ) : (
+                                            <span className="text-slate-400">Belum Ada</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </Link>
