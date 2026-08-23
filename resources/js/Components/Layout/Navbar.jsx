@@ -199,60 +199,56 @@ export default function Navbar({ onMobileMenuClick }) {
                             </div>
 
                             {/* Center Search Bar - Well Proportioned */}
-                            {!isAthlete && (
-                                <div className="hidden md:flex justify-center max-w-[420px] w-full mx-4" ref={searchRef}>
-                                    <div className="w-full relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                            {isLoading ? <Loader2 className="h-4 w-4 text-orange-500 animate-spin" /> : <Search className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />}
-                                        </div>
-                                        <input 
-                                            ref={searchInputRef} 
-                                            type="text" 
-                                            value={keyword} 
-                                            onChange={(e) => setKeyword(e.target.value)}
-                                            onFocus={() => { if(results.length > 0) setShowResults(true); }}
-                                            placeholder="Cari atlet, tes fisik, atau jadwal..." 
-                                            className="block w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200/90 bg-slate-50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all font-medium text-xs shadow-2xs hover:bg-white"
-                                        />
-
-                                        {showResults && (
-                                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-100 z-50">
-                                                {results.length > 0 ? (
-                                                    <ul className="py-1 divide-y divide-slate-50">
-                                                        <li className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">Hasil Pencarian</li>
-                                                        {results.map((result) => (
-                                                            <li key={result.id}>
-                                                                <Link href={result.url} onClick={() => { setShowResults(false); setKeyword(''); }} className="flex items-center justify-between px-3.5 py-2.5 hover:bg-orange-50/60 transition-colors group">
-                                                                    <div className="flex items-center gap-2.5 min-w-0">
-                                                                        <div className="h-7 w-7 rounded-md bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0">
-                                                                            {result.title.charAt(0)}
-                                                                        </div>
-                                                                        <div className="min-w-0">
-                                                                            <p className="text-xs font-bold text-slate-800 group-hover:text-orange-600 transition-colors truncate">{result.title}</p>
-                                                                            <p className="text-[10px] text-slate-400 font-medium truncate">{result.subtitle}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 -translate-x-1 group-hover:translate-x-0 transition-all opacity-0 group-hover:opacity-100 shrink-0" />
-                                                                </Link>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    <div className="p-4 text-center text-xs font-medium text-slate-500">Tidak ada hasil untuk "{keyword}".</div>
-                                                )}
-                                            </div>
-                                        )}
+                            <div className="hidden md:flex justify-center max-w-[420px] w-full mx-4" ref={searchRef}>
+                                <div className="w-full relative group">
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        {isLoading ? <Loader2 className="h-4 w-4 text-orange-500 animate-spin" /> : <Search className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />}
                                     </div>
+                                    <input 
+                                        ref={searchInputRef} 
+                                        type="text" 
+                                        value={keyword} 
+                                        onChange={(e) => setKeyword(e.target.value)}
+                                        onFocus={() => { if(results.length > 0) setShowResults(true); }}
+                                        placeholder={isAthlete ? "Cari fitur, jadwal, atau analisis..." : "Cari atlet, tes fisik, atau jadwal..."} 
+                                        className="block w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200/90 bg-slate-50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all font-medium text-xs shadow-2xs hover:bg-white"
+                                    />
+
+                                    {showResults && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-100 z-50">
+                                            {results.length > 0 ? (
+                                                <ul className="py-1 divide-y divide-slate-50">
+                                                    <li className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">Hasil Pencarian</li>
+                                                    {results.map((result) => (
+                                                        <li key={result.id}>
+                                                            <Link href={result.url} onClick={() => { setShowResults(false); setKeyword(''); }} className="flex items-center justify-between px-3.5 py-2.5 hover:bg-orange-50/60 transition-colors group">
+                                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                                    <div className="h-7 w-7 rounded-md bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                                        {result.title.charAt(0)}
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <p className="text-xs font-bold text-slate-800 group-hover:text-orange-600 transition-colors truncate">{result.title}</p>
+                                                                        <p className="text-[10px] text-slate-400 font-medium truncate">{result.subtitle}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 -translate-x-1 group-hover:translate-x-0 transition-all opacity-0 group-hover:opacity-100 shrink-0" />
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <div className="p-4 text-center text-xs font-medium text-slate-500">Tidak ada hasil untuk "{keyword}".</div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
 
                             {/* Right Side: Quick Action & Profile */}
                             <div className="flex items-center justify-end gap-2.5 sm:gap-3 shrink-0">
-                                {!isAthlete && (
-                                    <button onClick={() => setIsMobileSearchOpen(true)} className="md:hidden p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-all">
-                                        <Search className="h-4 w-4" />
-                                    </button>
-                                )}
+                                <button onClick={() => setIsMobileSearchOpen(true)} className="md:hidden p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-all">
+                                    <Search className="h-4 w-4" />
+                                </button>
 
                                 {/* Quick Action Button [ + Input Baru ▾ ] */}
                                 {!isAthlete && (

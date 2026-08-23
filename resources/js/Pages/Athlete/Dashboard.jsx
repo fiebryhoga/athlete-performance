@@ -128,6 +128,115 @@ const AthleteHeroGreeting = ({ user, stats }) => {
 };
 
 /* ───────────────────────────────────────────────
+   ATHLETE PHYSICAL SCORE & EVALUATION CARD
+   ─────────────────────────────────────────────── */
+
+const AthletePhysicalScoreCard = ({ stats = {} }) => {
+    const score = stats?.latest_test_score !== null && stats?.latest_test_score !== undefined ? Number(stats.latest_test_score) : null;
+    const hasScore = score !== null;
+
+    const getPredicate = (val) => {
+        if (val === null) return { label: "Belum Ada Tes", color: "bg-slate-100 text-slate-600 border-slate-200" };
+        if (val >= 85) return { label: "Sangat Baik", color: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+        if (val >= 70) return { label: "Baik", color: "bg-blue-50 text-blue-700 border-blue-200" };
+        if (val >= 55) return { label: "Cukup Baik", color: "bg-orange-50 text-orange-700 border-orange-200" };
+        return { label: "Perlu Peningkatan", color: "bg-amber-50 text-amber-700 border-amber-200" };
+    };
+
+    const predicate = getPredicate(score);
+    const scorePercent = hasScore ? Math.min(Math.max(score, 0), 100) : 0;
+    const scoreDiff = stats?.score_diff;
+
+    return (
+        <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-xl p-5 flex flex-col justify-between h-full hover:border-slate-300 transition-all">
+            {/* Subtle Warm Ambient Background Glow */}
+            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+
+            {/* Header */}
+            <div className="relative z-10 flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                        <Trophy size={16} />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-800 leading-tight">
+                            Skor Evaluasi Fisik
+                        </h3>
+                        <p className="text-[11px] text-slate-400 font-medium">
+                            Skor kumulatif atribut tes performa
+                        </p>
+                    </div>
+                </div>
+
+                <span
+                    className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 ${predicate.color}`}
+                >
+                    {predicate.label}
+                </span>
+            </div>
+
+            {/* Main Score Visual with Progress Bar & Metrics */}
+            <div className="relative z-10 my-auto py-3">
+                <div className="flex items-baseline justify-between gap-2 mb-2">
+                    <div className="flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black text-slate-900 tracking-tight">
+                            {hasScore ? score.toFixed(1) : "—"}
+                        </span>
+                        {hasScore && (
+                            <span className="text-xs font-bold text-slate-400">
+                                / 100 Pts
+                            </span>
+                        )}
+                    </div>
+
+                    {scoreDiff !== null && scoreDiff !== undefined && (
+                        <span
+                            className={`inline-flex items-center gap-0.5 text-[11px] font-bold px-2 py-0.5 rounded-md border ${
+                                scoreDiff >= 0
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : "bg-rose-50 text-rose-700 border-rose-200"
+                            }`}
+                        >
+                            {scoreDiff >= 0 ? `▲ +${scoreDiff}` : `▼ ${scoreDiff}`} Pts
+                        </span>
+                    )}
+                </div>
+
+                {/* Visual Progress Bar */}
+                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mb-2.5">
+                    <div
+                        className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full transition-all duration-700 ease-out"
+                        style={{ width: `${scorePercent}%` }}
+                    ></div>
+                </div>
+
+                {/* Metadata Pills */}
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
+                    <span className="flex items-center gap-1 font-medium text-slate-500">
+                        <Calendar size={12} className="text-orange-500" />
+                        {stats?.latest_test_date || "Belum ada tes"}
+                    </span>
+                    <span className="font-semibold text-slate-600">
+                        {stats?.total_tests || 0} Total Evaluasi
+                    </span>
+                </div>
+            </div>
+
+            {/* Footer Link */}
+            <div className="relative z-10 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                <Link
+                    href={route("athlete.profiling")}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors group"
+                >
+                    <span>Buka Rincian Tes & Analisis</span>
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+            </div>
+        </div>
+    );
+};
+
+/* ───────────────────────────────────────────────
    ATHLETE PHYSICAL CATEGORY RADAR CARD
    ─────────────────────────────────────────────── */
 
@@ -149,7 +258,6 @@ const AthleteCategoryRadarCard = ({ data }) => {
         fullMark: 100,
     }));
 
-    // Top and lowest category insights
     const sorted = [...rawItems].sort((a, b) => b.value - a.value);
     const topCat = sorted[0];
     const lowestCat = sorted[sorted.length - 1];
@@ -219,6 +327,184 @@ const AthleteCategoryRadarCard = ({ data }) => {
                 )}
             </div>
         </div>
+    );
+};
+
+/* ───────────────────────────────────────────────
+   CARD 1: KUISIONER WELLNESS (STANDALONE & FULLY CLICKABLE)
+   ─────────────────────────────────────────────── */
+
+const AthleteWellnessCard = ({ hasWellnessToday, wellnessRecord, todayDate }) => {
+    return (
+        <Link
+            href={route("admin.wellness-rpe.session-form", {
+                date: todayDate,
+                mode: "wellness",
+            })}
+            className="relative overflow-hidden bg-white border border-slate-200/80 hover:border-orange-300 rounded-xl p-5 flex flex-col justify-between h-full hover:shadow-xs transition-all group cursor-pointer block"
+        >
+            {/* Subtle Warm Ambient Background Glow */}
+            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+
+            <div className="relative z-10">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <HeartPulse size={16} />
+                        </div>
+                        <div className="min-w-0">
+                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                                Log Kebugaran
+                            </h4>
+                            <h3 className="text-sm font-bold text-slate-800 group-hover:text-orange-600 transition-colors leading-tight truncate">
+                                Kuisioner Wellness
+                            </h3>
+                        </div>
+                    </div>
+
+                    <span
+                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 ${
+                            hasWellnessToday
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-orange-50 text-orange-700 border-orange-200"
+                        }`}
+                    >
+                        {hasWellnessToday ? "Sudah Terisi" : "Wajib Diisi"}
+                    </span>
+                </div>
+
+                <p className="text-xs text-slate-500 font-normal leading-relaxed mb-3">
+                    Pantau kualitas tidur, tingkat stres, rasa lelah, dan nyeri otot untuk evaluasi pemulihan fisik.
+                </p>
+
+                {/* Data preview when filled */}
+                {hasWellnessToday && wellnessRecord ? (
+                    <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 mb-1 text-center">
+                        <div>
+                            <span className="block text-[10px] text-slate-400 font-semibold">Tidur</span>
+                            <span className="text-xs font-bold text-slate-800">
+                                {wellnessRecord.sleep_quality ? `${wellnessRecord.sleep_quality}/5` : "—"}
+                            </span>
+                        </div>
+                        <div className="border-x border-slate-200/60">
+                            <span className="block text-[10px] text-slate-400 font-semibold">Kelelahan</span>
+                            <span className="text-xs font-bold text-slate-800">
+                                {wellnessRecord.fatigue ? `${wellnessRecord.fatigue}/5` : "—"}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="block text-[10px] text-slate-400 font-semibold">Total Skor</span>
+                            <span className="text-xs font-bold text-emerald-600">
+                                {wellnessRecord.daily_wellness_score || "Terisi"}
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="p-2.5 rounded-lg bg-orange-50/40 border border-orange-100 text-[11px] text-orange-700 font-medium">
+                        Belum ada input evaluasi kesiapan fisik untuk hari ini.
+                    </div>
+                )}
+            </div>
+
+            {/* Footer Link */}
+            <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                    <span>{hasWellnessToday ? "Lihat / Ubah Kuisioner" : "Isi Kuisioner Sekarang"}</span>
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">Form Harian</span>
+            </div>
+        </Link>
+    );
+};
+
+/* ───────────────────────────────────────────────
+   CARD 2: PENGERAHAN TENAGA (RPE) (STANDALONE & FULLY CLICKABLE)
+   ─────────────────────────────────────────────── */
+
+const AthleteRpeCard = ({ hasRpeToday, wellnessRecord, todayDate }) => {
+    return (
+        <Link
+            href={route("admin.wellness-rpe.session-form", {
+                date: todayDate,
+                mode: "rpe",
+            })}
+            className="relative overflow-hidden bg-white border border-slate-200/80 hover:border-orange-300 rounded-xl p-5 flex flex-col justify-between h-full hover:shadow-xs transition-all group cursor-pointer block"
+        >
+            {/* Subtle Warm Ambient Background Glow */}
+            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+
+            <div className="relative z-10">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <Activity size={16} />
+                        </div>
+                        <div className="min-w-0">
+                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                                Log Latihan
+                            </h4>
+                            <h3 className="text-sm font-bold text-slate-800 group-hover:text-orange-600 transition-colors leading-tight truncate">
+                                Pengerahan Tenaga (RPE)
+                            </h3>
+                        </div>
+                    </div>
+
+                    <span
+                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 ${
+                            hasRpeToday
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-orange-50 text-orange-700 border-orange-200"
+                        }`}
+                    >
+                        {hasRpeToday ? "Sudah Terisi" : "Wajib Diisi"}
+                    </span>
+                </div>
+
+                <p className="text-xs text-slate-500 font-normal leading-relaxed mb-3">
+                    Catat skala intensitas kelelahan dan beban pengerahan tenaga (Skala 1 - 10 RPE) sesi latihan hari ini.
+                </p>
+
+                {/* Data preview when filled */}
+                {hasRpeToday && wellnessRecord ? (
+                    <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 mb-1 text-center">
+                        <div>
+                            <span className="block text-[10px] text-slate-400 font-semibold">RPE Pagi</span>
+                            <span className="text-xs font-bold text-slate-800">
+                                {wellnessRecord.am_rpe ? `${wellnessRecord.am_rpe}/10` : "—"}
+                            </span>
+                        </div>
+                        <div className="border-x border-slate-200/60">
+                            <span className="block text-[10px] text-slate-400 font-semibold">RPE Sore</span>
+                            <span className="text-xs font-bold text-slate-800">
+                                {wellnessRecord.pm_rpe ? `${wellnessRecord.pm_rpe}/10` : "—"}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="block text-[10px] text-slate-400 font-semibold">Daily Load</span>
+                            <span className="text-xs font-bold text-orange-600">
+                                {wellnessRecord.daily_load ? `${wellnessRecord.daily_load} AU` : "Terisi"}
+                            </span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="p-2.5 rounded-lg bg-orange-50/40 border border-orange-100 text-[11px] text-orange-700 font-medium">
+                        Belum ada catatan skala pengerahan tenaga yang dimasukkan hari ini.
+                    </div>
+                )}
+            </div>
+
+            {/* Footer Link */}
+            <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                    <span>{hasRpeToday ? "Lihat / Ubah Catatan RPE" : "Isi Catatan RPE Sekarang"}</span>
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">Beban Sesi</span>
+            </div>
+        </Link>
     );
 };
 
@@ -417,6 +703,7 @@ export default function AthleteDashboard({
     selected_agenda_date = null,
     has_wellness_today,
     has_rpe_today,
+    today_wellness_record = null,
     today_date,
     category_averages = [],
     stats = {},
@@ -427,16 +714,6 @@ export default function AthleteDashboard({
         month: "long",
         year: "numeric",
     });
-
-    const allDone =
-        has_wellness_today &&
-        has_rpe_today &&
-        (today_agendas?.length || 0) === 0;
-
-    const totalTasks =
-        (today_agendas?.length || 0) +
-        (!has_wellness_today ? 1 : 0) +
-        (!has_rpe_today ? 1 : 0);
 
     return (
         <AppLayout title="Dashboard">
@@ -457,231 +734,30 @@ export default function AthleteDashboard({
                         {/* Hero Greeting */}
                         <AthleteHeroGreeting user={user} stats={stats} />
 
-                        {/* 2 Quick Performance Overview Cards: Skor Tes Fisik & Radar Kategori Fisik */}
+                        {/* Row 1: Skor Tes Fisik & Radar Kategori Fisik (2 Columns) */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Card 1: Skor Tes Fisik */}
-                            <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-xl p-5 hover:border-slate-300 transition-all flex flex-col justify-between">
-                                <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/70 via-amber-50/20 to-transparent pointer-events-none rounded-tr-xl"></div>
-
-                                <div className="relative z-10">
-                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
-                                            <Trophy size={16} />
-                                        </div>
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                            Evaluasi Fisik
-                                        </span>
-                                    </div>
-
-                                    <h4 className="text-xs font-bold text-slate-500 leading-tight">
-                                        Skor Tes Fisik Terakhir
-                                    </h4>
-                                    <div className="flex items-baseline gap-2 mt-1 mb-1.5">
-                                        <span className="text-2xl font-black text-slate-900 leading-tight">
-                                            {stats?.latest_test_score !== null
-                                                ? `${stats.latest_test_score}`
-                                                : "—"}
-                                        </span>
-                                        {stats?.latest_test_score !== null && (
-                                            <span className="text-xs font-bold text-slate-400">
-                                                / 100 Pts
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-                                        {stats?.latest_test_date
-                                            ? `Evaluasi tercatat pada ${stats.latest_test_date}`
-                                            : "Belum ada sesi tes fisik yang tercatat"}
-                                    </p>
-                                </div>
-
-                                <div className="relative z-10 pt-3 mt-3 border-t border-slate-100">
-                                    <Link
-                                        href={route("athlete.profiling")}
-                                        className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors"
-                                    >
-                                        <span>Lihat Profil Fisik & Tren</span>
-                                        <ArrowRight size={13} />
-                                    </Link>
-                                </div>
-                            </div>
+                            <AthletePhysicalScoreCard stats={stats} />
 
                             {/* Card 2: Radar Kategori Fisik */}
                             <AthleteCategoryRadarCard data={category_averages} />
                         </div>
 
-                        {/* Agenda & Tugas Hari Ini Section */}
-                        <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-xl p-5 hover:border-slate-300 transition-all">
-                            <div className="absolute right-0 top-0 w-48 h-36 bg-gradient-to-bl from-orange-50/70 via-amber-50/20 to-transparent pointer-events-none rounded-tr-xl"></div>
+                        {/* Row 2: 2 Standalone Daily Log Cards (Wellness & RPE) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Card 3: Kuisioner Wellness */}
+                            <AthleteWellnessCard
+                                hasWellnessToday={has_wellness_today}
+                                wellnessRecord={today_wellness_record}
+                                todayDate={today_date}
+                            />
 
-                            {/* Section Header */}
-                            <div className="relative z-10 flex items-center justify-between gap-3 mb-4">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
-                                        <Target size={16} />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h3 className="text-xs sm:text-sm font-bold text-slate-800 leading-tight truncate">
-                                            Agenda & Tugas Hari Ini
-                                        </h3>
-                                        <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">
-                                            Checklist log harian dan kuisioner kesiapan fisik
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {totalTasks > 0 ? (
-                                    <span className="px-2.5 py-1 bg-orange-50 border border-orange-200 text-orange-600 rounded-lg text-[11px] font-bold shrink-0">
-                                        {totalTasks} Agenda Tersisa
-                                    </span>
-                                ) : (
-                                    <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg text-[11px] font-bold shrink-0 flex items-center gap-1">
-                                        <CheckCircle2 size={12} /> Semua Selesai
-                                    </span>
-                                )}
-                            </div>
-
-                            {/* Tasks Grid */}
-                            <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                                {/* Task 1: Wellness Survey */}
-                                <div
-                                    className={`bg-white border rounded-xl p-4 transition-all flex flex-col justify-between ${
-                                        has_wellness_today
-                                            ? "border-emerald-200 bg-emerald-50/20"
-                                            : "border-slate-200/80 hover:border-orange-200"
-                                    }`}
-                                >
-                                    <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2.5">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <div
-                                                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                                                        has_wellness_today
-                                                            ? "bg-emerald-100 text-emerald-600"
-                                                            : "bg-rose-50 text-rose-600"
-                                                    }`}
-                                                >
-                                                    <HeartPulse size={15} />
-                                                </div>
-                                                <h4 className="text-xs font-bold text-slate-800 truncate leading-tight">
-                                                    Kuisioner Wellness
-                                                </h4>
-                                            </div>
-                                            <span
-                                                className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                                                    has_wellness_today
-                                                        ? "bg-emerald-100 text-emerald-700"
-                                                        : "bg-rose-100 text-rose-700"
-                                                }`}
-                                            >
-                                                {has_wellness_today
-                                                    ? "Selesai"
-                                                    : "Wajib"}
-                                            </span>
-                                        </div>
-                                        <p className="text-[11px] text-slate-500 font-normal leading-relaxed mb-3">
-                                            Catat kualitas tidur, tingkat stres, dan kelelahan otot untuk evaluasi pelatih.
-                                        </p>
-                                    </div>
-
-                                    <Link
-                                        href={route(
-                                            "admin.wellness-rpe.session-form",
-                                            { date: today_date, mode: "wellness" }
-                                        )}
-                                        className={`w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
-                                            has_wellness_today
-                                                ? "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
-                                                : "bg-orange-500 text-white hover:bg-orange-600 shadow-xs"
-                                        }`}
-                                    >
-                                        <span>
-                                            {has_wellness_today
-                                                ? "Lihat / Ubah Data"
-                                                : "Isi Kuisioner Sekarang"}
-                                        </span>
-                                        <ArrowRight size={13} />
-                                    </Link>
-                                </div>
-
-                                {/* Task 2: RPE Log */}
-                                <div
-                                    className={`bg-white border rounded-xl p-4 transition-all flex flex-col justify-between ${
-                                        has_rpe_today
-                                            ? "border-emerald-200 bg-emerald-50/20"
-                                            : "border-slate-200/80 hover:border-orange-200"
-                                    }`}
-                                >
-                                    <div>
-                                        <div className="flex items-center justify-between gap-2 mb-2.5">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <div
-                                                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                                                        has_rpe_today
-                                                            ? "bg-emerald-100 text-emerald-600"
-                                                            : "bg-blue-50 text-blue-600"
-                                                    }`}
-                                                >
-                                                    <Activity size={15} />
-                                                </div>
-                                                <h4 className="text-xs font-bold text-slate-800 truncate leading-tight">
-                                                    Pengerahan Tenaga (RPE)
-                                                </h4>
-                                            </div>
-                                            <span
-                                                className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                                                    has_rpe_today
-                                                        ? "bg-emerald-100 text-emerald-700"
-                                                        : "bg-blue-100 text-blue-700"
-                                                }`}
-                                            >
-                                                {has_rpe_today
-                                                    ? "Selesai"
-                                                    : "Wajib"}
-                                            </span>
-                                        </div>
-                                        <p className="text-[11px] text-slate-500 font-normal leading-relaxed mb-3">
-                                            Catat tingkat pengerahan tenaga dan intensitas beban latihan hari ini.
-                                        </p>
-                                    </div>
-
-                                    <Link
-                                        href={route(
-                                            "admin.wellness-rpe.session-form",
-                                            { date: today_date, mode: "rpe" }
-                                        )}
-                                        className={`w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
-                                            has_rpe_today
-                                                ? "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
-                                                : "bg-orange-500 text-white hover:bg-orange-600 shadow-xs"
-                                        }`}
-                                    >
-                                        <span>
-                                            {has_rpe_today
-                                                ? "Lihat / Ubah Data"
-                                                : "Isi RPE Sekarang"}
-                                        </span>
-                                        <ArrowRight size={13} />
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {/* Congratulatory Card when All Done */}
-                            {allDone && (
-                                <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center gap-3.5">
-                                    <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                                        <CheckCircle2 size={18} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-xs font-bold text-emerald-900 leading-tight">
-                                            Kerja Bagus, {user?.name?.split(" ")[0]}! 🎉
-                                        </h4>
-                                        <p className="text-[11px] text-emerald-700 leading-relaxed mt-0.5">
-                                            Kamu telah melengkapi seluruh kuisioner harian dan sesi latihan hari ini. Waktunya beristirahat dan pemulihan!
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                            {/* Card 4: Log Beban Latihan RPE */}
+                            <AthleteRpeCard
+                                hasRpeToday={has_rpe_today}
+                                wellnessRecord={today_wellness_record}
+                                todayDate={today_date}
+                            />
                         </div>
                     </div>
 

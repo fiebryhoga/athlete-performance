@@ -17,6 +17,30 @@ class GlobalSearchController extends Controller
         }
 
         
+        $user = $request->user();
+
+        if ($user && $user->role === 'athlete') {
+            $items = collect([
+                ['title' => 'Dashboard', 'subtitle' => 'Ringkasan Performa & Agenda', 'url' => route('dashboard')],
+                ['title' => 'Profil Fisik & Analisis', 'subtitle' => 'Hasil Evaluasi & Tes Performa', 'url' => route('athlete.profiling')],
+                ['title' => 'Program Latihan', 'subtitle' => 'Daftar Sesi Latihan Privat & Grup', 'url' => route('admin.individual-trainings.index')],
+                ['title' => 'Rencana Nutrisi & Makan', 'subtitle' => 'Meal Plans & Panduan Gizi', 'url' => route('admin.meal-plans.index')],
+                ['title' => 'Wellness & Recovery', 'subtitle' => 'Kuisioner Kebugaran & RPE', 'url' => route('admin.wellness-rpe.index')],
+            ])->filter(function ($item) use ($query) {
+                return stripos($item['title'], $query) !== false || stripos($item['subtitle'], $query) !== false;
+            })->values()->map(function ($item, $idx) {
+                return [
+                    'id' => $idx + 1,
+                    'title' => $item['title'],
+                    'subtitle' => $item['subtitle'],
+                    'type' => 'Menu',
+                    'url' => $item['url'],
+                ];
+            });
+
+            return response()->json($items);
+        }
+
         $athletes = User::where('role', 'athlete')
             ->where(function($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")

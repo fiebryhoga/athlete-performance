@@ -20,8 +20,13 @@ class AthleteController extends Controller
         $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches', 'package', 'groups.package']);
 
         if (auth()->user()->role === 'coach') {
-            $query->whereHas('coaches', function($q) {
-                $q->where('coach_id', auth()->id());
+            $coachId = auth()->id();
+            $query->where(function($q) use ($coachId) {
+                $q->whereHas('coaches', function($cq) use ($coachId) {
+                    $cq->where('coach_id', $coachId);
+                })->orWhereHas('groups.coaches', function($gq) use ($coachId) {
+                    $gq->where('users.id', $coachId);
+                });
             });
         }
 

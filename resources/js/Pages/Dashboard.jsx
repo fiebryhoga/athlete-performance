@@ -24,6 +24,7 @@ import {
     ChevronLeft,
     Minus,
     Wallet,
+    Dumbbell,
 } from "lucide-react";
 import {
     ComposedChart,
@@ -447,6 +448,13 @@ const PerformanceTrendChart = ({ trendData }) => {
 
     const chartData = trendData && trendData.length > 0 ? trendData : defaultData;
 
+    // Hitung batas maksimal sesi mingguan secara dinamis untuk sumbu kiri
+    const maxSessions = Math.max(
+        ...chartData.map((d) => (Number(d.private) || 0) + (Number(d.group) || 0)),
+        4
+    );
+    const sessionAxisMax = Math.max(Math.ceil(maxSessions * 1.3), 5);
+
     return (
         <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-xl p-5 hover:border-slate-300 transition-all">
             {/* Subtle Warm Ambient Background Glow */}
@@ -471,15 +479,15 @@ const PerformanceTrendChart = ({ trendData }) => {
                 <div className="flex items-center gap-3.5 text-[11px] font-semibold shrink-0 sm:ml-auto">
                     <div className="flex items-center gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-xs bg-orange-600 shadow-2xs"></div>
-                        <span className="text-slate-600">Privat</span>
+                        <span className="text-slate-600">Privat (Sesi)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-xs bg-amber-400 shadow-2xs"></div>
-                        <span className="text-slate-600">Grup</span>
+                        <span className="text-slate-600">Grup (Sesi)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div className="w-2.5 h-2.5 rounded-full bg-orange-950 border border-orange-800 shadow-2xs"></div>
-                        <span className="text-slate-600">Skor Fisik</span>
+                        <span className="text-slate-600">Skor Fisik (Pts)</span>
                     </div>
                 </div>
             </div>
@@ -488,7 +496,7 @@ const PerformanceTrendChart = ({ trendData }) => {
                 <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart
                         data={chartData}
-                        margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
+                        margin={{ top: 10, right: 0, left: -22, bottom: 5 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis
@@ -501,21 +509,24 @@ const PerformanceTrendChart = ({ trendData }) => {
                             height={32}
                             interval={0}
                         />
+                        {/* Parameter Kiri: Volume Sesi Latihan */}
                         <YAxis
-                            yAxisId="left"
-                            domain={[0, 70]}
+                            yAxisId="sessions"
+                            domain={[0, sessionAxisMax]}
+                            allowDecimals={false}
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#94a3b8", fontSize: 10 }}
+                            tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
                         />
+                        {/* Parameter Kanan: Skor Tes Fisik (0 - 100 Pts) */}
                         <YAxis
-                            yAxisId="right"
+                            yAxisId="score"
                             orientation="right"
                             domain={[0, 100]}
+                            ticks={[0, 25, 50, 75, 100]}
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#ea580c", fontSize: 10 }}
-                            hide={true}
+                            tick={{ fill: "#431407", fontSize: 9.5, fontWeight: 700 }}
                         />
                         <Tooltip
                             content={({ active, payload }) => {
@@ -535,12 +546,12 @@ const PerformanceTrendChart = ({ trendData }) => {
                                             <div className="flex items-center justify-between gap-4 text-slate-600 text-[11px]">
                                                 <span>Skor Fisik:</span>
                                                 <span className={`font-bold ${hasScore ? "text-orange-950" : "text-slate-400 italic font-normal"}`}>
-                                                    {hasScore ? `${data.score} pts` : "— (Tidak ada tes)"}
+                                                    {hasScore ? `${data.score} pts` : "0 pts (Tidak ada tes)"}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between gap-4 text-slate-600 text-[11px]">
                                                 <span>Total Sesi:</span>
-                                                <span className="font-bold text-slate-900">{data?.sessions || 0}</span>
+                                                <span className="font-bold text-slate-900">{data?.sessions || 0} Sesi</span>
                                             </div>
                                             <div className="text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 flex justify-between gap-2 font-medium">
                                                 <span className="text-orange-600 font-semibold">Privat: <strong className="text-slate-900 font-bold">{data?.private || 0}</strong></span>
@@ -555,28 +566,28 @@ const PerformanceTrendChart = ({ trendData }) => {
                                 return null;
                             }}
                         />
-                        {/* Stacked Chunky Bars with Deep Orange & Warm Amber */}
+                        {/* Stacked Chunky Bars with Dynamic Session Scaling */}
                         <Bar
-                            yAxisId="left"
+                            yAxisId="sessions"
                             dataKey="private"
                             name="Sesi Privat"
                             stackId="sessions"
                             fill="#ea580c"
                             radius={[0, 0, 0, 0]}
-                            barSize={44}
+                            barSize={38}
                         />
                         <Bar
-                            yAxisId="left"
+                            yAxisId="sessions"
                             dataKey="group"
                             name="Sesi Grup"
                             stackId="sessions"
                             fill="#fbbf24"
                             radius={[4, 4, 0, 0]}
-                            barSize={44}
+                            barSize={38}
                         />
-                        {/* Dashed Line for Physical Score: Drops down when empty, solid unbroken dots */}
+                        {/* Dashed Line for Physical Score on Right Axis (0 - 100 Scale) across all weeks */}
                         <Line
-                            yAxisId="left"
+                            yAxisId="score"
                             type="monotone"
                             dataKey="score"
                             name="Skor Fisik"
@@ -629,6 +640,8 @@ const PerformanceTrendChart = ({ trendData }) => {
    ─────────────────────────────────────────────── */
 
 const CoachEarningsCard = ({ salaryData }) => {
+    const { auth } = usePage().props;
+    const isCoach = auth?.user?.role === "coach";
     const currentMonthStr = new Date().toISOString().slice(0, 7); // "YYYY-MM"
     const selectedMonth = salaryData?.month || currentMonthStr;
     const [isLoading, setIsLoading] = useState(false);
@@ -688,6 +701,14 @@ const CoachEarningsCard = ({ salaryData }) => {
     const isCurrentMonth = selectedMonth === currentMonthStr;
     const coaches = salaryData?.coaches || [];
     const activeCoaches = coaches.filter((c) => (c.total_fee || 0) > 0);
+    const myData = coaches[0] || null;
+
+    const [categoryFilter, setCategoryFilter] = useState("all");
+    const myItems = myData?.items || [];
+    const filteredItems = myItems.filter((it) => {
+        if (categoryFilter === "all") return true;
+        return it.type === categoryFilter;
+    });
 
     return (
         <div className="relative overflow-hidden bg-white border border-slate-200/80 rounded-xl p-5 hover:border-slate-300 transition-all">
@@ -702,10 +723,12 @@ const CoachEarningsCard = ({ salaryData }) => {
                     </div>
                     <div className="min-w-0">
                         <h3 className="text-xs sm:text-sm font-bold text-slate-800 leading-tight truncate">
-                            Rekap Gaji & Fee Pelatih
+                            {isCoach ? "Ringkasan Pendapatan & Fee Saya" : "Rekap Gaji & Fee Pelatih"}
                         </h3>
                         <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium truncate">
-                            Rincian fee sesi privat, latihan grup, dan shift jaga gym
+                            {isCoach
+                                ? `Rincian honor sesi privat, latihan grup, dan shift gym Anda pada ${salaryData?.month_label || selectedMonth}`
+                                : "Rincian fee sesi privat, latihan grup, dan shift jaga gym"}
                         </p>
                     </div>
                 </div>
@@ -780,9 +803,288 @@ const CoachEarningsCard = ({ salaryData }) => {
                 )}
             </div>
 
-            {/* Coaches List / Cards */}
+            {/* Content Body: Coach Personal View vs Admin Multi-Coach View */}
             <div className={`relative z-10 transition-opacity duration-200 ${isLoading ? "opacity-40 pointer-events-none" : "opacity-100"}`}>
-                {activeCoaches && activeCoaches.length > 0 ? (
+                {isCoach ? (
+                    /* ═══════════════════════════════════════════
+                       COACH PERSONAL REDESIGN VIEW WITH DIRECT DETAILS
+                       ═══════════════════════════════════════════ */
+                    <div className="space-y-4">
+                        {/* 3 Categories Breakdown Grid with Smooth Gradients */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {/* 1. Sesi Privat */}
+                            <button
+                                type="button"
+                                onClick={() => setCategoryFilter(categoryFilter === "individual" ? "all" : "individual")}
+                                className={`relative overflow-hidden p-4 rounded-xl text-left border transition-all duration-300 shadow-2xs group ${
+                                    categoryFilter === "individual"
+                                        ? "bg-gradient-to-br from-orange-50/70 via-white to-amber-50/40 border-orange-200/90 shadow-xs ring-1 ring-orange-400/30"
+                                        : "bg-gradient-to-br from-white via-white to-slate-50/60 border-slate-200/80 hover:border-slate-300 hover:to-orange-50/30"
+                                }`}
+                            >
+                                {/* Subtle Warm Gradient Orb */}
+                                <div className="absolute right-0 top-0 w-24 h-24 bg-gradient-to-bl from-orange-400/10 via-amber-400/5 to-transparent rounded-bl-full pointer-events-none transition-opacity group-hover:opacity-100"></div>
+
+                                <div className="relative z-10 flex items-center justify-between gap-2 mb-3 w-full">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-orange-500/25">
+                                            <Dumbbell size={15} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-800 leading-tight">
+                                                Sesi Privat
+                                            </h4>
+                                            <span className="text-[10px] text-slate-400 font-semibold">
+                                                Latihan Individu
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 border border-slate-200/80 text-slate-700 shrink-0 shadow-2xs">
+                                        {myData?.individual_count || 0} Sesi
+                                    </span>
+                                </div>
+                                <div className="relative z-10 pt-2.5 border-t border-slate-100 flex items-baseline justify-between w-full">
+                                    <span className="text-[10px] text-slate-400 font-medium">Honor Sesi</span>
+                                    <span className="text-sm font-black text-slate-900">
+                                        {formatRupiah(myData?.individual_fee || 0)}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {/* 2. Sesi Grup */}
+                            <button
+                                type="button"
+                                onClick={() => setCategoryFilter(categoryFilter === "group" ? "all" : "group")}
+                                className={`relative overflow-hidden p-4 rounded-xl text-left border transition-all duration-300 shadow-2xs group ${
+                                    categoryFilter === "group"
+                                        ? "bg-gradient-to-br from-amber-50/70 via-white to-yellow-50/40 border-amber-200/90 shadow-xs ring-1 ring-amber-400/30"
+                                        : "bg-gradient-to-br from-white via-white to-slate-50/60 border-slate-200/80 hover:border-slate-300 hover:to-amber-50/30"
+                                }`}
+                            >
+                                {/* Subtle Warm Gradient Orb */}
+                                <div className="absolute right-0 top-0 w-24 h-24 bg-gradient-to-bl from-amber-400/10 via-yellow-400/5 to-transparent rounded-bl-full pointer-events-none transition-opacity group-hover:opacity-100"></div>
+
+                                <div className="relative z-10 flex items-center justify-between gap-2 mb-3 w-full">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-amber-500/25">
+                                            <Users size={15} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-800 leading-tight">
+                                                Latihan Grup
+                                            </h4>
+                                            <span className="text-[10px] text-slate-400 font-semibold">
+                                                Sesi Kelompok
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 border border-slate-200/80 text-slate-700 shrink-0 shadow-2xs">
+                                        {myData?.group_count || 0} Sesi
+                                    </span>
+                                </div>
+                                <div className="relative z-10 pt-2.5 border-t border-slate-100 flex items-baseline justify-between w-full">
+                                    <span className="text-[10px] text-slate-400 font-medium">Honor Sesi</span>
+                                    <span className="text-sm font-black text-slate-900">
+                                        {formatRupiah(myData?.group_fee || 0)}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {/* 3. Shift Jaga Gym */}
+                            <button
+                                type="button"
+                                onClick={() => setCategoryFilter(categoryFilter === "gym" ? "all" : "gym")}
+                                className={`relative overflow-hidden p-4 rounded-xl text-left border transition-all duration-300 shadow-2xs group ${
+                                    categoryFilter === "gym"
+                                        ? "bg-gradient-to-br from-blue-50/70 via-white to-cyan-50/40 border-blue-200/90 shadow-xs ring-1 ring-blue-400/30"
+                                        : "bg-gradient-to-br from-white via-white to-slate-50/60 border-slate-200/80 hover:border-slate-300 hover:to-blue-50/30"
+                                }`}
+                            >
+                                {/* Subtle Cool Gradient Orb */}
+                                <div className="absolute right-0 top-0 w-24 h-24 bg-gradient-to-bl from-blue-400/10 via-cyan-400/5 to-transparent rounded-bl-full pointer-events-none transition-opacity group-hover:opacity-100"></div>
+
+                                <div className="relative z-10 flex items-center justify-between gap-2 mb-3 w-full">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-blue-500/25">
+                                            <Clock size={15} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-800 leading-tight">
+                                                Shift Jaga Gym
+                                            </h4>
+                                            <span className="text-[10px] text-slate-400 font-semibold">
+                                                Tugas Jaga OTS
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/90 border border-slate-200/80 text-slate-700 shrink-0 shadow-2xs">
+                                        {myData?.gym_count || 0} Shift
+                                    </span>
+                                </div>
+                                <div className="relative z-10 pt-2.5 border-t border-slate-100 flex items-baseline justify-between w-full">
+                                    <span className="text-[10px] text-slate-400 font-medium">Honor Shift</span>
+                                    <span className="text-sm font-black text-slate-900">
+                                        {formatRupiah(myData?.gym_fee || 0)}
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+
+                        {/* Direct Detail Table / Itemized List */}
+                        <div className="border border-slate-200/90 rounded-xl overflow-hidden bg-white shadow-2xs">
+                            {/* Table Header Controls */}
+                            <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <ClipboardList size={14} className="text-orange-500" />
+                                    <h4 className="text-xs font-bold text-slate-800">
+                                        Rincian Sesi & Shift Latihan
+                                    </h4>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700">
+                                        {filteredItems.length} Catatan
+                                    </span>
+                                </div>
+
+                                {/* Category Tabs */}
+                                <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 text-[10px] font-semibold">
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoryFilter("all")}
+                                        className={`px-2 py-1 rounded-md transition-all ${
+                                            categoryFilter === "all"
+                                                ? "bg-slate-900 text-white font-bold"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                    >
+                                        Semua ({myItems.length})
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoryFilter("individual")}
+                                        className={`px-2 py-1 rounded-md transition-all ${
+                                            categoryFilter === "individual"
+                                                ? "bg-orange-500 text-white font-bold"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                    >
+                                        Privat ({myData?.individual_count || 0})
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoryFilter("group")}
+                                        className={`px-2 py-1 rounded-md transition-all ${
+                                            categoryFilter === "group"
+                                                ? "bg-amber-500 text-white font-bold"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                    >
+                                        Grup ({myData?.group_count || 0})
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCategoryFilter("gym")}
+                                        className={`px-2 py-1 rounded-md transition-all ${
+                                            categoryFilter === "gym"
+                                                ? "bg-blue-500 text-white font-bold"
+                                                : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                    >
+                                        Gym ({myData?.gym_count || 0})
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Table Content with hidden scrollbar */}
+                            {filteredItems.length > 0 ? (
+                                <div className="divide-y divide-slate-100 max-h-[290px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                    {filteredItems.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="px-4 py-3 hover:bg-slate-50/60 transition-colors flex items-center justify-between gap-3 text-xs"
+                                        >
+                                            {/* Left: Date & Badge & Title */}
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200/80 flex flex-col items-center justify-center shrink-0 text-slate-700">
+                                                    <span className="text-[9px] font-bold uppercase leading-none text-slate-400">
+                                                        {item.date?.split(" ")[1] || "—"}
+                                                    </span>
+                                                    <span className="text-xs font-black leading-none text-slate-900 mt-0.5">
+                                                        {item.date?.split(" ")[0] || "—"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <span
+                                                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                                                item.type === "individual"
+                                                                    ? "bg-orange-50 text-orange-600 border border-orange-100"
+                                                                    : item.type === "group"
+                                                                    ? "bg-amber-50 text-amber-700 border border-amber-100"
+                                                                    : "bg-blue-50 text-blue-700 border border-blue-100"
+                                                            }`}
+                                                        >
+                                                            {item.type_label}
+                                                        </span>
+                                                        <h5 className="text-xs font-bold text-slate-800 truncate">
+                                                            {item.title}
+                                                        </h5>
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
+                                                        {item.subtitle} {item.time ? `• ${item.time}` : ""}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Right: Fee & Status Badge */}
+                                            <div className="flex items-center gap-3 shrink-0 text-right">
+                                                <div>
+                                                    <p className="text-xs font-black text-slate-900">
+                                                        {formatRupiah(item.fee)}
+                                                    </p>
+                                                    <div className="mt-0.5">
+                                                        {item.is_paid ? (
+                                                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                                                <span className="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                                                Lunas
+                                                            </span>
+                                                        ) : item.fee > 0 ? (
+                                                            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
+                                                                <span className="w-1 h-1 rounded-full bg-amber-500"></span>
+                                                                Belum Cair
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-[10px] text-slate-400 font-medium">—</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-8 px-4 text-center bg-slate-50/40">
+                                    <ClipboardList size={22} className="mx-auto text-slate-300 mb-1.5" />
+                                    <p className="text-xs font-bold text-slate-600">
+                                        Tidak ada catatan sesi untuk kategori ini
+                                    </p>
+                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                        Pilih filter lain atau ubah bulan untuk melihat riwayat sesi Anda.
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Table Footer */}
+                            <div className="p-3 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500 font-medium">
+                                <span>
+                                    Menampilkan {filteredItems.length} dari total {myItems.length} sesi/shift bulan {salaryData?.month_label || selectedMonth}.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ) : activeCoaches && activeCoaches.length > 0 ? (
+                    /* ═══════════════════════════════════════════
+                       SUPERADMIN MULTI-COACH VIEW
+                       ═══════════════════════════════════════════ */
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {activeCoaches.map((c) => (
                             <div
@@ -811,7 +1113,7 @@ const CoachEarningsCard = ({ salaryData }) => {
                                         </span>
                                     </div>
 
-                                    {/* Sesi Breakdown Pills (Only show active categories with fee > 0) */}
+                                    {/* Sesi Breakdown Pills */}
                                     <div className="space-y-1 text-[10px] text-slate-600 mb-3 bg-slate-50/70 p-2 rounded-lg border border-slate-100">
                                         {c.individual_fee > 0 && (
                                             <div className="flex items-center justify-between">

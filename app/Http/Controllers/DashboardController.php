@@ -88,6 +88,20 @@ class DashboardController extends Controller
             $hasWellnessToday = $wellnessRecord && !is_null($wellnessRecord->quality_of_sleep);
             $hasRpeToday = $wellnessRecord && (!is_null($wellnessRecord->am_rpe) || !is_null($wellnessRecord->pm_rpe));
 
+            $wellnessSummary = null;
+            if ($wellnessRecord) {
+                $wellnessSummary = [
+                    'daily_wellness_score' => $wellnessRecord->daily_wellness_score,
+                    'sleep_quality' => $wellnessRecord->quality_of_sleep,
+                    'fatigue' => $wellnessRecord->fatigue,
+                    'soreness' => $wellnessRecord->muscle_soreness,
+                    'stress' => $wellnessRecord->stress,
+                    'am_rpe' => $wellnessRecord->am_rpe,
+                    'pm_rpe' => $wellnessRecord->pm_rpe,
+                    'daily_load' => $wellnessRecord->daily_load,
+                ];
+            }
+
             // 3. Completed Sessions
             $completedIndCount = \App\Models\IndividualTraining::where('user_id', $user->id)->where('is_completed', true)->count();
             $completedGrpCount = \App\Models\GroupTrainingMember::where('athlete_id', $user->id)->where('is_completed', true)->count();
@@ -138,6 +152,7 @@ class DashboardController extends Controller
                 'selected_agenda_date' => $agendaDateParam ?: $today->format('Y-m-d'),
                 'has_wellness_today' => $hasWellnessToday,
                 'has_rpe_today' => $hasRpeToday,
+                'today_wellness_record' => $wellnessSummary,
                 'today_date' => $today->format('Y-m-d'),
                 'category_averages' => $categoryAverages,
                 'stats' => [
@@ -158,30 +173,89 @@ class DashboardController extends Controller
         
         
         
-        $athletes = User::where('role', 'athlete')->get();
+        $currentUser = Auth::user();
+        $isCoach = $currentUser->role === 'coach';
+
+        // 1. Athletes query scoped by coach
+        $athletesQuery = User::where('role', 'athlete')->with(['sport', 'package', 'coaches', 'groups.coaches', 'performanceTests.results']);
+        if ($isCoach) {
+            $athletesQuery->where(function ($q) use ($currentUser) {
+                $q->whereHas('coaches', function ($sub) use ($currentUser) {
+                    $sub->where('coach_id', $currentUser->id);
+                })
+                ->orWhereHas('groups.coaches', function ($sub) use ($currentUser) {
+                    $sub->where('users.id', $currentUser->id);
+                });
+            });
+        }
+        $athletes = $athletesQuery->get();
+        $athleteIds = $athletes->pluck('id')->toArray();
         $totalAtlet = $athletes->count();
 
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        $individualSessions = \App\Models\IndividualTraining::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->count();
-        $groupSessions = \App\Models\GroupTraining::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->count();
-        $testSessions = PerformanceTest::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->count();
+        // 2. Monthly Training Sessions Scoping
+        $indSessQuery = \App\Models\IndividualTraining::whereMonth('date', $currentMonth)->whereYear('date', $currentYear);
+        $grpSessQuery = \App\Models\GroupTraining::whereMonth('date', $currentMonth)->whereYear('date', $currentYear);
+        $testSessQuery = PerformanceTest::whereMonth('date', $currentMonth)->whereYear('date', $currentYear);
+
+        if ($isCoach) {
+            $indSessQuery->where(function ($q) use ($currentUser, $athleteIds) {
+                $q->where('coach_id', $currentUser->id)
+                  ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                  ->orWhereJsonContains('coach_ids', $currentUser->id);
+                if (!empty($athleteIds)) {
+                    $q->orWhereIn('user_id', $athleteIds);
+                }
+            });
+
+            $grpSessQuery->where(function ($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id)
+                  ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                  ->orWhereJsonContains('coach_ids', $currentUser->id)
+                  ->orWhereHas('group.coaches', function ($sub) use ($currentUser) {
+                      $sub->where('users.id', $currentUser->id);
+                  });
+            });
+
+            $testSessQuery->where(function ($q) use ($athleteIds) {
+                if (!empty($athleteIds)) {
+                    $q->whereIn('user_id', $athleteIds);
+                } else {
+                    $q->whereRaw('1=0');
+                }
+            });
+        }
+
+        $individualSessions = $indSessQuery->count();
+        $groupSessions = $grpSessQuery->count();
+        $testSessions = $testSessQuery->count();
 
         // Total sesi gabungan yang aktif tercatat di sistem (Privat + Grup + Tes Fisik)
         $sesiBulanIni = $individualSessions + $groupSessions + $testSessions;
-        $avgSkorGlobal = TestResult::avg('score') ?? 0;
 
-        
+        // Avg Skor Fisik
+        $avgSkorQuery = TestResult::query();
+        if ($isCoach) {
+            $avgSkorQuery->whereHas('performanceTest', function ($q) use ($athleteIds) {
+                if (!empty($athleteIds)) {
+                    $q->whereIn('user_id', $athleteIds);
+                } else {
+                    $q->whereRaw('1=0');
+                }
+            });
+        }
+        $avgSkorGlobal = $avgSkorQuery->avg('score') ?? 0;
+
+        // Demografi Atlet yang Didampingi
         $avgAge = $athletes->avg('age') ?? 0;
         $avgHeight = $athletes->avg('height') ?? 0;
         $avgWeight = $athletes->avg('weight') ?? 0;
 
-        
-        $topAthletes = User::where('role', 'athlete')
-            ->whereHas('performanceTests.results')
-            ->with(['performanceTests.results', 'sport'])
-            ->get()
+        // Top Athletes (dari atlet yang didampingi)
+        $topAthletes = $athletes
+            ->filter(fn($a) => $a->performanceTests->isNotEmpty() && $a->performanceTests->flatMap->results->isNotEmpty())
             ->map(function ($atlet) {
                 $allScores = $atlet->performanceTests->flatMap->results->pluck('score');
                 $avgScore = $allScores->avg() ?? 0;
@@ -196,8 +270,19 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
-        
-        $caborPerformance = Sport::with(['athletes.performanceTests.results'])
+        // Performa Cabor
+        $sportsQuery = Sport::query();
+        if ($isCoach && !empty($athleteIds)) {
+            $sportsQuery->whereHas('athletes', function ($q) use ($athleteIds) {
+                $q->whereIn('id', $athleteIds);
+            })->with(['athletes' => function ($q) use ($athleteIds) {
+                $q->whereIn('id', $athleteIds)->with('performanceTests.results');
+            }]);
+        } else {
+            $sportsQuery->with(['athletes.performanceTests.results']);
+        }
+
+        $caborPerformance = $sportsQuery
             ->get()
             ->map(function ($sport) {
                 $totalScore = 0;
@@ -218,12 +303,13 @@ class DashboardController extends Controller
                     'raw_score' => $finalScore
                 ];
             })
+            ->filter(fn($sp) => $sp['score'] > 0 || !$isCoach)
             ->sortByDesc('raw_score')
             ->values();
 
         $caborUnggulan = $caborPerformance->first()['name'] ?? '-';
 
-        
+        // Gender & Age & BMI Charts
         $genderCounts = $athletes->groupBy('gender')->map->count();
         $genderChart = [
             ['name' => 'Laki-laki', 'value' => $genderCounts->get('L') ?? 0, 'color' => '#ea580c'],
@@ -290,7 +376,19 @@ class DashboardController extends Controller
             ],
         ];
 
-        $recentActivity = PerformanceTest::with(['athlete.sport', 'results'])
+        // Recent Activity (Hasil tes performa atlet didampingi)
+        $recentActQuery = PerformanceTest::with(['athlete.sport', 'results']);
+        if ($isCoach) {
+            $recentActQuery->where(function ($q) use ($athleteIds) {
+                if (!empty($athleteIds)) {
+                    $q->whereIn('user_id', $athleteIds);
+                } else {
+                    $q->whereRaw('1=0');
+                }
+            });
+        }
+        $recentActivity = $recentActQuery
+            ->orderBy('date', 'desc')
             ->take(5)
             ->get()
             ->map(function ($test) {
@@ -304,8 +402,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        
-        
         $radarData = [
             ['subject' => 'Strength', 'A' => 70, 'B' => 100],
             ['subject' => 'Speed', 'A' => 65, 'B' => 100],
@@ -316,15 +412,21 @@ class DashboardController extends Controller
         // Today's Agendas / Selected Date Agendas
         $agendaDateParam = $request->query('agenda_date');
         $targetDate = $agendaDateParam ? Carbon::parse($agendaDateParam) : Carbon::today();
-        $adminUser = Auth::user();
 
         // Fetch all coaches to resolve coach_ids array
         $allCoaches = \App\Models\User::whereIn('role', ['coach', 'superadmin'])->get()->keyBy('id');
 
         // 1. Group Trainings on target date
         $groupQuery = \App\Models\GroupTraining::whereDate('date', $targetDate)->where('status', 'scheduled');
-        if ($adminUser->role === 'coach') {
-            $groupQuery->whereJsonContains('coach_ids', $adminUser->id);
+        if ($isCoach) {
+            $groupQuery->where(function ($q) use ($currentUser) {
+                $q->where('coach_id', $currentUser->id)
+                  ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                  ->orWhereJsonContains('coach_ids', $currentUser->id)
+                  ->orWhereHas('group.coaches', function ($sub) use ($currentUser) {
+                      $sub->where('users.id', $currentUser->id);
+                  });
+            });
         }
         $groupTrainings = $groupQuery->with(['coach', 'group'])->get()->map(function ($training) use ($allCoaches) {
             $actualCoaches = collect($training->coach_ids ?? [])->map(function ($id) use ($allCoaches) {
@@ -348,8 +450,15 @@ class DashboardController extends Controller
 
         // 2. Individual Trainings on target date
         $individualQuery = \App\Models\IndividualTraining::whereDate('date', $targetDate)->where('is_completed', false);
-        if ($adminUser->role === 'coach') {
-            $individualQuery->whereJsonContains('coach_ids', $adminUser->id);
+        if ($isCoach) {
+            $individualQuery->where(function ($q) use ($currentUser, $athleteIds) {
+                $q->where('coach_id', $currentUser->id)
+                  ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                  ->orWhereJsonContains('coach_ids', $currentUser->id);
+                if (!empty($athleteIds)) {
+                    $q->orWhereIn('user_id', $athleteIds);
+                }
+            });
         }
         $individualTrainings = $individualQuery->with(['user', 'coach'])->get()->map(function ($training) use ($allCoaches) {
             $actualCoaches = collect($training->coach_ids ?? [])->map(function ($id) use ($allCoaches) {
@@ -372,19 +481,59 @@ class DashboardController extends Controller
         });
 
         // 10 Weeks Weekly Trend (Weekly Physical Score & Training Volume)
-        $weeklyTrend = collect(range(9, 0))->map(function ($weeksAgo) {
+        $weeklyTrend = collect(range(9, 0))->map(function ($weeksAgo) use ($isCoach, $currentUser, $athleteIds) {
             $startOfWeek = Carbon::now()->subWeeks($weeksAgo)->startOfWeek();
             $endOfWeek = Carbon::now()->subWeeks($weeksAgo)->endOfWeek();
 
-            $indCount = \App\Models\IndividualTraining::whereBetween('date', [$startOfWeek, $endOfWeek])->count();
-            $grpCount = \App\Models\GroupTraining::whereBetween('date', [$startOfWeek, $endOfWeek])->count();
-            $testCount = PerformanceTest::whereBetween('date', [$startOfWeek, $endOfWeek])->count();
+            $indCountQuery = \App\Models\IndividualTraining::whereBetween('date', [$startOfWeek, $endOfWeek]);
+            $grpCountQuery = \App\Models\GroupTraining::whereBetween('date', [$startOfWeek, $endOfWeek]);
+            $testCountQuery = PerformanceTest::whereBetween('date', [$startOfWeek, $endOfWeek]);
+
+            if ($isCoach) {
+                $indCountQuery->where(function ($q) use ($currentUser, $athleteIds) {
+                    $q->where('coach_id', $currentUser->id)
+                      ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                      ->orWhereJsonContains('coach_ids', $currentUser->id);
+                    if (!empty($athleteIds)) {
+                        $q->orWhereIn('user_id', $athleteIds);
+                    }
+                });
+
+                $grpCountQuery->where(function ($q) use ($currentUser) {
+                    $q->where('coach_id', $currentUser->id)
+                      ->orWhereJsonContains('coach_ids', (string)$currentUser->id)
+                      ->orWhereJsonContains('coach_ids', $currentUser->id)
+                      ->orWhereHas('group.coaches', function ($sub) use ($currentUser) {
+                          $sub->where('users.id', $currentUser->id);
+                      });
+                });
+
+                $testCountQuery->where(function ($q) use ($athleteIds) {
+                    if (!empty($athleteIds)) {
+                        $q->whereIn('user_id', $athleteIds);
+                    } else {
+                        $q->whereRaw('1=0');
+                    }
+                });
+            }
+
+            $indCount = $indCountQuery->count();
+            $grpCount = $grpCountQuery->count();
+            $testCount = $testCountQuery->count();
 
             $totalWeeklySessions = $indCount + $grpCount + $testCount;
 
-            $avgScore = TestResult::whereHas('performanceTest', function($q) use ($startOfWeek, $endOfWeek) {
+            $avgScoreQuery = TestResult::whereHas('performanceTest', function($q) use ($startOfWeek, $endOfWeek, $isCoach, $athleteIds) {
                 $q->whereBetween('date', [$startOfWeek, $endOfWeek]);
-            })->avg('score');
+                if ($isCoach) {
+                    if (!empty($athleteIds)) {
+                        $q->whereIn('user_id', $athleteIds);
+                    } else {
+                        $q->whereRaw('1=0');
+                    }
+                }
+            });
+            $avgScore = $avgScoreQuery->avg('score');
 
             $finalScore = $avgScore ? round($avgScore, 1) : 0;
 
@@ -402,7 +551,18 @@ class DashboardController extends Controller
         $todayAgendas = $individualTrainings->concat($groupTrainings)->sortBy('raw_date')->values();
 
         // 1. Category Averages Component (Real Physical Categories from DB)
-        $allResults = TestResult::with('testItem.category')->get();
+        $allResultsQuery = TestResult::with('testItem.category');
+        if ($isCoach) {
+            $allResultsQuery->whereHas('performanceTest', function ($q) use ($athleteIds) {
+                if (!empty($athleteIds)) {
+                    $q->whereIn('user_id', $athleteIds);
+                } else {
+                    $q->whereRaw('1=0');
+                }
+            });
+        }
+        $allResults = $allResultsQuery->get();
+
         $palette = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
         $categoryAverages = $allResults->groupBy(function ($r) {
             return $r->testItem->category->name ?? 'Other';
@@ -415,13 +575,22 @@ class DashboardController extends Controller
         })->values();
 
         // 2. Wellness Pulse (Real 6 Parameters from wellness_rpes DB)
+        $wellnessBaseQuery = WellnessRpe::query();
+        if ($isCoach) {
+            if (!empty($athleteIds)) {
+                $wellnessBaseQuery->whereIn('user_id', $athleteIds);
+            } else {
+                $wellnessBaseQuery->whereRaw('1=0');
+            }
+        }
+
         $wellnessPulse = [
-            ['subject' => 'Sleep (' . round(WellnessRpe::avg('quality_of_sleep') ?? 2.6, 1) . ')', 'value' => round(WellnessRpe::avg('quality_of_sleep') ?? 2.6, 1), 'fullMark' => 5],
-            ['subject' => 'Stress (' . round(WellnessRpe::avg('stress') ?? 2.2, 1) . ')', 'value' => round(WellnessRpe::avg('stress') ?? 2.2, 1), 'fullMark' => 5],
-            ['subject' => 'Fatigue (' . round(WellnessRpe::avg('fatigue') ?? 2.4, 1) . ')', 'value' => round(WellnessRpe::avg('fatigue') ?? 2.4, 1), 'fullMark' => 5],
-            ['subject' => 'Soreness (' . round(WellnessRpe::avg('muscle_soreness') ?? 2.3, 1) . ')', 'value' => round(WellnessRpe::avg('muscle_soreness') ?? 2.3, 1), 'fullMark' => 5],
-            ['subject' => 'Mood (' . round(WellnessRpe::avg('mood_state') ?? 2.2, 1) . ')', 'value' => round(WellnessRpe::avg('mood_state') ?? 2.2, 1), 'fullMark' => 5],
-            ['subject' => 'Motivation (' . round(WellnessRpe::avg('motivation') ?? 2.2, 1) . ')', 'value' => round(WellnessRpe::avg('motivation') ?? 2.2, 1), 'fullMark' => 5],
+            ['subject' => 'Sleep (' . round((clone $wellnessBaseQuery)->avg('quality_of_sleep') ?? 2.6, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('quality_of_sleep') ?? 2.6, 1), 'fullMark' => 5],
+            ['subject' => 'Stress (' . round((clone $wellnessBaseQuery)->avg('stress') ?? 2.2, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('stress') ?? 2.2, 1), 'fullMark' => 5],
+            ['subject' => 'Fatigue (' . round((clone $wellnessBaseQuery)->avg('fatigue') ?? 2.4, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('fatigue') ?? 2.4, 1), 'fullMark' => 5],
+            ['subject' => 'Soreness (' . round((clone $wellnessBaseQuery)->avg('muscle_soreness') ?? 2.3, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('muscle_soreness') ?? 2.3, 1), 'fullMark' => 5],
+            ['subject' => 'Mood (' . round((clone $wellnessBaseQuery)->avg('mood_state') ?? 2.2, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('mood_state') ?? 2.2, 1), 'fullMark' => 5],
+            ['subject' => 'Motivation (' . round((clone $wellnessBaseQuery)->avg('motivation') ?? 2.2, 1) . ')', 'value' => round((clone $wellnessBaseQuery)->avg('motivation') ?? 2.2, 1), 'fullMark' => 5],
         ];
 
         // 3. Top Clients (Based on their latest physical test score)
@@ -446,10 +615,13 @@ class DashboardController extends Controller
 
         // 4. EMWA / ACWR Team Workload (Calculated from WellnessRpe daily_load)
         $now = Carbon::now();
-        $acuteLoad = WellnessRpe::whereBetween('record_date', [$now->copy()->subDays(7), $now])->sum('daily_load');
-        if ($acuteLoad == 0) $acuteLoad = WellnessRpe::sum('daily_load') ?: 1830;
-        $chronicLoad = WellnessRpe::whereBetween('record_date', [$now->copy()->subDays(28), $now])->sum('daily_load');
-        if ($chronicLoad == 0) $chronicLoad = (WellnessRpe::sum('daily_load') * 1.5) ?: 12608;
+        $acuteQuery = (clone $wellnessBaseQuery)->whereBetween('record_date', [$now->copy()->subDays(7), $now]);
+        $acuteLoad = $acuteQuery->sum('daily_load');
+        if ($acuteLoad == 0) $acuteLoad = (clone $wellnessBaseQuery)->sum('daily_load') ?: 1830;
+
+        $chronicQuery = (clone $wellnessBaseQuery)->whereBetween('record_date', [$now->copy()->subDays(28), $now]);
+        $chronicLoad = $chronicQuery->sum('daily_load');
+        if ($chronicLoad == 0) $chronicLoad = ((clone $wellnessBaseQuery)->sum('daily_load') * 1.5) ?: 12608;
 
         $acwr = $chronicLoad > 0 ? round(($acuteLoad / 7) / ($chronicLoad / 28), 2) : 0.85;
 
@@ -480,9 +652,16 @@ class DashboardController extends Controller
         $salaryMonthLabel = ($monthNamesIndo[(int)$salaryMonthCarbon->format('n')] ?? '') . ' ' . $salaryMonthCarbon->format('Y');
 
         $gymShiftFee = (int) (\App\Models\Setting::where('key', 'gym_shift_fee')->value('value') ?: 0);
-        $coaches = \App\Models\User::whereIn('role', ['coach', 'superadmin'])->get();
+        
+        $coachesQuery = \App\Models\User::whereIn('role', ['coach', 'superadmin']);
+        if ($isCoach) {
+            $coachesQuery->where('id', $currentUser->id);
+        }
+        $coaches = $coachesQuery->get();
 
         $coachEarningsList = $coaches->map(function ($coach) use ($startOfMonth, $endOfMonth, $gymShiftFee) {
+            $detailedItems = collect();
+
             // Individual Trainings in month
             $indTrainings = \App\Models\IndividualTraining::where(function ($q) use ($coach) {
                     $q->where('coach_id', $coach->id)
@@ -505,6 +684,20 @@ class DashboardController extends Controller
 
                 $indFee += $fee;
                 if ($isPaid) $indPaidFee += $fee; else $indUnpaidFee += $fee;
+
+                $detailedItems->push([
+                    'id' => 'ind-' . $session->id,
+                    'type' => 'individual',
+                    'type_label' => 'Sesi Privat',
+                    'title' => $session->user?->name ?? 'Klien',
+                    'subtitle' => $session->program_name ?? 'Latihan Privat',
+                    'raw_date' => $session->date,
+                    'date' => Carbon::parse($session->date)->format('d M Y'),
+                    'time' => ($session->start_time ? Carbon::parse($session->start_time)->format('H:i') : '') . 
+                              ($session->end_time ? ' - ' . Carbon::parse($session->end_time)->format('H:i') : ''),
+                    'fee' => $fee,
+                    'is_paid' => $isPaid,
+                ]);
             }
 
             // Group Trainings in month
@@ -527,6 +720,20 @@ class DashboardController extends Controller
 
                 $grpFee += $fee;
                 if ($isPaid) $grpPaidFee += $fee; else $grpUnpaidFee += $fee;
+
+                $detailedItems->push([
+                    'id' => 'grp-' . $session->id,
+                    'type' => 'group',
+                    'type_label' => 'Latihan Grup',
+                    'title' => $session->group?->name ?? 'Grup Latihan',
+                    'subtitle' => $session->program_name ?? 'Sesi Kelompok',
+                    'raw_date' => $session->date,
+                    'date' => Carbon::parse($session->date)->format('d M Y'),
+                    'time' => ($session->start_time ? Carbon::parse($session->start_time)->format('H:i') : '') . 
+                              ($session->end_time ? ' - ' . Carbon::parse($session->end_time)->format('H:i') : ''),
+                    'fee' => $fee,
+                    'is_paid' => $isPaid,
+                ]);
             }
 
             // Gym Shifts in month
@@ -545,6 +752,20 @@ class DashboardController extends Controller
 
                 $gymFee += $fee;
                 if ($isPaid) $gymPaidFee += $fee; else $gymUnpaidFee += $fee;
+
+                $detailedItems->push([
+                    'id' => 'gym-' . $shift->id,
+                    'type' => 'gym',
+                    'type_label' => 'Shift Jaga Gym',
+                    'title' => 'Shift Jaga OTS',
+                    'subtitle' => 'Tugas Jaga OTS Gym',
+                    'raw_date' => $shift->date,
+                    'date' => Carbon::parse($shift->date)->format('d M Y'),
+                    'time' => ($shift->check_in_time ? Carbon::parse($shift->check_in_time)->format('H:i') : '') . 
+                              ($shift->check_out_time ? ' - ' . Carbon::parse($shift->check_out_time)->format('H:i') : ''),
+                    'fee' => $fee,
+                    'is_paid' => $isPaid,
+                ]);
             }
 
             $totalSessions = $indTrainings->count() + $grpTrainings->count() + $gymShifts->count();
@@ -567,10 +788,11 @@ class DashboardController extends Controller
                 'total_fee' => $totalFee,
                 'paid_fee' => $paidFee,
                 'unpaid_fee' => $unpaidFee,
+                'items' => $detailedItems->sortByDesc('raw_date')->values()->all(),
             ];
         })
         ->filter(function ($c) {
-            return $c['total_fee'] > 0;
+            return $c['total_sessions'] > 0 || $c['total_fee'] > 0;
         })
         ->sortByDesc('total_fee')
         ->values();
