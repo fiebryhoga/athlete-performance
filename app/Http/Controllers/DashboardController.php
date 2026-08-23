@@ -651,15 +651,14 @@ class DashboardController extends Controller
         ];
         $salaryMonthLabel = ($monthNamesIndo[(int)$salaryMonthCarbon->format('n')] ?? '') . ' ' . $salaryMonthCarbon->format('Y');
 
-        $gymShiftFee = (int) (\App\Models\Setting::where('key', 'gym_shift_fee')->value('value') ?: 0);
-        
         $coachesQuery = \App\Models\User::whereIn('role', ['coach', 'superadmin']);
         if ($isCoach) {
             $coachesQuery->where('id', $currentUser->id);
         }
         $coaches = $coachesQuery->get();
 
-        $coachEarningsList = $coaches->map(function ($coach) use ($startOfMonth, $endOfMonth, $gymShiftFee) {
+        $coachEarningsList = $coaches->map(function ($coach) use ($startOfMonth, $endOfMonth) {
+            $gymShiftFee = (int) ($coach->effective_gym_fee ?? 0);
             $detailedItems = collect();
 
             // Individual Trainings in month

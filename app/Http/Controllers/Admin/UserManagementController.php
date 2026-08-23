@@ -100,6 +100,7 @@ class UserManagementController extends Controller
 
         if ($request->role === 'coach') {
             $rules['is_gym_guard'] = 'nullable|boolean';
+            $rules['gym_fee'] = 'nullable|numeric|min:0';
         }
 
         $request->validate($rules);
@@ -130,7 +131,10 @@ class UserManagementController extends Controller
         $user = User::create($data);
 
         if ($request->role === 'coach') {
-            $user->update(['is_gym_guard' => (bool) $request->is_gym_guard]);
+            $user->update([
+                'is_gym_guard' => (bool) $request->is_gym_guard,
+                'gym_fee' => $request->filled('gym_fee') && $request->gym_fee > 0 ? (int)$request->gym_fee : null,
+            ]);
         }
 
         if ($request->role === 'athlete' && $request->has('coach_ids')) {
@@ -259,6 +263,7 @@ class UserManagementController extends Controller
 
         if ($request->role === 'coach') {
             $rules['is_gym_guard'] = 'nullable|boolean';
+            $rules['gym_fee'] = 'nullable|numeric|min:0';
         }
 
         $request->validate($rules);
@@ -294,7 +299,10 @@ class UserManagementController extends Controller
         $user->update($data);
 
         if ($request->role === 'coach') {
-            $user->update(['is_gym_guard' => (bool) $request->is_gym_guard]);
+            $user->update([
+                'is_gym_guard' => (bool) $request->is_gym_guard,
+                'gym_fee' => $request->filled('gym_fee') && $request->gym_fee > 0 ? (int)$request->gym_fee : null,
+            ]);
         }
 
         if ($request->role === 'athlete' && $request->has('coach_ids')) {

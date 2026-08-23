@@ -6,12 +6,12 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 8mm 10mm 10mm 10mm;
+            margin: 10mm 12mm 12mm 12mm;
         }
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 9.5px;
+            font-size: 9px;
             color: #0f172a;
             line-height: 1.35;
             margin: 0;
@@ -23,8 +23,8 @@
         .doc-header {
             width: 100%;
             border-bottom: 2px solid #0f172a;
-            padding-bottom: 6px;
-            margin-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
         .header-table {
             width: 100%;
@@ -45,7 +45,7 @@
         .doc-subtitle {
             font-size: 8.5px;
             color: #64748b;
-            margin: 0 0 3px 0;
+            margin: 0 0 2px 0;
             font-weight: 500;
         }
         .doc-date {
@@ -54,8 +54,8 @@
             margin: 0;
         }
         .logo-img {
-            max-height: 58px;
-            max-width: 190px;
+            max-height: 48px;
+            max-width: 160px;
             object-fit: contain;
         }
         .logo-text {
@@ -67,30 +67,35 @@
 
         /* ─── SECTION TITLES ─── */
         .section-title {
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 900;
             color: #0f172a;
             text-transform: uppercase;
             letter-spacing: 0.4px;
-            margin: 8px 0 4px 0;
-            padding-bottom: 2px;
+            margin: 10px 0 5px 0;
+            padding-bottom: 3px;
             border-bottom: 1.5px solid #e2e8f0;
             page-break-after: avoid;
             break-after: avoid;
-        }
-        .section-title span {
-            color: #ea580c;
-            margin-right: 2px;
         }
 
         /* ─── ATHLETE PROFILE CARD ─── */
         .profile-card {
             width: 100%;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
-            background-color: #f8fafc;
-            margin-bottom: 8px;
+            background-color: #ffffff;
+            margin-bottom: 10px;
             page-break-inside: avoid;
+        }
+        .profile-banner {
+            background-color: #fff7ed;
+            border-bottom: 1px solid #fed7aa;
+            padding: 4px 8px;
+            text-align: right;
+            font-size: 8px;
+            font-weight: bold;
+            color: #c2410c;
         }
         .profile-table {
             width: 100%;
@@ -110,7 +115,7 @@
             height: 48px;
             border-radius: 6px;
             object-fit: cover;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
         }
         .avatar-initial {
             width: 48px;
@@ -125,17 +130,17 @@
             margin: 0 auto;
         }
         .athlete-info {
-            width: 44%;
+            width: 45%;
             padding-left: 8px !important;
         }
         .athlete-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 900;
             color: #0f172a;
             margin: 0 0 1px 0;
         }
         .athlete-meta {
-            font-size: 8.5px;
+            font-size: 8px;
             color: #64748b;
             margin: 0 0 3px 0;
         }
@@ -144,7 +149,7 @@
             font-size: 7.5px;
             font-weight: 700;
             padding: 1px 5px;
-            border-radius: 6px;
+            border-radius: 4px;
             margin-right: 3px;
         }
         .badge-orange {
@@ -157,21 +162,6 @@
             color: #334155;
             border: 1px solid #cbd5e1;
         }
-        .badge-emerald {
-            background-color: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-        }
-        .badge-amber {
-            background-color: #fffbeb;
-            color: #b45309;
-            border: 1px solid #fde68a;
-        }
-        .badge-rose {
-            background-color: #fff1f2;
-            color: #be123c;
-            border: 1px solid #fecdd3;
-        }
 
         /* ─── BIOMETRICS GRID ─── */
         .bio-table {
@@ -183,23 +173,23 @@
             padding: 4px 5px;
             text-align: center;
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
         }
         .bio-label {
-            font-size: 7.5px;
+            font-size: 7px;
             color: #64748b;
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 1px;
         }
         .bio-value {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 900;
             color: #0f172a;
         }
         .bio-unit {
-            font-size: 7.5px;
+            font-size: 7px;
             font-weight: normal;
             color: #64748b;
         }
@@ -208,7 +198,7 @@
         .stats-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             page-break-inside: avoid;
         }
         .stats-table td {
@@ -216,17 +206,17 @@
             padding: 5px 6px;
             text-align: center;
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
         }
         .stat-label {
-            font-size: 7.5px;
+            font-size: 7px;
             font-weight: bold;
             text-transform: uppercase;
             color: #64748b;
         }
         .stat-num {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 900;
             color: #ea580c;
             margin: 1px 0;
@@ -234,7 +224,7 @@
         .stat-num-dark { color: #0f172a; }
         .stat-num-green { color: #059669; }
         .stat-desc {
-            font-size: 7.5px;
+            font-size: 7px;
             color: #94a3b8;
         }
 
@@ -242,7 +232,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .data-table thead {
             display: table-header-group;
@@ -251,23 +241,23 @@
             page-break-inside: avoid;
         }
         .data-table th {
-            background-color: #f1f5f9;
-            color: #334155;
-            font-size: 8px;
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 7.5px;
             font-weight: 800;
             text-transform: uppercase;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
             padding: 4px 6px;
             text-align: left;
         }
         .data-table td {
-            border: 1px solid #e2e8f0;
+            border: 1px solid #f1f5f9;
             padding: 4px 6px;
-            font-size: 8.5px;
+            font-size: 8px;
             vertical-align: middle;
         }
         .data-table tr:nth-child(even) {
-            background-color: #fafafa;
+            background-color: #fcfcfc;
         }
         .text-center { text-align: center !important; }
         .text-right { text-align: right !important; }
@@ -275,9 +265,9 @@
 
         /* Progress Bar */
         .progress-bar-bg {
-            background-color: #e2e8f0;
-            border-radius: 6px;
-            height: 6px;
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            height: 5px;
             width: 100%;
             overflow: hidden;
             display: inline-block;
@@ -286,17 +276,17 @@
         .progress-bar-fill {
             background-color: #ea580c;
             height: 100%;
-            border-radius: 6px;
+            border-radius: 4px;
         }
         .progress-bar-fill-green {
             background-color: #059669;
         }
 
-        /* ─── STRENGTHS & WEAKNESSES CARDS ─── */
+        /* ─── STRENGTHS & WEAKNESSES ─── */
         .sw-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             page-break-inside: avoid;
         }
         .sw-table > tbody > tr > td {
@@ -308,24 +298,22 @@
         .sw-table > tbody > tr > td:last-child { padding-right: 0; }
 
         .sw-box {
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
             background: #ffffff;
             overflow: hidden;
         }
-        .sw-header-green, .sw-header-rose {
-            background-color: #f1f5f9;
-            border-bottom: 1px solid #cbd5e1;
-            padding: 4px 8px;
-            font-size: 8px;
+        .sw-header {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 4px 6px;
+            font-size: 7.5px;
             font-weight: 800;
             color: #334155;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
         }
         .sw-body {
-            padding: 5px 8px;
-            min-height: 52px;
+            padding: 5px 6px;
         }
         .sw-item {
             width: 100%;
@@ -335,35 +323,14 @@
         .sw-item td {
             padding: 2px 0;
             border: none;
-            font-size: 8.5px;
-        }
-        .sw-num {
-            width: 14px;
-            font-weight: bold;
-            color: #64748b;
-        }
-        .sw-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .sw-score-green {
-            text-align: right;
-            font-weight: 800;
-            color: #334155;
-            font-size: 9px;
-        }
-        .sw-score-rose {
-            text-align: right;
-            font-weight: 800;
-            color: #334155;
-            font-size: 9px;
+            font-size: 8px;
         }
 
         /* ─── MULTI-DOMAIN PROFILING MATRIX ─── */
         .matrix-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             page-break-inside: avoid;
         }
         .matrix-table td {
@@ -372,24 +339,22 @@
             vertical-align: top;
         }
         .matrix-card {
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
             background: #ffffff;
             overflow: hidden;
         }
         .matrix-card-header {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: #334155;
-            font-size: 8px;
+            font-size: 7.5px;
             font-weight: 800;
             text-transform: uppercase;
-            padding: 4px 8px;
-            border-bottom: 1px solid #cbd5e1;
-            letter-spacing: 0.3px;
+            padding: 4px 6px;
+            border-bottom: 1px solid #e2e8f0;
         }
         .matrix-card-body {
-            padding: 5px 8px;
-            min-height: 56px;
+            padding: 5px 6px;
         }
         .matrix-row {
             width: 100%;
@@ -397,7 +362,7 @@
         }
         .matrix-row td {
             padding: 2px 0;
-            font-size: 8px;
+            font-size: 7.5px;
             border: none;
         }
         .matrix-label {
@@ -411,57 +376,6 @@
             width: 45%;
         }
 
-        /* ─── BIOMETRIC GALLERY ─── */
-        .gallery-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 8px;
-        }
-        .gallery-table tr {
-            page-break-inside: avoid;
-        }
-        .gallery-table td {
-            padding: 4px;
-            vertical-align: top;
-            border: none;
-            width: 50%;
-        }
-        .gallery-card {
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            background: #ffffff;
-            overflow: hidden;
-        }
-        .gallery-img-box {
-            background-color: #f8fafc;
-            padding: 6px;
-            border-bottom: 1px solid #e2e8f0;
-            height: 220px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .gallery-img {
-            max-height: 210px;
-            max-width: 100%;
-            object-fit: contain;
-            border-radius: 6px;
-        }
-        .gallery-meta {
-            padding: 5px 7px;
-            text-align: left;
-        }
-        .gallery-date {
-            font-size: 8px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 2px;
-        }
-        .gallery-notes {
-            font-size: 7.5px;
-            color: #475569;
-            line-height: 1.35;
-        }
-
         /* ─── SIGNATURE & FOOTER ─── */
         .sign-table {
             width: 100%;
@@ -470,22 +384,22 @@
             page-break-inside: avoid;
         }
         .sign-table td {
-            width: 50%;
+            width: 33.3%;
             text-align: center;
             vertical-align: top;
-            padding: 0 20px;
+            padding: 0 10px;
             border: none;
         }
         .sign-line {
-            width: 150px;
+            width: 120px;
             border-bottom: 1px solid #334155;
-            margin: 32px auto 3px auto;
+            margin: 28px auto 3px auto;
         }
         .footer {
             margin-top: 12px;
             border-top: 1px solid #e2e8f0;
-            padding-top: 5px;
-            font-size: 7.5px;
+            padding-top: 4px;
+            font-size: 7px;
             color: #94a3b8;
             text-align: center;
         }
@@ -493,18 +407,14 @@
 </head>
 <body>
 
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!--                      HALAMAN 1 : PROFIL & ANALISIS           -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
-
     <!-- ─── HEADER ─── -->
     <div class="doc-header">
         <table class="header-table">
             <tr>
                 <td style="width: 65%; vertical-align: middle;">
-                    <h1 class="doc-title">Laporan Profiling & Analisis Klien</h1>
-                    <p class="doc-subtitle">Integrated Performance Analysis & Physical Biometrics Report</p>
-                    <div class="doc-date">Tanggal: {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</div>
+                    <h1 class="doc-title">Laporan Profiling & Analisis Performa</h1>
+                    <p class="doc-subtitle">Olympus Training Surabaya - Performance Hub</p>
+                    <div class="doc-date">Tanggal Cetak: {{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y') }}</div>
                 </td>
                 <td style="width: 35%; text-align: right; vertical-align: middle;">
                     @if($clubLogo)
@@ -519,6 +429,9 @@
 
     <!-- ─── ATHLETE IDENTITY & BIOMETRICS CARD ─── -->
     <div class="profile-card">
+        <div class="profile-banner">
+            {{ $packageName ?? ($athlete->sport->name ?? 'Olympus Member') }}
+        </div>
         <table class="profile-table">
             <tr>
                 <td class="avatar-box">
@@ -530,14 +443,14 @@
                 </td>
                 <td class="athlete-info">
                     <div class="athlete-name">{{ $athlete->name }}</div>
-                    <div class="athlete-meta">{{ '@' . ($athlete->username ?? '-') }} &bull; {{ $athlete->gender === 'L' ? 'Laki-laki' : ($athlete->gender === 'P' ? 'Perempuan' : '-') }}</div>
-                    <div style="font-size: 8.5px; margin: 2px 0;">
+                    <div class="athlete-meta">{{ '@' . ($athlete->username ?? '-') }} &bull; {{ $athlete->gender === 'L' || $athlete->gender === 'male' || $athlete->gender === 'Laki-laki' ? 'Laki-laki' : 'Perempuan' }}</div>
+                    <div style="font-size: 8px; margin: 2px 0;">
                         <strong style="color: #ea580c;">{{ $athlete->sport->name ?? 'Umum' }}</strong>
                         @if($packageName)
                             <span style="color: #64748b;"> &bull; {{ $packageName }}</span>
                         @endif
                     </div>
-                    <div style="font-size: 8px; color: #64748b; margin-top: 2px;">
+                    <div style="font-size: 7.5px; color: #64748b;">
                         <strong>Coach:</strong> {{ $coachesText }}
                     </div>
                 </td>
@@ -558,8 +471,8 @@
                             </td>
                             <td>
                                 <div class="bio-label">BMI</div>
-                                <div class="bio-value">{{ $bmi }}</div>
-                                <div style="font-size: 7.5px; font-weight: bold; color: {{ $bmiStatus['color'] ?? '#64748b' }}; margin-top: 1px;">
+                                <div class="bio-value" style="color: {{ $bmiStatus['color'] ?? '#0f172a' }};">{{ $bmi }}</div>
+                                <div style="font-size: 7px; font-weight: bold; color: {{ $bmiStatus['color'] ?? '#64748b' }}; margin-top: 1px;">
                                     {{ $bmiClass['label'] }}
                                 </div>
                             </td>
@@ -586,11 +499,11 @@
             <td>
                 <div class="stat-label">Skor Tertinggi</div>
                 <div class="stat-num stat-num-green">{{ number_format($highestScore, 1) }}</div>
-                <div class="stat-desc">Capaian Terbaik</div>
+                <div class="stat-desc">Capaian Puncak</div>
             </td>
             <td>
                 <div class="stat-label">Tes Terakhir</div>
-                <div class="stat-num stat-num-dark" style="font-size: 11px; margin-top: 3px;">{{ $latestDate }}</div>
+                <div class="stat-num stat-num-dark" style="font-size: 10px; margin-top: 2px;">{{ $latestDate }}</div>
                 <div class="stat-desc">Skor: <strong style="color: #ea580c;">{{ number_format($latestScore, 1) }}</strong></div>
             </td>
         </tr>
@@ -603,11 +516,10 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th style="width: 25%;">Kategori Fisik</th>
+                    <th style="width: 28%;">Kategori Fisik</th>
                     <th style="width: 14%; text-align: center;">Skor Rata-Rata</th>
-                    <th style="width: 36%;">Visual Progress (Target 100)</th>
-                    <th style="width: 12%; text-align: center;">Gap Target</th>
-                    <th style="width: 13%; text-align: center;">Status</th>
+                    <th style="width: 38%;">Visual Progress (Target 100)</th>
+                    <th style="width: 20%; text-align: center;">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -619,8 +531,8 @@
                     @endphp
                     <tr>
                         <td class="font-bold">{{ $cat['name'] }}</td>
-                        <td class="text-center font-bold" style="color: {{ $isHigh ? '#059669' : ($isMedium ? '#ea580c' : '#e11d48') }};">
-                            {{ number_format($cat['score'], 1) }}
+                        <td class="text-center font-bold" style="color: {{ $isHigh ? '#059669' : ($isMedium ? '#d97706' : '#e11d48') }};">
+                            {{ number_format($cat['score'], 1) }}%
                         </td>
                         <td>
                             <table style="width: 100%; border-collapse: collapse; border: none;">
@@ -630,195 +542,172 @@
                                             <div class="progress-bar-fill {{ $isHigh ? 'progress-bar-fill-green' : '' }}" style="width: {{ $pct }}%;"></div>
                                         </div>
                                     </td>
-                                    <td style="width: 20%; border: none; padding: 0 0 0 4px; text-align: right; font-size: 7.5px; color: #64748b;">
+                                    <td style="width: 20%; border: none; padding: 0 0 0 4px; text-align: right; font-size: 7px; color: #64748b;">
                                         {{ round($pct) }}%
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td class="text-center font-bold" style="color: {{ $cat['gap'] >= 0 ? '#059669' : '#e11d48' }};">
-                            {{ $cat['gap'] > 0 ? '+' : '' }}{{ number_format($cat['gap'], 1) }}
-                        </td>
-                        <td class="text-center">
-                            @if($isHigh)
-                                <span class="badge badge-emerald">Sangat Baik</span>
-                            @elseif($isMedium)
-                                <span class="badge badge-amber">Baik</span>
-                            @else
-                                <span class="badge badge-rose">Perlu Latihan</span>
-                            @endif
+                        <td class="text-center font-bold" style="color: {{ $isHigh ? '#059669' : ($isMedium ? '#d97706' : '#e11d48') }};">
+                            {{ $isHigh ? 'Excellent' : ($isMedium ? 'Good' : 'Needs Improvement') }}
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-    @else
-        <div style="border: 1px dashed #cbd5e1; border-radius: 6px; padding: 10px; text-align: center; color: #94a3b8; margin-bottom: 8px; font-size: 8.5px;">
-            Belum ada data tes fisik yang terekam untuk analisis kategori.
-        </div>
     @endif
 
+    <!-- ─── KEUNGGULAN & PRIORITAS PENINGKATAN ─── -->
+    <table class="sw-table">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="sw-box">
+                        <div class="sw-header">Keunggulan Fisik (>70%)</div>
+                        <div class="sw-body">
+                            @if($strengths && count($strengths) > 0)
+                                @foreach($strengths as $item)
+                                    <table class="sw-item">
+                                        <tr>
+                                            <td class="font-bold" style="color: #0f172a;">{{ $item['name'] }}</td>
+                                            <td class="text-right font-bold" style="color: #059669;">{{ number_format($item['score'], 1) }}%</td>
+                                        </tr>
+                                    </table>
+                                @endforeach
+                            @else
+                                <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; text-align: center; padding: 4px 0;">Belum ada kategori di atas 70%.</div>
+                            @endif
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="sw-box">
+                        <div class="sw-header">Prioritas Peningkatan (≤70%)</div>
+                        <div class="sw-body">
+                            @if($weaknesses && count($weaknesses) > 0)
+                                @foreach($weaknesses as $item)
+                                    <table class="sw-item">
+                                        <tr>
+                                            <td class="font-bold" style="color: #0f172a;">{{ $item['name'] }}</td>
+                                            <td class="text-right font-bold" style="color: #e11d48;">{{ number_format($item['score'], 1) }}%</td>
+                                        </tr>
+                                    </table>
+                                @endforeach
+                            @else
+                                <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; text-align: center; padding: 4px 0;">Semua kategori berada di atas 70%.</div>
+                            @endif
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <!-- ─── MATRIKS PENILAIAN MULTI-DOMAIN ATLET ─── -->
-    <div class="section-title">Matriks Penilaian Multi-Domain Atlet</div>
+    <div class="section-title">Status Multi-Domain Asesmen Atlet</div>
 
     <table class="matrix-table">
         <tr>
             <!-- PHV & Pertumbuhan -->
             <td>
                 <div class="matrix-card">
-                    <div class="matrix-card-header">
-                        PHV & Pertumbuhan Biologis
-                        @if($latest_phv)
-                            <span style="font-size: 7.5px; font-weight: normal; color: #64748b; float: right;">
-                                {{ $latest_phv->assessment_date ? \Carbon\Carbon::parse($latest_phv->assessment_date)->format('d/m/Y') : '-' }}
-                            </span>
-                        @endif
-                    </div>
+                    <div class="matrix-card-header">PHV & Pertumbuhan</div>
                     <div class="matrix-card-body">
                         @if($latest_phv)
                             <table class="matrix-row">
                                 <tr>
-                                    <td class="matrix-label">Status PHV</td>
-                                    <td class="matrix-val">{{ $latest_phv->phv_status ?? ($latest_phv->maturity_status ?? '-') }}</td>
-                                </tr>
-                                <tr>
                                     <td class="matrix-label">Maturity Offset</td>
-                                    <td class="matrix-val">{{ $latest_phv->maturity_offset ?? '-' }} thn</td>
+                                    <td class="matrix-val">{{ number_format($latest_phv->maturity_offset ?? 0, 2) }} thn</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Prediksi Tinggi Dewasa</td>
+                                    <td class="matrix-label">Prediksi Tinggi</td>
                                     <td class="matrix-val">{{ $latest_phv->predicted_adult_height ?? '-' }} cm</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Tinggi Duduk / Berdiri</td>
-                                    <td class="matrix-val">{{ $latest_phv->sitting_height ?? '-' }} / {{ $latest_phv->standing_height ?? '-' }} cm</td>
+                                    <td class="matrix-label">Sisa Tumbuh</td>
+                                    <td class="matrix-val" style="color: #ea580c;">+{{ $latest_phv->remaining_growth ?? '-' }} cm</td>
                                 </tr>
                             </table>
                         @else
-                            <div style="font-size: 8px; color: #94a3b8; font-style: italic; padding: 6px 0; text-align: center;">Belum ada asesmen PHV.</div>
+                            <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; padding: 4px 0; text-align: center;">Belum ada asesmen PHV.</div>
                         @endif
                     </div>
                 </div>
             </td>
 
-            <!-- Wellness & Beban Latihan -->
+            <!-- Komposisi Tubuh -->
             <td>
                 <div class="matrix-card">
-                    <div class="matrix-card-header">
-                        Wellness & Beban Latihan (RPE)
-                        @if($latest_wellness)
-                            <span style="font-size: 7.5px; font-weight: normal; color: #64748b; float: right;">
-                                {{ $latest_wellness->record_date ? \Carbon\Carbon::parse($latest_wellness->record_date)->format('d/m/Y') : '-' }}
-                            </span>
-                        @endif
-                    </div>
+                    <div class="matrix-card-header">Komposisi Tubuh</div>
                     <div class="matrix-card-body">
-                        @if($latest_wellness)
+                        @if($latest_composition)
                             <table class="matrix-row">
                                 <tr>
-                                    <td class="matrix-label">Skor Wellness Harian</td>
-                                    <td class="matrix-val">{{ $latest_wellness->daily_wellness_score ?? '-' }} <span style="font-size: 7px; color: #64748b;">/ 30</span></td>
+                                    <td class="matrix-label">Body Fat</td>
+                                    <td class="matrix-val" style="color: #ea580c;">{{ $latest_composition->body_fat_percentage ?? '-' }} %</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Session RPE (AM/PM)</td>
-                                    <td class="matrix-val">{{ $latest_wellness->am_rpe ?? '-' }} / {{ $latest_wellness->pm_rpe ?? '-' }} <span style="font-size: 7px; color: #64748b;">/ 10</span></td>
+                                    <td class="matrix-label">Massa Otot</td>
+                                    <td class="matrix-val">{{ $latest_composition->muscle_mass ?? '-' }} kg</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Daily Training Load</td>
-                                    <td class="matrix-val">{{ $latest_wellness->daily_load ?? '-' }} AU</td>
-                                </tr>
-                                <tr>
-                                    <td class="matrix-label">Keluhan Nyeri Otot</td>
-                                    <td class="matrix-val" style="font-size: 7.5px;">
-                                        {{ !empty($latest_wellness->muscle_pain_areas) && is_array($latest_wellness->muscle_pain_areas) ? implode(', ', $latest_wellness->muscle_pain_areas) : 'Tidak ada' }}
-                                    </td>
+                                    <td class="matrix-label">BMR / Visceral</td>
+                                    <td class="matrix-val">{{ $latest_composition->bmr ?? '-' }} kcal / Lvl {{ $latest_composition->visceral_fat_level ?? '-' }}</td>
                                 </tr>
                             </table>
                         @else
-                            <div style="font-size: 8px; color: #94a3b8; font-style: italic; padding: 6px 0; text-align: center;">Belum ada log wellness.</div>
+                            <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; padding: 4px 0; text-align: center;">Belum ada tes komposisi tubuh.</div>
                         @endif
                     </div>
                 </div>
             </td>
         </tr>
         <tr>
-            <!-- Dynamic Posture Assessment (DPA) -->
+            <!-- Wellness -->
             <td>
                 <div class="matrix-card">
-                    <div class="matrix-card-header">
-                        Postur Dinamis (DPA)
-                        @if($latest_dpa)
-                            <span style="font-size: 7.5px; font-weight: normal; color: #64748b; float: right;">
-                                {{ $latest_dpa->assessment_date ? \Carbon\Carbon::parse($latest_dpa->assessment_date)->format('d/m/Y') : '-' }}
-                            </span>
-                        @endif
-                    </div>
+                    <div class="matrix-card-header">Beban & Wellness</div>
                     <div class="matrix-card-body">
-                        @if($latest_dpa)
-                            @php
-                                $compCount = $latest_dpa->details ? $latest_dpa->details->count() : 0;
-                            @endphp
+                        @if($latest_wellness)
                             <table class="matrix-row">
                                 <tr>
-                                    <td class="matrix-label">Status Evaluasi DPA</td>
-                                    <td class="matrix-val">Terverifikasi</td>
+                                    <td class="matrix-label">Skor Wellness</td>
+                                    <td class="matrix-val" style="color: #059669;">{{ $latest_wellness->daily_wellness_score ?? '-' }} / 30</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Total Temuan Kompensasi</td>
-                                    <td class="matrix-val">
-                                        {{ $compCount }} Temuan
-                                    </td>
+                                    <td class="matrix-label">Session RPE</td>
+                                    <td class="matrix-val">{{ $latest_wellness->session_rpe ?? ($latest_wellness->am_rpe ?? '-') }} / 10</td>
                                 </tr>
-                                @if($compCount > 0)
-                                    <tr>
-                                        <td class="matrix-label">Contoh Kompensasi</td>
-                                        <td class="matrix-val" style="font-size: 7.5px; font-weight: normal;">
-                                            {{ $latest_dpa->details->map(fn($d) => $d->compensation->name ?? null)->filter()->take(2)->implode(', ') }}
-                                        </td>
-                                    </tr>
-                                @endif
+                                <tr>
+                                    <td class="matrix-label">Daily Load</td>
+                                    <td class="matrix-val" style="color: #ea580c;">{{ $latest_wellness->daily_load ?? '-' }} AU</td>
+                                </tr>
                             </table>
                         @else
-                            <div style="font-size: 8px; color: #94a3b8; font-style: italic; padding: 6px 0; text-align: center;">Belum ada asesmen DPA.</div>
+                            <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; padding: 4px 0; text-align: center;">Belum ada catatan wellness.</div>
                         @endif
                     </div>
                 </div>
             </td>
 
-            <!-- Komposisi Tubuh (InBody) -->
+            <!-- Postur Dinamis DPA -->
             <td>
                 <div class="matrix-card">
-                    <div class="matrix-card-header">
-                        Komposisi Tubuh & Metabolisme
-                        @if($latest_composition)
-                            <span style="font-size: 7.5px; font-weight: normal; color: #64748b; float: right;">
-                                {{ $latest_composition->date ? \Carbon\Carbon::parse($latest_composition->date)->format('d/m/Y') : '-' }}
-                            </span>
-                        @endif
-                    </div>
+                    <div class="matrix-card-header">Postur Dinamis (DPA)</div>
                     <div class="matrix-card-body">
-                        @if($latest_composition)
+                        @if($latest_dpa)
                             <table class="matrix-row">
                                 <tr>
-                                    <td class="matrix-label">Lemak Tubuh (Body Fat)</td>
-                                    <td class="matrix-val">{{ $latest_composition->body_fat_percentage ?? '-' }} %</td>
+                                    <td class="matrix-label">Hasil Evaluasi</td>
+                                    <td class="matrix-val">{{ $latest_dpa->conclusion ?? 'Normal' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="matrix-label">Massa Otot (Muscle Mass)</td>
-                                    <td class="matrix-val">{{ $latest_composition->muscle_mass ?? '-' }} kg</td>
-                                </tr>
-                                <tr>
-                                    <td class="matrix-label">Visceral Fat / TBW</td>
-                                    <td class="matrix-val">{{ $latest_composition->visceral_fat ?? '-' }} / {{ $latest_composition->total_body_water ?? '-' }} L</td>
-                                </tr>
-                                <tr>
-                                    <td class="matrix-label">BMR / TDEE</td>
-                                    <td class="matrix-val">{{ $latest_composition->bmr ?? '-' }} / {{ $latest_composition->tdee ?? '-' }} kcal</td>
+                                    <td class="matrix-label">Total Deviasi</td>
+                                    <td class="matrix-val">{{ $latest_dpa->total_score ?? 0 }} kompensasi</td>
                                 </tr>
                             </table>
                         @else
-                            <div style="font-size: 8px; color: #94a3b8; font-style: italic; padding: 6px 0; text-align: center;">Belum ada tes komposisi tubuh.</div>
+                            <div style="font-size: 7.5px; color: #94a3b8; font-style: italic; padding: 4px 0; text-align: center;">Belum ada asesmen DPA.</div>
                         @endif
                     </div>
                 </div>
@@ -826,62 +715,39 @@
         </tr>
     </table>
 
-    <!-- ─── RINCIAN ITEM TES FISIK TERKINI ─── -->
-    <div class="section-title">Rincian Item Tes Fisik Terkini</div>
+    <!-- ─── RINCIAN PARAMETER TES SESI TERAKHIR (SORTED BY SCORE DESCENDING) ─── -->
+    <div class="section-title">Rincian Parameter Tes Sesi Terakhir</div>
 
     @if($latestTestItems && count($latestTestItems) > 0)
+        @php
+            $sortedItems = collect($latestTestItems)->sortByDesc('score')->values();
+        @endphp
         <table class="data-table">
             <thead>
                 <tr>
                     <th style="width: 5%; text-align: center;">No</th>
-                    <th style="width: 32%;">Item Tes</th>
-                    <th style="width: 20%;">Kategori</th>
-                    <th style="width: 14%; text-align: center;">Target</th>
-                    <th style="width: 14%; text-align: center;">Hasil</th>
-                    <th style="width: 15%; text-align: center;">Skor</th>
+                    <th style="width: 40%;">Item Tes & Kategori</th>
+                    <th style="width: 18%; text-align: center;">Target</th>
+                    <th style="width: 18%; text-align: center;">Hasil</th>
+                    <th style="width: 19%; text-align: right;">Skor</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($latestTestItems as $i => $item)
+                @foreach($sortedItems as $i => $item)
                     <tr>
                         <td class="text-center" style="color: #64748b;">{{ $i + 1 }}</td>
-                        <td class="font-bold">{{ $item['name'] }}</td>
-                        <td style="color: #475569;">{{ $item['category'] }}</td>
-                        <td class="text-center">{{ $item['target'] }} {{ $item['unit'] }}</td>
-                        <td class="text-center font-bold">{{ $item['result'] }} {{ $item['unit'] }}</td>
-                        <td class="text-center font-bold" style="color: {{ $item['score'] >= 80 ? '#059669' : ($item['score'] >= 60 ? '#ea580c' : '#e11d48') }};">
-                            {{ number_format($item['score'], 1) }}
+                        <td>
+                            <div class="font-bold">{{ $item['name'] ?? '-' }}</div>
+                            <div style="font-size: 7px; color: #94a3b8;">{{ $item['category'] ?? '-' }}</div>
                         </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <div style="border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; text-align: center; color: #94a3b8; margin-bottom: 8px; font-size: 8px;">
-            Belum ada rincian item tes fisik terkini.
-        </div>
-    @endif
-
-    <!-- ─── RIWAYAT SESI TES FISIK TERAKHIR ─── -->
-    @if($history && count($history) > 0)
-        <div class="section-title">Riwayat Sesi Tes Fisik Terakhir</div>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th style="width: 25%;">Tanggal Sesi</th>
-                    <th style="width: 40%;">Nama Sesi Latihan</th>
-                    <th style="width: 15%; text-align: center;">Jumlah Item</th>
-                    <th style="width: 20%; text-align: center;">Skor Akhir</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($history as $h)
-                    <tr>
-                        <td class="font-bold">{{ $h['date'] }}</td>
-                        <td>{{ $h['name'] }}</td>
-                        <td class="text-center">{{ $h['items_count'] }} tes</td>
-                        <td class="text-center font-bold" style="color: {{ $h['score'] >= 70 ? '#059669' : '#ea580c' }};">
-                            {{ number_format($h['score'], 1) }}
+                        <td class="text-center" style="color: #64748b;">
+                            {{ $item['target_value'] ?? ($item['target'] ?? '-') }} {{ $item['unit'] ?? '' }}
+                        </td>
+                        <td class="text-center font-bold">
+                            {{ $item['result_value'] ?? ($item['result'] ?? '-') }} {{ $item['unit'] ?? '' }}
+                        </td>
+                        <td class="text-right font-bold" style="color: {{ ($item['score'] ?? 0) >= 80 ? '#059669' : (($item['score'] ?? 0) >= 60 ? '#d97706' : '#e11d48') }};">
+                            {{ number_format($item['score'] ?? 0, 1) }}%
                         </td>
                     </tr>
                 @endforeach
@@ -889,38 +755,30 @@
         </table>
     @endif
 
-    <!-- ─── GALERI BIOMETRIK & PERKEMBANGAN FISIK ─── -->
-    @if(isset($galleries) && count($galleries) > 0)
-        <div class="section-title">Galeri Biometrik & Perkembangan Fisik</div>
-        <table class="gallery-table">
-            @foreach(collect($galleries)->chunk(2) as $row)
-                <tr>
-                    @foreach($row as $photo)
-                        <td style="width: 50%;">
-                            <div class="gallery-card">
-                                <div class="gallery-img-box">
-                                    <img src="{{ $photo['image'] }}" class="gallery-img" alt="Foto Biometrik">
-                                </div>
-                                <div class="gallery-meta">
-                                    <div class="gallery-date">{{ $photo['date'] }}</div>
-                                    @if(!empty($photo['notes']))
-                                        <div class="gallery-notes">{{ $photo['notes'] }}</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </td>
-                    @endforeach
-                    @if(count($row) === 1)
-                        <td style="width: 50%; border: none;"></td>
-                    @endif
-                </tr>
-            @endforeach
-        </table>
-    @endif
+    <!-- ─── TANDA TANGAN ─── -->
+    <table class="sign-table">
+        <tr>
+            <td>
+                <div style="font-size: 7.5px; color: #64748b;">Atlet / Klien</div>
+                <div class="sign-line"></div>
+                <strong style="font-size: 8.5px; color: #0f172a;">{{ $athlete->name }}</strong>
+            </td>
+            <td>
+                <div style="font-size: 7.5px; color: #64748b;">Pelatih Kepala</div>
+                <div class="sign-line"></div>
+                <strong style="font-size: 8.5px; color: #0f172a;">{{ $coachesText !== '-' ? $coachesText : 'Head Coach' }}</strong>
+            </td>
+            <td>
+                <div style="font-size: 7.5px; color: #64748b;">Sports Performance Lead</div>
+                <div class="sign-line"></div>
+                <strong style="font-size: 8.5px; color: #0f172a;">Olympus Performance Lead</strong>
+            </td>
+        </tr>
+    </table>
 
     <!-- ─── FOOTER ─── -->
     <div class="footer">
-        Generated on {{ \Carbon\Carbon::now()->translatedFormat('d F Y H:i') }} &bull; Powered by: Olympus Training Surabaya
+        Generated on {{ \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y, HH:mm') }} &bull; Olympus Training Surabaya
     </div>
 
 </body>

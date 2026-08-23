@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\CompositionTest;
 use App\Models\Setting;
+use App\Models\Sport;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +58,7 @@ class CompositionTestController extends Controller
             return redirect()->route('admin.composition-tests.show', $currentUser->id);
         }
 
-        $query = User::where('role', 'athlete')->orderBy('name', 'asc');
+        $query = User::where('role', 'athlete')->with('sport')->orderBy('name', 'asc');
         
         if ($currentUser && $currentUser->role === 'coach') {
             $query->whereHas('coaches', function($q) use ($currentUser) {
@@ -83,11 +84,13 @@ class CompositionTestController extends Controller
             return $athlete;
         });
 
+        $sports = Sport::orderBy('name')->get();
         $setting = Setting::where('key', 'composition_benchmarks')->first();
         $benchmarks = $setting ? json_decode($setting->value, true) : $this->getDefaultBenchmarks();
 
         return Inertia::render('Admin/CompositionTests/Index', [
             'athletes' => $athletes,
+            'sports' => $sports,
             'benchmarks' => $benchmarks,
             'filters' => $request->only(['search'])
         ]);
@@ -100,6 +103,7 @@ class CompositionTestController extends Controller
         $currentUser = auth()->user();
         if ($currentUser->role === 'athlete' && $user->id !== $currentUser->id) abort(403);
 
+        $user->load(['sport', 'coaches', 'package']);
         $user->photo_url = $user->profile_photo ? asset('storage/' . $user->profile_photo) : null;
         
         $history = CompositionTest::where('user_id', $user->id)

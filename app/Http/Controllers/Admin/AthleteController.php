@@ -202,9 +202,14 @@ class AthleteController extends Controller
 
         $tests = $athlete->performanceTests->sortBy('date')->values();
         $hasData = $tests->count() > 0;
+        $totalTrainings = $athlete->individualTrainings()->count();
+        $completedTrainings = $athlete->individualTrainings()->where('is_completed', true)->count();
 
         $stats = [
-            'total_sessions' => $tests->count(),
+            'total_tests' => $tests->count(),
+            'total_trainings' => $totalTrainings,
+            'completed_trainings' => $completedTrainings,
+            'total_sessions' => $totalTrainings,
             'highest_score' => 0,
             'average_score' => 0,
             'latest_score' => 0,

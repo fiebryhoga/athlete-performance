@@ -23,6 +23,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         profile_photo: null,
         role: activeTab,
         is_gym_guard: false,
+        gym_fee: '',
         sport_id: '',
         gender: 'L',
         age: '',
@@ -97,6 +98,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             profile_photo: null,
             role: activeTab,
             is_gym_guard: false,
+            gym_fee: '',
             sport_id: '',
             gender: 'L',
             age: '',
@@ -122,6 +124,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             profile_photo: null,
             role: user.role,
             is_gym_guard: user.is_gym_guard || false,
+            gym_fee: user.gym_fee || '',
             sport_id: user.sport_id || '',
             gender: user.gender || 'L',
             age: user.age || '',
@@ -617,6 +620,27 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     <p className="text-[10px] text-slate-400 font-medium mt-0.5 ml-6">Coach ini akan bisa dijadwalkan untuk piket jaga gym</p>
                                                 </div>
                                             </label>
+
+                                            {data.is_gym_guard && (
+                                                <div className="mt-3 pt-3 border-t border-slate-200/80 pl-8">
+                                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">
+                                                        Tarif Khusus Jaga Gym (Rp / shift)
+                                                    </label>
+                                                    <div className="relative">
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
+                                                        <input 
+                                                            type="number"
+                                                            value={data.gym_fee || ''}
+                                                            onChange={e => setData('gym_fee', e.target.value)}
+                                                            placeholder="Kosongkan untuk tarif default gym"
+                                                            className="w-full pl-9 pr-3 py-1.5 rounded-md border-slate-200 text-xs focus:ring-orange-500 focus:border-orange-500"
+                                                            min="0"
+                                                            disabled={auth.user.role !== 'superadmin'}
+                                                        />
+                                                    </div>
+                                                    <p className="text-[9.5px] text-slate-400 font-medium mt-1">Kosongkan jika ingin mengikuti tarif default global gym.</p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 

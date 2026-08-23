@@ -323,8 +323,9 @@ Route::middleware([
         Route::post('/admin/gym-attendance/check-out', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'checkOut'])->name('admin.gym-attendance.check-out');
         Route::delete('/admin/gym-attendance/record/{attendance}', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'destroy'])->name('admin.gym-attendance.destroy');
 
-        // Location setting (superadmin only)
+        // Location setting & Guard Fee (superadmin only)
         Route::post('/admin/gym-attendance/location', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'updateLocation'])->name('admin.gym-attendance.location.update');
+        Route::post('/admin/gym-attendance/guard-fee/{user}', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'updateGuardFee'])->name('admin.gym-attendance.guard-fee.update');
 
         // Payout (superadmin only)
         Route::post('/admin/gym-attendance/pay/{user}', [\App\Http\Controllers\Admin\GymAttendanceController::class, 'payGuard'])->name('admin.gym-attendance.pay');

@@ -1,61 +1,213 @@
-import React from 'react';
-import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link } from '@inertiajs/react';
-import CompositionAnatomy from '@/Pages/Admin/CompositionTests/Partials/CompositionAnatomy';
-import AthleteGallery from '@/Pages/Admin/Athletes/Partials/AthleteGallery';
-import { 
-    User, Calendar, Activity, Trophy, ArrowLeft, TrendingUp, TrendingDown, 
-    Target, Scale, Ruler, Weight, Clock, Zap, AlertCircle, Minus, FileText, ChevronRight, 
-    Download, HeartPulse, Battery, History, ArrowRight, ShieldCheck, Sparkles, CheckCircle2, 
-    AlertTriangle, Dumbbell, Compass, Flame, Droplets, Bed, Info, Layers, Eye, Camera
-} from 'lucide-react';
-import { 
-    ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
-    ComposedChart, Bar, Line, BarChart
-} from 'recharts';
+import React, { useState } from "react";
+import AppLayout from "@/Layouts/AppLayout";
+import { Head, Link } from "@inertiajs/react";
+import PageHeader from "@/Components/Common/PageHeader";
+import AthleteGallery from "@/Pages/Admin/Athletes/Partials/AthleteGallery";
+import ProfilingPdfDocument from "@/Pages/Admin/Athletes/Partials/ProfilingPdfDocument";
+import { pdf } from "@react-pdf/renderer";
+import {
+    User,
+    Calendar,
+    Activity,
+    Trophy,
+    ArrowLeft,
+    TrendingUp,
+    TrendingDown,
+    Target,
+    Scale,
+    Ruler,
+    Weight,
+    Clock,
+    Minus,
+    FileText,
+    ChevronRight,
+    Download,
+    HeartPulse,
+    Battery,
+    History,
+    ArrowRight,
+    ShieldCheck,
+    Sparkles,
+    CheckCircle2,
+    AlertTriangle,
+    Dumbbell,
+    Compass,
+    Flame,
+    Droplets,
+    Bed,
+    Info,
+    Layers,
+    Eye,
+    Camera,
+    Loader2,
+} from "lucide-react";
+import {
+    ResponsiveContainer,
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
+    Radar,
+    Legend,
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip as RechartsTooltip,
+    ComposedChart,
+    Bar,
+    Line,
+    BarChart,
+    LabelList,
+} from "recharts";
 
-export default function AthleteProfiling({ 
-    user, 
+export default function AthleteProfiling({
+    user,
     galleries = [],
-    stats = {}, 
-    radarData = [], 
-    comparisonData = [], 
-    itemAnalysis = [], 
-    strengths = [], 
-    weaknesses = [], 
-    trendData = [], 
-    history = [], 
-    daily_metrics = [], 
-    training_loads = [], 
-    latest_phv, 
-    latest_composition, 
-    latest_wellness, 
-    latest_dpa, 
+    stats = {},
+    radarData = [],
+    comparisonData = [],
+    itemAnalysis = [],
+    strengths = [],
+    weaknesses = [],
+    trendData = [],
+    history = [],
+    daily_metrics = [],
+    training_loads = [],
+    latest_phv,
+    latest_composition,
+    latest_wellness,
+    latest_dpa,
     latest_daily_metric,
-    has_data = false 
+    has_data = false,
 }) {
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleDownloadPdf = async () => {
+        if (isExporting) return;
+        setIsExporting(true);
+        try {
+            const doc = (
+                <ProfilingPdfDocument
+                    athlete={user}
+                    stats={stats}
+                    radarData={radarData}
+                    comparisonData={comparisonData}
+                    itemAnalysis={itemAnalysis}
+                    strengths={strengths}
+                    weaknesses={weaknesses}
+                    latest_phv={latest_phv}
+                    latest_composition={latest_composition}
+                    latest_wellness={latest_wellness}
+                    latest_dpa={latest_dpa}
+                />
+            );
+            const asPdf = pdf();
+            asPdf.updateContainer(doc);
+            const blob = await asPdf.toBlob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const cleanName = (user?.name || "Athlete").replace(
+                /[^a-zA-Z0-9_-]/g,
+                "_",
+            );
+            a.download = `Profiling_${cleanName}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("PDF generation error:", err);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     const calculateBMI = (h, w) => {
-        if (!h || !w) return '-';
+        if (!h || !w) return "-";
         const heightInM = h / 100;
         const bmiVal = w / (heightInM * heightInM);
-        return parseFloat(bmiVal.toFixed(1)); 
+        return parseFloat(bmiVal.toFixed(1));
     };
 
     const bmi = calculateBMI(user?.height, user?.weight);
-    const initial = user?.name ? user.name.charAt(0).toUpperCase() : '-';
+    const initial = user?.name ? user.name.charAt(0).toUpperCase() : "-";
 
     const getBMIStatus = (val) => {
-        if (val === '-') return { label: '-', color: 'text-slate-500', bg: 'bg-slate-100 border-slate-200' };
-        if (val < 18.5) return { label: 'Underweight', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' };
-        if (val >= 18.5 && val <= 24.9) return { label: 'Ideal', color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' };
-        if (val >= 25 && val <= 29.9) return { label: 'Overweight', color: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' };
-        return { label: 'Obese', color: 'text-rose-600', bg: 'bg-rose-50 border-rose-200' };
+        if (val === "-")
+            return {
+                label: "-",
+                color: "text-slate-500",
+                bg: "bg-slate-100 border-slate-200",
+            };
+        if (val < 18.5)
+            return {
+                label: "Underweight",
+                color: "text-amber-600",
+                bg: "bg-amber-50 border-amber-200",
+            };
+        if (val >= 18.5 && val <= 24.9)
+            return {
+                label: "Ideal",
+                color: "text-emerald-600",
+                bg: "bg-emerald-50 border-emerald-200",
+            };
+        if (val >= 25 && val <= 29.9)
+            return {
+                label: "Overweight",
+                color: "text-orange-600",
+                bg: "bg-orange-50 border-orange-200",
+            };
+        return {
+            label: "Obese",
+            color: "text-rose-600",
+            bg: "bg-rose-50 border-rose-200",
+        };
     };
     const bmiStatus = getBMIStatus(bmi);
 
-    const isFemale = user?.gender === 'P' || user?.gender === 'female' || user?.gender === 'Perempuan';
-    const genderLabel = isFemale ? 'Perempuan' : 'Laki-laki';
+    const getScoreBadge = (score) => {
+        const val = parseFloat(score || 0);
+        if (val >= 90)
+            return {
+                label: "Sangat Baik",
+                color: "text-emerald-600",
+                badgeClass:
+                    "bg-emerald-50 text-emerald-700 border-emerald-200/70",
+            };
+        if (val >= 80)
+            return {
+                label: "Baik",
+                color: "text-teal-600",
+                badgeClass: "bg-teal-50 text-teal-700 border-teal-200/70",
+            };
+        if (val >= 70)
+            return {
+                label: "Cukup",
+                color: "text-amber-600",
+                badgeClass: "bg-amber-50 text-amber-700 border-amber-200/70",
+            };
+        if (val >= 60)
+            return {
+                label: "Kurang",
+                color: "text-orange-600",
+                badgeClass: "bg-orange-50 text-orange-700 border-orange-200/70",
+            };
+        return {
+            label: "Sangat Kurang",
+            color: "text-rose-600",
+            badgeClass: "bg-rose-50 text-rose-700 border-rose-200/70",
+        };
+    };
+    const perfStatus = getScoreBadge(stats?.avg_score);
+
+    const isFemale =
+        user?.gender === "P" ||
+        user?.gender === "female" ||
+        user?.gender === "Perempuan";
+    const genderLabel = isFemale ? "Perempuan" : "Laki-laki";
 
     const formatScore = (val) => {
         if (val === undefined || val === null) return 0;
@@ -63,708 +215,1157 @@ export default function AthleteProfiling({
     };
 
     const formatNumber = (val) => {
-        if (val === undefined || val === null) return '-';
+        if (val === undefined || val === null) return "-";
         return Number(val) % 1 === 0 ? Number(val) : Number(val).toFixed(1);
     };
 
     const customTooltipStyle = {
-        borderRadius: '8px', 
-        border: '1px solid #e2e8f0',
-        backgroundColor: '#ffffff',
-        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', 
-        fontSize: '12px',
-        fontWeight: '600',
-        padding: '8px 12px'
+        borderRadius: "6px",
+        border: "1px solid #e2e8f0",
+        backgroundColor: "#ffffff",
+        boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
+        fontSize: "11px",
+        fontWeight: "700",
+        padding: "6px 10px",
     };
 
     const GrowthIndicator = ({ value }) => {
-        if (value === undefined || value === null) return <span className="text-slate-300">-</span>;
-        if (value > 0) return <span className="inline-flex items-center text-emerald-600 text-xs font-bold"><TrendingUp className="w-3.5 h-3.5 mr-0.5" /> +{value}%</span>;
-        if (value < 0) return <span className="inline-flex items-center text-rose-500 text-xs font-bold"><TrendingDown className="w-3.5 h-3.5 mr-0.5" /> {value}%</span>;
-        return <span className="inline-flex items-center text-slate-400 text-xs font-bold"><Minus className="w-3.5 h-3.5 mr-0.5" /> 0%</span>;
+        if (value === undefined || value === null)
+            return <span className="text-slate-300">-</span>;
+        if (value > 0)
+            return (
+                <span className="inline-flex items-center text-emerald-600 text-xs font-bold">
+                    <TrendingUp className="w-3.5 h-3.5 mr-0.5" /> +{value}%
+                </span>
+            );
+        if (value < 0)
+            return (
+                <span className="inline-flex items-center text-rose-500 text-xs font-bold">
+                    <TrendingDown className="w-3.5 h-3.5 mr-0.5" /> {value}%
+                </span>
+            );
+        return (
+            <span className="inline-flex items-center text-slate-400 text-xs font-bold">
+                <Minus className="w-3.5 h-3.5 mr-0.5" /> 0%
+            </span>
+        );
     };
 
     return (
         <AppLayout title="Profil Fisik & Analisis Komprehensif">
-            <Head title={`Profil Fisik - ${user?.name || 'Athlete'}`} />
+            <Head title={`Profil Fisik - ${user?.name || "Athlete"}`} />
 
-            <div className="w-full mx-auto pb-16 px-4 sm:px-6 lg:px-8 space-y-6">
-                
-                {/* ─── TOP ACTION & TITLE BAR ─── */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-2">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded-md border border-orange-200">
-                                {stats?.sport || user?.sport?.name || 'General Athlete'}
-                            </span>
-                            <span className="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md">
-                                {genderLabel}
-                            </span>
-                        </div>
-                        <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-                            Profil Fisik & Analisis Performa
-                        </h1>
-                        <p className="text-slate-500 text-xs md:text-sm mt-0.5">
-                            Pusat evaluasi komprehensif metrik performa fisik, antropometri, dan pemantauan kebugaran harian.
-                        </p>
-                    </div>
-
-                    {user?.id && (
-                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto">
-                            <a 
-                                href={route('admin.athletes.export-pdf', user.id)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm shadow-sm transition-all flex items-center justify-center gap-2 shrink-0"
-                            >
-                                <Download className="w-4 h-4 text-orange-500" /> Download PDF Profiling
-                            </a>
-                            <Link 
-                                href={route('admin.individual-trainings.show', user.id)}
-                                className="w-full sm:w-auto bg-orange-500 text-white px-4 py-2.5 rounded-lg font-bold text-xs md:text-sm hover:bg-orange-600 transition-colors shadow-sm flex items-center justify-center gap-2 shrink-0"
-                            >
-                                <Activity className="w-4 h-4" /> Program Latihan
-                            </Link>
-                        </div>
-                    )}
+            <div className="space-y-3.5 pb-4">
+                {/* ─── PAGE HEADER ─── */}
+                <div className="space-y-1">
+                    <PageHeader
+                        title="Profil Fisik & Analisis Performa"
+                        description={`Evaluasi rekam jejak performa fisik, antropometri, dan beban latihan ${user?.name || "atlet"}.`}
+                        actions={
+                            user?.id ? (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleDownloadPdf}
+                                        disabled={isExporting}
+                                        className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-slate-300 px-3 py-1.5 rounded-md font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                                    >
+                                        {isExporting ? (
+                                            <>
+                                                <Loader2
+                                                    size={13}
+                                                    className="text-orange-500 animate-spin"
+                                                />
+                                                <span>Membuat PDF...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Download
+                                                    size={13}
+                                                    className="text-orange-500"
+                                                />
+                                                <span>Download PDF</span>
+                                            </>
+                                        )}
+                                    </button>
+                                    <Link
+                                        href={route(
+                                            "admin.individual-trainings.show",
+                                            user.id,
+                                        )}
+                                        className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-3 py-1.5 rounded-md font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <Activity size={13} /> Program Latihan
+                                    </Link>
+                                </div>
+                            ) : null
+                        }
+                    />
                 </div>
 
-                {/* ─── 1. HERO PROFILE & BIOMETRICS BANNER ─── */}
-                <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 md:p-6 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-500/5 via-amber-500/5 to-transparent rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-                        {/* Left: Avatar & Identity details */}
-                        <div className="flex items-center gap-4 min-w-0">
-                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white flex items-center justify-center text-2xl font-black shadow-md border-2 border-white shrink-0 overflow-hidden">
-                                {user?.profile_photo_url ? (
-                                    <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    initial
-                                )}
-                            </div>
-                            <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-                                    {stats?.package_name && (
-                                        <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-200 truncate">
-                                            {stats.package_name}
-                                        </span>
-                                    )}
-                                    {stats?.sport && (
-                                        <span className="text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded-md border border-orange-200 truncate">
-                                            {stats.sport}
-                                        </span>
-                                    )}
-                                    {stats?.coaches_text && stats.coaches_text !== '-' && (
-                                        <span className="text-[11px] font-medium text-slate-600 bg-slate-50 px-2.5 py-0.5 rounded-md border border-slate-200 truncate">
-                                            Pelatih: {stats.coaches_text}
-                                        </span>
-                                    )}
-                                </div>
-                                <h2 className="text-xl md:text-2xl font-black text-slate-900 truncate tracking-tight">{user?.name || 'Athlete'}</h2>
-                                <p className="text-xs text-slate-400 font-mono">@{user?.username || '-'}</p>
-                            </div>
-                        </div>
-
-                        {/* Right: 4 Biometrics Metric Cards */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
-                            <div className="px-4 py-3 bg-slate-50 rounded-lg border border-slate-200/80 min-w-[95px] flex flex-col justify-between">
-                                <div className="flex items-center justify-between text-slate-400 mb-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">Tinggi</span>
-                                    <Ruler className="w-3.5 h-3.5 text-slate-400" />
-                                </div>
-                                <div className="text-slate-900 font-black text-base md:text-lg">
-                                    {user?.height || '-'} <span className="text-xs font-semibold text-slate-400">cm</span>
-                                </div>
-                            </div>
-                            <div className="px-4 py-3 bg-slate-50 rounded-lg border border-slate-200/80 min-w-[95px] flex flex-col justify-between">
-                                <div className="flex items-center justify-between text-slate-400 mb-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">Berat</span>
-                                    <Weight className="w-3.5 h-3.5 text-slate-400" />
-                                </div>
-                                <div className="text-slate-900 font-black text-base md:text-lg">
-                                    {user?.weight || '-'} <span className="text-xs font-semibold text-slate-400">kg</span>
-                                </div>
-                            </div>
-                            <div className="px-4 py-3 bg-slate-50 rounded-lg border border-slate-200/80 min-w-[95px] flex flex-col justify-between">
-                                <div className="flex items-center justify-between text-slate-400 mb-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">Usia</span>
-                                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                                </div>
-                                <div className="text-slate-900 font-black text-base md:text-lg">
-                                    {user?.age || '-'} <span className="text-xs font-semibold text-slate-400">thn</span>
-                                </div>
-                            </div>
-                            <div className="px-4 py-3 bg-slate-50 rounded-lg border border-slate-200/80 min-w-[95px] flex flex-col justify-between">
-                                <div className="flex items-center justify-between text-slate-400 mb-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">BMI</span>
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${bmiStatus.bg} ${bmiStatus.color}`}>{bmiStatus.label}</span>
-                                </div>
-                                <div className={`font-black text-base md:text-lg ${bmiStatus.color}`}>
-                                    {bmi}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ─── 2. EXECUTIVE PERFORMANCE KPIS (4 STAT CARDS) ─── */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Sesi</span>
-                            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg border border-blue-100"><Layers className="w-4 h-4" /></div>
-                        </div>
-                        <div>
-                            <p className="text-2xl md:text-3xl font-black text-slate-900">{stats?.sessions || 0}</p>
-                            <span className="text-xs text-slate-400 font-medium">Tes fisik terekam</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rata-Rata Skor</span>
-                            <div className="p-2 bg-orange-50 text-orange-600 rounded-lg border border-orange-100"><Activity className="w-4 h-4" /></div>
-                        </div>
-                        <div>
-                            <p className="text-2xl md:text-3xl font-black text-orange-500">{formatScore(stats?.avg_score)} <span className="text-xs font-bold text-slate-400">/ 100</span></p>
-                            <span className="text-xs text-slate-400 font-medium">Skor kumulatif tes</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Skor Tertinggi</span>
-                            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100"><Trophy className="w-4 h-4" /></div>
-                        </div>
-                        <div>
-                            <p className="text-2xl md:text-3xl font-black text-emerald-600">{formatScore(stats?.max_score)} <span className="text-xs font-bold text-slate-400">/ 100</span></p>
-                            <span className="text-xs text-slate-400 font-medium">Rekor performa puncak</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kategori Terbaik</span>
-                            <div className="p-2 bg-purple-50 text-purple-600 rounded-lg border border-purple-100"><Sparkles className="w-4 h-4" /></div>
-                        </div>
-                        <div>
-                            <p className="text-base md:text-lg font-black text-slate-800 truncate mt-1">{stats?.best_category || '-'}</p>
-                            <span className="text-xs text-slate-400 font-medium">Dominan keunggulan</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ─── 3. PHYSICAL STRENGTHS & IMPROVEMENT PRIORITIES (2 BALANCED CARDS) ─── */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Strengths */}
-                    <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                    <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100">
-                                        <Zap className="w-4 h-4" />
-                                    </div>
-                                    Keunggulan Fisik (&gt;70%)
-                                </h3>
-                                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                                    {strengths?.length || 0} Kategori Unggul
+                {/* ─── 2-COLUMN GRID (LEFT: HERO & CHARTS, RIGHT: SCORE GAUGE & SIDEBAR) ─── */}
+                <div className="flex flex-col lg:flex-row gap-4 items-start">
+                    {/* ═══════════════════════════════════════
+                        KOLOM KIRI — HERO, CHARTS, STRENGTHS, GALLERY (FLEX-1)
+                       ═══════════════════════════════════════ */}
+                    <div className="flex-1 min-w-0 space-y-4 w-full">
+                        {/* 1. Athlete Profile Hero Card (Cover Banner + Overlapping Avatar Style) */}
+                        <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden hover:border-slate-300 transition-all">
+                            {/* Cover Banner (Soft White-Orange Gradient) */}
+                            <div className="relative h-20 sm:h-24 bg-gradient-to-r from-white via-orange-50/50 to-amber-50/60 border-b border-slate-100 p-3 flex justify-end items-start overflow-hidden">
+                                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ea580c_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none"></div>
+                                <span className="relative z-10 inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs border border-slate-200/80 text-slate-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs">
+                                    <ShieldCheck
+                                        size={11}
+                                        className="text-orange-500"
+                                    />
+                                    <span>
+                                        {stats?.package_name ||
+                                            (stats?.sport
+                                                ? `${stats.sport}`
+                                                : "Member")}
+                                    </span>
                                 </span>
                             </div>
-                            <div className="space-y-3">
-                                {strengths && strengths.length > 0 ? strengths.map((item, idx) => (
-                                    <div key={idx} className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex flex-col gap-2">
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="font-bold text-slate-800 text-sm">{item.name}</span>
-                                            <span className="font-black text-emerald-600 text-sm">{formatScore(item.score)}%</span>
-                                        </div>
-                                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                                            <div 
-                                                className="bg-emerald-500 h-full rounded-full transition-all duration-500" 
-                                                style={{ width: `${Math.min(100, Math.max(0, item.score))}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="py-6 text-center text-slate-400 text-xs italic bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                        Belum ada kategori dengan skor di atas 70%.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Weaknesses / Improvement Priorities */}
-                    <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                    <div className="p-1.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100">
-                                        <AlertCircle className="w-4 h-4" />
-                                    </div>
-                                    Prioritas Peningkatan (&le;70%)
-                                </h3>
-                                <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
-                                    {weaknesses?.length || 0} Kategori Perlu Dilatih
-                                </span>
-                            </div>
-                            <div className="space-y-3">
-                                {weaknesses && weaknesses.length > 0 ? weaknesses.map((item, idx) => (
-                                    <div key={idx} className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex flex-col gap-2">
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="font-bold text-slate-800 text-sm">{item.name}</span>
-                                            <span className="font-black text-rose-500 text-sm">{formatScore(item.score)}%</span>
+                            {/* Content Container Below Banner */}
+                            <div className="px-5 pb-4 pt-2.5 sm:pt-3">
+                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                    {/* Left: Avatar overlapping banner + Identity */}
+                                    <div className="flex items-center gap-3.5 min-w-0">
+                                        <div className="relative -mt-10 sm:-mt-12 w-[72px] h-[72px] sm:w-[80px] sm:h-[80px] rounded-md border-[3px] border-white shadow-md overflow-hidden bg-white text-orange-600 font-black text-xl sm:text-2xl flex items-center justify-center shrink-0 z-10">
+                                            {user?.profile_photo_url ? (
+                                                <img
+                                                    src={user.profile_photo_url}
+                                                    alt={user.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <span className="leading-none select-none">
+                                                    {initial}
+                                                </span>
+                                            )}
                                         </div>
-                                        <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                                            <div 
-                                                className="bg-rose-500 h-full rounded-full transition-all duration-500" 
-                                                style={{ width: `${Math.min(100, Math.max(0, item.score))}%` }}
-                                            />
+
+                                        <div className="space-y-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+                                                    {user?.name || "Athlete"}
+                                                </h2>
+                                                <span className="text-[10px] font-mono text-slate-400 font-bold">
+                                                    @{user?.username || "-"}
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 font-bold text-orange-700 bg-orange-50 border border-orange-200/70 px-2 py-0.5 rounded text-[10px]">
+                                                    <Compass
+                                                        size={10}
+                                                        className="text-orange-500"
+                                                    />
+                                                    {stats?.sport ||
+                                                        user?.sport?.name ||
+                                                        "Tanpa Cabor"}
+                                                </span>
+                                                {stats?.package_name && (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border bg-blue-50 text-blue-700 border-blue-200/70">
+                                                        {stats.package_name}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium flex-wrap">
+                                                <span className="inline-flex items-center gap-1">
+                                                    <User
+                                                        size={11}
+                                                        className="text-slate-400"
+                                                    />
+                                                    {genderLabel}
+                                                </span>
+                                                {stats?.coaches_text &&
+                                                    stats.coaches_text !==
+                                                        "-" && (
+                                                        <>
+                                                            <span className="text-slate-300">
+                                                                •
+                                                            </span>
+                                                            <span>
+                                                                Pelatih:{" "}
+                                                                <strong className="text-slate-700 font-semibold">
+                                                                    {
+                                                                        stats.coaches_text
+                                                                    }
+                                                                </strong>
+                                                            </span>
+                                                        </>
+                                                    )}
+                                            </div>
                                         </div>
                                     </div>
-                                )) : (
-                                    <div className="py-6 text-center text-slate-400 text-xs italic bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                        Semua kategori telah berada di atas standar 70%.
+
+                                    {/* Right: 4 Biometrics Sub-Boxes */}
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0 mt-1 lg:mt-0">
+                                        <div className="px-3 py-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-center min-w-[70px]">
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Tinggi
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                                                {user?.height || "-"}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    cm
+                                                </span>
+                                            </span>
+                                        </div>
+
+                                        <div className="px-3 py-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-center min-w-[70px]">
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Berat
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                                                {user?.weight || "-"}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    kg
+                                                </span>
+                                            </span>
+                                        </div>
+
+                                        <div className="px-3 py-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-center min-w-[70px]">
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Usia
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
+                                                {user?.age || "-"}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    thn
+                                                </span>
+                                            </span>
+                                        </div>
+
+                                        <div className="px-3 py-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-center min-w-[70px]">
+                                            <span
+                                                className={`text-[8.5px] font-bold block truncate ${bmiStatus.color}`}
+                                            >
+                                                {bmiStatus.label}
+                                            </span>
+                                            <span
+                                                className={`text-xs sm:text-sm font-black leading-tight ${bmiStatus.color}`}
+                                            >
+                                                {bmi}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    BMI
+                                                </span>
+                                            </span>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ─── 4. MULTI-DOMAIN HEALTH & ASSESSMENT MATRIX (4 BENTO CARDS) ─── */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-orange-50 text-orange-500 rounded-lg border border-orange-100">
-                            <Layers className="w-4 h-4" />
-                        </div>
-                        <h2 className="text-lg font-black text-slate-900 tracking-tight">Status Multi-Domain Asesmen Atlet</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* 1. PHV & Maturity */}
-                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                            <div>
-                                <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                        <Activity className="w-4 h-4 text-emerald-500" /> PHV & Pertumbuhan
-                                    </h4>
-                                    {latest_phv && (
-                                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                                            {latest_phv.phv_status || 'Circa-PHV'}
-                                        </span>
-                                    )}
                                 </div>
-
-                                {latest_phv ? (
-                                    <div className="space-y-2.5">
-                                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase block">Maturity Offset</span>
-                                            <p className="text-xl font-black text-slate-900">{Number(latest_phv.maturity_offset).toFixed(2)} <span className="text-xs font-normal text-slate-500">thn dr PHV</span></p>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 text-xs text-center">
-                                            <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">Prediksi Tinggi</span>
-                                                <strong className="text-slate-800 font-extrabold">{latest_phv.predicted_adult_height || '-'} cm</strong>
-                                            </div>
-                                            <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">Sisa Tumbuh</span>
-                                                <strong className="text-orange-600 font-extrabold">+{latest_phv.remaining_growth || '-'} cm</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="py-8 text-center text-slate-400 text-xs italic">Belum ada asesmen PHV</div>
-                                )}
                             </div>
                         </div>
 
-                        {/* 2. Body Composition */}
-                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                            <div>
-                                <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                        <Scale className="w-4 h-4 text-indigo-500" /> Komposisi Tubuh
-                                    </h4>
-                                    {latest_composition && (
-                                        <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
-                                            Terekam
-                                        </span>
-                                    )}
-                                </div>
-
-                                {latest_composition ? (
-                                    <div className="space-y-2.5">
-                                        <div className="grid grid-cols-2 gap-2 text-center">
-                                            <div className="bg-orange-50/70 p-2.5 rounded-lg border border-orange-200/60">
-                                                <span className="text-[10px] font-bold text-orange-700 uppercase block">Body Fat</span>
-                                                <p className="text-lg font-black text-orange-600">{latest_composition.body_fat_percentage ?? '-'}%</p>
-                                                <span className="text-[10px] text-slate-500">{latest_composition.fat_mass ?? '-'} kg</span>
-                                            </div>
-                                            <div className="bg-indigo-50/70 p-2.5 rounded-lg border border-indigo-200/60">
-                                                <span className="text-[10px] font-bold text-indigo-700 uppercase block">Muscle Mass</span>
-                                                <p className="text-lg font-black text-indigo-600">{latest_composition.muscle_mass ?? '-'} <span className="text-xs">kg</span></p>
-                                                <span className="text-[10px] text-slate-500">Massa Bebas Lemak</span>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 text-xs text-center">
-                                            <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">BMR</span>
-                                                <strong className="text-slate-800 font-extrabold">{latest_composition.bmr ? `${latest_composition.bmr} kcal` : '-'}</strong>
-                                            </div>
-                                            <div className="p-2 bg-slate-50 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">Visceral Fat</span>
-                                                <strong className="text-slate-800 font-extrabold">Lvl {latest_composition.visceral_fat_level ?? '-'}</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="py-8 text-center text-slate-400 text-xs italic">Belum ada tes komposisi tubuh</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* 3. Wellness & Training Load */}
-                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                            <div>
-                                <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                        <Battery className="w-4 h-4 text-amber-500" /> Beban & Wellness
-                                    </h4>
-                                    {latest_wellness && (
-                                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                                            Aktif
-                                        </span>
-                                    )}
-                                </div>
-
-                                {latest_wellness ? (
-                                    <div className="space-y-2.5">
-                                        <div className="grid grid-cols-2 gap-2 text-center">
-                                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 font-bold uppercase block">Wellness</span>
-                                                <p className="text-lg font-black text-emerald-600">{latest_wellness.daily_wellness_score ?? '-'} <span className="text-xs text-slate-400 font-normal">/30</span></p>
-                                            </div>
-                                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
-                                                <span className="text-[10px] text-slate-400 font-bold uppercase block">Session RPE</span>
-                                                <p className="text-lg font-black text-orange-500">{latest_wellness.session_rpe ?? '-'} <span className="text-xs text-slate-400 font-normal">/10</span></p>
-                                            </div>
-                                        </div>
-                                        <div className="bg-orange-50/60 p-2.5 rounded-lg border border-orange-200/60 flex items-center justify-between text-xs">
-                                            <span className="font-bold text-orange-800">Daily Load (AU)</span>
-                                            <strong className="text-base font-black text-orange-600">{latest_wellness.daily_load ?? '-'}</strong>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="py-8 text-center text-slate-400 text-xs italic">Belum ada catatan wellness & RPE</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* 4. Dynamic Posture Assessment (DPA) */}
-                        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors">
-                            <div>
-                                <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-100">
-                                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                        <User className="w-4 h-4 text-purple-500" /> Postur Dinamis (DPA)
-                                    </h4>
-                                    {latest_dpa && (
-                                        <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
-                                            Assessed
-                                        </span>
-                                    )}
-                                </div>
-
-                                {latest_dpa ? (
-                                    <div className="space-y-2.5">
-                                        <div className="bg-purple-50/50 p-3 rounded-lg border border-purple-200/60 flex items-center justify-between">
-                                            <span className="text-xs font-bold text-purple-800">Total Deviasi</span>
-                                            <p className="text-xl font-black text-purple-700">{latest_dpa.total_score} <span className="text-xs font-normal">kompensasi</span></p>
-                                        </div>
-                                        <p className="text-xs text-slate-500 line-clamp-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
-                                            {latest_dpa.details && latest_dpa.details.length > 0 
-                                                ? latest_dpa.details.map(d => d.compensation?.name || d.movement_name).filter(Boolean).slice(0, 2).join(', ')
-                                                : 'Tidak ada deviasi sendi signifikan.'}
+                        {/* 2. Visualisasi Dual Chart (Radar & Bar Comparison) */}
+                        {has_data ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                {/* Radar Chart Card */}
+                                <div className="bg-gradient-to-br from-white via-white to-orange-50/40 p-4 sm:p-5 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition-all">
+                                    {/* Header */}
+                                    <div className="mb-2">
+                                        <h3 className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
+                                            Radar Kategori Fisik
+                                        </h3>
+                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                                            Profil atribut fisik dari evaluasi
+                                            tes terakhir (0 – 100)
                                         </p>
                                     </div>
-                                ) : (
-                                    <div className="py-8 text-center text-slate-400 text-xs italic">Belum ada asesmen postur (DPA)</div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* ─── 5. PHYSICAL PERFORMANCE CHARTS & BREAKDOWN ─── */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-orange-50 text-orange-500 rounded-lg border border-orange-100">
-                            <Target className="w-4 h-4" />
-                        </div>
-                        <h2 className="text-lg font-black text-slate-900 tracking-tight">Analisis Performa & Grafik Tes Fisik</h2>
-                    </div>
-
-                    {has_data ? (
-                        <>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {/* Radar Chart */}
-                                <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                                    <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                        <Target className="w-4 h-4 text-orange-500" /> Peta Kemampuan Fisik (Radar Chart)
-                                    </h3>
-                                    <div className="h-[280px] md:h-[320px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                                                <PolarGrid stroke="#f1f5f9" strokeDasharray="3 3" />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} />
-                                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                                <Radar name="Target Cabor" dataKey="B" stroke="#f59e0b" strokeWidth={2} fill="#f59e0b" fillOpacity={0.1} />
-                                                <Radar name="Performa Atlet" dataKey="A" stroke="#f97316" strokeWidth={2.5} fill="#f97316" fillOpacity={0.4} />
-                                                <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                                                <RechartsTooltip contentStyle={customTooltipStyle} />
+                                    {/* Chart */}
+                                    <div className="h-[230px] sm:h-[250px] w-full py-1">
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height="100%"
+                                        >
+                                            <RadarChart
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius="68%"
+                                                data={radarData}
+                                            >
+                                                <PolarGrid
+                                                    stroke="#e2e8f0"
+                                                    strokeDasharray="3 3"
+                                                />
+                                                <PolarAngleAxis
+                                                    dataKey="subject"
+                                                    tick={({
+                                                        payload,
+                                                        x,
+                                                        y,
+                                                        cx,
+                                                        cy,
+                                                        ...rest
+                                                    }) => {
+                                                        const item =
+                                                            radarData?.find(
+                                                                (d) =>
+                                                                    d.subject ===
+                                                                    payload.value,
+                                                            );
+                                                        const labelName =
+                                                            payload.value ===
+                                                            "Strength Endurance"
+                                                                ? "Str. Endurance"
+                                                                : payload.value;
+                                                        const valStr = item
+                                                            ? ` (${formatScore(item.A)})`
+                                                            : "";
+                                                        return (
+                                                            <text
+                                                                {...rest}
+                                                                x={x}
+                                                                y={y}
+                                                                fill="#475569"
+                                                                fontSize={9.5}
+                                                                fontWeight="600"
+                                                                textAnchor={
+                                                                    x > cx
+                                                                        ? "start"
+                                                                        : x < cx
+                                                                          ? "end"
+                                                                          : "middle"
+                                                                }
+                                                            >
+                                                                {labelName}
+                                                                {valStr}
+                                                            </text>
+                                                        );
+                                                    }}
+                                                />
+                                                <PolarRadiusAxis
+                                                    angle={30}
+                                                    domain={[0, 100]}
+                                                    tick={false}
+                                                    axisLine={false}
+                                                />
+                                                <Radar
+                                                    name="Performa Atlet"
+                                                    dataKey="A"
+                                                    stroke="#ea580c"
+                                                    strokeWidth={2.5}
+                                                    fill="#fed7aa"
+                                                    fillOpacity={0.45}
+                                                    dot={{
+                                                        r: 3.5,
+                                                        fill: "#fff",
+                                                        stroke: "#ea580c",
+                                                        strokeWidth: 2,
+                                                    }}
+                                                />
+                                                <RechartsTooltip
+                                                    contentStyle={
+                                                        customTooltipStyle
+                                                    }
+                                                />
                                             </RadarChart>
                                         </ResponsiveContainer>
+                                    </div>
+
+                                    {/* Footer Summary */}
+                                    <div className="border-t border-slate-100 pt-2.5 flex items-center justify-between text-[11px] font-normal text-slate-500">
+                                        <div>
+                                            Teratas:{" "}
+                                            <strong className="text-slate-900 font-bold">
+                                                {(() => {
+                                                    if (
+                                                        !radarData ||
+                                                        radarData.length === 0
+                                                    )
+                                                        return "-";
+                                                    const top = [
+                                                        ...radarData,
+                                                    ].sort(
+                                                        (a, b) =>
+                                                            (b.A || 0) -
+                                                            (a.A || 0),
+                                                    )[0];
+                                                    const name =
+                                                        top?.subject ===
+                                                        "Strength Endurance"
+                                                            ? "Str. Endurance"
+                                                            : top?.subject;
+                                                    return `${name} (${formatScore(top?.A)})`;
+                                                })()}
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            Fokus:{" "}
+                                            <strong className="text-orange-600 font-bold">
+                                                {(() => {
+                                                    if (
+                                                        !radarData ||
+                                                        radarData.length === 0
+                                                    )
+                                                        return "-";
+                                                    const lowest = [
+                                                        ...radarData,
+                                                    ].sort(
+                                                        (a, b) =>
+                                                            (a.A || 0) -
+                                                            (b.A || 0),
+                                                    )[0];
+                                                    const name =
+                                                        lowest?.subject ===
+                                                        "Strength Endurance"
+                                                            ? "Str. Endurance"
+                                                            : lowest?.subject;
+                                                    return `${name} (${formatScore(lowest?.A)})`;
+                                                })()}
+                                            </strong>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Comparison Bar Chart */}
-                                <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                                    <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                        <Activity className="w-4 h-4 text-orange-500" /> Perbandingan Kategori: Sesi Terkini vs Sebelumnya
-                                    </h3>
-                                    <div className="h-[280px] md:h-[320px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={comparisonData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barGap={4}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                                                <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
-                                                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
-                                                <Bar name="Sesi Sebelumnya" dataKey="previous" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={16} />
-                                                <Bar name="Sesi Terkini" dataKey="latest" fill="#f97316" radius={[4, 4, 0, 0]} barSize={16} />
+                                <div className="bg-gradient-to-br from-white via-white to-orange-50/40 p-4 sm:p-5 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition-all">
+                                    <div className="mb-2">
+                                        <h3 className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
+                                            Komparasi Sesi Terkini
+                                        </h3>
+                                        <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                                            Perbandingan kategori sesi terkini
+                                            vs sebelumnya (0 – 100)
+                                        </p>
+                                    </div>
+                                    <div className="h-[230px] sm:h-[250px] w-full py-1">
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height="100%"
+                                        >
+                                            <BarChart
+                                                data={comparisonData}
+                                                margin={{
+                                                    top: 22,
+                                                    right: 0,
+                                                    left: -20,
+                                                    bottom: 0,
+                                                }}
+                                                barGap={3}
+                                            >
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    vertical={false}
+                                                    stroke="#f1f5f9"
+                                                />
+                                                <XAxis
+                                                    dataKey="name"
+                                                    tick={{
+                                                        fontSize: 9,
+                                                        fill: "#64748b",
+                                                        fontWeight: 600,
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <YAxis
+                                                    domain={[0, 100]}
+                                                    tick={{
+                                                        fontSize: 9,
+                                                        fill: "#94a3b8",
+                                                    }}
+                                                    axisLine={false}
+                                                    tickLine={false}
+                                                />
+                                                <RechartsTooltip
+                                                    cursor={{ fill: "#f8fafc" }}
+                                                    contentStyle={
+                                                        customTooltipStyle
+                                                    }
+                                                />
+                                                <Legend
+                                                    wrapperStyle={{
+                                                        fontSize: "10px",
+                                                        paddingTop: "4px",
+                                                    }}
+                                                    iconType="circle"
+                                                />
+                                                <Bar
+                                                    name="Sesi Sebelumnya"
+                                                    dataKey="previous"
+                                                    fill="#cbd5e1"
+                                                    radius={[3, 3, 0, 0]}
+                                                    barSize={14}
+                                                >
+                                                    <LabelList
+                                                        dataKey="previous"
+                                                        position="top"
+                                                        fill="#64748b"
+                                                        fontSize={8.5}
+                                                        fontWeight="bold"
+                                                        formatter={(val) =>
+                                                            val > 0
+                                                                ? `${formatScore(val)}`
+                                                                : ""
+                                                        }
+                                                        offset={3}
+                                                    />
+                                                </Bar>
+                                                <Bar
+                                                    name="Sesi Terkini"
+                                                    dataKey="latest"
+                                                    fill="#f97316"
+                                                    radius={[3, 3, 0, 0]}
+                                                    barSize={14}
+                                                >
+                                                    <LabelList
+                                                        dataKey="latest"
+                                                        position="top"
+                                                        fill="#ea580c"
+                                                        fontSize={8.5}
+                                                        fontWeight="bold"
+                                                        formatter={(val) =>
+                                                            val > 0
+                                                                ? `${formatScore(val)}`
+                                                                : ""
+                                                        }
+                                                        offset={3}
+                                                    />
+                                                </Bar>
                                             </BarChart>
                                         </ResponsiveContainer>
+                                    </div>
+                                    <div className="border-t border-slate-100 pt-2.5 flex items-center text-[11px] font-normal text-slate-500">
+                                        <span>
+                                            Total Kategori:{" "}
+                                            <strong className="text-slate-900 font-bold">
+                                                {comparisonData?.length || 0}{" "}
+                                                Elemen
+                                            </strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
+
+                        {/* 3. Analisis Keunggulan & Prioritas Peningkatan (2 Kolom Seimbang) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            {/* Strengths */}
+                            <div className="bg-gradient-to-br from-white via-white to-orange-50/40 p-3.5 sm:p-4 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition-all">
+                                <div>
+                                    <div className="mb-2.5 pb-2 border-b border-slate-100">
+                                        <h3 className="text-[11.5px] sm:text-xs font-bold text-slate-900">
+                                            Keunggulan Fisik (&gt;70%)
+                                        </h3>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {strengths && strengths.length > 0 ? (
+                                            strengths.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="p-2 rounded-md bg-slate-50/70 border border-slate-200/70 flex flex-col gap-1"
+                                                >
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="font-bold text-slate-800 text-xs">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="font-black text-emerald-600 text-xs">
+                                                            {formatScore(
+                                                                item.score,
+                                                            )}
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                    <div className="w-full bg-slate-200/70 h-1.5 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+                                                            style={{
+                                                                width: `${Math.min(100, Math.max(0, item.score))}%`,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="py-4 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-md border border-dashed border-slate-200">
+                                                Belum ada kategori di atas 70%.
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Detailed Item Breakdown Table */}
-                            {itemAnalysis && itemAnalysis.length > 0 && (
-                                <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                                    <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
-                                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-orange-500" /> Rincian Parameter Tes Sesi Terakhir
+                            {/* Weaknesses */}
+                            <div className="bg-gradient-to-br from-white via-white to-orange-50/40 p-3.5 sm:p-4 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition-all">
+                                <div>
+                                    <div className="mb-2.5 pb-2 border-b border-slate-100">
+                                        <h3 className="text-[11.5px] sm:text-xs font-bold text-slate-900">
+                                            Prioritas Peningkatan (&le;70%)
                                         </h3>
-                                        <span className="text-xs text-slate-500 font-bold bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                                            Total {itemAnalysis.length} Item Tes
+                                    </div>
+                                    <div className="space-y-2">
+                                        {weaknesses && weaknesses.length > 0 ? (
+                                            weaknesses.map((item, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="p-2 rounded-md bg-slate-50/70 border border-slate-200/70 flex flex-col gap-1"
+                                                >
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="font-bold text-slate-800 text-xs">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="font-black text-rose-500 text-xs">
+                                                            {formatScore(
+                                                                item.score,
+                                                            )}
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                    <div className="w-full bg-slate-200/70 h-1.5 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="bg-gradient-to-r from-rose-500 to-orange-400 h-full rounded-full transition-all duration-500"
+                                                            style={{
+                                                                width: `${Math.min(100, Math.max(0, item.score))}%`,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="py-4 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-md border border-dashed border-slate-200">
+                                                Semua kategori berada di atas
+                                                70%.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 4. Galeri Biometrik (Full Width di Kolom Kiri) */}
+                        <div className="space-y-2">
+                            <AthleteGallery
+                                athlete={user}
+                                galleries={
+                                    galleries && galleries.length > 0
+                                        ? galleries
+                                        : user?.galleries || []
+                                }
+                            />
+                        </div>
+
+                        {/* 5. Complete Performance Sessions History */}
+                        <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                            <div className="px-4 py-3 bg-gradient-to-r from-white via-orange-50/30 to-white border-b border-slate-200/80 flex items-center justify-between">
+                                <h3 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                                    <History className="w-4 h-4 text-orange-500" />{" "}
+                                    Riwayat Seluruh Sesi Tes Performa
+                                </h3>
+                                <span className="text-[10px] text-slate-500 font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200/80 shadow-2xs">
+                                    Total {history?.length || 0} Sesi
+                                </span>
+                            </div>
+
+                            <div className="overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                <table className="w-full text-xs text-left whitespace-nowrap">
+                                    <thead className="text-[10px] text-slate-500 bg-slate-50/95 border-b border-slate-200/80 font-bold uppercase tracking-wider">
+                                        <tr>
+                                            <th className="px-4 py-2.5">
+                                                Tanggal Sesi
+                                            </th>
+                                            <th className="px-4 py-2.5 text-center">
+                                                Skor Kumulatif
+                                            </th>
+                                            <th className="px-4 py-2.5 text-center">
+                                                Evaluasi Kinerja
+                                            </th>
+                                            <th className="px-4 py-2.5 text-right">
+                                                Tindakan
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {history && history.length > 0 ? (
+                                            history.map((session) => (
+                                                <tr
+                                                    key={session.id}
+                                                    className="hover:bg-orange-50/20 transition-colors"
+                                                >
+                                                    <td className="px-4 py-3 font-bold text-slate-800">
+                                                        {session.full_date}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className="font-black text-orange-600 text-sm">
+                                                            {formatScore(
+                                                                session.score,
+                                                            )}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        {(() => {
+                                                            const badge =
+                                                                getScoreBadge(
+                                                                    session.score,
+                                                                );
+                                                            return (
+                                                                <span
+                                                                    className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold border ${badge.badgeClass}`}
+                                                                >
+                                                                    {
+                                                                        badge.label
+                                                                    }
+                                                                </span>
+                                                            );
+                                                        })()}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <Link
+                                                            href={route(
+                                                                "admin.performance.show",
+                                                                session.id,
+                                                            )}
+                                                            className="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-orange-600 hover:text-white rounded-md transition-all shadow-2xs"
+                                                        >
+                                                            Detail Sesi
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td
+                                                    colSpan="4"
+                                                    className="px-4 py-8 text-center text-slate-400 italic"
+                                                >
+                                                    Belum ada riwayat tes
+                                                    performa fisik yang terekam.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ═══════════════════════════════════════
+                        KOLOM KANAN — PERFORMANCE STATS & MULTI-DOMAIN SIDEBAR (340px-380px)
+                       ═══════════════════════════════════════ */}
+                    <div className="w-full lg:w-[340px] xl:w-[380px] shrink-0 space-y-4">
+                        {/* 1. Executive Performance Summary Widget (Semi-Circle Aspect Gauge Meter Style) */}
+                        <div className="bg-gradient-to-br from-white via-white to-orange-50/40 border border-slate-200/80 rounded-md p-4 shadow-2xs hover:border-slate-300 transition-all">
+                            <div className="mb-2 pb-2 border-b border-slate-100 flex items-center justify-between">
+                                <h3 className="text-xs font-bold text-slate-900">
+                                    Skor Performa
+                                </h3>
+                                <span
+                                    className={`text-xs font-bold ${perfStatus.color}`}
+                                >
+                                    {perfStatus.label}
+                                </span>
+                            </div>
+
+                            {/* Semi-Circle Aspect Gauge Meter (Matching Reference) */}
+                            <div className="flex flex-col items-center justify-center pt-2 pb-1">
+                                <div className="relative w-48 h-26 flex items-end justify-center">
+                                    <svg
+                                        className="w-48 h-26 overflow-visible"
+                                        viewBox="0 0 160 90"
+                                    >
+                                        {/* Background Arc */}
+                                        <path
+                                            d="M 16 80 A 64 64 0 0 1 144 80"
+                                            fill="none"
+                                            stroke="#f1f5f9"
+                                            strokeWidth="11"
+                                            strokeLinecap="round"
+                                        />
+                                        {/* Value Arc */}
+                                        <path
+                                            d="M 16 80 A 64 64 0 0 1 144 80"
+                                            fill="none"
+                                            stroke="url(#aspectGaugeGradientAthlete)"
+                                            strokeWidth="11"
+                                            strokeLinecap="round"
+                                            strokeDasharray="201.06"
+                                            strokeDashoffset={
+                                                201.06 -
+                                                (201.06 *
+                                                    Math.min(
+                                                        100,
+                                                        Math.max(
+                                                            0,
+                                                            stats?.avg_score ||
+                                                                0,
+                                                        ),
+                                                    )) /
+                                                    100
+                                            }
+                                            className="transition-all duration-1000 ease-out"
+                                        />
+                                        <defs>
+                                            <linearGradient
+                                                id="aspectGaugeGradientAthlete"
+                                                x1="0%"
+                                                y1="0%"
+                                                x2="100%"
+                                                y2="0%"
+                                            >
+                                                <stop
+                                                    offset="0%"
+                                                    stopColor="#fb923c"
+                                                />
+                                                <stop
+                                                    offset="100%"
+                                                    stopColor="#ea580c"
+                                                />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <div className="absolute bottom-0 text-center pb-0.5">
+                                        <span className="text-3xl font-black text-slate-900 leading-none">
+                                            {formatScore(stats?.avg_score)}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-slate-400 block mt-0.5">
+                                            Rata-Rata Tes
                                         </span>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div className="overflow-x-auto custom-scrollbar">
-                                        <table className="w-full text-sm text-left whitespace-nowrap">
-                                            <thead className="text-[11px] text-slate-500 bg-slate-50 border-b border-slate-200 font-bold uppercase tracking-wider">
-                                                <tr>
-                                                    <th className="px-6 py-3.5">Item Tes</th>
-                                                    <th className="px-6 py-3.5 text-center">Hasil Aktual</th>
-                                                    <th className="px-6 py-3.5 text-center">Target Benchmark</th>
-                                                    <th className="px-6 py-3.5 text-center">Skor Sebelumnya</th>
-                                                    <th className="px-6 py-3.5 text-center">Skor Terkini</th>
-                                                    <th className="px-6 py-3.5 text-center">Pertumbuhan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100">
-                                                {itemAnalysis.map((item, idx) => (
-                                                    <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                                                        <td className="px-6 py-4">
-                                                            <div className="font-extrabold text-slate-900 text-sm">{item.name}</div>
-                                                            <span className="text-[10px] text-slate-400 font-semibold">{item.category}</span>
+                            {/* 3-Column Mini Metrics */}
+                            <div className="grid grid-cols-3 gap-1.5 text-center mt-3 pt-2.5 border-t border-slate-100">
+                                <div className="p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+                                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                        Total Sesi
+                                    </span>
+                                    <p className="text-xs sm:text-sm font-black text-slate-800 leading-tight mt-0.5">
+                                        {stats?.sessions ?? 0}{" "}
+                                        <span className="text-[8.5px] font-normal text-slate-400">
+                                            sesi
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div className="p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+                                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                        Skor Puncak
+                                    </span>
+                                    <p className="text-xs sm:text-sm font-black text-emerald-600 leading-tight mt-0.5">
+                                        {formatScore(stats?.max_score)}
+                                    </p>
+                                </div>
+
+                                <div className="p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+                                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                                        Terbaik
+                                    </span>
+                                    <p className="text-xs sm:text-sm font-black text-orange-600 leading-tight mt-0.5 truncate">
+                                        {stats?.best_category || "-"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. Detailed Item Breakdown Table */}
+                        {itemAnalysis && itemAnalysis.length > 0 && (
+                            <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                <div className="px-4 py-3 bg-gradient-to-r from-white via-orange-50/30 to-white border-b border-slate-200/80 flex items-center justify-between">
+                                    <h3 className="text-xs font-bold text-slate-900">
+                                        Rincian Parameter Tes Sesi Terakhir
+                                    </h3>
+                                    <span className="text-[10px] text-slate-500 font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200/80 shadow-2xs">
+                                        Total {itemAnalysis.length} Item
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <table className="w-full text-xs text-left">
+                                        <thead className="sticky top-0 z-10 text-[9.5px] text-slate-500 bg-slate-50/95 backdrop-blur-xs border-b border-slate-200/80 font-bold uppercase tracking-wider">
+                                            <tr>
+                                                <th className="px-3 py-2">
+                                                    Item Tes & Target
+                                                </th>
+                                                <th className="px-2 py-2 text-center">
+                                                    Hasil
+                                                </th>
+                                                <th className="px-3 py-2 text-right">
+                                                    Skor
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {[...(itemAnalysis || [])]
+                                                .sort(
+                                                    (a, b) =>
+                                                        (Number(b.score) || 0) -
+                                                        (Number(a.score) || 0),
+                                                )
+                                                .map((item, idx) => (
+                                                    <tr
+                                                        key={idx}
+                                                        className="hover:bg-orange-50/20 transition-colors"
+                                                    >
+                                                        <td className="px-3 py-2.5">
+                                                            <div className="font-bold text-slate-900 text-xs leading-tight">
+                                                                {item.name}
+                                                            </div>
+                                                            <div className="text-[9.5px] text-slate-400 font-medium mt-0.5 flex items-center gap-1">
+                                                                <span>
+                                                                    {
+                                                                        item.category
+                                                                    }
+                                                                </span>
+                                                                <span>•</span>
+                                                                <span className="text-slate-500">
+                                                                    Tgt:{" "}
+                                                                    {formatNumber(
+                                                                        item.target_value,
+                                                                    )}{" "}
+                                                                    {item.unit}
+                                                                </span>
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 text-center font-bold text-slate-900 bg-slate-50/40">
-                                                            {formatNumber(item.result_value)} <span className="text-[10px] font-normal text-slate-500">{item.unit}</span>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <span className="inline-flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded text-xs font-bold text-slate-700 border border-slate-200">
-                                                                <Target className="w-3 h-3 text-slate-400" />
-                                                                {formatNumber(item.target_value)} {item.unit}
+                                                        <td className="px-2 py-2.5 text-center">
+                                                            <span className="font-black text-slate-900 text-xs block leading-tight">
+                                                                {formatNumber(
+                                                                    item.result_value,
+                                                                )}
+                                                            </span>
+                                                            <span className="text-[10.5px] text-slate-500 font-medium">
+                                                                {item.unit}
                                                             </span>
                                                         </td>
-                                                        <td className="px-6 py-4 text-center text-slate-500 font-medium">
-                                                            {item.previous_score > 0 ? `${formatScore(item.previous_score)}%` : '-'}
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <span className="inline-block font-black text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md text-sm border border-orange-200">
-                                                                {formatScore(item.score)}%
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <div className="flex justify-center">
-                                                                <div className="bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-sm">
-                                                                    <GrowthIndicator value={item.growth} />
-                                                                </div>
+                                                        <td className="px-3 py-2.5 text-right">
+                                                            <div className="inline-flex flex-col items-end">
+                                                                <span
+                                                                    className={`font-black text-xs sm:text-sm leading-tight ${
+                                                                        (item.score ||
+                                                                            0) >=
+                                                                        80
+                                                                            ? "text-emerald-600"
+                                                                            : (item.score ||
+                                                                                    0) >=
+                                                                                60
+                                                                              ? "text-amber-600"
+                                                                              : "text-rose-600"
+                                                                    }`}
+                                                                >
+                                                                    {formatScore(
+                                                                        item.score,
+                                                                    )}
+                                                                    %
+                                                                </span>
+                                                                {item.growth !==
+                                                                    0 && (
+                                                                    <div className="mt-0.5 scale-90 origin-right">
+                                                                        <GrowthIndicator
+                                                                            value={
+                                                                                item.growth
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
                                                 ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="bg-white border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center p-12 text-slate-400 gap-2">
-                            <Activity className="w-8 h-8 opacity-25" />
-                            <p className="text-xs font-bold">Belum ada data rekaman tes performa fisik</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* ─── 6. TRAINING LOAD & PHYSIOLOGICAL RECOVERY (30 DAYS) ─── */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-orange-50 text-orange-500 rounded-lg border border-orange-100">
-                            <Battery className="w-4 h-4" />
-                        </div>
-                        <h2 className="text-lg font-black text-slate-900 tracking-tight">Tren Beban Latihan & Pemulihan Fisiologis (30 Hari)</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {/* Training Load 30 Days */}
-                        <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <Battery className="w-4 h-4 text-orange-500" /> Beban Latihan (AU) vs Skor Wellness (/30)
-                            </h3>
-                            <div className="h-[280px] md:h-[300px] w-full">
-                                {training_loads && training_loads.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <ComposedChart data={training_loads} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: '#fb923c', fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: '#f97316', fontWeight: 600 }} axisLine={false} tickLine={false} domain={[0, 40]}/>
-                                            <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={customTooltipStyle} />
-                                            <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} iconType="circle" />
-                                            <Bar yAxisId="left" name="Daily Load (AU)" dataKey="daily_load" fill="#fed7aa" radius={[4, 4, 0, 0]} barSize={16} />
-                                            <Line yAxisId="right" type="monotone" dataKey="wellness" name="Wellness (/30)" stroke="#f97316" strokeWidth={2.5} dot={{r: 3, fill: '#fff', strokeWidth: 2}} activeDot={{r: 5}} />
-                                        </ComposedChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2 py-12">
-                                        <Activity className="w-8 h-8 opacity-20" />
-                                        <p className="text-xs font-bold">Belum ada data beban latihan</p>
-                                    </div>
-                                )}
                             </div>
-                        </div>
+                        )}
 
-                        {/* Physiological Recovery 30 Days */}
-                        <div className="bg-white p-5 md:p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col justify-between">
-                            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <HeartPulse className="w-4 h-4 text-emerald-500" /> Kurva Pemulihan Fisiologis (% Recovery)
-                            </h3>
-                            <div className="h-[280px] md:h-[300px] w-full">
-                                {daily_metrics && daily_metrics.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={daily_metrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                            <defs>
-                                                <linearGradient id="colorRecUnified" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                            <XAxis dataKey="date" tick={{fontSize: 10, fill: '#64748b', fontWeight: 600}} axisLine={false} tickLine={false} />
-                                            <YAxis tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 600}} axisLine={false} tickLine={false} domain={[0, 100]}/>
-                                            <RechartsTooltip contentStyle={customTooltipStyle} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }} />
-                                            <Area type="monotone" dataKey="recovery" name="Recovery Score (%)" stroke="#10b981" strokeWidth={3} fill="url(#colorRecUnified)" activeDot={{r: 5}} />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2 py-12">
-                                        <HeartPulse className="w-8 h-8 opacity-20" />
-                                        <p className="text-xs font-bold">Belum ada data pemulihan harian</p>
-                                    </div>
-                                )}
+                        {/* 3. Status Multi-Domain Asesmen Atlet (Single Unified Card) */}
+                        <div className="bg-gradient-to-br from-white via-white to-orange-50/40 border border-slate-200/80 rounded-md p-4 shadow-2xs hover:border-slate-300 transition-all space-y-3.5">
+                            <div className="mb-1 pb-2 border-b border-slate-100">
+                                <h3 className="text-xs font-bold text-slate-900">
+                                    Status Multi-Domain Asesmen
+                                </h3>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* ─── 7. BODY COMPOSITION ANATOMY VISUALIZATION ─── */}
-                {latest_composition && (
-                    <div className="space-y-4">
-                        <CompositionAnatomy test={latest_composition} />
-                    </div>
-                )}
-
-                {/* ─── 8. BIOMETRIC PROGRESS GALLERY ─── */}
-                <div className="space-y-4">
-                    <AthleteGallery 
-                        athlete={user} 
-                        galleries={galleries && galleries.length > 0 ? galleries : (user?.galleries || [])} 
-                    />
-                </div>
-
-                {/* ─── 9. COMPLETE PERFORMANCE SESSIONS HISTORY ─── */}
-                <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
-                        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <History className="w-4 h-4 text-orange-500" /> Riwayat Seluruh Sesi Tes Performa
-                        </h3>
-                        <span className="text-xs text-slate-500 font-bold bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                            Total {history?.length || 0} Sesi
-                        </span>
-                    </div>
-
-                    <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full text-sm text-left whitespace-nowrap">
-                            <thead className="text-[11px] text-slate-500 bg-slate-50 border-b border-slate-200 font-bold uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-3.5">Tanggal Sesi</th>
-                                    <th className="px-6 py-3.5 text-center">Skor Kumulatif</th>
-                                    <th className="px-6 py-3.5 text-center">Evaluasi Kinerja</th>
-                                    <th className="px-6 py-3.5 text-right">Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {history && history.length > 0 ? (
-                                    history.map((session) => (
-                                        <tr key={session.id} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="px-6 py-4 font-bold text-slate-800">{session.full_date}</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className="font-black text-orange-600 text-base">{formatScore(session.score)}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`inline-flex px-2.5 py-1 rounded-md text-[10px] font-bold border ${
-                                                    session.score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
-                                                    session.score >= 60 ? 'bg-amber-50 text-amber-700 border-amber-200' : 
-                                                    'bg-rose-50 text-rose-700 border-rose-200'
-                                                }`}>
-                                                    {session.score >= 80 ? 'Excellent' : session.score >= 60 ? 'Good' : 'Needs Improvement'}
+                            {/* Section 1: PHV & Pertumbuhan */}
+                            <div className="space-y-1.5">
+                                <div className="text-xs">
+                                    <span className="font-bold text-slate-800 text-[11px]">
+                                        PHV & Pertumbuhan
+                                    </span>
+                                </div>
+                                {latest_phv ? (
+                                    <div className="grid grid-cols-3 gap-1.5 text-center p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-xs">
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Maturity Offset
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                {Number(
+                                                    latest_phv.maturity_offset,
+                                                ).toFixed(2)}{" "}
+                                                <span className="text-[9px] font-normal text-slate-400">
+                                                    thn
                                                 </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <Link 
-                                                    href={route('admin.performance.show', session.id)} 
-                                                    className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition-all shadow-sm"
-                                                >
-                                                    Detail Sesi
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    ))
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Prediksi Tinggi
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                {latest_phv.predicted_adult_height ||
+                                                    "-"}{" "}
+                                                <span className="text-[9px] font-normal text-slate-400">
+                                                    cm
+                                                </span>
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Sisa Tumbuh
+                                            </span>
+                                            <strong className="text-orange-600 font-bold text-xs">
+                                                +
+                                                {latest_phv.remaining_growth ||
+                                                    "-"}{" "}
+                                                <span className="text-[9px] font-normal text-slate-400">
+                                                    cm
+                                                </span>
+                                            </strong>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <tr>
-                                        <td colSpan="4" className="px-6 py-10 text-center text-slate-400 italic">
-                                            Belum ada riwayat tes performa fisik yang terekam.
-                                        </td>
-                                    </tr>
+                                    <p className="text-[10.5px] text-slate-400 italic">
+                                        Belum ada asesmen PHV
+                                    </p>
                                 )}
-                            </tbody>
-                        </table>
+                            </div>
+
+                            {/* Section 2: Komposisi Tubuh */}
+                            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                                <div className="text-xs">
+                                    <span className="font-bold text-slate-800 text-[11px]">
+                                        Komposisi Tubuh
+                                    </span>
+                                </div>
+                                {latest_composition ? (
+                                    <div className="grid grid-cols-4 gap-1 text-center p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-xs">
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Body Fat
+                                            </span>
+                                            <strong className="text-orange-600 font-bold text-xs">
+                                                {latest_composition.body_fat_percentage ??
+                                                    "-"}
+                                                %
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Muscle
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                {latest_composition.muscle_mass ??
+                                                    "-"}{" "}
+                                                <span className="text-[8px] font-normal text-slate-400">
+                                                    kg
+                                                </span>
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                BMR
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                {latest_composition.bmr ?? "-"}
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Visceral
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                Lvl{" "}
+                                                {latest_composition.visceral_fat_level ??
+                                                    "-"}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-[10.5px] text-slate-400 italic">
+                                        Belum ada tes komposisi tubuh
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Section 3: Beban & Wellness */}
+                            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                                <div className="text-xs">
+                                    <span className="font-bold text-slate-800 text-[11px]">
+                                        Beban & Wellness
+                                    </span>
+                                </div>
+                                {latest_wellness ? (
+                                    <div className="grid grid-cols-3 gap-1.5 text-center p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-xs">
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Wellness
+                                            </span>
+                                            <strong className="text-emerald-600 font-bold text-xs">
+                                                {latest_wellness.daily_wellness_score ??
+                                                    "-"}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    /30
+                                                </span>
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Session RPE
+                                            </span>
+                                            <strong className="text-slate-900 font-bold text-xs">
+                                                {latest_wellness.session_rpe ??
+                                                    "-"}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    /10
+                                                </span>
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                Daily Load
+                                            </span>
+                                            <strong className="text-orange-600 font-bold text-xs">
+                                                {latest_wellness.daily_load ??
+                                                    0}{" "}
+                                                <span className="text-[8.5px] font-normal text-slate-400">
+                                                    AU
+                                                </span>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-[10.5px] text-slate-400 italic">
+                                        Belum ada catatan wellness
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Section 4: Postur Dinamis (DPA) */}
+                            <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                                <div className="text-xs">
+                                    <span className="font-bold text-slate-800 text-[11px]">
+                                        Postur Dinamis (DPA)
+                                    </span>
+                                </div>
+                                {latest_dpa ? (
+                                    <div className="p-2 bg-gradient-to-br from-white via-white to-orange-50/40 rounded-md border border-slate-200/80 shadow-2xs text-xs flex items-center justify-between">
+                                        <span className="text-[9px] text-slate-500 font-medium">
+                                            Hasil Postur
+                                        </span>
+                                        <strong className="text-slate-900 font-bold text-xs">
+                                            {latest_dpa.conclusion || "Normal"}
+                                        </strong>
+                                    </div>
+                                ) : (
+                                    <p className="text-[10.5px] text-slate-400 italic">
+                                        Belum ada asesmen postur (DPA)
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </AppLayout>
     );

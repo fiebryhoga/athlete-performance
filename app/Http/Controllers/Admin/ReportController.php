@@ -149,7 +149,7 @@ class ReportController extends Controller
                     ->get();
 
                 // Gym shift fee
-                $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+                $gymShiftFee = (int) ($coach->effective_gym_fee ?? 0);
                 $gymShifts = GymAttendance::where('user_id', $coach->id)
                     ->whereNotNull('check_in_time')
                     ->whereNotNull('check_out_time')
@@ -390,7 +390,7 @@ class ReportController extends Controller
         }
 
         // Mark gym shifts as paid for this coach
-        $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+        $gymShiftFee = (int) ($user->effective_gym_fee ?? 0);
         $unpaidGymShifts = GymAttendance::where('user_id', $user->id)
             ->where('is_paid', false)
             ->whereNotNull('check_in_time')
@@ -653,17 +653,34 @@ class ReportController extends Controller
         $latestScore = $tests->last() ? round($tests->last()->results->avg('score') ?? 0, 1) : 0;
         $latestDate = $tests->last() ? Carbon::parse($tests->last()->date)->format('d M Y') : '-';
 
+        // Package & Coaches text
+        $packageName = $athlete->package->name ?? null;
+        if (!$packageName && $athlete->groups && $athlete->groups->count() > 0) {
+            $group = $athlete->groups->first();
+            $packageName = $group->package->name ?? ($group->name . ' (Grup)');
+        }
+        $coachNames = $athlete->coaches ? $athlete->coaches->pluck('name')->toArray() : [];
+        $coachesText = count($coachNames) > 0 ? implode(', ', $coachNames) : '-';
+
         $stats = [
             'total_sessions' => $totalSessions,
             'avg_score' => $averageScore,
             'highest_score' => $highestScore,
             'latest_score' => $latestScore,
             'latest_date' => $latestDate,
+            'package_name' => $packageName,
+            'coaches_text' => $coachesText,
+            'sport' => $athlete->sport->name ?? 'General Athlete',
+            'best_category' => '-'
         ];
 
         $categoryStats = collect();
         $strengths = collect();
         $weaknesses = collect();
+        $radarData = [];
+        $comparisonData = []; 
+        $itemAnalysis = []; 
+
         if ($hasData) {
             $categoryStats = $allResults->groupBy(function($res) {
                 return $res->testItem->category->name ?? 'Uncategorized';
@@ -679,21 +696,71 @@ class ReportController extends Controller
 
             $strengths = $categoryStats->filter(fn($item) => $item['score'] >= 70)->sortByDesc('score')->values();
             $weaknesses = $categoryStats->filter(fn($item) => $item['score'] < 70)->sortBy('score')->values();
-        }
+            $stats['best_category'] = $strengths->first()['name'] ?? '-';
 
-        $latestTest = $tests->last();
-        $latestTestItems = collect();
-        if ($latestTest) {
-            $latestTestItems = $latestTest->results->map(function($res) {
+            $radarData = $categoryStats->map(function($cat) {
                 return [
-                    'name' => $res->testItem->name ?? '-',
-                    'category' => $res->testItem->category->name ?? '-',
-                    'unit' => $res->testItem->unit ?? '',
-                    'target' => $res->testItem->target_value ?? '-',
-                    'result' => $res->result ?? '-',
-                    'score' => round($res->score, 1),
+                    'subject' => $cat['name'],
+                    'A' => $cat['score'], 
+                    'B' => 100,           
+                    'fullMark' => 100
                 ];
-            });
+            })->values();
+
+            $latestTest = $tests->last();
+            $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
+
+            $latestCats = $latestTest ? $latestTest->results->groupBy(function($r) {
+                return $r->testItem->category->name ?? 'Uncat';
+            })->map(function($i) { return round($i->avg('score'), 1); }) : collect();
+
+            $prevCats = collect();
+            if ($previousTests->count() > 0) {
+                $prevCats = $previousTests->flatMap->results->groupBy(function($r) {
+                    return $r->testItem->category->name ?? 'Uncat';
+                })->map(function($i) { return round($i->avg('score'), 1); });
+            }
+            
+            $allCatNames = $latestCats->keys()->merge($prevCats->keys())->unique();
+            
+            $comparisonData = $allCatNames->map(function($catName) use ($latestCats, $prevCats) {
+                return [
+                    'name' => $catName,
+                    'latest' => $latestCats->get($catName) ?? 0,
+                    'previous' => $prevCats->get($catName) ?? 0,
+                ];
+            })->values();
+
+            if ($latestTest) {
+                $itemAnalysis = $latestTest->results->map(function($res) use ($previousTests) {
+                    $item = $res->testItem;
+                    $rawScore = floatval($res->score);
+                    $prevScoreForGrowth = 0;
+                    $growth = 0;
+
+                    if ($previousTests->count() > 0) {
+                        $lastPrev = $previousTests->last();
+                        $resPrev = $lastPrev->results->where('test_item_id', $item->id)->first();
+                        $pScore = $resPrev ? floatval($resPrev->score) : 0;
+                        $prevScoreForGrowth = $pScore;
+                        if ($prevScoreForGrowth > 0) {
+                            $growth = (($rawScore - $prevScoreForGrowth) / $prevScoreForGrowth) * 100;
+                        }
+                    }
+
+                    return [
+                        'id' => $res->id,
+                        'name' => $item->name,
+                        'category' => $item->category->name ?? '-',
+                        'unit' => $item->unit,
+                        'target_value' => $item->target_value,
+                        'result_value' => $res->result,
+                        'score' => round($rawScore, 1),
+                        'previous_score' => round($prevScoreForGrowth, 1),
+                        'growth' => round($growth, 1)
+                    ];
+                })->sortByDesc('score')->values();
+            }
         }
 
         $history = $tests->sortByDesc('date')->take(5)->map(function ($test) {
@@ -713,45 +780,12 @@ class ReportController extends Controller
         $latest_dpa = \App\Models\DpaAssessment::where('user_id', $athlete->id)->with('details.compensation')->orderBy('assessment_date', 'desc')->first();
         $latest_daily_metric = \App\Models\DailyMetric::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
 
-        // Package & Coaches text
-        $packageName = $athlete->package->name ?? null;
-        if (!$packageName && $athlete->groups && $athlete->groups->count() > 0) {
-            $group = $athlete->groups->first();
-            $packageName = $group->package->name ?? ($group->name . ' (Grup)');
-        }
-        $coachNames = $athlete->coaches->pluck('name')->toArray();
-        $coachesText = count($coachNames) > 0 ? implode(', ', $coachNames) : '-';
-
         // Athlete Biometric & Progress Galleries
         $athlete->load(['galleries' => function ($query) {
             $query->latest();
         }]);
 
-        $galleries = $athlete->galleries->map(function ($g) {
-            $base64 = null;
-            if ($g->image_path) {
-                $cleanPath = ltrim(str_replace('/storage/', '', $g->image_path), '/');
-                $p1 = public_path('storage/' . $cleanPath);
-                $p2 = storage_path('app/public/' . $cleanPath);
-                $p3 = public_path($cleanPath);
-                $finalP = file_exists($p1) ? $p1 : (file_exists($p2) ? $p2 : (file_exists($p3) ? $p3 : null));
-                if ($finalP) {
-                    $type = pathinfo($finalP, PATHINFO_EXTENSION);
-                    $data = @file_get_contents($finalP);
-                    if ($data) {
-                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                }
-            }
-            return [
-                'id' => $g->id,
-                'image' => $base64,
-                'notes' => $g->notes,
-                'date' => Carbon::parse($g->created_at)->format('d M Y'),
-            ];
-        })->filter(fn($g) => !empty($g['image']))->values();
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.profiling_pdf', [
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.profiling_pdf_landscape', [
             'athlete' => $athlete,
             'athletePhoto' => $athletePhoto,
             'clubLogo' => $clubLogo,
@@ -768,8 +802,8 @@ class ReportController extends Controller
             'categoryStats' => $categoryStats,
             'strengths' => $strengths,
             'weaknesses' => $weaknesses,
-            'latestTest' => $latestTest,
-            'latestTestItems' => $latestTestItems,
+            'latestTest' => $latestTest ?? null,
+            'latestTestItems' => $itemAnalysis,
             'history' => $history,
             'latest_phv' => $latest_phv,
             'latest_composition' => $latest_composition,
@@ -778,10 +812,10 @@ class ReportController extends Controller
             'latest_daily_metric' => $latest_daily_metric,
             'packageName' => $packageName,
             'coachesText' => $coachesText,
-            'galleries' => $galleries,
+            'galleries' => $athlete->galleries,
         ]);
 
-        $pdf->setPaper('A4', 'portrait');
+        $pdf->setPaper('A4', 'landscape');
 
         $cleanAthleteName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $athlete->name);
         $fileName = 'Profiling_Athlete_' . $cleanAthleteName . '.pdf';
@@ -817,7 +851,7 @@ class ReportController extends Controller
             ->get();
 
         // Gym shift fee
-        $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
+        $gymShiftFee = (int) ($coach->effective_gym_fee ?? 0);
         $gymShifts = GymAttendance::where('user_id', $coach->id)
             ->whereNotNull('check_in_time')
             ->whereNotNull('check_out_time')

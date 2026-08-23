@@ -16,34 +16,39 @@ export default function SmartInsights({ test, player, benchmarks }) {
 
     const insights = [];
     const isMale =
-        player?.gender === "male" || player?.gender === "L" || !player?.gender;
+        player?.gender === "male" ||
+        player?.gender === "L" ||
+        player?.gender === "Laki-laki" ||
+        !player?.gender;
 
     const bmi = parseFloat(test.bmi);
     if (bmi) {
         if (bmi < 18.5) {
             insights.push({
-                type: "warning",
                 icon: Activity,
                 title: "Kekurangan Berat Badan (BMI)",
                 desc: "BMI di bawah batas normal. Diperlukan surplus kalori dan latihan hipertrofi untuk meningkatkan massa otot.",
             });
-        } else if (bmi >= 18.5 && bmi < 25) {
+        } else if (bmi >= 18.5 && bmi < 23) {
             insights.push({
-                type: "info",
                 icon: CheckCircle2,
-                title: "BMI Proporsional",
-                desc: "Rasio berat dan tinggi badan berada dalam batas ideal dan sehat.",
+                title: "BMI Ideal & Proporsional",
+                desc: "Rasio berat dan tinggi badan berada dalam batas ideal dan sehat untuk atlet.",
+            });
+        } else if (bmi >= 23 && bmi < 25) {
+            insights.push({
+                icon: CheckCircle2,
+                title: "BMI Normal (Batas Atas)",
+                desc: "Rasio berat badan dalam batas normal. Pertahankan massa otot dan pantau persentase lemak.",
             });
         } else if (bmi >= 25 && bmi < 30) {
             insights.push({
-                type: "warning",
                 icon: Activity,
                 title: "Kelebihan Berat Badan (BMI)",
                 desc: "BMI tinggi. Pastikan berat ini berasal dari massa otot (wajar untuk atlet), bukan penumpukan lemak.",
             });
         } else if (bmi >= 30) {
             insights.push({
-                type: "danger",
                 icon: AlertTriangle,
                 title: "Indikasi Obesitas (BMI)",
                 desc: "Tingkat BMI sangat tinggi. Segera perbaiki pola makan dan jalani program defisit kalori.",
@@ -59,9 +64,8 @@ export default function SmartInsights({ test, player, benchmarks }) {
         if (bfRef) {
             if (bf >= bfRef.obese?.min) {
                 insights.push({
-                    type: "danger",
                     icon: HeartPulse,
-                    title: "Lemak Sangat Tinggi",
+                    title: "Lemak Tubuh Sangat Tinggi",
                     desc: "Risiko membebani sendi lutut/pergelangan kaki dan secara drastis mengurangi kelincahan.",
                 });
             } else if (
@@ -69,24 +73,21 @@ export default function SmartInsights({ test, player, benchmarks }) {
                 bf <= bfRef.acceptable?.max
             ) {
                 insights.push({
-                    type: "warning",
                     icon: HeartPulse,
                     title: "Kadar Lemak Rata-rata",
                     desc: "Normal untuk non-atlet, tetapi perlu dikurangi 3-5% untuk mencapai level kompetitif.",
                 });
             } else if (bf >= bfRef.fitness?.min && bf <= bfRef.athlete?.max) {
                 insights.push({
-                    type: "success",
                     icon: CheckCircle2,
                     title: "Lemak Tubuh Ideal Atlet",
                     desc: "Komposisi otot dan lemak optimal. Rasio tenaga terhadap berat (power-to-weight) berada di kondisi puncak.",
                 });
             } else if (bf <= bfRef.essential?.max) {
                 insights.push({
-                    type: "info",
                     icon: Info,
-                    title: "Lemak Esensial",
-                    desc: "Persentase lemak sangat rendah. Waspadai penurunan sistem imun atau gangguan hormonal jika dipertahankan terlalu lama.",
+                    title: "Lemak Esensial Rendah",
+                    desc: "Persentase lemak sangat rendah. Waspadai penurunan sistem imun jika dipertahankan terlalu lama.",
                 });
             }
         }
@@ -97,21 +98,18 @@ export default function SmartInsights({ test, player, benchmarks }) {
         const minTbw = isMale ? 50 : 45;
         if (tbw < minTbw) {
             insights.push({
-                type: "danger",
                 icon: Droplets,
                 title: "Dehidrasi Klinis",
                 desc: `Total air dalam tubuh (${tbw}%) kurang. Sangat rentan mengalami kram otot. Tingkatkan asupan cairan dan elektrolit.`,
             });
         } else if (tbw >= minTbw && tbw <= 65) {
             insights.push({
-                type: "success",
                 icon: Droplets,
-                title: "Hidrasi Optimal",
+                title: "Hidrasi Tubuh Optimal",
                 desc: "Sel-sel otot terhidrasi dengan baik, sangat mendukung kelenturan dan daya tahan selama pertandingan.",
             });
         } else {
             insights.push({
-                type: "info",
                 icon: Droplets,
                 title: "Hidrasi Tinggi",
                 desc: "Total air dalam tubuh cukup tinggi. Umumnya menandakan massa otot yang besar karena otot menyimpan banyak air.",
@@ -123,21 +121,18 @@ export default function SmartInsights({ test, player, benchmarks }) {
     if (visc) {
         if (visc < 10) {
             insights.push({
-                type: "info",
                 icon: CheckCircle2,
-                title: "Lemak Organ Aman",
+                title: "Lemak Organ (Visceral) Aman",
                 desc: `Lemak viseral di Level ${visc} sangat sehat. Organ dalam (jantung/paru-paru) terbebas dari tumpukan lemak jahat.`,
             });
         } else if (visc >= 10 && visc < 15) {
             insights.push({
-                type: "warning",
                 icon: HeartPulse,
                 title: "Lemak Organ Meningkat",
                 desc: "Penumpukan lemak organ mulai terjadi. Batasi asupan gula sederhana/gorengan dan tingkatkan intensitas kardio.",
             });
         } else if (visc >= 15) {
             insights.push({
-                type: "danger",
                 icon: AlertTriangle,
                 title: "Lemak Organ Berbahaya",
                 desc: "Level lemak organ berada di zona merah. Hal ini akan sangat menghambat kapasitas VO2Max dan stamina pemain.",
@@ -150,21 +145,18 @@ export default function SmartInsights({ test, player, benchmarks }) {
     if (actualAge && metAge) {
         if (metAge > actualAge + 2) {
             insights.push({
-                type: "warning",
                 icon: Zap,
                 title: "Penurunan Metabolisme",
                 desc: `Usia seluler (${metAge} th) terdeteksi lebih tua dari usia sebenarnya. Perbaiki pola istirahat, nutrisi, dan kurangi stres.`,
             });
         } else if (metAge < actualAge) {
             insights.push({
-                type: "success",
                 icon: Zap,
                 title: "Metabolisme Prima",
                 desc: `Luar biasa! Usia biologis sel (${metAge} th) lebih muda dari usia sebenarnya. Pemulihan fisik akan berjalan sangat cepat.`,
             });
         } else {
             insights.push({
-                type: "info",
                 icon: CheckCircle2,
                 title: "Metabolisme Stabil",
                 desc: "Usia seluler sesuai dengan usia sebenarnya. Fungsi regenerasi otot berjalan normal.",
@@ -176,23 +168,20 @@ export default function SmartInsights({ test, player, benchmarks }) {
     if (pa) {
         if (pa < 5.5) {
             insights.push({
-                type: "danger",
                 icon: Zap,
                 title: "Indikasi Overtraining",
                 desc: "Phase Angle sangat rendah. Membran sel rusak/meradang. Wajib pemulihan penuh selama 48-72 jam.",
             });
         } else if (pa >= 5.5 && pa < 7.0) {
             insights.push({
-                type: "info",
                 icon: Activity,
                 title: "Integritas Sel Normal",
                 desc: "Kondisi kesehatan dan daya tahan sel otot berada dalam batas wajar.",
             });
         } else if (pa >= 7.0) {
             insights.push({
-                type: "success",
                 icon: CheckCircle2,
-                title: "Sel Sangat Kuat",
+                title: "Integritas Sel Sangat Kuat",
                 desc: "Phase angle tinggi. Sel-sel tubuh sangat bugar dan siap menerima beban latihan intensitas maksimal.",
             });
         }
@@ -200,88 +189,43 @@ export default function SmartInsights({ test, player, benchmarks }) {
 
     if (insights.length === 0) {
         insights.push({
-            type: "info",
             icon: Lightbulb,
             title: "Belum Ada Kesimpulan",
             desc: "Silakan lengkapi form komposisi tubuh untuk mendapatkan rangkuman kesehatan otomatis.",
         });
     }
 
-    const getStyles = (type) => {
-        switch (type) {
-            case "danger":
-                return {
-                    bg: "bg-red-50 ",
-                    border: "border-red-100 ",
-                    iconBg: "bg-red-100 ",
-                    iconColor: "text-red-600 ",
-                    titleColor: "text-red-900 ",
-                };
-            case "warning":
-                return {
-                    bg: "bg-amber-50 ",
-                    border: "border-amber-100 ",
-                    iconBg: "bg-amber-100 ",
-                    iconColor: "text-amber-600 ",
-                    titleColor: "text-amber-900 ",
-                };
-            case "success":
-                return {
-                    bg: "bg-emerald-50 ",
-                    border: "border-emerald-100 ",
-                    iconBg: "bg-emerald-100 ",
-                    iconColor: "text-emerald-600 ",
-                    titleColor: "text-emerald-900 ",
-                };
-            case "info":
-            default:
-                return {
-                    bg: "bg-zinc-50 ",
-                    border: "border-zinc-200 ",
-                    iconBg: "bg-zinc-200 ",
-                    iconColor: "text-zinc-600 ",
-                    titleColor: "text-zinc-900 ",
-                };
-        }
-    };
-
     return (
-        <div className="bg-white  border border-zinc-200  rounded-xl flex flex-col h-full shadow-sm overflow-hidden transition-colors">
-            <div className="px-6 py-5 border-b border-zinc-200  flex items-center justify-between bg-zinc-50/50  transition-colors">
-                <div className="space-y-1">
-                    <h3 className="text-base font-semibold tracking-tight text-zinc-950  flex items-center gap-2">
-                        <Brain className="w-4 h-4 text-amber-500" />
-                        {"Smart Insights"}
+        <div className="bg-white border border-slate-200/80 rounded-xl flex flex-col h-full shadow-2xs overflow-hidden transition-colors">
+            <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                        <Brain className="w-3.5 h-3.5 text-orange-500" />
+                        Smart Insights
                     </h3>
-                    <p className="text-xs text-zinc-500  font-semibold">
-                        Analisis cerdas dan deteksi masalah dari seluruh matrik komposisi tubuh
+                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                        Analisis cerdas & deteksi kondisi dari metrik komposisi
+                        tubuh.
                     </p>
                 </div>
             </div>
 
-            <div className="p-2 flex-1 space-y-3 overflow-y-auto max-h-[800px] custom-scrollbar">
+            <div className="p-3 flex-1 space-y-2 overflow-y-auto max-h-[800px] custom-scrollbar">
                 {insights.map((insight, idx) => {
-                    const style = getStyles(insight.type);
                     const Icon = insight.icon;
                     return (
                         <div
                             key={idx}
-                            className={`p-4 rounded-xl border ${style.bg} ${style.border} flex items-start gap-3.5 transition-colors`}
+                            className="bg-gradient-to-b from-white via-orange-50/10 to-orange-50/25 border border-slate-200/90 rounded-lg p-2.5 flex items-start gap-2.5 shadow-2xs hover:border-orange-200/90 transition-all"
                         >
-                            <div
-                                className={`p-2 rounded-lg ${style.iconBg} shrink-0 transition-colors`}
-                            >
-                                <Icon
-                                    className={`w-4 h-4 ${style.iconColor}`}
-                                />
+                            <div className="w-5 h-5 rounded bg-white text-orange-500 flex items-center justify-center shrink-0 border border-slate-200/80 shadow-2xs mt-0.5">
+                                <Icon className="w-3 h-3" />
                             </div>
-                            <div>
-                                <h4
-                                    className={`text-sm font-bold tracking-tight mb-1 ${style.titleColor}`}
-                                >
+                            <div className="min-w-0 space-y-0.5">
+                                <h4 className="text-xs font-bold text-slate-900 leading-tight">
                                     {insight.title}
                                 </h4>
-                                <p className="text-xs text-zinc-600  leading-relaxed font-semibold">
+                                <p className="text-[11px] leading-relaxed text-slate-500 font-medium">
                                     {insight.desc}
                                 </p>
                             </div>

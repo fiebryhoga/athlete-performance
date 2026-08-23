@@ -1,0 +1,263 @@
+import { jsxs, jsx } from "react/jsx-runtime";
+import { useState } from "react";
+import { useForm } from "@inertiajs/react";
+import { Search, Plus, Edit3, Trash2, Package, Users } from "lucide-react";
+import { M as Modal } from "./Modal-DUGk5ZHw.js";
+import "@headlessui/react";
+function GroupList({ groups, packages, allAthletes, coaches }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editGroup, setEditGroup] = useState(null);
+  const { data, setData, post, put, delete: destroy, reset, errors, clearErrors } = useForm({
+    name: "",
+    description: "",
+    subscription_package_id: "",
+    expiration_date: "",
+    member_ids: [],
+    coach_ids: []
+  });
+  const openCreateModal = () => {
+    clearErrors();
+    reset();
+    setEditGroup(null);
+    setIsModalOpen(true);
+  };
+  const openEditModal = (group) => {
+    clearErrors();
+    setEditGroup(group);
+    setData({
+      name: group.name,
+      description: group.description || "",
+      subscription_package_id: group.subscription_package_id || "",
+      expiration_date: group.expiration_date ? group.expiration_date.split("T")[0] : "",
+      member_ids: group.members?.map((m) => m.id) || [],
+      coach_ids: group.coaches?.map((c) => c.id) || []
+    });
+    setIsModalOpen(true);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editGroup) {
+      put(route("admin.groups.update", editGroup.id), {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          reset();
+        }
+      });
+    } else {
+      post(route("admin.groups.store"), {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          reset();
+        }
+      });
+    }
+  };
+  const handleDelete = (id) => {
+    if (confirm("Yakin ingin menghapus grup ini?")) {
+      destroy(route("admin.groups.destroy", id));
+    }
+  };
+  const toggleMember = (athleteId) => {
+    let current = [...data.member_ids];
+    if (current.includes(athleteId)) {
+      current = current.filter((id) => id !== athleteId);
+    } else {
+      current.push(athleteId);
+    }
+    setData("member_ids", current);
+  };
+  const toggleCoach = (coachId) => {
+    let current = [...data.coach_ids];
+    if (current.includes(coachId)) {
+      current = current.filter((id) => id !== coachId);
+    } else {
+      current.push(coachId);
+    }
+    setData("coach_ids", current);
+  };
+  const filteredGroups = groups.filter((g) => g.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  return /* @__PURE__ */ jsxs("div", { className: "bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-4 mb-6", children: [
+      /* @__PURE__ */ jsxs("div", { className: "relative w-full sm:w-72", children: [
+        /* @__PURE__ */ jsx(Search, { className: "absolute left-3.5 top-3 w-4 h-4 text-slate-400" }),
+        /* @__PURE__ */ jsx(
+          "input",
+          {
+            type: "text",
+            placeholder: "Cari nama grup...",
+            value: searchTerm,
+            onChange: (e) => setSearchTerm(e.target.value),
+            className: "w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxs(
+        "button",
+        {
+          onClick: openCreateModal,
+          className: "w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all",
+          children: [
+            /* @__PURE__ */ jsx(Plus, { className: "w-4 h-4 md:w-5 md:h-5" }),
+            " Buat Grup"
+          ]
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", children: [
+      filteredGroups.map((group) => /* @__PURE__ */ jsxs("div", { className: "border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow", children: [
+        /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-start mb-4", children: [
+          /* @__PURE__ */ jsxs("div", { children: [
+            /* @__PURE__ */ jsx("h3", { className: "font-bold text-lg text-slate-900", children: group.name }),
+            group.description && /* @__PURE__ */ jsx("p", { className: "text-xs text-slate-500 mt-1 line-clamp-2", children: group.description })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsx("button", { onClick: () => openEditModal(group), className: "text-slate-400 hover:text-orange-500 transition-colors", children: /* @__PURE__ */ jsx(Edit3, { size: 16 }) }),
+            /* @__PURE__ */ jsx("button", { onClick: () => handleDelete(group.id), className: "text-slate-400 hover:text-red-500 transition-colors", children: /* @__PURE__ */ jsx(Trash2, { size: 16 }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-3 mt-4", children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100", children: [
+            /* @__PURE__ */ jsx(Package, { size: 16, className: "text-orange-500" }),
+            /* @__PURE__ */ jsx("span", { className: "font-medium", children: group.package?.name || "Belum ada paket" })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100", children: [
+            /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 text-sm text-slate-600", children: [
+              /* @__PURE__ */ jsx(Users, { size: 16, className: "text-blue-500" }),
+              /* @__PURE__ */ jsxs("span", { className: "font-bold", children: [
+                group.members?.length || 0,
+                " Klien terdaftar"
+              ] })
+            ] }),
+            group.members?.length > 0 && /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-1 mt-1 border-t border-slate-200 pt-2", children: [
+              /* @__PURE__ */ jsx("span", { className: "w-full text-[10px] font-bold text-slate-400 mb-0.5", children: "Anggota Grup:" }),
+              group.members.map((member) => /* @__PURE__ */ jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-white border border-slate-200 text-slate-600 shadow-sm", children: member.name }, member.id))
+            ] }),
+            group.coaches?.length > 0 && /* @__PURE__ */ jsxs("div", { className: "flex flex-wrap gap-1 mt-1 border-t border-slate-200 pt-2", children: [
+              /* @__PURE__ */ jsx("span", { className: "w-full text-[10px] font-bold text-slate-400 mb-0.5", children: "Coach Pendamping:" }),
+              group.coaches.map((coach) => /* @__PURE__ */ jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 border border-emerald-100 text-emerald-600 shadow-sm", children: coach.name }, coach.id))
+            ] })
+          ] })
+        ] })
+      ] }, group.id)),
+      filteredGroups.length === 0 && /* @__PURE__ */ jsx("div", { className: "col-span-full py-12 text-center text-slate-500", children: "Tidak ada grup yang ditemukan." })
+    ] }),
+    /* @__PURE__ */ jsx(Modal, { show: isModalOpen, onClose: () => setIsModalOpen(false), maxWidth: "2xl", children: /* @__PURE__ */ jsxs("div", { className: "p-6", children: [
+      /* @__PURE__ */ jsx("h2", { className: "text-xl font-bold text-slate-900 mb-6", children: editGroup ? "Edit Grup" : "Buat Grup Baru" }),
+      /* @__PURE__ */ jsxs("form", { onSubmit: handleSubmit, className: "space-y-5", children: [
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-1.5", children: "Nama Grup" }),
+          /* @__PURE__ */ jsx(
+            "input",
+            {
+              type: "text",
+              value: data.name,
+              onChange: (e) => setData("name", e.target.value),
+              className: "w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm",
+              required: true
+            }
+          ),
+          errors.name && /* @__PURE__ */ jsx("p", { className: "text-red-500 text-xs mt-1", children: errors.name })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxs("div", { children: [
+            /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-1.5", children: "Paket Langganan Grup" }),
+            /* @__PURE__ */ jsxs(
+              "select",
+              {
+                value: data.subscription_package_id,
+                onChange: (e) => setData("subscription_package_id", e.target.value),
+                className: "w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm",
+                children: [
+                  /* @__PURE__ */ jsx("option", { value: "", children: "-- Tidak Ada / Kosongkan --" }),
+                  packages?.map((pkg) => /* @__PURE__ */ jsx("option", { value: pkg.id, children: pkg.name }, pkg.id))
+                ]
+              }
+            ),
+            errors.subscription_package_id && /* @__PURE__ */ jsx("p", { className: "text-red-500 text-xs mt-1", children: errors.subscription_package_id })
+          ] }),
+          /* @__PURE__ */ jsxs("div", { children: [
+            /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-1.5", children: "Tanggal Kedaluwarsa" }),
+            /* @__PURE__ */ jsx(
+              "input",
+              {
+                type: "date",
+                value: data.expiration_date,
+                onChange: (e) => setData("expiration_date", e.target.value),
+                className: "w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm"
+              }
+            ),
+            errors.expiration_date && /* @__PURE__ */ jsx("p", { className: "text-red-500 text-xs mt-1", children: errors.expiration_date })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-1.5", children: "Deskripsi Singkat" }),
+          /* @__PURE__ */ jsx(
+            "textarea",
+            {
+              value: data.description,
+              onChange: (e) => setData("description", e.target.value),
+              className: "w-full px-4 py-2.5 rounded-lg border-slate-200 focus:ring-orange-500 focus:border-orange-500 text-sm",
+              rows: "2"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-3", children: "Pilih Klien / Anggota Grup" }),
+          /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scrollbar p-1", children: allAthletes?.map((athlete) => /* @__PURE__ */ jsxs(
+            "div",
+            {
+              onClick: () => toggleMember(athlete.id),
+              className: `flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${data.member_ids.includes(athlete.id) ? "border-orange-500 bg-orange-50" : "border-slate-200 bg-white hover:border-orange-500/30 hover:bg-orange-50/30"}`,
+              children: [
+                /* @__PURE__ */ jsx("div", { className: `w-4 h-4 rounded border flex items-center justify-center shrink-0 ${data.member_ids.includes(athlete.id) ? "bg-orange-500 border-orange-500" : "border-slate-300"}`, children: data.member_ids.includes(athlete.id) && /* @__PURE__ */ jsx("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" }) }) }),
+                /* @__PURE__ */ jsxs("div", { children: [
+                  /* @__PURE__ */ jsx("p", { className: "text-xs font-bold text-slate-800 line-clamp-1", children: athlete.name }),
+                  /* @__PURE__ */ jsx("p", { className: "text-[10px] text-slate-500", children: athlete.sport?.name || "Umum" })
+                ] })
+              ]
+            },
+            athlete.id
+          )) })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { children: [
+          /* @__PURE__ */ jsx("label", { className: "block text-xs font-bold text-slate-700 mb-3", children: "Pilih Coach Pendamping" }),
+          /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scrollbar p-1", children: coaches?.map((coach) => /* @__PURE__ */ jsxs(
+            "div",
+            {
+              onClick: () => toggleCoach(coach.id),
+              className: `flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${data.coach_ids.includes(coach.id) ? "border-orange-500 bg-orange-50" : "border-slate-200 bg-white hover:border-orange-500/30 hover:bg-orange-50/30"}`,
+              children: [
+                /* @__PURE__ */ jsx("div", { className: `w-4 h-4 rounded border flex items-center justify-center shrink-0 ${data.coach_ids.includes(coach.id) ? "bg-orange-500 border-orange-500" : "border-slate-300"}`, children: data.coach_ids.includes(coach.id) && /* @__PURE__ */ jsx("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" }) }) }),
+                /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("p", { className: "text-xs font-bold text-slate-800 line-clamp-1", children: coach.name }) })
+              ]
+            },
+            coach.id
+          )) })
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "flex justify-end gap-3 pt-4 border-t border-slate-100", children: [
+          /* @__PURE__ */ jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => setIsModalOpen(false),
+              className: "px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors",
+              children: "Batal"
+            }
+          ),
+          /* @__PURE__ */ jsx(
+            "button",
+            {
+              type: "submit",
+              className: "px-5 py-2.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-500/90 rounded-lg shadow-sm shadow-orange-500/20",
+              children: "Simpan Grup"
+            }
+          )
+        ] })
+      ] })
+    ] }) })
+  ] });
+}
+export {
+  GroupList as default
+};

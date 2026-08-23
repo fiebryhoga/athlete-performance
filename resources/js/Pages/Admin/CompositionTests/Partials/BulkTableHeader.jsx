@@ -30,14 +30,21 @@ export default function BulkTableHeader({ actions }) {
                 <th className="px-3 py-2 font-semibold text-zinc-500  text-left sticky left-0 z-30 bg-zinc-50  border-r border-zinc-200  tracking-tight text-[11px] min-w-[200px]">
                     {"Player"}
                 </th>
-                
+
                 {COLUMNS.map((col) => (
-                    <th key={col.id} className="px-2 py-2 font-semibold text-zinc-500  text-center tracking-tight text-[10px] relative group">
+                    <th
+                        key={col.id}
+                        className="px-2 py-2 font-semibold text-zinc-500  text-center tracking-tight text-[10px] relative group"
+                    >
                         <div className="flex flex-col items-center justify-center gap-1">
-                            <span className="whitespace-nowrap">{col.label}</span>
+                            <span className="whitespace-nowrap">
+                                {col.label}
+                            </span>
                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
-                                    onClick={() => actions.clearColumn(col.id, col.label)}
+                                    onClick={() =>
+                                        actions.clearColumn(col.id, col.label)
+                                    }
                                     className="p-1 rounded bg-zinc-100  hover:bg-zinc-200  text-red-500 transition-colors"
                                     title={`Clear ${col.label}`}
                                 >
@@ -47,7 +54,7 @@ export default function BulkTableHeader({ actions }) {
                         </div>
                     </th>
                 ))}
-                
+
                 <th className="px-3 py-2 font-semibold text-zinc-500  text-center sticky right-0 z-30 bg-zinc-50  border-l border-zinc-200  tracking-tight text-[11px] w-12">
                     {"Del"}
                 </th>

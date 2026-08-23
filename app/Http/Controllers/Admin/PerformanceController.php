@@ -47,6 +47,26 @@ class PerformanceController extends Controller
             });
         }
 
+        if ($request->month) {
+            try {
+                $monthYear = Carbon::parse($request->month);
+                $query->whereYear('date', $monthYear->year)
+                      ->whereMonth('date', $monthYear->month);
+            } catch (\Exception $e) {
+                // Ignore parse error
+            }
+        }
+
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+        } elseif ($request->start_date) {
+            $query->where('date', '>=', $request->start_date);
+        } elseif ($request->end_date) {
+            $query->where('date', '<=', $request->end_date);
+        } elseif ($request->date) {
+            $query->whereDate('date', $request->date);
+        }
+
         $tests = $query->get()->map(function ($test) {
             $totalScore = $test->results->avg('score') ?? 0;
             $test->average_score = round($totalScore, 1);
@@ -66,7 +86,7 @@ class PerformanceController extends Controller
         return Inertia::render('Admin/Performance/Index', [
             'tests' => $tests,
             'sports' => $sports,
-            'filters' => $request->only(['search', 'sport_id']),
+            'filters' => $request->only(['search', 'sport_id', 'month', 'date', 'start_date', 'end_date']),
             'auth_role' => $user->role 
         ]);
     }

@@ -8,7 +8,7 @@ export default function PageFooter({
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className={`py-4 mt-4 text-center font-semibold ${className}`}>
+        <footer className={`pt-3 pb-1 mt-2 text-center font-semibold ${className}`}>
             <p className="text-[11px] text-slate-400 leading-relaxed">
                 © {currentYear} <span className="text-slate-600">{brand}</span>. {description}
             </p>

@@ -126,76 +126,71 @@ export default function AthleteGallery({ athlete, galleries = [] }) {
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-6 md:mt-8 w-full max-w-full">
+        <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden w-full">
             
             {/* HEADER GALERI */}
-            <div className="px-4 md:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <div className="flex items-center gap-3">
-                    <div className="p-1.5 md:p-2 bg-orange-100 text-orange-500 rounded-xl shadow-sm">
-                        <Camera className="w-4 h-4 md:w-5 md:h-5" />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-slate-800 text-sm md:text-lg tracking-tight">Galeri Biometrik</h3>
-                        <p className="text-[9px] md:text-xs text-slate-500 font-medium mt-0.5">Dokumentasi fisik dan catatan atlet.</p>
-                    </div>
+            <div className="px-4 py-3 bg-gradient-to-r from-white via-orange-50/40 to-white border-b border-slate-200/80 flex justify-between items-center">
+                <div>
+                    <h3 className="font-bold text-slate-900 text-xs sm:text-sm tracking-tight">Galeri Biometrik</h3>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">Dokumentasi fisik dan catatan atlet.</p>
                 </div>
                 <button 
                     onClick={() => setIsUploadModalOpen(true)} 
-                    className="bg-orange-500 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold flex items-center gap-1.5 md:gap-2 shadow-lg shadow-orange-500/20 hover:bg-orange-600 hover:scale-105 transition-all touch-manipulation whitespace-nowrap"
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition-all touch-manipulation whitespace-nowrap"
                 >
-                    <ImagePlus className="w-3.5 h-3.5 md:w-4 md:h-4" /> <span className="hidden sm:inline">Tambah Foto</span>
+                    <ImagePlus className="w-3.5 h-3.5" /> <span>Tambah Foto</span>
                 </button>
             </div>
 
             {/* GRID GALERI */}
-            <div className="p-4 md:p-6 bg-slate-50/30">
+            <div className="p-4 bg-white">
                 {galleries.length === 0 ? (
-                    <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-200 rounded-xl bg-white">
-                        <Camera className="w-10 h-10 md:w-12 md:h-12 text-slate-300 mb-3" />
-                        <h4 className="text-slate-600 font-bold text-sm md:text-base">Belum Ada Dokumentasi</h4>
-                        <p className="text-[10px] md:text-xs text-slate-400 mt-1 max-w-xs md:max-w-sm">Tambahkan foto postur, cedera, atau progres biometrik atlet di sini.</p>
+                    <div className="py-8 flex flex-col items-center justify-center text-center border border-dashed border-slate-200 rounded-md bg-gradient-to-br from-white via-white to-orange-50/30">
+                        <Camera className="w-8 h-8 text-slate-300 mb-2" />
+                        <h4 className="text-slate-700 font-bold text-xs sm:text-sm">Belum Ada Dokumentasi</h4>
+                        <p className="text-[10px] text-slate-400 mt-0.5 max-w-xs">Tambahkan foto postur, cedera, atau progres biometrik atlet di sini.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                         {galleries.map((item) => (
-                            <div key={item.id} className="flex flex-col bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                            <div key={item.id} className="flex flex-col bg-gradient-to-br from-white via-white to-orange-50/40 border border-slate-200/80 rounded-md overflow-hidden shadow-2xs hover:border-slate-300 transition-all">
                                 
                                 {/* Area Gambar */}
                                 <div 
-                                    className="aspect-[4/5] bg-slate-100 relative overflow-hidden cursor-pointer group" 
+                                    className="aspect-square bg-slate-100 relative overflow-hidden cursor-pointer group" 
                                     onClick={() => setViewer({ isOpen: true, photo: item })}
                                 >
                                     <img src={item.image_path} alt="Biometric" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                                     
                                     {/* Overlay Tanggal Singkat */}
-                                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-white text-[9px] font-bold px-2 py-1 rounded shadow-sm">
+                                    <div className="absolute top-1.5 left-1.5 bg-black/60 backdrop-blur-xs text-white text-[8.5px] font-bold px-1.5 py-0.5 rounded shadow-xs">
                                         {new Date(item.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
                                     </div>
                                     
                                     {/* Indikator Klik */}
                                     <div className="absolute inset-0 bg-slate-900/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                                        <div className="p-2 bg-white/90 rounded-full text-slate-800 shadow-lg scale-75 group-hover:scale-100 transition-transform">
-                                            <Maximize2 className="w-5 h-5" />
+                                        <div className="p-1.5 bg-white/90 rounded-full text-slate-800 shadow-md scale-75 group-hover:scale-100 transition-transform">
+                                            <Maximize2 className="w-4 h-4" />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Area Catatan */}
                                 {item.notes && (
-                                    <div className="p-3 bg-slate-50 flex-1 border-t border-slate-100 cursor-pointer" onClick={() => setViewer({ isOpen: true, photo: item })}>
-                                        <div className="flex items-start gap-1.5 text-slate-600">
-                                            <Info className="w-3 h-3 md:w-3.5 md:h-3.5 mt-0.5 shrink-0 text-orange-500" />
-                                            <p className="text-[10px] md:text-xs italic text-slate-700 leading-relaxed line-clamp-2 md:line-clamp-3">"{item.notes}"</p>
+                                    <div className="p-2 bg-white/70 flex-1 border-t border-slate-100 cursor-pointer" onClick={() => setViewer({ isOpen: true, photo: item })}>
+                                        <div className="flex items-start gap-1 text-slate-600">
+                                            <Info className="w-3 h-3 mt-0.5 shrink-0 text-orange-500" />
+                                            <p className="text-[10px] italic text-slate-700 leading-relaxed line-clamp-2">"{item.notes}"</p>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Toolbar Aksi Bawah */}
-                                <div className="p-2 bg-white flex justify-between items-center border-t border-slate-100">
-                                    <button onClick={() => setViewer({ isOpen: true, photo: item })} title="Lihat Penuh" className="p-2 text-slate-400 hover:bg-slate-100 hover:text-orange-500 rounded-lg transition-colors touch-manipulation"><Maximize2 className="w-4 h-4 md:w-4 md:h-4"/></button>
-                                    <button onClick={() => handleDownload(item.image_path, `biometric-${item.id}.jpg`)} title="Download" className="p-2 text-slate-400 hover:bg-slate-100 hover:text-orange-500 rounded-lg transition-colors touch-manipulation"><Download className="w-4 h-4 md:w-4 md:h-4"/></button>
-                                    <button onClick={() => openEdit(item)} title="Edit Catatan" className="p-2 text-slate-400 hover:bg-amber-50 hover:text-amber-500 rounded-lg transition-colors touch-manipulation"><Edit3 className="w-4 h-4 md:w-4 md:h-4"/></button>
-                                    <button onClick={() => deleteGallery(item.id)} title="Hapus Foto" className="p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-500 rounded-lg transition-colors touch-manipulation"><Trash2 className="w-4 h-4 md:w-4 md:h-4"/></button>
+                                <div className="p-1.5 bg-white/90 flex justify-between items-center border-t border-slate-100">
+                                    <button onClick={() => setViewer({ isOpen: true, photo: item })} title="Lihat Penuh" className="p-1.5 text-slate-400 hover:bg-slate-100 hover:text-orange-500 rounded transition-colors touch-manipulation"><Maximize2 className="w-3.5 h-3.5"/></button>
+                                    <button onClick={() => handleDownload(item.image_path, `biometric-${item.id}.jpg`)} title="Download" className="p-1.5 text-slate-400 hover:bg-slate-100 hover:text-orange-500 rounded transition-colors touch-manipulation"><Download className="w-3.5 h-3.5"/></button>
+                                    <button onClick={() => openEdit(item)} title="Edit Catatan" className="p-1.5 text-slate-400 hover:bg-amber-50 hover:text-amber-500 rounded transition-colors touch-manipulation"><Edit3 className="w-3.5 h-3.5"/></button>
+                                    <button onClick={() => deleteGallery(item.id)} title="Hapus Foto" className="p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500 rounded transition-colors touch-manipulation"><Trash2 className="w-3.5 h-3.5"/></button>
                                 </div>
                             </div>
                         ))}

@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_gym_guard',
+        'gym_fee',
         'sport_id',
         'age',
         'gender',
@@ -30,6 +31,11 @@ class User extends Authenticatable
     ];
 
     public function package()
+    {
+        return $this->belongsTo(SubscriptionPackage::class, 'subscription_package_id');
+    }
+
+    public function subscriptionPackage()
     {
         return $this->belongsTo(SubscriptionPackage::class, 'subscription_package_id');
     }
@@ -55,7 +61,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_gym_guard' => 'boolean',
+            'gym_fee' => 'integer',
         ];
+    }
+
+    public function getEffectiveGymFeeAttribute(): int
+    {
+        if ($this->gym_fee !== null && (int)$this->gym_fee > 0) {
+            return (int) $this->gym_fee;
+        }
+        return (int) (\App\Models\Setting::where('key', 'gym_shift_fee')->value('value') ?: 0);
     }
 
     

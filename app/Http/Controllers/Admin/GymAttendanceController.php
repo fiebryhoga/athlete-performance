@@ -73,8 +73,11 @@ class GymAttendanceController extends Controller
                         ->whereNotNull('check_out_time')
                         ->count();
 
+                    $effectiveFee = $guard->effective_gym_fee;
                     $guard->unpaid_shifts = $unpaidAttendances->count();
                     $guard->total_shifts = $totalAttendances;
+                    $guard->effective_gym_fee = $effectiveFee;
+                    $guard->unpaid_amount = $unpaidAttendances->count() * $effectiveFee;
                     $guard->unpaid_shift_list = $unpaidAttendances->map(function ($att) {
                         return [
                             'id' => $att->id,
@@ -96,11 +99,44 @@ class GymAttendanceController extends Controller
                 });
         }
 
+        // ─── COACH STATS (for logged in coach) ───
+        $myStats = null;
+        if ($user->role === 'coach' && $user->is_gym_guard) {
+            $unpaidAttendances = GymAttendance::where('user_id', $user->id)
+                ->where('is_paid', false)
+                ->whereNotNull('check_in_time')
+                ->whereNotNull('check_out_time')
+                ->get();
+
+            $totalMonth = GymAttendance::where('user_id', $user->id)
+                ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                ->whereNotNull('check_in_time')
+                ->whereNotNull('check_out_time')
+                ->count();
+
+            $totalAll = GymAttendance::where('user_id', $user->id)
+                ->whereNotNull('check_in_time')
+                ->whereNotNull('check_out_time')
+                ->count();
+
+            $effectiveFee = $user->effective_gym_fee;
+
+            $myStats = [
+                'effective_fee' => $effectiveFee,
+                'is_custom_fee' => ($user->gym_fee !== null && $user->gym_fee > 0),
+                'total_shifts_month' => $totalMonth,
+                'total_shifts_all' => $totalAll,
+                'unpaid_shifts' => $unpaidAttendances->count(),
+                'unpaid_amount' => $unpaidAttendances->count() * $effectiveFee,
+            ];
+        }
+
         return Inertia::render('Admin/GymAttendance/Index', [
             'attendances' => $attendances,
             'gymLocation' => $gymLocation,
             'todayAttendance' => $todayAttendance,
             'recapData' => $recapData,
+            'myStats' => $myStats,
             'currentMonth' => (int) $month,
             'currentYear' => (int) $year,
         ]);
@@ -274,7 +310,25 @@ class GymAttendanceController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        return redirect()->back()->with('message', 'Lokasi gym berhasil diperbarui.');
+        return redirect()->back()->with('message', 'Pengaturan lokasi & tarif default gym berhasil diperbarui.');
+    }
+
+    /**
+     * Update individual gym guard fee.
+     */
+    public function updateGuardFee(Request $request, User $user)
+    {
+        abort_if(auth()->user()->role !== 'superadmin', 403);
+
+        $request->validate([
+            'gym_fee' => 'nullable|integer|min:0',
+        ]);
+
+        $user->update([
+            'gym_fee' => $request->filled('gym_fee') && $request->gym_fee > 0 ? (int)$request->gym_fee : null,
+        ]);
+
+        return redirect()->back()->with('message', "Tarif jaga gym untuk {$user->name} berhasil diperbarui.");
     }
 
     // ─── PAYOUT (Rekap & Cairkan) ───
@@ -300,15 +354,15 @@ class GymAttendanceController extends Controller
             ->whereNotNull('check_out_time')
             ->update(['is_paid' => true]);
 
-        $gymShiftFee = (int) Setting::where('key', 'gym_shift_fee')->value('value') ?: 0;
-        $totalFee = $unpaidCount * $gymShiftFee;
+        $guardFee = $user->effective_gym_fee;
+        $totalFee = $unpaidCount * $guardFee;
 
         // Record payout
         CoachPayout::create([
             'user_id' => $user->id,
             'amount' => $totalFee,
             'paid_at' => now(),
-            'notes' => "Pencairan gym guard: {$unpaidCount} kali jaga",
+            'notes' => "Pencairan gym guard: {$unpaidCount} kali jaga (@ Rp " . number_format($guardFee, 0, ',', '.') . ")",
         ]);
 
         return redirect()->back()->with('message', "Berhasil mencairkan {$unpaidCount} hari jaga untuk {$user->name}. Counter di-reset.");
