@@ -63,7 +63,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             title: null, 
             items: [
                 { name: 'Dashboard', route: 'dashboard', checkPath: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Profilling', route: 'admin.athletes.index', checkPath: '/admin/athletes', icon: Users, roles: ['superadmin', 'coach'] },
+                { name: 'Profiling', route: 'admin.athletes.index', checkPath: '/admin/athletes', icon: Users, roles: ['superadmin', 'coach'] },
                 { name: 'Profil Fisik', route: 'athlete.profiling', checkPath: '/profiling', icon: Target, roles: ['athlete'] },
                 { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Absensi Gym', route: 'admin.gym-attendance.index', checkPath: '/admin/gym-attendance', icon: Building2, roles: ['superadmin', 'coach'], condition: () => userRole === 'superadmin' || props.auth.user.is_gym_guard },

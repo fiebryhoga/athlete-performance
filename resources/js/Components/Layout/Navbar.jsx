@@ -32,7 +32,7 @@ export default function Navbar({ onMobileMenuClick }) {
         const segmentNames = {
             'dashboard': 'Overview',
             'admin': 'Admin',
-            'athletes': 'Profilling',
+            'athletes': 'Profiling',
             'dpa': 'Analysis DPA',
             'performance': 'Tes Fisik',
             'composition': 'Komposisi Tubuh',
@@ -66,8 +66,9 @@ export default function Navbar({ onMobileMenuClick }) {
             ];
         }
 
+        const isUnderAdmin = pathSegments.includes('admin');
         const items = [{ name: 'Dashboard', route: '/dashboard', isCurrent: false }];
-        let accumulatedPath = '';
+        let accumulatedPath = isUnderAdmin ? '/admin' : '';
 
         pathSegments.forEach((segment, idx) => {
             if (segment === 'admin' || segment === 'dashboard') return;
