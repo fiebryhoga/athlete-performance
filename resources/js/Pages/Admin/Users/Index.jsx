@@ -1,5 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, Link } from '@inertiajs/react';
 import { 
     Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package, Building2
 } from 'lucide-react';
@@ -215,6 +215,14 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                 className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm touch-manipulation" 
                             />
                         </div>
+                        {auth.user.role === 'superadmin' && activeTab === 'athlete' && (
+                            <Link 
+                                href={route('admin.users.bulkCreate')}
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-50 border border-orange-200 text-orange-600 px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-sm hover:bg-orange-100 hover:text-orange-700 transition-all active:scale-95 touch-manipulation shrink-0"
+                            >
+                                <UploadCloud className="w-4 h-4 md:w-5 md:h-5" /> Bulk Add Klien
+                            </Link>
+                        )}
                         {auth.user.role === 'superadmin' && (
                             <button 
                                 onClick={openCreateModal}

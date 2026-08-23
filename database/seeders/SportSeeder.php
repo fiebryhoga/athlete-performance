@@ -19,6 +19,7 @@ class SportSeeder extends Seeder
             'Speed',
             'Agility',
             'Power',
+            'Flexibility',
         ];
 
         $catIds = [];
@@ -120,6 +121,13 @@ class SportSeeder extends Seeder
                 'unit'   => 'Cm',
                 'type'   => 'cm',
                 'target' => 245 
+            ],
+            [
+                'cat'    => 'Flexibility',
+                'name'   => 'Sit and Reach',
+                'unit'   => 'Cm',
+                'type'   => 'cm',
+                'target' => 35 
             ],
         ];
 

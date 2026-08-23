@@ -31,6 +31,7 @@ class VolleyballSeeder extends Seeder
             'Speed',
             'Agility',
             'Power',
+            'Flexibility',
         ];
 
         $catIds = [];
@@ -86,6 +87,7 @@ class VolleyballSeeder extends Seeder
             ['cat' => 'Agility', 'name' => 'T Test', 'unit' => 'Sec', 'type' => 'second', 'target' => 9.5],
             ['cat' => 'Power', 'name' => 'Vertical Jump', 'unit' => 'Cm', 'type' => 'cm', 'target' => 70],
             ['cat' => 'Power', 'name' => 'Standing Board Jump', 'unit' => 'Cm', 'type' => 'cm', 'target' => 245],
+            ['cat' => 'Flexibility', 'name' => 'Sit and Reach', 'unit' => 'Cm', 'type' => 'cm', 'target' => 35],
         ];
 
         foreach ($tests as $test) {

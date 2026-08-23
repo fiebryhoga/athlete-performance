@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TrainingGroup;
 use App\Models\GroupTraining;
 use App\Models\Exercise;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -152,16 +153,34 @@ class GroupTrainingController extends Controller
                 }
             }
         }
+
+        return redirect()->route('admin.group-trainings.show', $group->id)
+            ->with('message', 'Sesi latihan grup berhasil dibuat!');
+    }
+
+    public function showSession(GroupTraining $training)
+    {
         $training->load(['group.members', 'members_pivot', 'rpe_records', 'coach', 'blocks.items.exercise.category']);
         
-        $availableAthletes = \App\Models\User::where('role', 'athlete')
+        $availableAthletes = User::where('role', 'athlete')
             ->select('id', 'name')
             ->get();
+            
+        $coaches = [];
+        if (!empty($training->coach_ids)) {
+            $coaches = User::whereIn('id', $training->coach_ids)->get();
+        } elseif ($training->coach_id) {
+            $c = User::find($training->coach_id);
+            if ($c) {
+                $coaches = [$c];
+            }
+        }
             
         return Inertia::render('Admin/GroupTrainings/ShowSession', [
             'training' => $training,
             'group' => $training->group,
             'availableAthletes' => $availableAthletes,
+            'coaches' => $coaches,
         ]);
     }
 

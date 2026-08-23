@@ -17,6 +17,18 @@ import {
 } from "lucide-react";
 import { getRemainingGrowth, phvLookupData } from "./PhvLookupTable";
 
+const isMaleGender = (g) => {
+    if (!g) return true;
+    const clean = String(g).trim().toUpperCase();
+    return clean === "MALE" || clean === "LAKI-LAKI" || clean === "L" || clean === "M" || clean === "BOYS" || clean === "BOY";
+};
+
+const isFemaleGender = (g) => {
+    if (!g) return false;
+    const clean = String(g).trim().toUpperCase();
+    return clean === "FEMALE" || clean === "PEREMPUAN" || clean === "P" || clean === "F" || clean === "GIRLS" || clean === "GIRL";
+};
+
 // Mirwald PHV Formula
 const calculateMaturityOffset = (
     gender,
@@ -33,7 +45,7 @@ const calculateMaturityOffset = (
 
     let mo = 0;
 
-    if (gender === "male" || gender === "Laki-laki") {
+    if (isMaleGender(gender)) {
         mo =
             -9.236 +
             0.0002708 * legLength * sittingHeight -
@@ -56,10 +68,9 @@ const calculateMaturityOffset = (
 export default function Form({ auth, athlete, assessment }) {
     const isEditing = !!assessment;
 
-    const defaultGender =
-        athlete.gender === "Perempuan" || athlete.gender === "female"
-            ? "female"
-            : "male";
+    const defaultGender = isFemaleGender(athlete?.gender)
+        ? "female"
+        : "male";
 
     const { data, setData, post, put, processing, errors, recentlySuccessful } =
         useForm({
@@ -136,7 +147,7 @@ export default function Form({ auth, athlete, assessment }) {
                 const phvAge = age - mo;
 
                 let status = "Average";
-                if (data.gender === "male") {
+                if (isMaleGender(data.gender)) {
                     if (phvAge < 13.0) status = "Early";
                     else if (phvAge > 15.0) status = "Late";
                 } else {
@@ -258,18 +269,23 @@ export default function Form({ auth, athlete, assessment }) {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-1">
-                                                Gender
+                                                Jenis Kelamin
                                             </label>
                                             <select
-                                                className="w-full bg-slate-50 border border-slate-200 text-slate-600 rounded-lg px-4 py-2.5"
+                                                className="w-full bg-white border border-slate-300 text-slate-800 rounded-lg px-4 py-2.5"
                                                 value={data.gender}
-                                                disabled
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "gender",
+                                                        e.target.value,
+                                                    )
+                                                }
                                             >
                                                 <option value="male">
-                                                    Boys
+                                                    Laki-laki (Boys)
                                                 </option>
                                                 <option value="female">
-                                                    Girls
+                                                    Perempuan (Girls)
                                                 </option>
                                             </select>
                                         </div>

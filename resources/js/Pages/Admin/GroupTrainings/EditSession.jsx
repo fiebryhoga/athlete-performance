@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ChevronLeft, Dumbbell, Activity, Type } from 'lucide-react';
+import { ChevronLeft, Dumbbell, Activity, Type, UserPlus } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import PhaseBlock from '../IndividualTrainings/Partials/PhaseBlock';
 import TextBlock from '../IndividualTrainings/Partials/TextBlock';
@@ -285,7 +285,93 @@ export default function EditSession({
                                         Belum ada anggota di grup ini.
                                     </div>
                                 )}
+
+                                {/* Render Guests that are selected */}
+                                {data.attendee_ids
+                                    .filter(id => !group?.members?.some(m => m.id === id))
+                                    .map(guestId => {
+                                        const guest = typeof availableAthletes !== 'undefined' ? availableAthletes?.find(a => a.id === guestId) : null;
+                                        if (!guest) return null;
+                                        return (
+                                            <label
+                                                key={`guest-${guest.id}`}
+                                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all bg-orange-50 border-orange-500 text-orange-700 shadow-sm"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={true}
+                                                    onChange={() => {
+                                                        const newIds = data.attendee_ids.filter(id => id !== guest.id);
+                                                        let newData = { ...data, attendee_ids: newIds };
+                                                        if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                            const newProgs = [...data.programs];
+                                                            if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                                newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+                                                            }
+                                                            if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                                newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                            }
+                                                            newData.programs = newProgs;
+                                                        }
+                                                        setData(newData);
+                                                    }}
+                                                />
+                                                <span className="text-xs font-bold">{guest.name}</span>
+                                                <span className="text-[9px] px-1.5 py-0.5 rounded font-extrabold bg-orange-200 text-orange-800">GUEST</span>
+                                            </label>
+                                        );
+                                    })}
                             </div>
+
+                            {/* Premium Dropdown to add a guest from outside group */}
+                            {typeof availableAthletes !== 'undefined' && availableAthletes && availableAthletes.filter(a => !group?.members?.some(m => m.id === a.id) && !data.attendee_ids.includes(a.id)).length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-zinc-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-orange-50/60 via-amber-50/30 to-transparent p-3.5 rounded-xl border border-orange-200/60 shadow-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-600 shrink-0 shadow-sm">
+                                            <UserPlus size={18} strokeWidth={2.5} />
+                                        </div>
+                                        <div>
+                                            <span className="block text-xs font-extrabold text-zinc-800 tracking-tight">Tambah Tamu (Guest Athlete)</span>
+                                            <span className="block text-[11px] font-medium text-zinc-500 mt-0.5">Undang atlet dari luar grup untuk sesi latihan gabungan / make-up</span>
+                                        </div>
+                                    </div>
+                                    <div className="relative min-w-[240px]">
+                                        <select
+                                            className="w-full text-xs font-bold bg-white border border-zinc-300 hover:border-orange-500 text-zinc-700 rounded-xl px-3.5 py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 cursor-pointer shadow-sm transition-all appearance-none"
+                                            value=""
+                                            onChange={(e) => {
+                                                const guestId = parseInt(e.target.value);
+                                                if (guestId && !data.attendee_ids.includes(guestId)) {
+                                                    const newIds = [...data.attendee_ids, guestId];
+                                                    let newData = { ...data, attendee_ids: newIds };
+                                                    if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                        const newProgs = [...data.programs];
+                                                        if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                            newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                        }
+                                                        newData.programs = newProgs;
+                                                    }
+                                                    setData(newData);
+                                                }
+                                            }}
+                                        >
+                                            <option value="" className="text-zinc-400">+ Pilih & Tambahkan Atlet...</option>
+                                            {availableAthletes
+                                                .filter(a => !group?.members?.some(m => m.id === a.id) && !data.attendee_ids.includes(a.id))
+                                                .map(a => (
+                                                    <option key={a.id} value={a.id} className="font-semibold text-zinc-800 py-1">
+                                                        {a.name} ({a.sport?.name || 'Atlet'})
+                                                    </option>
+                                                ))
+                                            }
+                                        </select>
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
  </div>
  </div>
@@ -298,33 +384,42 @@ export default function EditSession({
                                 <Dumbbell className="w-5 h-5 text-orange-500" />
                                 Skema & Program Latihan
                             </h3>
-                            <label className="flex items-center gap-2 text-sm font-bold text-zinc-600 cursor-pointer bg-zinc-50 px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 transition-all">
-                                <input 
-                                    type="checkbox" 
-                                    className="rounded border-zinc-300 text-orange-500 focus:ring-orange-500"
-                                    checked={hasSecondaryProgram}
-                                    onChange={(e) => {
-                                        const isChecked = e.target.checked;
-                                        setHasSecondaryProgram(isChecked);
-                                        
-                                        const newProgs = [...data.programs];
-                                        if (isChecked) {
-                                            if (newProgs.length < 2) {
-                                                newProgs.push({ name: "Program Sekunder", athlete_ids: [], blocks: [] });
+                            <div className="flex items-center gap-3">
+                                <label className="flex items-center gap-2 text-sm font-bold text-zinc-600 cursor-pointer bg-zinc-50 px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 transition-all">
+                                    <input 
+                                        type="checkbox" 
+                                        className="rounded border-zinc-300 text-orange-500 focus:ring-orange-500"
+                                        checked={hasSecondaryProgram}
+                                        onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setHasSecondaryProgram(isChecked);
+                                            
+                                            const newProgs = [...data.programs];
+                                            if (isChecked) {
+                                                if (newProgs.length < 2) {
+                                                    newProgs.push({ name: "Program Sekunder", athlete_ids: [], blocks: [] });
+                                                }
+                                                newProgs[0].athlete_ids = [...data.attendee_ids];
+                                                if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                    newProgs[0].athlete_ids = data.attendee_ids.filter(id => !newProgs[1].athlete_ids.includes(id));
+                                                }
+                                            } else {
+                                                setActiveProgramIndex(0);
+                                                newProgs[0].athlete_ids = null;
                                             }
-                                            newProgs[0].athlete_ids = [...data.attendee_ids];
-                                            if (newProgs[1] && newProgs[1].athlete_ids) {
-                                                newProgs[0].athlete_ids = data.attendee_ids.filter(id => !newProgs[1].athlete_ids.includes(id));
-                                            }
-                                        } else {
-                                            setActiveProgramIndex(0);
-                                            newProgs[0].athlete_ids = null;
-                                        }
-                                        setData("programs", newProgs);
-                                    }}
-                                />
-                                Buat 2 Program Berbeda?
-                            </label>
+                                            setData("programs", newProgs);
+                                        }}
+                                    />
+                                    Buat 2 Program Berbeda?
+                                </label>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-6 py-2 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-md shadow-orange-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                    {processing ? "MENYIMPAN..." : "Simpan Program"}
+                                </button>
+                            </div>
                         </div>
                         
                         {hasSecondaryProgram && (
@@ -462,15 +557,6 @@ export default function EditSession({
  </div>
  </div>
 
- <div className="p-4 bg-white border-t border-zinc-200 flex justify-end">
- <button
- type="submit"
- disabled={processing}
- className="px-8 py-3 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
- >
- {processing ? "MENYIMPAN..." : "SIMPAN PROGRAM SESI INI"}
- </button>
- </div>
  </div>
  </form>
 

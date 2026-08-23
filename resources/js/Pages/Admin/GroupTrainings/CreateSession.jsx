@@ -8,6 +8,16 @@ import {
     Type,
     ClipboardEdit,
     X,
+    UserPlus,
+    Check,
+    Users,
+    Calendar,
+    MapPin,
+    Target,
+    UserCheck,
+    Sparkles,
+    Search,
+    ChevronDown,
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import PhaseBlock from "../IndividualTrainings/Partials/PhaseBlock";
@@ -43,10 +53,42 @@ export default function CreateSession({
     }));
 
     const [isExModalOpen, setIsExModalOpen] = useState(false);
-        const [activeProgramIndex, setActiveProgramIndex] = useState(0);
+    const [activeProgramIndex, setActiveProgramIndex] = useState(0);
     const [hasSecondaryProgram, setHasSecondaryProgram] = useState(
         data.programs && data.programs.length > 1
     );
+    const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
+    const [guestSearchQuery, setGuestSearchQuery] = useState("");
+
+    const handleSelectAllAthletes = () => {
+        const allMemberIds = group?.members?.map(m => m.id) || [];
+        const guestIds = data.attendee_ids.filter(id => !allMemberIds.includes(id));
+        const newIds = [...new Set([...allMemberIds, ...guestIds])];
+        
+        let newData = { ...data, attendee_ids: newIds };
+        if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+            const newProgs = [...data.programs];
+            if (newProgs[1] && newProgs[1].athlete_ids) {
+                newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+            }
+            if (newProgs[0] && newProgs[0].athlete_ids) {
+                newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+            }
+            newData.programs = newProgs;
+        }
+        setData(newData);
+    };
+
+    const handleDeselectAllAthletes = () => {
+        let newData = { ...data, attendee_ids: [] };
+        if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+            const newProgs = [...data.programs];
+            if (newProgs[1]) newProgs[1].athlete_ids = [];
+            if (newProgs[0]) newProgs[0].athlete_ids = [];
+            newData.programs = newProgs;
+        }
+        setData(newData);
+    };
 
     const submitSession = (e) => {
         e.preventDefault();
@@ -180,17 +222,31 @@ export default function CreateSession({
             />
 
             <form onSubmit={submitSession} className="space-y-6 md:space-y-8">
-                {/* Basic Info */}
-                <div className="bg-white p-6 md:p-8 border border-slate-200 rounded-2xl shadow-sm">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-orange-500" />
-                        Informasi Dasar
-                    </h3>
+                {/* Basic Info Container */}
+                <div className="bg-white p-6 md:p-8 border border-slate-200 rounded-xl shadow-sm space-y-8 transition-colors">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-[#ed4e18]/10 border border-[#ed4e18]/20 flex items-center justify-center text-[#ed4e18] shrink-0 shadow-2xs">
+                                <Activity className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-bold text-slate-900">
+                                    Informasi Dasar Sesi
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Tentukan jadwal, judul, fokus latihan, dan lokasi pelaksanaan sesi.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Group A: Date, Title, Focus, Location */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                         <div>
-                            <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
-                                Tanggal Sesi
+                            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                                <Calendar size={14} className="text-[#ed4e18]" />
+                                <span>Tanggal Sesi</span>
                             </label>
                             <input
                                 type="date"
@@ -198,19 +254,19 @@ export default function CreateSession({
                                 onChange={(e) =>
                                     setData("date", e.target.value)
                                 }
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                                className="w-full py-2.5 px-3.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#ed4e18]/25 focus:border-[#ed4e18] outline-none transition-all shadow-2xs"
                             />
                             {errors.date && (
-                                <div className="text-rose-500 text-xs mt-1 font-bold">
+                                <div className="text-rose-500 text-xs mt-1.5 font-semibold">
                                     {errors.date}
                                 </div>
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
-                                Judul Sesi Latihan{" "}
-                                <span className="text-rose-500">*</span>
+                            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                                <span>Judul Sesi Latihan</span>
+                                <span className="text-[#ed4e18] font-bold">*</span>
                             </label>
                             <input
                                 type="text"
@@ -219,19 +275,20 @@ export default function CreateSession({
                                     setData("name", e.target.value)
                                 }
                                 placeholder="Contoh: Recovery Training"
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400"
+                                className="w-full py-2.5 px-3.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#ed4e18]/25 focus:border-[#ed4e18] outline-none transition-all placeholder:text-slate-400 shadow-2xs"
                                 required
                             />
                             {errors.name && (
-                                <div className="text-rose-500 text-xs mt-1 font-bold">
+                                <div className="text-rose-500 text-xs mt-1.5 font-semibold">
                                     {errors.name}
                                 </div>
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
-                                Fokus Latihan
+                            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                                <Target size={14} className="text-[#ed4e18]" />
+                                <span>Fokus Latihan</span>
                             </label>
                             <input
                                 type="text"
@@ -239,14 +296,16 @@ export default function CreateSession({
                                 onChange={(e) =>
                                     setData("training_type", e.target.value)
                                 }
-                                placeholder="e.g. Strength, Recovery..."
-                                className="w-full py-2.5 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400"
+                                placeholder="Contoh: Strength, Endurance..."
+                                className="w-full py-2.5 px-3.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#ed4e18]/25 focus:border-[#ed4e18] outline-none transition-all placeholder:text-slate-400 shadow-2xs"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
-                                Lokasi <span className="text-rose-500">*</span>
+                            <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mb-2">
+                                <MapPin size={14} className="text-[#ed4e18]" />
+                                <span>Lokasi</span>
+                                <span className="text-[#ed4e18] font-bold">*</span>
                             </label>
                             <input
                                 type="text"
@@ -254,199 +313,481 @@ export default function CreateSession({
                                 onChange={(e) =>
                                     setData("location", e.target.value)
                                 }
-                                placeholder="e.g. Gym A..."
-                                className={`w-full py-2.5 px-4 bg-slate-50 border rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder-slate-400 ${errors.location ? "border-rose-300" : "border-slate-200"}`}
+                                placeholder="Contoh: Gym A, Lapangan Utama..."
+                                className={`w-full py-2.5 px-3.5 bg-white border rounded-lg text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#ed4e18]/25 focus:border-[#ed4e18] outline-none transition-all placeholder:text-slate-400 shadow-2xs ${errors.location ? "border-rose-300" : "border-slate-200"}`}
                             />
                             {errors.location && (
-                                <div className="text-rose-500 text-xs mt-1 font-bold">
+                                <div className="text-rose-500 text-xs mt-1.5 font-semibold">
                                     {errors.location}
                                 </div>
                             )}
                         </div>
 
-                        <div className="md:col-span-2 lg:col-span-3">
-                            <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer" onClick={() => setData('is_extra', !data.is_extra)}>
-                                <input
-                                    type="checkbox"
-                                    checked={data.is_extra}
-                                    onChange={(e) => setData('is_extra', e.target.checked)}
-                                    className="w-4 h-4 text-orange-500 rounded border-slate-300 focus:ring-orange-500"
-                                />
-                                <label className="text-sm font-semibold text-slate-800 cursor-pointer">
-                                    Sesi Tambahan (Turnamen / PR / Latihan Mandiri)
-                                    <span className="block text-xs text-slate-500 mt-0.5">Sesi ini tidak akan memotong kuota paket latihan.</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-2 lg:col-span-3">
-                            <label className="block text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-widest">
-                                Coach Pendamping (Pilih 1 atau 2)
-                            </label>
-                            <div className="flex flex-wrap gap-3">
-                                {coaches && coaches.length > 0 ? (
-                                    coaches.map((coach) => (
-                                        <label
-                                            key={coach.id}
-                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all ${data.coach_ids.includes(coach.id) ? "bg-orange-50 border-orange-500 text-orange-500 shadow-sm" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"}`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={data.coach_ids.includes(
-                                                    coach.id,
-                                                )}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        if (
-                                                            data.coach_ids
-                                                                .length >= 2
-                                                        ) {
-                                                            alert(
-                                                                "Maksimal memilih 2 pelatih",
-                                                            );
-                                                            return;
-                                                        }
-                                                        setData("coach_ids", [
-                                                            ...data.coach_ids,
-                                                            coach.id,
-                                                        ]);
-                                                    } else {
-                                                        setData(
-                                                            "coach_ids",
-                                                            data.coach_ids.filter(
-                                                                (id) =>
-                                                                    id !==
-                                                                    coach.id,
-                                                            ),
-                                                        );
-                                                    }
-                                                }}
-                                            />
+                        {/* Extra Session Banner Card */}
+                        <div className="col-span-full pt-2">
+                            <div
+                                onClick={() => setData('is_extra', !data.is_extra)}
+                                className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                                    data.is_extra
+                                        ? "bg-[#ed4e18] text-white border-[#ed4e18] shadow-md shadow-[#ed4e18]/20"
+                                        : "bg-slate-50/80 text-slate-800 border-slate-200 hover:border-[#ed4e18]/40"
+                                }`}
+                            >
+                                <div className="flex items-start sm:items-center gap-3.5">
+                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-bold text-sm transition-colors ${
+                                        data.is_extra
+                                            ? "bg-white/20 text-white shadow-2xs"
+                                            : "bg-[#ed4e18]/10 text-[#ed4e18] border border-[#ed4e18]/20 shadow-2xs"
+                                    }`}>
+                                        <Sparkles size={18} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
                                             <span className="text-sm font-bold">
-                                                {coach.name}
+                                                Sesi Tambahan (Turnamen / PR / Latihan Mandiri)
                                             </span>
-                                            <span
-                                                className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md font-bold ${data.coach_ids.includes(coach.id) ? "bg-orange-500/10 text-orange-500" : "bg-slate-100 text-slate-500"}`}
-                                            >
-                                                {coach.role.replace("_", " ")}
-                                            </span>
-                                        </label>
-                                    ))
-                                ) : (
-                                    <div className="text-sm text-slate-500 italic py-2">
-                                        Belum ada coach yang ditugaskan untuk
-                                        atlet ini.
+                                            {data.is_extra && (
+                                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-white/20">
+                                                    Aktif
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className={`block text-xs mt-0.5 ${data.is_extra ? "text-white/90" : "text-slate-500"}`}>
+                                            Sesi ini tidak akan memotong kuota paket latihan.
+                                        </span>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-2 lg:col-span-3">
-                            <label className="block text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-widest">
-                                Peserta Sesi (Checklist Kehadiran)
-                            </label>
-                            <p className="text-xs text-slate-500 mb-3 -mt-1">
-                                Hapus centang pada atlet yang <strong>tidak hadir / absen</strong> pada sesi ini agar mereka tidak dimasukkan ke dalam catatan sesi.
-                            </p>
-                            <div className="flex flex-wrap gap-3">
-                                {group?.members && group.members.length > 0 ? (
-                                    group.members.map((member) => (
-                                        <label
-                                            key={member.id}
-                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all ${data.attendee_ids.includes(member.id) ? "bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"}`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={data.attendee_ids.includes(member.id)}
-                                                onChange={(e) => {
-                                                    let newIds = [...data.attendee_ids];
-                                                    if (e.target.checked) {
-                                                        newIds.push(member.id);
-                                                    } else {
-                                                        newIds = newIds.filter(id => id !== member.id);
-                                                    }
-                                                    
-                                                    let newData = { ...data, attendee_ids: newIds };
-                                                    
-                                                    if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
-                                                        const newProgs = [...data.programs];
-                                                        if (newProgs[1] && newProgs[1].athlete_ids) {
-                                                            newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
-                                                        }
-                                                        if (newProgs[0] && newProgs[0].athlete_ids) {
-                                                            newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
-                                                        }
-                                                        newData.programs = newProgs;
-                                                    }
-                                                    
-                                                    setData(newData);
-                                                }}
-                                            />
-                                            <span className="text-xs font-bold">{member.name}</span>
-                                        </label>
-                                    ))
-                                ) : (
-                                    <div className="text-sm text-slate-500 italic py-2">
-                                        Belum ada anggota di grup ini.
-                                    </div>
-                                )}
+                                </div>
+                                
+                                <div className="flex items-center gap-2.5 self-end sm:self-center shrink-0">
+                                    <input
+                                        type="checkbox"
+                                        checked={data.is_extra}
+                                        onChange={(e) => setData('is_extra', e.target.checked)}
+                                        className="w-4 h-4 rounded border-slate-300 text-[#ed4e18] focus:ring-[#ed4e18] pointer-events-none"
+                                    />
+                                    <span className="text-xs font-semibold select-none">
+                                        {data.is_extra ? "Ya, Jadikan Sesi Tambahan" : "Tidak"}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Group B: Coach Pendamping */}
+                    <div className="pt-6 border-t border-slate-100 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <label className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
+                                    <UserCheck size={16} className="text-[#ed4e18]" />
+                                    <span>Coach Pendamping</span>
+                                </label>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Pilih 1 atau maksimal 2 pelatih yang bertugas mendampingi sesi ini.
+                                </p>
+                            </div>
+                            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#ed4e18]/10 text-[#ed4e18] border border-[#ed4e18]/20 self-start sm:self-center shrink-0">
+                                Terpilih: {data.coach_ids.length} / 2 Coach
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            {coaches && coaches.length > 0 ? (
+                                coaches.map((coach) => {
+                                    const isSelected = data.coach_ids.includes(coach.id);
+                                    return (
+                                        <div
+                                            key={coach.id}
+                                            onClick={() => {
+                                                if (isSelected) {
+                                                    setData("coach_ids", data.coach_ids.filter((id) => id !== coach.id));
+                                                } else {
+                                                    if (data.coach_ids.length >= 2) {
+                                                        alert("Maksimal memilih 2 pelatih");
+                                                        return;
+                                                    }
+                                                    setData("coach_ids", [...data.coach_ids, coach.id]);
+                                                }
+                                            }}
+                                            className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all ${
+                                                isSelected
+                                                    ? "bg-[#ed4e18] border-[#ed4e18] text-white shadow-md shadow-[#ed4e18]/20"
+                                                    : "bg-white border-slate-200 text-slate-700 hover:bg-[#ed4e18]/5 hover:border-[#ed4e18]/30"
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
+                                                    isSelected
+                                                        ? "bg-white/20 text-white"
+                                                        : "bg-[#ed4e18]/10 text-[#ed4e18] border border-[#ed4e18]/20"
+                                                }`}>
+                                                    {coach.name ? coach.name.substring(0, 2).toUpperCase() : "CO"}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <span className="block text-sm font-bold truncate">
+                                                        {coach.name}
+                                                    </span>
+                                                    <span className={`block text-[11px] font-medium capitalize truncate ${
+                                                        isSelected ? "text-white/90" : "text-slate-500"
+                                                    }`}>
+                                                        {coach.role ? coach.role.replace("_", " ").toLowerCase() : "coach"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className={`w-5 h-5 rounded-md flex items-center justify-center border shrink-0 transition-all ${
+                                                isSelected
+                                                    ? "bg-white text-[#ed4e18] border-white shadow-2xs"
+                                                    : "border-slate-300 text-transparent"
+                                            }`}>
+                                                <Check size={12} strokeWidth={3} />
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-full text-sm text-slate-500 italic py-3 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    Belum ada coach yang ditugaskan untuk atlet ini.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Group C: Attendance & Guest Athletes */}
+                    <div className="pt-6 border-t border-slate-100 space-y-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <label className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
+                                    <Users size={16} className="text-[#ed4e18]" />
+                                    <span>Daftar Hadir Atlet</span>
+                                </label>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Hapus centang pada atlet yang <strong className="text-slate-700 font-semibold">tidak hadir / absen</strong> pada sesi ini agar tidak dimasukkan dalam catatan.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={handleSelectAllAthletes}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#ed4e18]/10 hover:bg-[#ed4e18]/20 text-[#ed4e18] transition-colors border border-[#ed4e18]/30 shadow-2xs"
+                                >
+                                    Pilih Semua ({group?.members?.length || 0})
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleDeselectAllAthletes}
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-500 transition-colors border border-slate-200 shadow-2xs"
+                                >
+                                    Kosongkan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                            {group?.members && group.members.length > 0 ? (
+                                group.members.map((member) => {
+                                    const isPresent = data.attendee_ids.includes(member.id);
+                                    return (
+                                        <div
+                                            key={member.id}
+                                            onClick={() => {
+                                                let newIds = [...data.attendee_ids];
+                                                if (!isPresent) {
+                                                    newIds.push(member.id);
+                                                } else {
+                                                    newIds = newIds.filter(id => id !== member.id);
+                                                }
+                                                
+                                                let newData = { ...data, attendee_ids: newIds };
+                                                if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                    const newProgs = [...data.programs];
+                                                    if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                        newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+                                                    }
+                                                    if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                        newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                    }
+                                                    newData.programs = newProgs;
+                                                }
+                                                setData(newData);
+                                            }}
+                                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl border cursor-pointer transition-all select-none ${
+                                                isPresent
+                                                    ? "bg-[#ed4e18] border-[#ed4e18] text-white shadow-sm shadow-[#ed4e18]/15"
+                                                    : "bg-slate-50/60 border-dashed border-slate-200 text-slate-400 hover:bg-[#ed4e18]/5 hover:border-[#ed4e18]/30 hover:text-slate-600"
+                                            }`}
+                                        >
+                                            <span className={`text-xs font-semibold truncate pr-1 ${!isPresent && "line-through opacity-70"}`}>
+                                                {member.name}
+                                            </span>
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 text-[10px] transition-colors ${
+                                                isPresent
+                                                    ? "bg-white/20 text-white font-bold"
+                                                    : "border border-slate-300 text-transparent"
+                                            }`}>
+                                                {isPresent && "✓"}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-full text-sm text-slate-500 italic py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                                    Belum ada anggota di grup ini.
+                                </div>
+                            )}
+
+                            {/* Render Guests that are selected */}
+                            {data.attendee_ids
+                                .filter(id => !group?.members?.some(m => m.id === id))
+                                .map(guestId => {
+                                    const guest = typeof availableAthletes !== 'undefined' ? availableAthletes?.find(a => a.id === guestId) : null;
+                                    if (!guest) return null;
+                                    return (
+                                        <div
+                                            key={`guest-${guest.id}`}
+                                            onClick={() => {
+                                                const newIds = data.attendee_ids.filter(id => id !== guest.id);
+                                                let newData = { ...data, attendee_ids: newIds };
+                                                if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                    const newProgs = [...data.programs];
+                                                    if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                        newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+                                                    }
+                                                    if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                        newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                    }
+                                                    newData.programs = newProgs;
+                                                }
+                                                setData(newData);
+                                            }}
+                                            className="flex items-center justify-between px-3 py-2.5 rounded-xl border cursor-pointer transition-all bg-[#ed4e18] border-[#ed4e18] text-white shadow-sm shadow-[#ed4e18]/20 group/guest select-none"
+                                        >
+                                            <div className="min-w-0 pr-1">
+                                                <span className="block text-xs font-semibold truncate">{guest.name}</span>
+                                                <span className="block text-[9px] font-bold text-white/80">TAMU</span>
+                                            </div>
+                                            <div className="w-5 h-5 rounded hover:bg-white/20 flex items-center justify-center shrink-0 text-xs transition-colors" title="Hapus tamu">
+                                                <X size={13} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+
+                        {/* Guest Athlete Dropdown */}
+                        {typeof availableAthletes !== 'undefined' && availableAthletes && availableAthletes.filter(a => !group?.members?.some(m => m.id === a.id)).length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#ed4e18]/5 p-4 rounded-xl border border-[#ed4e18]/20 shadow-2xs">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-[#ed4e18]/20 flex items-center justify-center text-[#ed4e18] shrink-0 shadow-2xs">
+                                        <UserPlus size={16} />
+                                    </div>
+                                    <div>
+                                        <span className="block text-xs font-bold text-slate-800">Tambah Tamu (Guest Athlete)</span>
+                                        <span className="block text-[11px] text-slate-500 mt-0.5">Undang atlet dari luar grup untuk sesi latihan gabungan / make-up</span>
+                                    </div>
+                                </div>
+                                <div className="relative min-w-[280px] self-stretch sm:self-auto">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsGuestDropdownOpen(!isGuestDropdownOpen)}
+                                        className="w-full text-xs font-semibold bg-white border border-slate-200 hover:border-[#ed4e18] text-slate-700 rounded-lg px-3.5 py-2.5 flex items-center justify-between gap-2 shadow-2xs transition-all text-left"
+                                    >
+                                        <span className="truncate">
+                                            {data.attendee_ids.filter(id => !group?.members?.some(m => m.id === id)).length > 0
+                                                ? `${data.attendee_ids.filter(id => !group?.members?.some(m => m.id === id)).length} Atlet Tamu Terpilih`
+                                                : "+ Pilih & Tambahkan Atlet..."}
+                                        </span>
+                                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 shrink-0 ${isGuestDropdownOpen ? "rotate-180 text-[#ed4e18]" : ""}`} />
+                                    </button>
+
+                                    {isGuestDropdownOpen && (
+                                        <>
+                                            <div 
+                                                className="fixed inset-0 z-40" 
+                                                onClick={() => setIsGuestDropdownOpen(false)} 
+                                            />
+                                            <div className="absolute right-0 left-0 sm:left-auto sm:right-0 sm:w-[320px] top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150 text-left">
+                                                <div className="p-2.5 border-b border-slate-100 bg-slate-50/80 sticky top-0 z-10 flex items-center justify-between gap-2">
+                                                    <div className="relative flex-1">
+                                                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Cari nama atau cabor..."
+                                                            value={guestSearchQuery}
+                                                            onChange={(e) => setGuestSearchQuery(e.target.value)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="w-full pl-8 pr-3 py-1.5 text-xs font-medium bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ed4e18]/25 focus:border-[#ed4e18] transition-all placeholder:text-slate-400 text-slate-800"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIsGuestDropdownOpen(false)}
+                                                        className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 rounded-lg transition-colors shrink-0"
+                                                        title="Tutup"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+
+                                                <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 divide-y divide-slate-50/80">
+                                                    {(() => {
+                                                        const externalAthletes = availableAthletes.filter(a => !group?.members?.some(m => m.id === a.id));
+                                                        const filteredGuests = externalAthletes.filter(a => {
+                                                            if (!guestSearchQuery) return true;
+                                                            const q = guestSearchQuery.toLowerCase();
+                                                            return (a.name && a.name.toLowerCase().includes(q)) || (a.sport?.name && a.sport.name.toLowerCase().includes(q));
+                                                        });
+
+                                                        if (filteredGuests.length === 0) {
+                                                            return (
+                                                                <div className="py-6 text-center text-xs text-slate-400 italic">
+                                                                    {guestSearchQuery ? "Atlet tidak ditemukan." : "Tidak ada atlet luar yang tersedia."}
+                                                                </div>
+                                                            );
+                                                        }
+
+                                                        return filteredGuests.map(guest => {
+                                                            const isSelected = data.attendee_ids.includes(guest.id);
+                                                            return (
+                                                                <div
+                                                                    key={`custom-guest-${guest.id}`}
+                                                                    onClick={() => {
+                                                                        let newIds;
+                                                                        if (isSelected) {
+                                                                            newIds = data.attendee_ids.filter(id => id !== guest.id);
+                                                                        } else {
+                                                                            newIds = [...data.attendee_ids, guest.id];
+                                                                        }
+                                                                        let newData = { ...data, attendee_ids: newIds };
+                                                                        if (typeof hasSecondaryProgram !== 'undefined' && hasSecondaryProgram) {
+                                                                            const newProgs = [...data.programs];
+                                                                            if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                                                newProgs[1].athlete_ids = newProgs[1].athlete_ids.filter(id => newIds.includes(id));
+                                                                            }
+                                                                            if (newProgs[0] && newProgs[0].athlete_ids) {
+                                                                                newProgs[0].athlete_ids = newIds.filter(id => !newProgs[1]?.athlete_ids?.includes(id));
+                                                                            }
+                                                                            newData.programs = newProgs;
+                                                                        }
+                                                                        setData(newData);
+                                                                    }}
+                                                                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all select-none ${
+                                                                        isSelected
+                                                                            ? "bg-[#ed4e18]/10 text-[#ed4e18] font-bold"
+                                                                            : "hover:bg-slate-50 text-slate-700 font-medium"
+                                                                    }`}
+                                                                >
+                                                                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                                                        <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border text-[10px] transition-colors ${
+                                                                            isSelected
+                                                                                ? "bg-[#ed4e18] border-[#ed4e18] text-white font-bold"
+                                                                                : "border-slate-300 bg-white text-transparent"
+                                                                        }`}>
+                                                                            {isSelected && "✓"}
+                                                                        </div>
+                                                                        <div className="min-w-0">
+                                                                            <span className="block text-xs truncate">{guest.name}</span>
+                                                                            <span className={`block text-[10px] font-normal truncate ${isSelected ? "text-[#ed4e18]/80" : "text-slate-400"}`}>
+                                                                                {guest.sport?.name || 'Atlet'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    {isSelected && (
+                                                                        <span className="text-[9px] bg-[#ed4e18] text-white px-1.5 py-0.5 rounded font-bold shrink-0 shadow-2xs">
+                                                                            TERPILIH
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        });
+                                                    })()}
+                                                </div>
+                                                
+                                                <div className="p-2 border-t border-slate-100 bg-slate-50/60 flex justify-between items-center text-[11px] text-slate-500">
+                                                    <span>Bisa pilih &gt; 1 atlet sekaligus</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setIsGuestDropdownOpen(false)}
+                                                        className="font-bold text-[#ed4e18] hover:underline px-2 py-0.5"
+                                                    >
+                                                        Selesai
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Editor */}
-                <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                {/* Editor Container */}
+                <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm transition-colors">
                     <div className="p-5 bg-white border-b border-slate-200 sticky top-0 z-40">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <Dumbbell className="w-5 h-5 text-orange-500" />
-                                Skema & Program Latihan
-                            </h3>
-                            <label className="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition-all">
-                                <input 
-                                    type="checkbox" 
-                                    className="rounded border-slate-300 text-orange-500 focus:ring-orange-500"
-                                    checked={hasSecondaryProgram}
-                                    onChange={(e) => {
-                                        const isChecked = e.target.checked;
-                                        setHasSecondaryProgram(isChecked);
-                                        
-                                        const newProgs = [...data.programs];
-                                        if (isChecked) {
-                                            if (newProgs.length < 2) {
-                                                newProgs.push({ name: "Program Sekunder", athlete_ids: [], blocks: [] });
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-[#ed4e18]/10 border border-[#ed4e18]/20 flex items-center justify-center text-[#ed4e18] shrink-0 shadow-2xs">
+                                    <Dumbbell className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900">
+                                        Skema & Program Latihan
+                                    </h3>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                        Atur urutan dan isi rancangan latihan untuk sesi ini.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer bg-slate-50 px-3.5 py-2 rounded-lg border border-slate-200 hover:bg-slate-100 transition-all select-none shadow-2xs">
+                                    <input 
+                                        type="checkbox" 
+                                        className="rounded border-slate-300 text-[#ed4e18] focus:ring-[#ed4e18]"
+                                        checked={hasSecondaryProgram}
+                                        onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setHasSecondaryProgram(isChecked);
+                                            
+                                            const newProgs = [...data.programs];
+                                            if (isChecked) {
+                                                if (newProgs.length < 2) {
+                                                    newProgs.push({ name: "Program Sekunder", athlete_ids: [], blocks: [] });
+                                                }
+                                                newProgs[0].athlete_ids = [...data.attendee_ids];
+                                                if (newProgs[1] && newProgs[1].athlete_ids) {
+                                                    newProgs[0].athlete_ids = data.attendee_ids.filter(id => !newProgs[1].athlete_ids.includes(id));
+                                                }
+                                            } else {
+                                                setActiveProgramIndex(0);
+                                                newProgs[0].athlete_ids = null;
                                             }
-                                            newProgs[0].athlete_ids = [...data.attendee_ids];
-                                            if (newProgs[1] && newProgs[1].athlete_ids) {
-                                                newProgs[0].athlete_ids = data.attendee_ids.filter(id => !newProgs[1].athlete_ids.includes(id));
-                                            }
-                                        } else {
-                                            setActiveProgramIndex(0);
-                                            newProgs[0].athlete_ids = null;
-                                        }
-                                        setData("programs", newProgs);
-                                    }}
-                                />
-                                Buat 2 Program Berbeda?
-                            </label>
+                                            setData("programs", newProgs);
+                                        }}
+                                    />
+                                    Buat 2 Program Berbeda?
+                                </label>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-6 py-2 text-xs font-bold text-white bg-[#ed4e18] hover:bg-[#d64312] rounded-lg transition-all shadow-md shadow-[#ed4e18]/25 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                    {processing ? "MENYIMPAN..." : "Simpan Program"}
+                                </button>
+                            </div>
                         </div>
                         
                         {hasSecondaryProgram && (
-                            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2">
+                            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pt-1 pb-2">
                                 <button
                                     type="button"
                                     onClick={() => setActiveProgramIndex(0)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeProgramIndex === 0 ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                    className={`px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${activeProgramIndex === 0 ? 'bg-[#ed4e18] text-white shadow-md shadow-[#ed4e18]/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                                 >
                                     {data.programs[0].name}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setActiveProgramIndex(1)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeProgramIndex === 1 ? 'bg-orange-500 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                    className={`px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${activeProgramIndex === 1 ? 'bg-[#ed4e18] text-white shadow-md shadow-[#ed4e18]/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                                 >
                                     {data.programs[1]?.name || 'Program Sekunder'}
                                 </button>
@@ -457,16 +798,16 @@ export default function CreateSession({
                     <div className="p-6 md:p-8">
                         {/* Program Settings (Audience) */}
                         {hasSecondaryProgram && activeProgramIndex === 1 && (
-                            <div className="mb-6 bg-white p-4 rounded-xl border border-zinc-200">
-                                <label className="block text-sm font-bold text-zinc-700 mb-1">Pilih Atlet untuk Program Sekunder</label>
-                                <p className="text-xs text-zinc-500 mb-3">Atlet yang dipilih akan menjalankan program ini dan TIDAK menjalankan Program Utama.</p>
-                                <div className="flex flex-wrap gap-2 pt-3 border-t border-zinc-100">
+                            <div className="mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+                                <label className="block text-sm font-bold text-slate-800 mb-1">Pilih Atlet untuk Program Sekunder</label>
+                                <p className="text-xs text-slate-500 mb-3">Atlet yang dipilih akan menjalankan program ini dan TIDAK menjalankan Program Utama.</p>
+                                <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
                                     {data.attendee_ids.map(attId => {
                                         const athlete = (typeof availableAthletes !== 'undefined' ? availableAthletes.find(a => a.id === attId) : null) || (typeof group !== 'undefined' ? group?.members?.find(m => m.id === attId) : null);
                                         if (!athlete) return null;
                                         const isSelected = data.programs[1]?.athlete_ids?.includes(attId);
                                         return (
-                                            <label key={attId} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all ${isSelected ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-white border-zinc-200 text-zinc-500 hover:bg-zinc-50'}`}>
+                                            <label key={attId} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-all select-none ${isSelected ? 'bg-[#ed4e18] border-[#ed4e18] text-white shadow-sm shadow-[#ed4e18]/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-[#ed4e18]/5 hover:border-[#ed4e18]/30'}`}>
                                                 <input 
                                                     type="checkbox"
                                                     className="hidden"
@@ -495,9 +836,9 @@ export default function CreateSession({
                         )}
                         
                         {hasSecondaryProgram && activeProgramIndex === 0 && (
-                            <div className="mb-6 bg-orange-50 p-4 rounded-xl border border-orange-200">
-                                <p className="text-sm font-bold text-orange-800">Informasi Program Utama</p>
-                                <p className="text-xs text-orange-600 mt-1">Program ini akan diterapkan ke semua atlet dalam sesi ini, <strong>KECUALI</strong> atlet yang sudah Anda centang di tab <strong>Program Sekunder</strong>.</p>
+                            <div className="mb-6 bg-[#ed4e18]/5 p-4 rounded-xl border border-[#ed4e18]/20 shadow-2xs">
+                                <p className="text-sm font-bold text-[#ed4e18]">Informasi Program Utama</p>
+                                <p className="text-xs text-slate-600 mt-1">Program ini akan diterapkan ke semua atlet dalam sesi ini, <strong className="font-bold text-slate-800">KECUALI</strong> atlet yang sudah Anda centang di tab <strong className="font-bold text-slate-800">Program Sekunder</strong>.</p>
                             </div>
                         )}
 
@@ -601,19 +942,17 @@ export default function CreateSession({
 
                         {data.programs[activeProgramIndex].blocks.length === 0 && (
                             <div className="text-center py-16 bg-white border-2 border-slate-200 border-dashed rounded-xl mt-4">
-                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-inner">
+                                <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-inner">
                                     <Dumbbell
-                                        size={28}
-                                        className="text-slate-300"
+                                        size={24}
+                                        className="text-slate-400"
                                     />
                                 </div>
-                                <p className="text-lg font-bold text-slate-700">
+                                <p className="text-base font-bold text-slate-800">
                                     Belum ada blok program latihan
                                 </p>
-                                <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto">
-                                    Gunakan tombol di bawah untuk mulai menyusun
-                                    program. Anda bisa menyeret (drag) blok yang
-                                    telah dibuat untuk mengatur urutannya.
+                                <p className="text-xs text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
+                                    Gunakan tombol di bawah untuk mulai menyusun program. Anda bisa menyeret (drag) blok yang telah dibuat untuk mengatur urutannya.
                                 </p>
                             </div>
                         )}
@@ -622,32 +961,22 @@ export default function CreateSession({
                             <button
                                 type="button"
                                 onClick={addTextBlock}
-                                className="text-sm font-bold bg-orange-50 border border-orange-200 text-orange-500 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-100 hover:border-orange-300 shadow-sm hover:shadow-md"
+                                className="text-xs font-bold bg-white border border-[#ed4e18]/30 text-[#ed4e18] px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all hover:bg-[#ed4e18]/5 shadow-2xs hover:shadow-sm"
                             >
-                                <Type size={16} className="text-orange-500" />{" "}
-                                Tambah Catatan Teks
+                                <Type size={15} className="text-[#ed4e18]" />
+                                <span>Tambah Catatan Teks</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={addPhaseBlock}
-                                className="text-sm font-bold bg-orange-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-orange-600 shadow-md shadow-orange-500/20 hover:shadow-lg"
+                                className="text-xs font-bold bg-[#ed4e18] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all hover:bg-[#d64312] shadow-md shadow-[#ed4e18]/20 hover:shadow-lg"
                             >
-                                <Activity size={16} /> Tambah Fase Latihan
+                                <Activity size={15} />
+                                <span>Tambah Fase Latihan</span>
                             </button>
                         </div>
                     </div>
 
-                    <div className="p-5 bg-white border-t border-slate-200 flex justify-end">
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-8 py-3.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50 flex items-center gap-2"
-                        >
-                            {processing
-                                ? "MENYIMPAN..."
-                                : "SIMPAN PROGRAM SESI INI"}
-                        </button>
-                    </div>
                 </div>
             </form>
 

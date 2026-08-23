@@ -327,9 +327,17 @@ export default function EditSession({
                 {/* Editor */}
                 <div className="bg-zinc-50 border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
                     <div className="p-4 bg-white border-b border-zinc-200 flex justify-between items-center sticky top-0 z-40">
-                        <h3 className="text-base font-bold text-zinc-900">
+                        <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                            <Dumbbell className="w-5 h-5 text-orange-500" />
                             Skema & Program Latihan
                         </h3>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-6 py-2.5 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-md shadow-orange-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                        >
+                            {processing ? "Menyimpan..." : "Simpan Program"}
+                        </button>
                     </div>
 
                     <div className="p-6">
@@ -468,17 +476,6 @@ export default function EditSession({
                         </div>
                     </div>
 
-                    <div className="p-4 bg-white border-t border-zinc-200 flex justify-end">
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-8 py-3 text-sm font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-xl transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
-                        >
-                            {processing
-                                ? "Menyimpan..."
-                                : "Update Program Sesi Ini"}
-                        </button>
-                    </div>
                 </div>
             </form>
 

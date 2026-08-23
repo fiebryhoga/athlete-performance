@@ -54,7 +54,7 @@ export default function Index({ auth, athletes }) {
                                                 <div className="overflow-hidden">
                                                     <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-orange-500 transition-colors">{athlete.name}</h3>
                                                     <p className="text-sm text-slate-500 capitalize flex items-center gap-2">
-                                                        {athlete.gender === 'female' ? 'Perempuan' : 'Laki-laki'} 
+                                                        {athlete.gender === 'P' || athlete.gender === 'female' || athlete.gender === 'Perempuan' ? 'Perempuan' : 'Laki-laki'} 
                                                         {athlete.age && <span className="bg-slate-100 px-2 rounded-full text-xs font-bold text-slate-600">{Math.round(athlete.age)} Thn</span>}
                                                     </p>
                                                 </div>

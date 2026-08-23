@@ -141,6 +141,77 @@ class UserManagementController extends Controller
     }
 
     /**
+     * Show the form for bulk creating users.
+     */
+    public function bulkCreate()
+    {
+        abort_if(auth()->user()->role !== 'superadmin', 403, 'Akses Ditolak.');
+        return Inertia::render('Admin/Users/BulkCreate');
+    }
+
+    /**
+     * Store multiple newly created users (clients) from bulk upload.
+     */
+    public function bulkStore(Request $request)
+    {
+        abort_if(auth()->user()->role !== 'superadmin', 403, 'Akses Ditolak.');
+        
+        $request->validate([
+            'users' => 'required|array',
+            'users.*.name' => 'required|string|max:255',
+            'users.*.username' => 'nullable|string|max:50',
+            'users.*.password' => 'nullable|string|min:6',
+            'users.*.age' => 'nullable|integer',
+            'users.*.weight' => 'nullable|numeric',
+            'users.*.height' => 'nullable|numeric',
+            'users.*.gender' => 'nullable|in:L,P',
+        ]);
+
+        $createdCount = 0;
+
+        foreach ($request->users as $userData) {
+            $name = $userData['name'];
+            $username = $userData['username'] ?? null;
+            
+            if (empty($username)) {
+                // Generate username from name: remove spaces, lowercase.
+                $base = \Illuminate\Support\Str::slug($name, '');
+                $username = $base;
+                $counter = 1;
+                while (User::where('username', $username)->exists()) {
+                    $username = $base . $counter;
+                    $counter++;
+                }
+            } else {
+                // Check if username exists, if it does, append counter
+                if (User::where('username', $username)->exists()) {
+                    $counter = 1;
+                    $original = $username;
+                    while (User::where('username', $username)->exists()) {
+                        $username = $original . $counter;
+                        $counter++;
+                    }
+                }
+            }
+
+            User::create([
+                'name' => $name,
+                'username' => $username,
+                'password' => Hash::make(empty($userData['password']) ? '12345678' : $userData['password']),
+                'role' => 'athlete',
+                'age' => $userData['age'] ?? null,
+                'weight' => $userData['weight'] ?? null,
+                'height' => $userData['height'] ?? null,
+                'gender' => $userData['gender'] ?? 'L',
+            ]);
+            
+            $createdCount++;
+        }
+
+        return redirect()->route('admin.users.index', ['tab' => 'athlete'])->with('message', $createdCount . ' pengguna baru (klien) berhasil ditambahkan.');
+    }
+
+    /**
      * Update the specified user in storage.
      */
     public function update(Request $request, User $user)

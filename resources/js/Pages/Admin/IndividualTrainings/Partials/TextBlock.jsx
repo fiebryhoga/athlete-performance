@@ -1,109 +1,130 @@
 import React from 'react';
-import { GripVertical, Trash2, AlignLeft, Copy } from 'lucide-react';
+import { GripVertical, Trash2, AlignLeft, Copy, AlertCircle, FileText, CheckSquare, MessageSquare } from 'lucide-react';
 
 export default function TextBlock({ block, onChange, onRemove, onDuplicate, dragHandleProps }) {
- const getAccentBorder = (category) => {
- switch(category) {
- case 'nb': return 'border-l-[4px] border-l-red-500';
- case 'instruction': return 'border-l-[4px] border-l-blue-500';
- case 'description': return 'border-l-[4px] border-l-emerald-500';
- default: return 'border-l-[4px] border-l-zinc-400';
- }
- };
+    const getCategoryConfig = (category) => {
+        switch (category) {
+            case 'nb':
+                return {
+                    label: 'N.B (Penting)',
+                    icon: AlertCircle,
+                    badgeStyle: 'bg-[#ed4e18]/10 text-[#ed4e18] border-[#ed4e18]/20',
+                    containerStyle: 'border-[#ed4e18]/30 bg-gradient-to-r from-[#ed4e18]/[0.03] to-transparent',
+                    textareaStyle: 'text-slate-900 font-semibold placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                };
+            case 'instruction':
+                return {
+                    label: 'Instruksi Latihan',
+                    icon: CheckSquare,
+                    badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
+                    containerStyle: 'border-slate-200 bg-white',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                };
+            case 'description':
+                return {
+                    label: 'Deskripsi Sesi',
+                    icon: FileText,
+                    badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
+                    containerStyle: 'border-slate-200 bg-white',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                };
+            default:
+                return {
+                    label: 'Catatan Umum',
+                    icon: MessageSquare,
+                    badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
+                    containerStyle: 'border-slate-200 bg-white',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                };
+        }
+    };
 
- const getIconColor = (category) => {
- switch(category) {
- case 'nb': return 'text-red-500';
- case 'instruction': return 'text-blue-500';
- case 'description': return 'text-emerald-500';
- default: return 'text-zinc-400';
- }
- };
+    const config = getCategoryConfig(block.category);
+    const IconComponent = config.icon;
 
- return (
- <div className={`bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden group/block ${getAccentBorder(block.category)} transition-all duration-300`}>
- 
- <div className="bg-zinc-50/80 p-3 px-4 border-b border-zinc-200 flex items-center justify-between gap-4">
- 
- <div className="flex items-center gap-3 flex-1">
- <div 
- {...dragHandleProps} 
- className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-zinc-600 transition-colors p-1"
- title="Tahan dan geser untuk memindahkan"
- >
- <GripVertical size={18} />
- </div>
- 
- <AlignLeft size={16} className={getIconColor(block.category)} />
+    return (
+        <div className={`rounded-2xl border ${config.containerStyle} shadow-sm hover:shadow-md transition-all duration-300 mb-6 overflow-hidden group/block`}>
+            {/* Header Bar */}
+            <div className="bg-slate-50/80 p-3.5 px-5 border-b border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
+                    <div 
+                        {...dragHandleProps} 
+                        className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-200/50 -ml-1 shrink-0"
+                        title="Tahan dan geser untuk memindahkan"
+                    >
+                        <GripVertical size={18} />
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 shadow-2xs ${config.badgeStyle}`}>
+                            <IconComponent size={16} />
+                        </div>
 
- <div className="relative">
- <select 
- className="appearance-none bg-white border border-zinc-200 text-zinc-700 rounded-md text-[10px] font-bold py-1.5 pl-3 pr-8 shadow-sm cursor-pointer hover:border-zinc-300 outline-none focus:ring-1 focus:ring-zinc-900 transition-all"
- value={block.category || 'note'} 
- onChange={e => onChange('category', e.target.value)}
- >
- <option value="instruction">Instruksi</option>
- <option value="description">Deskripsi</option>
- <option value="nb">N.B (Penting)</option>
- <option value="note">Catatan Umum</option>
- </select>
- 
- <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-500">
- <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
- </div>
- </div>
+                        <div className="relative">
+                            <select 
+                                className="appearance-none bg-white border border-slate-200 text-slate-800 rounded-lg text-xs font-bold py-1.5 pl-3 pr-8 shadow-2xs cursor-pointer hover:border-[#ed4e18] outline-none focus:ring-2 focus:ring-[#ed4e18]/20 focus:border-[#ed4e18] transition-all"
+                                value={block.category || 'note'} 
+                                onChange={e => onChange('category', e.target.value)}
+                            >
+                                <option value="instruction">Instruksi Latihan</option>
+                                <option value="description">Deskripsi Sesi</option>
+                                <option value="nb">N.B (Penting)</option>
+                                <option value="note">Catatan Umum</option>
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                    </div>
 
- <div className="w-px h-5 bg-zinc-300 hidden sm:block"></div>
+                    <div className="w-px h-5 bg-slate-200 hidden sm:block mx-1"></div>
 
- <input 
- type="text" 
- placeholder="Judul blok teks (Opsional)..." 
- className="bg-transparent border-none p-0 focus:ring-0 text-sm font-bold w-full text-zinc-900 placeholder:text-zinc-400 placeholder:font-medium"
- value={block.title || ''}
- onChange={e => onChange('title', e.target.value)}
- />
- </div>
+                    <input 
+                        type="text" 
+                        placeholder="Judul blok teks (opsional)..." 
+                        className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm font-bold text-slate-900 placeholder:text-slate-400 w-full hover:bg-white/50 focus:bg-white rounded px-2 py-1 transition-all"
+                        value={block.title || ''}
+                        onChange={e => onChange('title', e.target.value)}
+                    />
+                </div>
 
- <div className="flex items-center gap-1">
- <button 
- type="button" 
- onClick={onDuplicate} 
- className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all"
- title="Duplikat Blok"
- >
- <Copy size={16} />
- </button>
- <button 
- type="button" 
- onClick={onRemove} 
- className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all"
- title="Hapus Blok"
- >
- <Trash2 size={16} />
- </button>
- </div>
- </div>
+                <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                    <button 
+                        type="button" 
+                        onClick={onDuplicate} 
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        title="Duplikat Blok"
+                    >
+                        <Copy size={16} />
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={onRemove} 
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                        title="Hapus Blok"
+                    >
+                        <Trash2 size={16} />
+                    </button>
+                </div>
+            </div>
 
- <div className="p-5 bg-white">
- <textarea 
- className={`w-full bg-transparent border-none p-0 focus:ring-0 text-sm min-h-[80px] resize-y placeholder:text-zinc-300 leading-relaxed transition-colors ${
- block.category === 'nb' 
- ? 'text-red-700 font-bold placeholder:text-red-300' 
- : 'text-zinc-700 font-medium'
- }`}
- placeholder={
- block.category === 'nb' 
- ? 'Tulis informasi atau peringatan krusial di sini...' 
- : 'Ketik pesan atau instruksi detail di sini...'
- }
- value={block.items?.[0]?.note || ''}
- onChange={e => {
- const newItems = block.items?.length ? [...block.items] : [{ note: '' }];
- newItems[0].note = e.target.value;
- onChange('items', newItems);
- }}
- />
- </div>
- </div>
- );
+            {/* Content Body */}
+            <div className="p-5 bg-white/80">
+                <textarea 
+                    className={`w-full bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200/80 rounded-xl p-4 text-sm leading-relaxed min-h-[100px] resize-y transition-all outline-none focus:ring-2 ${config.textareaStyle}`}
+                    placeholder={
+                        block.category === 'nb' 
+                            ? 'Tulis catatan penting atau instruksi krusial yang harus diperhatikan atlet di sini...' 
+                            : 'Ketik penjelasan detail, arahan sesi, atau catatan umum di sini...'
+                    }
+                    value={block.items?.[0]?.note || ''}
+                    onChange={e => {
+                        const newItems = block.items?.length ? [...block.items] : [{ note: '' }];
+                        newItems[0].note = e.target.value;
+                        onChange('items', newItems);
+                    }}
+                />
+            </div>
+        </div>
+    );
 }

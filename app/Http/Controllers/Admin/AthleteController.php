@@ -34,18 +34,33 @@ class AthleteController extends Controller
 
         $coaches = User::where('role', 'coach')->get(['id', 'name']);
 
+        $athletesList = $query->orderBy('name', 'asc')->get()->map(function ($athlete) {
+            $data = $athlete->toArray();
+            $data['profile_photo_url'] = $athlete->profile_photo_url;
+            $data['latest_phv'] = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+            $data['latest_composition'] = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
+            $data['latest_wellness'] = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
+            $data['latest_dpa'] = \App\Models\DpaAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+            $latestTest = \App\Models\PerformanceTest::where('user_id', $athlete->id)->with('results')->orderBy('date', 'desc')->first();
+            $data['latest_test_score'] = $latestTest ? round($latestTest->results->avg('score') ?? 0, 1) : null;
+            $data['package'] = $athlete->package;
+            $data['groups'] = $athlete->groups;
+            return $data;
+        });
+
+        $totalAthletes = $athletesList->count();
+        $phvCount = $athletesList->filter(fn($a) => !empty($a['latest_phv']))->count();
+        $compCount = $athletesList->filter(fn($a) => !empty($a['latest_composition']))->count();
+        $testedCount = $athletesList->filter(fn($a) => $a['latest_test_score'] !== null)->count();
+
         return Inertia::render('Admin/Athletes/Index', [
-            'athletes' => $query->orderBy('name', 'asc')->get()->map(function ($athlete) {
-                $data = $athlete->toArray();
-                $data['profile_photo_url'] = $athlete->profile_photo_url;
-                $data['latest_phv'] = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
-                $data['latest_composition'] = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
-                $data['latest_wellness'] = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
-                $data['package'] = $athlete->package;
-                $data['groups'] = $athlete->groups;
-                return $data;
-            }),
-            
+            'athletes' => $athletesList,
+            'summary' => [
+                'total' => $totalAthletes,
+                'phv_count' => $phvCount,
+                'comp_count' => $compCount,
+                'tested_count' => $testedCount,
+            ],
             'sports' => Sport::all(),
             'coachesList' => $coaches,
             'filters' => $request->only(['search']),
@@ -169,7 +184,16 @@ class AthleteController extends Controller
     
     public function show($id)
     {
-        $athlete = User::with(['sport', 'performanceTests.results.testItem.category'])->findOrFail($id);
+        $athlete = User::with([
+            'sport', 
+            'performanceTests.results.testItem.category',
+            'package',
+            'groups.package',
+            'coaches',
+            'galleries' => function ($query) {
+                $query->latest();
+            }
+        ])->findOrFail($id);
 
         $tests = $athlete->performanceTests->sortBy('date')->values();
         $hasData = $tests->count() > 0;
@@ -251,7 +275,7 @@ class AthleteController extends Controller
 
                 $weaknesses = $categoryStats->filter(function($item) {
                     return $item['score'] <= 70;
-                })->sortBy('score')->take(3)->values();
+                })->sortBy('score')->values();
 
                 
                 $latestCats = $latestTest->results->groupBy(function($r) {
@@ -327,17 +351,39 @@ class AthleteController extends Controller
             ];
         })->values();
 
-        $athlete->load(['galleries' => function($query) {
-            $query->latest(); // Urutkan foto terbaru di atas
-        }]);
+        $dailyMetrics = \App\Models\DailyMetric::where('user_id', $athlete->id)
+            ->where('recovery_status', '!=', 'KOSONG') 
+            ->orderBy('record_date', 'asc')
+            ->take(30)
+            ->get()
+            ->map(function($metric) {
+                return [
+                    'date' => date('d/m', strtotime($metric->record_date)),
+                    'recovery' => (float) $metric->quick_recovery_score,
+                ];
+            });
+
+        $trainingLoads = \App\Models\WellnessRpe::where('user_id', $athlete->id)
+            ->orderBy('record_date', 'asc')
+            ->take(30)
+            ->get()
+            ->map(function($load) {
+                return [
+                    'date' => date('d/m', strtotime($load->record_date)),
+                    'daily_load' => (float) $load->daily_load,
+                    'wellness' => (float) $load->daily_wellness_score,
+                ];
+            });
 
         $latest_phv = \App\Models\PhvAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
         $latest_composition = \App\Models\CompositionTest::where('user_id', $athlete->id)->orderBy('date', 'desc')->first();
         $latest_wellness = \App\Models\WellnessRpe::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
-        $latest_dpa = \App\Models\DpaAssessment::where('user_id', $athlete->id)->orderBy('assessment_date', 'desc')->first();
+        $latest_dpa = \App\Models\DpaAssessment::where('user_id', $athlete->id)->with('details.compensation')->orderBy('assessment_date', 'desc')->first();
+        $latest_daily_metric = \App\Models\DailyMetric::where('user_id', $athlete->id)->orderBy('record_date', 'desc')->first();
 
         return Inertia::render('Admin/Athletes/Show', [
             'athlete' => $athlete,
+            'galleries' => $athlete->galleries ?? [],
             'stats' => $stats,
             'radar_data' => $radarData,
             'comparison_data' => $comparisonData,
@@ -347,10 +393,13 @@ class AthleteController extends Controller
             'weaknesses' => $weaknesses,
             'has_data' => $hasData,
             'historical_labels' => $historicalLabels,
+            'daily_metrics' => $dailyMetrics,
+            'training_loads' => $trainingLoads,
             'latest_phv' => $latest_phv,
             'latest_composition' => $latest_composition,
             'latest_wellness' => $latest_wellness,
-            'latest_dpa' => $latest_dpa
+            'latest_dpa' => $latest_dpa,
+            'latest_daily_metric' => $latest_daily_metric,
         ]);
     }
 

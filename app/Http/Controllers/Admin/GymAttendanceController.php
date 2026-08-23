@@ -259,7 +259,7 @@ class GymAttendanceController extends Controller
         $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'radius' => 'required|integer|min:10|max:1000',
+            'radius' => 'required|integer|min:10|max:10000',
             'fee' => 'nullable|integer|min:0',
         ]);
 

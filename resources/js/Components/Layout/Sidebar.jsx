@@ -30,7 +30,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
 
     const userRole = props.auth.user.role; 
     const appSettings = props.app_settings || {}; 
-    const appName = appSettings?.name || 'Sistem Performa';
+    const appName = appSettings?.name || 'Olympus Training';
     const appLogo = appSettings?.logo;
 
     const isActive = (path) => {
@@ -70,7 +70,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             ]
         },
         {
-            title: 'Tes',
+            title: 'Tes & Evaluasi',
             items: [
                 { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: ClipboardList, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Komposisi Tubuh', route: 'admin.composition-tests.index', checkPath: '/admin/composition', icon: Scale, roles: ['superadmin', 'coach', 'athlete'] },
@@ -103,7 +103,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             ]
         },
         {
-            title: 'Setting',
+            title: 'Pengaturan',
             items: [
                 { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: Shield, roles: ['superadmin', 'coach'] },
                 { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: BarChart3, roles: ['superadmin'] },
@@ -114,9 +114,9 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
 
     // Gaya dasar sidebar
     const sidebarClasses = `
-        fixed top-0 left-0 h-screen bg-white border-r border-slate-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]
+        fixed top-0 left-0 h-screen bg-white border-r border-slate-200/80 shadow-[1px_0_10px_rgba(0,0,0,0.02)]
         flex flex-col z-40 transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-[76px]' : 'w-[250px]'}
+        ${isCollapsed ? 'w-[70px]' : 'w-[235px]'}
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
     `;
 
@@ -124,34 +124,35 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
         <aside className={sidebarClasses}>
             
             {/* Header (Logo & Brand) */}
-            <div className={`h-20 flex items-center border-b border-slate-100 px-4 relative transition-all ${isCollapsed ? 'justify-center' : 'justify-start gap-3'}`}>
+            <div className={`h-16 flex items-center border-b border-slate-100 px-3.5 relative transition-all ${isCollapsed ? 'justify-center' : 'justify-start gap-2.5'}`}>
                 {appLogo ? (
                     <div className="flex-shrink-0 flex items-center justify-center">
-                        <img src={appLogo} alt="Logo" className="w-9 h-9 object-contain drop-shadow-sm" />
+                        <img src={appLogo} alt="Logo" className="w-8 h-8 object-contain" />
                     </div>
                 ) : (
-                    <div className="flex-shrink-0 w-9 h-9 bg-orange-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm shadow-orange-500/20">
+                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 text-white rounded-md flex items-center justify-center font-bold text-sm shadow-xs">
                         {appName.charAt(0)}
                     </div>
                 )}
                 {!isCollapsed && (
-                    <div className="flex flex-col animate-in fade-in duration-300 truncate">
-                        <span className="font-bold text-slate-800 text-[13px] truncate">{appName}</span>
-                        <span className="text-[10px] font-medium text-slate-400 capitalize">{userRole} Portal</span>
+                    <div className="flex flex-col animate-in fade-in duration-300 truncate min-w-0 pr-3">
+                        <span className="font-bold text-slate-900 text-xs truncate leading-tight">{appName}</span>
+                        <span className="text-[10px] font-medium text-slate-400 capitalize">{userRole} Hub</span>
                     </div>
                 )}
                 
                 {/* Desktop Toggle Button */}
                 <button 
                     onClick={onToggleCollapse} 
-                    className="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-500 shadow-sm transition-colors z-50 group"
+                    className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-500 shadow-xs transition-colors z-50 group"
+                    title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
                 >
-                    {isCollapsed ? <ChevronRight className="w-4 h-4 group-hover:scale-110 transition-transform" /> : <ChevronLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />}
+                    {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> : <ChevronLeft className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />}
                 </button>
             </div>
 
             {/* Menu List */}
-            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-5 px-3 space-y-5" onMouseLeave={handleMouseLeave}>
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-3 px-2 space-y-3.5" onMouseLeave={handleMouseLeave}>
                 {menuGroups.map((group, groupIdx) => {
                     const filteredItems = group.items.filter(item => {
                         if (!item.roles.includes(userRole)) return false;
@@ -161,14 +162,14 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                     if (filteredItems.length === 0) return null;
 
                     return (
-                        <div key={groupIdx} className="space-y-1">
+                        <div key={groupIdx} className="space-y-0.5">
                             {group.title && !isCollapsed && (
-                                <div className="px-3 py-1 mt-3 mb-1 text-[10px] font-bold text-slate-400/80 tracking-wider">
+                                <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 tracking-wider">
                                     {group.title}
                                 </div>
                             )}
                             {group.title && isCollapsed && (
-                                <div className="w-6 h-px bg-slate-200 mx-auto my-3"></div>
+                                <div className="w-4 h-px bg-slate-100 mx-auto my-2"></div>
                             )}
                             
                             {filteredItems.map((item, index) => {
@@ -182,22 +183,22 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                                             onMouseLeave={handleMouseLeave}
                                             onClick={() => { if(window.innerWidth < 1024) onMobileClose() }}
                                             className={`
-                                                relative flex items-center rounded-xl transition-all duration-200
-                                                ${isCollapsed ? 'justify-center p-2.5 mx-auto w-11 h-11' : 'justify-start px-3 py-2.5 gap-3 w-full'}
+                                                relative flex items-center rounded-md transition-all duration-150
+                                                ${isCollapsed ? 'justify-center p-2 mx-auto w-9 h-9' : 'justify-start px-2.5 py-2 gap-2.5 w-full'}
                                                 ${active 
-                                                    ? 'bg-orange-50 text-orange-600 font-bold' 
-                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 font-medium'}
+                                                    ? 'text-orange-600 font-semibold border border-orange-100/70 shadow-2xs bg-orange-20/80' 
+                                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'}
                                             `}
                                         >
-                                            <Icon className={`flex-shrink-0 transition-all w-5 h-5 ${active ? 'text-orange-500' : 'text-slate-400'}`} />
+                                            <Icon className={`flex-shrink-0 transition-all w-4 h-4 ${active ? 'text-orange-500 stroke-[2.2]' : 'text-slate-400 group-hover:text-slate-600 stroke-[1.8]'}`} />
                                             
                                             {!isCollapsed && (
-                                                <span className="truncate text-[13px]">{item.name}</span>
+                                                <span className="truncate text-xs">{item.name}</span>
                                             )}
 
-                                            {/* Indikator Aktif Kiri (hanya di mode expand) */}
+                                            {/* Subtle indicator dot on active when expanded */}
                                             {active && !isCollapsed && (
-                                                <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-5 bg-orange-500 rounded-r-full"></div>
+                                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-500"></div>
                                             )}
                                         </Link>
                                     </div>
@@ -209,7 +210,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             </div>
 
             {/* Logout Footer */}
-            <div className="p-3 border-t border-slate-100">
+            <div className="p-2 border-t border-slate-100">
                 <Link
                     href={route('logout')}
                     method="post"
@@ -217,24 +218,24 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                     onMouseEnter={(e) => handleMouseEnter(e, 'Keluar Sesi')}
                     onMouseLeave={handleMouseLeave}
                     className={`
-                        flex items-center rounded-xl transition-all duration-200 w-full
-                        text-rose-500 hover:bg-rose-50 hover:text-rose-600 font-medium
-                        ${isCollapsed ? 'justify-center p-2.5 mx-auto w-11 h-11' : 'justify-start px-3 py-2.5 gap-3'}
+                        flex items-center rounded-md transition-all duration-150 w-full
+                        text-rose-500 hover:bg-rose-50/80 hover:text-rose-600 font-medium text-xs
+                        ${isCollapsed ? 'justify-center p-2 mx-auto w-9 h-9' : 'justify-start px-2.5 py-2 gap-2.5'}
                     `}
                 >
-                    <LogOut className="flex-shrink-0 w-5 h-5" />
-                    {!isCollapsed && <span className="text-[13px]">Keluar Sesi</span>}
+                    <LogOut className="flex-shrink-0 w-4 h-4" />
+                    {!isCollapsed && <span className="text-xs font-medium">Keluar Sesi</span>}
                 </Link>
             </div>
 
-            {/* Fixed Tooltip for Collapsed Mode (Escapes scroll overflow) */}
+            {/* Fixed Tooltip for Collapsed Mode */}
             {tooltip.show && (
                 <div 
-                    className="fixed z-[100] px-3 py-1.5 bg-slate-800 text-white text-[12px] font-bold rounded-lg shadow-xl whitespace-nowrap pointer-events-none animate-in fade-in duration-150"
+                    className="fixed z-[100] px-2.5 py-1 bg-slate-900 text-white text-[11px] font-semibold rounded-md shadow-lg whitespace-nowrap pointer-events-none animate-in fade-in duration-100"
                     style={{ top: tooltip.top, left: tooltip.left, transform: 'translateY(-50%)' }}
                 >
                     {tooltip.text}
-                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 rounded-sm"></div>
+                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-slate-900 rotate-45 rounded-2xs"></div>
                 </div>
             )}
         </aside>

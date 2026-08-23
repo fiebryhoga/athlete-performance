@@ -201,6 +201,8 @@ Route::middleware([
         Route::post('/admin/athletes/{user}/gallery', [App\Http\Controllers\Admin\AthleteController::class, 'storeGallery'])->name('admin.athletes.gallery.store');
         Route::delete('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'destroyGallery'])->name('admin.athletes.gallery.destroy');
         Route::put('/admin/gallery/{gallery}', [App\Http\Controllers\Admin\AthleteController::class, 'updateGallery'])->name('admin.athletes.gallery.update');
+        Route::get('/admin/athletes/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProfilingPdf'])->name('admin.athletes.export-pdf');
+        Route::get('/admin/reports/profiling/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProfilingPdf'])->name('admin.reports.profiling.export-pdf');
         
     });
     
@@ -211,7 +213,7 @@ Route::middleware([
         Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
         Route::get('/admin/reports/sessions/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportAthleteReportPdf'])->name('admin.reports.sessions.export-athlete');
         Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
-        Route::get('/admin/reports/profiling/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProfilingPdf'])->name('admin.reports.profiling.export-pdf');
+        Route::get('/admin/reports/sessions/coach/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.sessions.export-coach');
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
@@ -224,6 +226,8 @@ Route::middleware([
         Route::put('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'update'])->name('admin.phv-calculator.update');
         Route::delete('/admin/phv-calculator/{phvAssessment}', [\App\Http\Controllers\Admin\PhvAssessmentController::class, 'destroy'])->name('admin.phv-calculator.destroy');        
         
+        Route::get('/admin/users/bulk-create', [UserManagementController::class, 'bulkCreate'])->name('admin.users.bulkCreate');
+        Route::post('/admin/users/bulk', [UserManagementController::class, 'bulkStore'])->name('admin.users.bulk');
         Route::resource('/admin/users', UserManagementController::class)->names('admin.users');
 
         Route::get('/admin/sports', [SportController::class, 'index'])->name('admin.sports.index');

@@ -22,7 +22,7 @@ import {
     generateWeeklyMealPlan,
     rerollMeal,
     rerollMealItem,
-} from "@/Utils/MealGenerator";
+} from "@/utils/MealGenerator";
 
 export default function Show({ player, history, latestTest }) {
     const { auth } = usePage().props;
