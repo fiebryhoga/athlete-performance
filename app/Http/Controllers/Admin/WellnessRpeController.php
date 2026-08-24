@@ -24,6 +24,12 @@ class WellnessRpeController extends Controller
         if ($user && $user->role === 'athlete') {
             // Simple 7-day backward looking dates for Athlete
             $days = [];
+            $totalWeeklyLoad = 0;
+            $filledWellnessCount = 0;
+            $filledRpeCount = 0;
+            $sumWellnessScore = 0;
+            $countWellness = 0;
+
             for ($i = 0; $i < 7; $i++) {
                 $date = Carbon::today()->subDays($i);
                 
@@ -31,19 +37,45 @@ class WellnessRpeController extends Controller
                     ->where('record_date', $date->format('Y-m-d'))
                     ->first();
 
+                $wellnessFilled = $log && !is_null($log->daily_wellness_score) && $log->daily_wellness_score > 0;
+                $rpeFilled = $log && (!is_null($log->am_rpe) || !is_null($log->pm_rpe) || (!is_null($log->daily_load) && $log->daily_load > 0));
+
+                if ($log && $log->daily_load) {
+                    $totalWeeklyLoad += (float)$log->daily_load;
+                }
+                if ($wellnessFilled) {
+                    $filledWellnessCount++;
+                    $sumWellnessScore += (float)$log->daily_wellness_score;
+                    $countWellness++;
+                }
+                if ($rpeFilled) {
+                    $filledRpeCount++;
+                }
+
                 $days[] = [
                     'date' => $date->format('Y-m-d'),
                     'day_name' => $date->locale(app()->getLocale())->translatedFormat('l'),
                     'formatted_date' => $date->locale(app()->getLocale())->translatedFormat('d M Y'),
                     'is_today' => $i === 0,
-                    'is_filled' => $log ? true : false,
+                    'is_filled' => $wellnessFilled && $rpeFilled,
+                    'wellness_filled' => $wellnessFilled,
+                    'rpe_filled' => $rpeFilled,
                     'wellness_score' => $log ? $log->daily_wellness_score : null,
                     'daily_load' => $log ? $log->daily_load : null,
+                    'am_rpe' => $log ? $log->am_rpe : null,
+                    'pm_rpe' => $log ? $log->pm_rpe : null,
+                    'notes' => $log ? $log->notes : null,
                 ];
             }
             
             return Inertia::render('Admin/WellnessRpe/AthleteIndex', [
-                'days' => $days
+                'days' => $days,
+                'metrics' => [
+                    'total_weekly_load' => round($totalWeeklyLoad),
+                    'avg_wellness_score' => $countWellness > 0 ? round($sumWellnessScore / $countWellness, 1) : null,
+                    'filled_wellness_count' => $filledWellnessCount,
+                    'filled_rpe_count' => $filledRpeCount,
+                ]
             ]);
         }
 

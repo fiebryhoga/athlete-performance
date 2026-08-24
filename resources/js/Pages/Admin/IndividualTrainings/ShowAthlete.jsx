@@ -8,6 +8,7 @@ import {
     Plus, 
     Trash2, 
     User, 
+    Activity,
     Edit2, 
     MapPin,
     Dumbbell, 
@@ -33,6 +34,84 @@ function getInitials(name) {
         .slice(0, 2)
         .join("")
         .toUpperCase();
+}
+
+function getSessionPhasesSummary(session) {
+    if (!session || !session.blocks || !Array.isArray(session.blocks)) {
+        return null;
+    }
+
+    let hasStrength = false;
+    let strengthVolume = 0;
+    let hasCardioInterval = false;
+    let cardioDistance = 0;
+
+    const rpeRecords = session.rpeRecords || session.rpe_records || [];
+    const rpeMap = {};
+    if (Array.isArray(rpeRecords)) {
+        rpeRecords.forEach((r) => {
+            if (r.training_block_item_id && r.rpe_data) {
+                rpeMap[r.training_block_item_id] = r.rpe_data;
+            }
+        });
+    }
+
+    session.blocks.forEach((block) => {
+        const cat = block.category;
+        const isStrength = cat === 'strength_training' || cat === 'free_strength';
+        const isCardioInterval = cat === 'interval' || cat === 'cardio';
+
+        if (isStrength) hasStrength = true;
+        if (isCardioInterval) hasCardioInterval = true;
+
+        if (block.items && Array.isArray(block.items)) {
+            block.items.forEach((item) => {
+                const actual = rpeMap[item.id] || {};
+
+                if (isStrength) {
+                    const loads = (actual.load_array && actual.load_array.length > 0) ? actual.load_array : (item.load_array || []);
+                    const reps = (actual.reps_array && actual.reps_array.length > 0) ? actual.reps_array : (item.reps_array || []);
+
+                    if (Array.isArray(loads) && Array.isArray(reps) && (loads.length > 0 || reps.length > 0)) {
+                        const count = Math.max(loads.length, reps.length);
+                        for (let i = 0; i < count; i++) {
+                            const l = parseFloat(loads[i]) || 0;
+                            const r = parseFloat(reps[i]) || 0;
+                            strengthVolume += l * r;
+                        }
+                    } else {
+                        const s = parseFloat(item.sets) || 0;
+                        const r = parseFloat(item.reps) || 0;
+                        const l = parseFloat(item.load) || 0;
+                        if (s > 0 && r > 0 && l > 0) {
+                            strengthVolume += s * r * l;
+                        }
+                    }
+                }
+
+                if (isCardioInterval) {
+                    const distances = (actual.distance_array && actual.distance_array.length > 0) ? actual.distance_array : (item.distance_array || []);
+                    if (Array.isArray(distances) && distances.length > 0) {
+                        distances.forEach((d) => {
+                            cardioDistance += parseFloat(d) || 0;
+                        });
+                    } else if (item.distance) {
+                        cardioDistance += parseFloat(item.distance) || 0;
+                    }
+                }
+            });
+        }
+    });
+
+    if (!hasStrength && !hasCardioInterval) return null;
+
+    return {
+        hasStrength,
+        strengthVolume: Math.round(strengthVolume),
+        hasCardioInterval,
+        cardioDistance: Math.round(cardioDistance),
+        totalLoad: Math.round(strengthVolume + cardioDistance),
+    };
 }
 
 export default function ShowAthlete({ auth, athlete, trainings = [], groupTrainings = [] }) {
@@ -522,14 +601,18 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                     <Copy size={10} />
                                                                                 </button>
                                                                                 {!isGroup && (
-                                                                                    <Link
-                                                                                        href={route('admin.individual-trainings.session.edit', session.id)}
-                                                                                        onClick={(e) => e.stopPropagation()}
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={(e) => {
+                                                                                            e.preventDefault();
+                                                                                            e.stopPropagation();
+                                                                                            router.visit(route('admin.individual-trainings.session.edit', session.id));
+                                                                                        }}
                                                                                         className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                                                                                         title="Edit"
                                                                                     >
                                                                                         <Edit2 size={10} />
-                                                                                    </Link>
+                                                                                    </button>
                                                                                 )}
                                                                                 <button 
                                                                                     type="button"
@@ -564,29 +647,66 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                         )}
                                                                     </div>
 
-                                                                    {/* Tags / Metadata */}
+                                                                    {/* Metadata: Focus, Location, Duration */}
                                                                     {(session.location || session.training_type || session.duration_minutes) && (
-                                                                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                                                                            {session.location && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md" title={session.location}>
-                                                                                    <MapPin size={8.5} className="text-slate-400 shrink-0" />
-                                                                                    <span className="truncate max-w-[80px]">{session.location}</span>
-                                                                                </span>
-                                                                            )}
+                                                                        <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-slate-600 mt-0.5">
                                                                             {session.training_type && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md" title={session.training_type}>
-                                                                                    <Dumbbell size={8.5} className="text-slate-400 shrink-0" />
-                                                                                    <span className="truncate max-w-[80px]">{session.training_type}</span>
-                                                                                </span>
+                                                                                <div className="flex items-center gap-1 truncate max-w-full" title={session.training_type}>
+                                                                                    <span className="text-orange-600 font-bold shrink-0">foc:</span>
+                                                                                    <span className="truncate font-medium text-slate-700">{session.training_type}</span>
+                                                                                </div>
+                                                                            )}
+                                                                            {session.location && (
+                                                                                <div className="flex items-center gap-1 truncate max-w-full" title={session.location}>
+                                                                                    <span className="text-slate-400 font-bold shrink-0">loc:</span>
+                                                                                    <span className="truncate font-medium text-slate-600">{session.location}</span>
+                                                                                </div>
                                                                             )}
                                                                             {session.duration_minutes && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md">
+                                                                                <div className="flex items-center gap-1 shrink-0">
                                                                                     <Timer size={8.5} className="text-slate-400 shrink-0" />
-                                                                                    <span>{session.duration_minutes}m</span>
-                                                                                </span>
+                                                                                    <span className="font-medium text-slate-600">{session.duration_minutes}m</span>
+                                                                                </div>
                                                                             )}
                                                                         </div>
                                                                     )}
+
+                                                                    {/* Phase Summary (Strength, Cardio Distance & Total Load in AU) */}
+                                                                    {(() => {
+                                                                        const phases = getSessionPhasesSummary(session);
+                                                                        if (!phases) return null;
+
+                                                                        return (
+                                                                            <div className="flex flex-col gap-0.5 mt-1 pt-1 border-t border-slate-100 text-[9px]">
+                                                                                {phases.hasStrength && (
+                                                                                    <div className="flex items-center justify-between text-slate-600 font-medium">
+                                                                                        <span className="flex items-center gap-1">
+                                                                                            <Dumbbell size={8.5} className="text-orange-500 shrink-0" /> Strength:
+                                                                                        </span>
+                                                                                        <strong className="text-slate-800 font-semibold">
+                                                                                            {phases.strengthVolume > 0 ? `${phases.strengthVolume >= 1000 ? (phases.strengthVolume / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'k' : phases.strengthVolume.toLocaleString('id-ID')} AU` : '-'}
+                                                                                        </strong>
+                                                                                    </div>
+                                                                                )}
+                                                                                {phases.hasCardioInterval && (
+                                                                                    <div className="flex items-center justify-between text-slate-600 font-medium">
+                                                                                        <span className="flex items-center gap-1">
+                                                                                            <Activity size={8.5} className="text-sky-600 shrink-0" /> Cardio:
+                                                                                        </span>
+                                                                                        <strong className="text-slate-800 font-semibold">
+                                                                                            {phases.cardioDistance > 0 ? (phases.cardioDistance >= 1000 ? (phases.cardioDistance / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' km' : `${phases.cardioDistance.toLocaleString('id-ID')} m`) : '-'}
+                                                                                        </strong>
+                                                                                    </div>
+                                                                                )}
+                                                                                <div className="flex items-center justify-between text-slate-700 font-bold pt-0.5 mt-0.5 border-t border-dashed border-slate-200/80">
+                                                                                    <span className="text-slate-500 font-semibold">Total Load:</span>
+                                                                                    <span className="text-orange-600 font-extrabold">
+                                                                                        {phases.totalLoad > 0 ? `${phases.totalLoad >= 1000 ? (phases.totalLoad / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'k' : phases.totalLoad.toLocaleString('id-ID')} AU` : '-'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })()}
                                                                 </div>
                                                             </>
                                                         )}
