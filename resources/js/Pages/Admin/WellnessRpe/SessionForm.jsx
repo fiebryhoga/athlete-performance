@@ -1,18 +1,21 @@
-import React, { useState } from "react";
-
+import React, { useState, useMemo } from "react";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
+import PageHeader from "@/Components/Common/PageHeader";
 import {
-    ArrowLeft,
+    ChevronLeft,
     Save,
     Clock,
     Activity,
     HeartPulse,
-    CheckSquare,
+    Check,
     ArrowRight,
+    Flame,
+    AlertCircle,
+    CheckCircle2,
+    Info
 } from "lucide-react";
 import BodyHighlighter from "@/Components/BodyHighlighter";
-import PageHeader from "@/Components/Layout/PageHeader";
 
 const MUSCLE_PAIN_AREAS = [
     "Neck (L)", "Neck (R)",
@@ -37,6 +40,19 @@ const MUSCLE_PAIN_AREAS = [
     "Head"
 ];
 
+const RPE_DESCRIPTIONS = {
+    1: { label: "Sangat Ringan", tag: "Rest / Very Light" },
+    2: { label: "Sangat Ringan", tag: "Easy" },
+    3: { label: "Ringan", tag: "Moderate Light" },
+    4: { label: "Ringan", tag: "Light" },
+    5: { label: "Sedang", tag: "Moderate" },
+    6: { label: "Sedang", tag: "Hard Working" },
+    7: { label: "Berat", tag: "Hard" },
+    8: { label: "Berat", tag: "Very Hard" },
+    9: { label: "Maksimal", tag: "Near Maximal" },
+    10: { label: "Maksimal", tag: "Maximal" },
+};
+
 export default function SessionForm({
     auth,
     date,
@@ -47,17 +63,16 @@ export default function SessionForm({
     isCompleted = false,
     athlete_id = null,
 }) {
-    
     // Wellness is locked when completed, RPE is always editable
     const isWellnessLocked = isCompleted && (mode === "all" || mode === "wellness");
-    const isRpeLocked = false; // RPE is never locked
+    
     const { data, setData, post, processing, errors, transform } = useForm({
         date: date,
         session_type: "am",
         rpe: log?.am_rpe || "",
         duration: log?.am_duration || "",
 
-        // Wellness
+        // Wellness fields
         quality_of_sleep: log?.quality_of_sleep || "",
         stress: log?.stress || "",
         fatigue: log?.fatigue || "",
@@ -66,17 +81,12 @@ export default function SessionForm({
         mood_state: log?.mood_state || "",
 
         muscle_pain_areas: log?.muscle_pain_areas || [],
-        other_pain: "", // Temporary field to handle "Other:" text
+        other_pain: "",
         redirect_to: redirectTo || "",
         athlete_id: athlete_id,
     });
 
-    const [isWellnessExpanded, setIsWellnessExpanded] = useState(
-        mode === "all" || mode === "wellness",
-    );
-    const [isRpeExpanded, setIsRpeExpanded] = useState(
-        mode === "all" || mode === "rpe",
-    );
+    const [rpeError, setRpeError] = useState('');
 
     // Initial load for "Other" text if it was saved before
     React.useEffect(() => {
@@ -95,8 +105,7 @@ export default function SessionForm({
             ...data,
             session_type: type,
             rpe: type === "am" ? log?.am_rpe || "" : log?.pm_rpe || "",
-            duration:
-                type === "am" ? log?.am_duration || "" : log?.pm_duration || "",
+            duration: type === "am" ? log?.am_duration || "" : log?.pm_duration || "",
         }));
     };
 
@@ -112,7 +121,6 @@ export default function SessionForm({
 
     const submit = (e) => {
         e.preventDefault();
-
         setRpeError('');
 
         transform((data) => {
@@ -131,65 +139,91 @@ export default function SessionForm({
         post(route("admin.wellness-rpe.store-session"));
     };
 
-    const isWellnessComplete = data.quality_of_sleep && data.stress && data.fatigue && data.muscle_soreness && data.motivation && data.mood_state;
+    const isWellnessComplete = 
+        data.quality_of_sleep && 
+        data.stress && 
+        data.fatigue && 
+        data.muscle_soreness && 
+        data.motivation && 
+        data.mood_state;
 
-    // RPE validation: current session RPE & Duration must be filled
     const isRpeComplete = data.rpe && data.duration;
 
-    const [rpeError, setRpeError] = useState('');
+    const calculatedLoad = useMemo(() => {
+        const r = parseFloat(data.rpe);
+        const d = parseFloat(data.duration);
+        if (!isNaN(r) && !isNaN(d) && r > 0 && d > 0) {
+            return Math.round(r * d);
+        }
+        return 0;
+    }, [data.rpe, data.duration]);
 
     const isSubmitDisabled = processing 
         || (mode === 'wellness' && isWellnessLocked)
         || ((mode === 'all' || mode === 'wellness') && !isWellnessComplete && !isWellnessLocked);
 
-    const renderScaleButtons = (field, label, leftLabel, rightLabel) => {
-        const getColorClass = (num, isSelected) => {
-            const colors = {
-                1: "bg-[#34a853]", // Green (Excellent)
-                2: "bg-[#4285f4]", // Blue (Good)
-                3: "bg-[#fbbc05]", // Yellow (OK)
-                4: "bg-[#f57c00]", // Orange (Poor)
-                5: "bg-[#ea4335]", // Red (Awful)
-            };
+    // Formatted date string
+    const formattedDate = new Date(date).toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
 
-            const baseColor = colors[num];
-            if (isSelected) {
-                return `${baseColor} text-white border-transparent shadow-lg transform scale-[1.03] ring-2 ring-offset-2 ring-slate-400  z-10`;
-            }
-            return `${baseColor} text-white/90 border-transparent opacity-70 hover:opacity-100 hover:scale-[1.02]`;
-        };
+    const renderScaleButtons = (field, label, leftLabel, rightLabel) => {
+        const levels = [
+            { num: 1, text: "Sangat Baik", selectedBg: "bg-emerald-500 text-white border-emerald-600 shadow-xs" },
+            { num: 2, text: "Baik", selectedBg: "bg-sky-500 text-white border-sky-600 shadow-xs" },
+            { num: 3, text: "Normal", selectedBg: "bg-amber-500 text-white border-amber-600 shadow-xs" },
+            { num: 4, text: "Buruk", selectedBg: "bg-orange-500 text-white border-orange-600 shadow-xs" },
+            { num: 5, text: "Sangat Buruk", selectedBg: "bg-rose-500 text-white border-rose-600 shadow-xs" },
+        ];
+
+        const selectedVal = data[field];
 
         return (
-            <div className="space-y-3 p-5 bg-slate-50  rounded-xl border border-slate-100 ">
-                <label className="text-sm font-bold text-slate-900  tracking-tight">
-                    {label}
-                </label>
-
-                <div className="flex justify-between text-[11px] font-bold text-slate-600  mb-1">
-                    <span>{leftLabel}</span>
-                    <span>{rightLabel}</span>
+            <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-900 tracking-tight">
+                        {label}
+                    </label>
+                    {selectedVal && (
+                        <span className="text-[10.5px] font-bold text-slate-600 bg-white border border-slate-200 px-1.5 py-0.2 rounded">
+                            Skor: {selectedVal}
+                        </span>
+                    )}
                 </div>
 
-                <div className="flex">
-                    {[1, 2, 3, 4, 5].map((num, idx) => (
-                        <button
-                            key={num}
-                            type="button"
-                            disabled={isWellnessLocked}
-                            onClick={() => {
-                                if (isWellnessLocked) return;
-                                setData(field, num);
-                            }}
-                            className={`flex-1 sm:h-12 py-3 font-bold text-sm sm:text-base transition-all relative
-                                ${idx === 0 ? "rounded-l-md" : ""} 
-                                ${idx === 4 ? "rounded-r-md" : ""}
-                                ${getColorClass(num, data[field] === num)}
-                                ${isWellnessLocked ? 'cursor-not-allowed opacity-50' : ''}
-                            `}
-                        >
-                            {num}
-                        </button>
-                    ))}
+                <div className="flex justify-between text-[9.5px] font-semibold text-slate-400 px-0.5">
+                    <span>1: {leftLabel}</span>
+                    <span>5: {rightLabel}</span>
+                </div>
+
+                <div className="grid grid-cols-5 gap-1">
+                    {levels.map((lvl) => {
+                        const isSelected = selectedVal === lvl.num;
+                        return (
+                            <button
+                                key={lvl.num}
+                                type="button"
+                                disabled={isWellnessLocked}
+                                onClick={() => {
+                                    if (isWellnessLocked) return;
+                                    setData(field, lvl.num);
+                                }}
+                                className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-md border text-xs font-bold transition-all cursor-pointer ${
+                                    isSelected
+                                        ? lvl.selectedBg
+                                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                } ${isWellnessLocked ? 'cursor-not-allowed opacity-50' : ''}`}
+                            >
+                                <span className="text-sm font-black leading-none">{lvl.num}</span>
+                                <span className={`text-[8.5px] mt-0.5 font-medium truncate max-w-full ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
+                                    {lvl.text}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -198,261 +232,140 @@ export default function SessionForm({
     return (
         <AppLayout
             user={auth.user}
-            headerTitle="Wellness & RPE Harian"
-            headerDescription="Catat metrik wellness harian dan RPE sesi latihan Anda."
+            title={`Wellness & RPE - ${formattedDate}`}
         >
-            <Head title="Wellness & RPE Harian" />
+            <Head title={`Wellness & RPE - ${formattedDate}`} />
 
-            <div className="pb-12 mx-auto space-y-6 relative">
+            <div className="space-y-4 pb-16">
+                {/* ─── 1. PAGE HEADER ─── */}
                 <PageHeader 
                     title="Wellness & RPE Harian"
-                    subtitle="Catat metrik wellness harian dan RPE sesi latihan Anda."
-                    badge={new Date(date).toLocaleDateString("id-ID", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
-                    icon={Activity}
+                    description={`Catat metrik pemulihan (Wellness) dan beban latihan untuk ${formattedDate}.`}
                     actions={
-                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={() => {
                                     if (redirectTo) {
                                         window.location.href = redirectTo;
                                     } else {
-                                        window.location.href = route("admin.individual-trainings.index");
+                                        window.location.href = route("admin.wellness-rpe.index");
                                     }
                                 }}
-                                className="flex justify-center items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm w-full sm:w-auto"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/90 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
                             >
-                                <ArrowLeft size={16} /> Kembali
+                                <ChevronLeft size={14} /> Kembali
                             </button>
+
                             {training_id && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        window.location.href = route("admin.individual-trainings.show", training_id);
-                                    }}
-                                    className="flex justify-center items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 w-full sm:w-auto"
+                                <Link
+                                    href={route("admin.individual-trainings.show", training_id)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-md text-xs font-bold hover:bg-orange-600 transition-colors shadow-2xs"
                                 >
-                                    {mode === "wellness" ? (
-                                        <>Ke Program Latihan <ArrowRight size={16} /></>
-                                    ) : (
-                                        <><ArrowLeft size={16} /> Ke Program Latihan</>
-                                    )}
-                                </button>
+                                    <span>Program Latihan</span>
+                                    <ArrowRight size={13} />
+                                </Link>
                             )}
                         </div>
                     }
                 />
 
-                <form onSubmit={submit} className="space-y-6">
-                    {/* WELLNESS SECTION */}
-                    {(mode === "all" || mode === "wellness") && (
-                        <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
-                            <div
-                                className="p-6 sm:p-8 cursor-pointer flex justify-between items-center bg-slate-50  hover:bg-slate-100  transition-colors"
-                                onClick={() =>
-                                    setIsWellnessExpanded(!isWellnessExpanded)
-                                }
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-slate-200  rounded-xl text-slate-900 ">
-                                        <HeartPulse size={24} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-bold text-slate-900  tracking-tight">
-                                            1. Wellness Harian
-                                        </h2>
-                                        <p className="text-sm font-medium text-slate-500  mt-1">
-                                            Catat kualitas tidur, stres, dan tingkat kelelahan otot
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="text-slate-400 font-bold text-sm bg-white  px-3 py-1 rounded-full border border-slate-200  shadow-sm">
-                                    {isWellnessExpanded ? "Tutup" : "Buka"}
-                                </div>
-                            </div>
-
-                            {isWellnessExpanded && (
-                                <div className="p-6 sm:p-8 border-t border-slate-100  space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {renderScaleButtons(
-                                            "quality_of_sleep",
-                                            "Kualitas Tidur (Quality of Sleep)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "fatigue",
-                                            "Tingkat Kelelahan (Fatigue)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "muscle_soreness",
-                                            "Nyeri Otot (Muscle Soreness)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "stress",
-                                            "Tingkat Stres (Stress)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "motivation",
-                                            "Motivasi Latihan (Motivation)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
-                                        )}
-                                        {renderScaleButtons(
-                                            "mood_state",
-                                            "Kondisi Mood (Mood State)",
-                                            "Sangat Baik",
-                                            "Sangat Buruk",
+                <form onSubmit={submit} className="space-y-4">
+                    {/* ─── 2. 2-COLUMN LAYOUT: KIRI & KANAN ─── */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                        {/* ─── LEFT COLUMN ─── */}
+                        <div className="lg:col-span-7 space-y-4">
+                            {/* WELLNESS SCALES (If mode === all or mode === wellness) */}
+                            {(mode === "all" || mode === "wellness") && (
+                                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                        <div>
+                                            <h2 className="text-xs sm:text-sm font-bold text-slate-900">
+                                                1. Evaluasi Parameter Wellness
+                                            </h2>
+                                            <p className="text-[11px] text-slate-500 font-medium">
+                                                Isi 6 parameter fisik & mental pagi ini (Skala 1–5)
+                                            </p>
+                                        </div>
+                                        {isWellnessComplete && (
+                                            <span className="inline-flex items-center gap-1 text-[10.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                                <CheckCircle2 size={11} className="text-emerald-600" />
+                                                Lengkap
+                                            </span>
                                         )}
                                     </div>
 
-                                    <div className="pt-6 border-t border-slate-100  space-y-6">
-                                        <h3 className="text-lg font-bold text-slate-900 ">
-                                            Bagaimana dengan Keluhan Area Nyeri Anda?
-                                        </h3>
-
-                                        <div className="flex flex-col lg:flex-row gap-8 items-start">
-                                            <div className="w-full lg:w-1/2 rounded-xl overflow-hidden border border-slate-200  bg-white  p-4 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-center">
-                                                <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-bold text-slate-400  tracking-[0.15em] mb-2">DEPAN (ANTERIOR)</h4>
-                                                    <div className="w-full max-w-[180px]">
-                                                        <BodyHighlighter type="anterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex-1 w-full flex flex-col items-center">
-                                                    <h4 className="text-[10px] font-bold text-slate-400  tracking-[0.15em] mb-2">BELAKANG (POSTERIOR)</h4>
-                                                    <div className="w-full max-w-[180px]">
-                                                        <BodyHighlighter type="posterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="w-full lg:w-1/2 space-y-4">
-                                                <p className="text-sm font-bold text-slate-500  mb-2">
-                                                    Pilih area spesifik di mana Anda merasakan nyeri atau ketidaknyamanan:
-                                                </p>
-
-                                                <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                                                    {MUSCLE_PAIN_AREAS.map(
-                                                        (area) => (
-                                                            <div
-                                                                key={area}
-                                                                onClick={() =>
-                                                                    togglePainArea(
-                                                                        area,
-                                                                    )
-                                                                }
-                                                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                                                                    data.muscle_pain_areas.includes(
-                                                                        area,
-                                                                    )
-                                                                        ? "bg-orange-500 border-orange-500 text-white shadow-md shadow-orange-500/20"
-                                                                        : "bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700"
-                                                                }`}
-                                                            >
-                                                                <div
-                                                                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                                                                        data.muscle_pain_areas.includes(
-                                                                            area,
-                                                                        )
-                                                                            ? "bg-white border-white text-orange-500"
-                                                                            : "bg-white border-slate-300"
-                                                                    }`}
-                                                                >
-                                                                    {data.muscle_pain_areas.includes(
-                                                                        area,
-                                                                    ) && (
-                                                                        <CheckSquare
-                                                                            size={
-                                                                                12
-                                                                            }
-                                                                            strokeWidth={
-                                                                                4
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                                <span className="text-xs font-bold leading-tight">
-                                                                    {area}
-                                                                </span>
-                                                            </div>
-                                                        ),
-                                                    )}
-                                                </div>
-
-                                                <div className="pt-2">
-                                                    <label className="text-xs font-bold text-slate-700  mb-1 block">
-                                                        Area Lainnya:
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Sebutkan titik nyeri lainnya..."
-                                                        className="w-full px-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-sm font-medium text-slate-900  focus:ring-2 focus:ring-orange-500  outline-none transition-all"
-                                                        value={data.other_pain}
-                                                        onChange={(e) =>
-                                                            setData(
-                                                                "other_pain",
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
+                                    <div className="p-3.5 sm:p-4 space-y-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            {renderScaleButtons(
+                                                "quality_of_sleep",
+                                                "Kualitas Tidur (Sleep)",
+                                                "Sangat Baik",
+                                                "Sangat Buruk",
+                                            )}
+                                            {renderScaleButtons(
+                                                "fatigue",
+                                                "Tingkat Kelelahan (Fatigue)",
+                                                "Sangat Bugar",
+                                                "Sangat Lelah",
+                                            )}
+                                            {renderScaleButtons(
+                                                "muscle_soreness",
+                                                "Nyeri Otot (Soreness)",
+                                                "Tidak Nyeri",
+                                                "Sangat Nyeri",
+                                            )}
+                                            {renderScaleButtons(
+                                                "stress",
+                                                "Tingkat Stres (Stress)",
+                                                "Sangat Tenang",
+                                                "Sangat Stres",
+                                            )}
+                                            {renderScaleButtons(
+                                                "motivation",
+                                                "Motivasi (Motivation)",
+                                                "Sangat Tinggi",
+                                                "Sangat Rendah",
+                                            )}
+                                            {renderScaleButtons(
+                                                "mood_state",
+                                                "Kondisi Mood (Mood)",
+                                                "Sangat Positif",
+                                                "Sangat Negatif",
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             )}
-                        </div>
-                    )}
 
-                    {/* RPE SECTION */}
-                    {(mode === "all" || mode === "rpe") && (
-                        <div className="bg-white  border border-slate-200  rounded-2xl shadow-sm overflow-hidden">
-                            <div className="p-6 sm:p-8 flex justify-between items-center bg-slate-50 border-b border-slate-100">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-white border border-slate-200 rounded-xl text-orange-500 shadow-sm">
-                                        <Activity size={24} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-bold text-slate-900  tracking-tight">
-                                            2. RPE Sesi Latihan
-                                        </h2>
-                                        <p className="text-sm font-medium text-slate-500  mt-1">
-                                            Catat intensitas dan durasi latihan Anda
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="p-6 sm:p-8 bg-white">
-                                    <div className="space-y-6">
-                                        {/* Session Type */}
-                                        <div className="space-y-3">
-                                            <label className="text-sm font-bold text-slate-900 ">
-                                                Pilih Sesi Latihan
-                                            </label>
-                                            <p className="text-xs font-medium text-slate-500  mb-3">
-                                                Masukkan skor RPE (1–10) berdasarkan seberapa berat sesi latihan yang dirasakan, lalu catat durasi latihan dalam menit
+                            {/* RPE SECTION (If mode === rpe) */}
+                            {mode === "rpe" && (
+                                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                        <div>
+                                            <h2 className="text-xs sm:text-sm font-bold text-slate-900">
+                                                Skala Intensitas RPE Latihan
+                                            </h2>
+                                            <p className="text-[11px] text-slate-500 font-medium">
+                                                Pilih nilai RPE (1–10 Skala Borg CR-10)
                                             </p>
-                                            <div className="grid grid-cols-2 gap-4">
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 space-y-4">
+                                        {/* Waktu Sesi Toggle */}
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-slate-700">
+                                                Waktu Sesi Latihan
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleSessionTypeChange("am")}
-                                                    className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
+                                                    className={`py-2 px-3 rounded-md border text-xs font-bold transition-all cursor-pointer ${
                                                         data.session_type === "am"
-                                                            ? "border-orange-500 bg-orange-50 text-orange-500 "
-                                                            : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
+                                                            ? "bg-orange-500 text-white border-orange-600 shadow-2xs"
+                                                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                                                     }`}
                                                 >
                                                     Sesi Pagi (AM)
@@ -460,185 +373,301 @@ export default function SessionForm({
                                                 <button
                                                     type="button"
                                                     onClick={() => handleSessionTypeChange("pm")}
-                                                    className={`p-4 rounded-xl border-2 font-bold text-sm transition-all flex flex-col items-center justify-center gap-2 ${
+                                                    className={`py-2 px-3 rounded-md border text-xs font-bold transition-all cursor-pointer ${
                                                         data.session_type === "pm"
-                                                            ? "border-orange-500 bg-orange-50 text-orange-500 "
-                                                            : "border-slate-200  bg-white  text-slate-500 hover:border-slate-300 "
+                                                            ? "bg-orange-500 text-white border-orange-600 shadow-2xs"
+                                                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                                                     }`}
                                                 >
-                                                    Sesi Sore (PM)
+                                                    Sesi Sore / Malam (PM)
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            {/* RPE Input */}
-                                            <div className="space-y-3">
-                                                <label className="text-sm font-bold text-slate-900 ">
-                                                    RPE Sesi (1-10)
+                                        {/* RPE 1-10 Grid */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-xs font-bold text-slate-900">
+                                                    Pilih Angka RPE (1–10)
                                                 </label>
-                                                <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                                        <Activity
-                                                            size={18}
-                                                            className="text-slate-400"
-                                                        />
-                                                    </div>
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        max="10"
-                                                        value={data.rpe}
-                                                        onChange={(e) => setData("rpe", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-orange-500  outline-none transition-all"
-                                                        placeholder="Masukkan angka 1 - 10"
-                                                    />
-                                                </div>
-                                                <p className="text-xs font-medium text-slate-500  mt-2">
-                                                    Pilih angka yang paling menggambarkan seberapa berat sesi latihan yang baru saja dilakukan.
-                                                </p>
-
-
-                                                {/* RPE Scale Information */}
-                                                <div className="mt-4 p-4 bg-slate-100  border border-slate-200  rounded-xl space-y-3">
-                                                    <div className="flex items-center justify-between text-xs font-bold">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-slate-300  text-slate-800  rounded">
-                                                                1 - 2
-                                                            </span>
-                                                            <span className="text-slate-600 ">
-                                                                Sangat Ringan
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs font-bold">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-blue-400  text-white rounded">
-                                                                3 - 4
-                                                            </span>
-                                                            <span className="text-blue-600 ">
-                                                                Ringan
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs font-bold">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-green-500  text-white rounded">
-                                                                5 - 6
-                                                            </span>
-                                                            <span className="text-green-600 ">
-                                                                Sedang
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs font-bold">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-amber-500  text-white rounded">
-                                                                7 - 8
-                                                            </span>
-                                                            <span className="text-amber-600 ">
-                                                                Berat
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between text-xs font-bold">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="w-12 text-center py-1 bg-red-600  text-white rounded">
-                                                                9 - 10
-                                                            </span>
-                                                            <span className="text-red-600 ">
-                                                                Maksimal
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                {data.rpe && (
+                                                    <span className="text-[11px] font-bold text-slate-700">
+                                                        Terpilih: {data.rpe} ({RPE_DESCRIPTIONS[data.rpe]?.label})
+                                                    </span>
+                                                )}
                                             </div>
 
-                                            {/* Duration Input */}
-                                            <div className="space-y-3">
-                                                <label className="text-sm font-bold text-slate-900 ">
-                                                    Durasi Latihan (Menit)
-                                                </label>
-                                                <div className="relative">
-                                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                                        <Clock
-                                                            size={18}
-                                                            className="text-slate-400"
-                                                        />
-                                                    </div>
-                                                    <input
-                                                        type="number"
-                                                        min="1"
-                                                        value={data.duration}
-                                                        onChange={(e) => setData("duration", e.target.value)}
-                                                        className="w-full pl-11 pr-4 py-3 bg-slate-50  border border-slate-200  rounded-xl text-slate-900  font-bold focus:ring-2 focus:ring-orange-500  outline-none transition-all"
-                                                        placeholder="Misal: 60"
-                                                    />
-                                                </div>
+                                            <div className="grid grid-cols-5 gap-1.5">
+                                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                                                    const isSelected = parseInt(data.rpe) === num;
+                                                    return (
+                                                        <button
+                                                            key={num}
+                                                            type="button"
+                                                            onClick={() => setData("rpe", num)}
+                                                            className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-md border text-xs font-bold transition-all cursor-pointer ${
+                                                                isSelected
+                                                                    ? "bg-slate-900 text-white border-slate-950 shadow-xs ring-2 ring-orange-500 ring-offset-1"
+                                                                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                                                            }`}
+                                                        >
+                                                            <span className="text-base font-black leading-none">{num}</span>
+                                                            <span className="text-[9px] mt-1 truncate opacity-75 font-medium">
+                                                                {num <= 2 ? 'Santai' : num <= 4 ? 'Ringan' : num <= 6 ? 'Sedang' : num <= 8 ? 'Berat' : 'Maks'}
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            )}
                         </div>
-                    )}
 
-                    {/* RPE Validation Error */}
-                    {rpeError && (
-                        <div className="p-3 rounded-lg bg-red-50  border border-red-200  text-red-600  text-sm font-semibold flex items-center gap-2">
-                            <Activity size={16} />
-                            {rpeError}
+                        {/* ─── RIGHT COLUMN ─── */}
+                        <div className="lg:col-span-5 space-y-4">
+                            {/* BODY HIGHLIGHTER / PAIN AREAS (If mode === all or mode === wellness) */}
+                            {(mode === "all" || mode === "wellness") && (
+                                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                        <div>
+                                            <h2 className="text-xs sm:text-sm font-bold text-slate-900">
+                                                2. Area Nyeri & Keluhan Otot
+                                            </h2>
+                                            <p className="text-[11px] text-slate-500 font-medium">
+                                                Pilih titik nyeri pada tubuh bila ada (Opsional)
+                                            </p>
+                                        </div>
+                                        {data.muscle_pain_areas.length > 0 && (
+                                            <span className="text-[10.5px] font-bold text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.2 rounded">
+                                                {data.muscle_pain_areas.length} Area
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="p-3.5 sm:p-4 space-y-3">
+                                        {/* Anterior & Posterior Model */}
+                                        <div className="rounded-md border border-slate-200/80 bg-slate-50/50 p-2.5 flex items-center justify-around">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[9px] font-bold text-slate-400 tracking-wider mb-1">DEPAN (ANTERIOR)</span>
+                                                <div className="w-[125px]">
+                                                    <BodyHighlighter type="anterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
+                                                </div>
+                                            </div>
+                                            <div className="w-px h-28 bg-slate-200" />
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[9px] font-bold text-slate-400 tracking-wider mb-1">BELAKANG (POSTERIOR)</span>
+                                                <div className="w-[125px]">
+                                                    <BodyHighlighter type="posterior" selectedAreas={data.muscle_pain_areas} onSelectArea={togglePainArea} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Pain Area Tags Grid */}
+                                        <div className="grid grid-cols-2 gap-1.5 max-h-[170px] overflow-y-auto pr-1 custom-scrollbar">
+                                            {MUSCLE_PAIN_AREAS.map((area) => {
+                                                const isSelected = data.muscle_pain_areas.includes(area);
+                                                return (
+                                                    <button
+                                                        key={area}
+                                                        type="button"
+                                                        disabled={isWellnessLocked}
+                                                        onClick={() => togglePainArea(area)}
+                                                        className={`flex items-center gap-1.5 p-1.5 rounded-md border text-left text-xs font-semibold transition-all cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-orange-500 border-orange-500 text-white shadow-2xs"
+                                                                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                                                        } ${isWellnessLocked ? 'cursor-not-allowed opacity-50' : ''}`}
+                                                    >
+                                                        <div className={`w-3 h-3 rounded border flex items-center justify-center shrink-0 ${
+                                                            isSelected ? "bg-white border-white text-orange-600" : "bg-slate-50 border-slate-300"
+                                                        }`}>
+                                                            {isSelected && <Check size={8} strokeWidth={4} />}
+                                                        </div>
+                                                        <span className="text-[10px] truncate leading-tight">{area}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div>
+                                            <input
+                                                type="text"
+                                                placeholder="Sebutkan titik nyeri lainnya bila ada..."
+                                                className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-hidden transition-all"
+                                                value={data.other_pain}
+                                                onChange={(e) => setData("other_pain", e.target.value)}
+                                                disabled={isWellnessLocked}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RPE SECTION (If mode === all) */}
+                            {mode === "all" && (
+                                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                        <div>
+                                            <h2 className="text-xs sm:text-sm font-bold text-slate-900">
+                                                3. RPE Sesi Latihan
+                                            </h2>
+                                            <p className="text-[11px] text-slate-500 font-medium">
+                                                Intensitas (1–10) & durasi latihan
+                                            </p>
+                                        </div>
+                                        {calculatedLoad > 0 && (
+                                            <span className="text-[10.5px] font-bold text-orange-700 bg-orange-50 border border-orange-200 px-1.5 py-0.2 rounded">
+                                                {calculatedLoad} AU
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="p-3.5 sm:p-4 space-y-3">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSessionTypeChange("am")}
+                                                className={`py-1.5 px-2.5 rounded-md border text-xs font-bold transition-all cursor-pointer ${
+                                                    data.session_type === "am"
+                                                        ? "bg-orange-500 text-white border-orange-600 shadow-2xs"
+                                                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                                                }`}
+                                            >
+                                                Sesi Pagi (AM)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSessionTypeChange("pm")}
+                                                className={`py-1.5 px-2.5 rounded-md border text-xs font-bold transition-all cursor-pointer ${
+                                                    data.session_type === "pm"
+                                                        ? "bg-orange-500 text-white border-orange-600 shadow-2xs"
+                                                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                                                }`}
+                                            >
+                                                Sesi Sore (PM)
+                                            </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-5 gap-1">
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                                                const isSelected = parseInt(data.rpe) === num;
+                                                return (
+                                                    <button
+                                                        key={num}
+                                                        type="button"
+                                                        onClick={() => setData("rpe", num)}
+                                                        className={`py-1.5 rounded-md border text-xs font-bold transition-all cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-slate-900 text-white border-slate-950 shadow-xs ring-1 ring-orange-500"
+                                                                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                                                        }`}
+                                                    >
+                                                        {num}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                                                Durasi Latihan (Menit)
+                                            </label>
+                                            <div className="relative">
+                                                <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={data.duration}
+                                                    onChange={(e) => setData("duration", e.target.value)}
+                                                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-bold text-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-hidden"
+                                                    placeholder="Contoh: 60"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RPE DURATION & LIVE CALCULATOR (If mode === rpe) */}
+                            {mode === "rpe" && (
+                                <div className="space-y-4">
+                                    <div className="bg-white rounded-md border border-slate-200/80 p-3.5 shadow-2xs space-y-3">
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-900 block mb-1">
+                                                Durasi Latihan (Menit)
+                                            </label>
+                                            <div className="relative">
+                                                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={data.duration}
+                                                    onChange={(e) => setData("duration", e.target.value)}
+                                                    className="w-full pl-8.5 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-bold text-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-hidden transition-all"
+                                                    placeholder="Contoh: 60"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-slate-50 border border-slate-200/80 rounded-md p-3 text-center">
+                                            <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                                                Kalkulasi Beban Latihan
+                                            </span>
+                                            <div className="flex items-baseline justify-center gap-1">
+                                                <span className="text-2xl font-black text-slate-900">
+                                                    {calculatedLoad > 0 ? calculatedLoad.toLocaleString('id-ID') : '0'}
+                                                </span>
+                                                <span className="text-xs font-bold text-orange-600">AU</span>
+                                            </div>
+                                            <p className="text-[9.5px] text-slate-400 font-medium mt-0.5">
+                                                Formula: RPE ({data.rpe || 0}) × {data.duration || 0} menit
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RPE Error Alert */}
+                            {rpeError && (
+                                <div className="p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                                    <AlertCircle size={14} className="text-rose-600 shrink-0" />
+                                    <span>{rpeError}</span>
+                                </div>
+                            )}
+
+                            {/* Action Submission Card */}
+                            <div className="bg-white rounded-md border border-slate-200/80 p-3.5 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <Link
+                                    href={redirectTo || route("admin.wellness-rpe.index")}
+                                    className="w-full sm:w-auto text-center px-3.5 py-2 bg-white text-slate-700 border border-slate-200 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs"
+                                >
+                                    Batal
+                                </Link>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitDisabled}
+                                    onClick={() => {
+                                        if ((mode === 'all' || mode === 'rpe') && !isRpeComplete) {
+                                            setRpeError('Harap mengisi RPE (1-10) dan durasi latihan minimal di salah satu sesi.');
+                                        }
+                                    }}
+                                    className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-md font-bold text-xs transition-all shadow-2xs cursor-pointer ${
+                                        isSubmitDisabled 
+                                            ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                                            : "bg-orange-500 text-white hover:bg-orange-600"
+                                    }`}
+                                >
+                                    <Save size={13} />
+                                    <span>{processing ? 'Menyimpan...' : 'Simpan Log Harian'}</span>
+                                </button>
+                            </div>
                         </div>
-                    )}
-
-                    <div className="flex justify-end pt-4 gap-4">
-                        {mode === "wellness" && isWellnessLocked ? (
-                            <>
-                                {training_id && (
-                                    <Link
-                                        href={route("admin.individual-trainings.show", training_id)}
-                                        className="rounded-lg flex items-center gap-2 px-8 py-3 bg-orange-500 text-white  hover:bg-orange-600 hover:scale-105 font-bold text-sm transition-all shadow-lg shadow-orange-500/20"
-                                    >
-                                        Lanjut: Lihat Program Aktual <ArrowRight size={18} />
-                                    </Link>
-                                )}
-                            </>
-                        ) : (
-                            <button
-                                type="submit"
-                                disabled={isSubmitDisabled}
-                                onClick={() => {
-                                    if ((mode === 'all' || mode === 'rpe') && !isRpeComplete) {
-                                        setRpeError('Wajib mengisi RPE & Duration minimal di salah satu sesi (AM/PM).');
-                                    }
-                                }}
-                                className={`w-full sm:w-auto px-8 py-3 rounded-lg font-bold text-sm transition-all shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2 ${
-                                    isSubmitDisabled 
-                                        ? "bg-slate-300  text-slate-500  cursor-not-allowed shadow-none"
-                                        : "bg-orange-500 text-white  hover:bg-orange-600 hover:scale-105"
-                                }`}
-                            >
-                                <>Selesai <CheckSquare size={18} /></>
-                            </button>
-                        )}
                     </div>
                 </form>
             </div>
-
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: #cbd5e1;
-                    border-radius: 10px;
-                }
-                :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: #334155;
-                }
-            `}</style>
         </AppLayout>
     );
 }
