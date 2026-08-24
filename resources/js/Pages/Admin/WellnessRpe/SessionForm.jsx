@@ -407,7 +407,7 @@ export default function SessionForm({
                                                             onClick={() => setData("rpe", num)}
                                                             className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-md border text-xs font-bold transition-all cursor-pointer ${
                                                                 isSelected
-                                                                    ? "bg-slate-900 text-white border-slate-950 shadow-xs ring-2 ring-orange-500 ring-offset-1"
+                                                                    ? "bg-orange-500 text-white border-orange-600 shadow-xs ring-2 ring-orange-300 ring-offset-1"
                                                                     : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                                                             }`}
                                                         >
@@ -560,7 +560,7 @@ export default function SessionForm({
                                                         onClick={() => setData("rpe", num)}
                                                         className={`py-1.5 rounded-md border text-xs font-bold transition-all cursor-pointer ${
                                                             isSelected
-                                                                ? "bg-slate-900 text-white border-slate-950 shadow-xs ring-1 ring-orange-500"
+                                                                ? "bg-orange-500 text-white border-orange-600 shadow-xs ring-1 ring-orange-300"
                                                                 : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                                                         }`}
                                                     >
@@ -575,7 +575,7 @@ export default function SessionForm({
                                                 Durasi Latihan (Menit)
                                             </label>
                                             <div className="relative">
-                                                <Clock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <Clock size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                                 <input
                                                     type="number"
                                                     min="1"
@@ -599,13 +599,13 @@ export default function SessionForm({
                                                 Durasi Latihan (Menit)
                                             </label>
                                             <div className="relative">
-                                                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                <Clock size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     value={data.duration}
                                                     onChange={(e) => setData("duration", e.target.value)}
-                                                    className="w-full pl-8.5 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-bold text-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-hidden transition-all"
+                                                    className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-bold text-slate-900 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-hidden transition-all"
                                                     placeholder="Contoh: 60"
                                                 />
                                             </div>

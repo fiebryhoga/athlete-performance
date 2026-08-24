@@ -109,19 +109,19 @@ export default function AthleteIndex({ auth, days = [], metrics = {} }) {
                                     </div>
 
                                     {/* Right Actions */}
-                                    <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                                    <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
                                         <Link
                                             href={route("admin.wellness-rpe.session-form", { date: day.date, mode: 'wellness' })}
-                                            className="px-2.5 py-1.5 bg-white text-slate-700 rounded-md text-xs font-semibold border border-slate-200/90 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-2xs"
+                                            className="px-2.5 py-1.5 bg-white text-slate-700 rounded-md text-xs font-semibold border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-2xs"
                                         >
                                             {day.wellness_filled ? 'Edit Wellness' : 'Isi Wellness'}
                                         </Link>
                                         <Link
                                             href={route("admin.wellness-rpe.session-form", { date: day.date, mode: 'rpe' })}
-                                            className={`px-2.5 py-1.5 rounded-md text-xs font-bold transition-all shadow-2xs ${
+                                            className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all shadow-2xs ${
                                                 day.rpe_filled 
-                                                    ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                                                    : 'bg-white border border-orange-200 text-orange-700 hover:bg-orange-50'
+                                                    ? 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:text-slate-900' 
+                                                    : 'bg-orange-500 text-white hover:bg-orange-600'
                                             }`}
                                         >
                                             {day.rpe_filled ? 'Edit RPE' : 'Isi RPE'}
