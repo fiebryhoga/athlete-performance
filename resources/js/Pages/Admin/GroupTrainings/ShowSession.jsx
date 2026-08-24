@@ -23,6 +23,8 @@ import {
     X,
     FileText,
     User,
+    Users,
+    Save,
 } from "lucide-react";
 
 import ActionFooter from "../IndividualTrainings/Partials/ActionFooter";
@@ -273,7 +275,11 @@ export default function ShowSession({
     const [mainTab, setMainTab] = useState("detail");
     const [warningMessage, setWarningMessage] = useState("");
     const [confirmComplete, setConfirmComplete] = useState(false);
+    const [completeMode, setCompleteMode] = useState("single"); // 'single' | 'all'
     const [isEditingActuals, setIsEditingActuals] = useState(false);
+
+    const currentAthlete = sortedMembers.find((m) => m.id === selectedAthleteId);
+    const allMembersCompleted = sortedMembers.length > 0 && sortedMembers.every(m => membersPivot.find(p => p.athlete_id === m.id)?.is_completed);
 
     // Per-athlete lock
     const isLocked = isCompleted && !isEditingActuals;
@@ -395,12 +401,19 @@ export default function ShowSession({
         setData("targets", newTargets);
     };
 
-    const submitRpe = (e) => {
-        e.preventDefault();
-        post(route("admin.group-trainings.session.rpe", training.id), {
-            preserveScroll: true,
-            forceFormData: true,
-        });
+    const submitRpe = (e, applyToAll = false) => {
+        if (e && e.preventDefault) e.preventDefault();
+        router.post(
+            route("admin.group-trainings.session.rpe", training.id),
+            {
+                athlete_id: selectedAthleteId,
+                rpes: data.rpes,
+                apply_to_all: applyToAll,
+            },
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     const getMissingRequiredActuals = () => {
@@ -472,34 +485,45 @@ export default function ShowSession({
         return missing;
     };
 
-    const completeTraining = () => {
-        const hasPhoto =
-            data.proof_photo ||
-            (currentPivot?.proof_photo && !data.remove_proof_photo);
+    const completeTraining = (applyToAll = false) => {
+        if (isAthlete) {
+            const hasPhoto =
+                data.proof_photo ||
+                (currentPivot?.proof_photo && !data.remove_proof_photo);
 
-        const missingFields = getMissingRequiredActuals();
-        
-        if (isAthlete && !hasPhoto) {
-            missingFields.push("Foto Bukti (wajib diunggah)");
+            const missingFields = getMissingRequiredActuals();
+            
+            if (!hasPhoto) {
+                missingFields.push("Foto Bukti (wajib diunggah)");
+            }
+
+            if (missingFields.length > 0) {
+                const formattedMissing = missingFields
+                    .map((m) => `• ${m}`)
+                    .join("\n");
+                setWarningMessage(
+                    `Pengisian belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
+                );
+                return;
+            }
         }
 
-        if (missingFields.length > 0) {
-            const formattedMissing = missingFields
-                .map((m) => `• ${m}`)
-                .join("\n");
-            setWarningMessage(
-                `Pengisian belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
-            );
-            return;
-        }
-
+        setCompleteMode(applyToAll ? "all" : "single");
         setConfirmComplete(true);
     };
 
     const confirmAndComplete = () => {
-        post(
+        router.post(
             route("admin.group-trainings.session.complete", training.id),
             {
+                athlete_id: selectedAthleteId,
+                rpes: data.rpes,
+                apply_to_all: completeMode === "all" ? 1 : 0,
+                group_note: data.group_note,
+                proof_photo: data.proof_photo,
+            },
+            {
+                preserveScroll: true,
                 forceFormData: true,
                 onSuccess: () => setConfirmComplete(false),
             },
@@ -514,7 +538,7 @@ export default function ShowSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={isAthlete ? route("athlete.dashboard") : route("admin.group-trainings.show", group?.id || training?.training_group_id || training?.group?.id || 1)}
+                        href={route("admin.group-trainings.show", group?.id || training?.training_group_id || training?.group?.id || 1)}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
                         <ChevronLeft size={13} /> Kembali ke Kalender Latihan Grup
@@ -533,7 +557,7 @@ export default function ShowSession({
                                 </span>
                             </div>
                         }
-                        description={`Sesi ${training.session_number} - ${training.date}${training.location ? ` - ${training.location}` : ""}`}
+                        description={`${training.is_extra ? "Sesi Tambahan" : training.session_number ? `Sesi ${training.session_number}` : "Sesi Latihan"} - ${training.date}${training.location ? ` - ${training.location}` : ""}`}
                         actions={
                             <div className="flex items-center gap-2">
                                 <a
@@ -597,7 +621,7 @@ export default function ShowSession({
                                     <div>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Nomor Sesi</span>
                                         <span className="font-bold text-slate-800 text-xs inline-block">
-                                            Sesi {training.session_number}
+                                            {training.is_extra ? "Sesi Tambahan" : training.session_number ? `Sesi ${training.session_number}` : "Sesi Latihan"}
                                         </span>
                                     </div>
                                 </div>
@@ -651,7 +675,7 @@ export default function ShowSession({
                                 </div>
 
                                 <div className="p-3">
-                                    <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto custom-scrollbar">
+                                    <div className="flex flex-col gap-1.5">
                                         {sortedMembers.map((member) => {
                                             const pivot = membersPivot.find((p) => p.athlete_id === member.id);
                                             const isDone = pivot?.is_completed;
@@ -662,23 +686,31 @@ export default function ShowSession({
                                                     key={member.id}
                                                     type="button"
                                                     onClick={() => setSelectedAthleteId(member.id)}
-                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                                                        isSelected
-                                                            ? "bg-orange-500 text-white shadow-2xs font-bold"
-                                                            : "bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200"
+                                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs transition-all cursor-pointer text-left ${
+                                                        isDone
+                                                            ? isSelected
+                                                                ? "bg-gradient-to-r from-emerald-100/90 via-emerald-50 to-white text-emerald-950 border border-emerald-500 shadow-2xs font-bold"
+                                                                : "bg-emerald-50/70 hover:bg-emerald-100/60 text-emerald-900 border border-emerald-300/80 font-semibold"
+                                                            : isSelected
+                                                                ? "bg-gradient-to-r from-orange-50 via-orange-50/40 to-white text-orange-950 border border-orange-400 shadow-2xs font-bold"
+                                                                : "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold"
                                                     }`}
                                                 >
-                                                    <span>{member.name}</span>
-                                                    {member.isGuest && (
-                                                        <span className={`text-[9px] px-1 py-0.2 rounded font-bold ${
-                                                            isSelected ? "bg-white/20 text-white" : "bg-orange-100 text-orange-600"
-                                                        }`}>
-                                                            GUEST
-                                                        </span>
-                                                    )}
-                                                    {isDone && (
-                                                        <CheckCircle2 size={12} className={isSelected ? "text-white" : "text-emerald-600"} />
-                                                    )}
+                                                    <span className="truncate pr-2">{member.name}</span>
+                                                    <div className="flex items-center gap-1.5 shrink-0">
+                                                        {member.isGuest && (
+                                                            <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                                                                isDone
+                                                                    ? "bg-emerald-100 text-emerald-800"
+                                                                    : "bg-orange-100 text-orange-600"
+                                                            }`}>
+                                                                GUEST
+                                                            </span>
+                                                        )}
+                                                        {isDone && (
+                                                            <CheckCircle2 size={13} className="text-emerald-600 shrink-0" />
+                                                        )}
+                                                    </div>
                                                 </button>
                                             );
                                         })}
@@ -1018,19 +1050,97 @@ export default function ShowSession({
                                 </div>
                             )}
 
-                            <ActionFooter
-                                isAthlete={isAthlete}
-                                isLocked={isLocked}
-                                isCompleted={isCompleted}
-                                recentlySuccessful={recentlySuccessful}
-                                processing={processing}
-                                onComplete={completeTraining}
-                                data={data}
-                                isMissingRequiredActuals={() => getMissingRequiredActuals().length > 0}
-                                training={training}
-                                isEditingActuals={isEditingActuals}
-                                setIsEditingActuals={setIsEditingActuals}
-                            />
+                            {isAthlete ? (
+                                <ActionFooter
+                                    isAthlete={isAthlete}
+                                    isLocked={isLocked}
+                                    isCompleted={isCompleted}
+                                    recentlySuccessful={recentlySuccessful}
+                                    processing={processing}
+                                    onComplete={() => completeTraining(false)}
+                                    data={data}
+                                    isMissingRequiredActuals={() => getMissingRequiredActuals().length > 0}
+                                    training={training}
+                                    isEditingActuals={isEditingActuals}
+                                    setIsEditingActuals={setIsEditingActuals}
+                                />
+                            ) : (
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-4 border-t border-slate-200 mt-4">
+                                    {/* Left info badge */}
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200/90 rounded-md shrink-0 whitespace-nowrap">
+                                        <User size={13} className="text-orange-500 shrink-0" />
+                                        <span className="text-xs text-slate-600">
+                                            Klien: <strong className="text-slate-900 font-semibold">{currentAthlete?.name || 'Pilih Atlet'}</strong>
+                                        </span>
+                                        <span className="text-slate-300">•</span>
+                                        {isCompleted ? (
+                                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                                                <CheckCircle2 size={12} className="text-emerald-600" /> Selesai
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600">
+                                                <Clock size={12} className="text-orange-500" /> Terjadwal
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Right Action Buttons */}
+                                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                                        {/* Action untuk Klien Terpilih */}
+                                        <button
+                                            type="button"
+                                            disabled={processing}
+                                            onClick={(e) => submitRpe(e, false)}
+                                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                                            title="Simpan input hanya untuk atlet yang sedang dipilih"
+                                        >
+                                            <Save size={13} className="text-slate-500" />
+                                            <span>Simpan</span>
+                                        </button>
+
+                                        {!isCompleted ? (
+                                            <button
+                                                type="button"
+                                                disabled={processing}
+                                                onClick={() => completeTraining(false)}
+                                                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                                                title="Selesaikan sesi hanya untuk atlet ini"
+                                            >
+                                                <CheckCircle2 size={13} />
+                                                <span>Selesaikan</span>
+                                            </button>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-xs font-bold whitespace-nowrap">
+                                                <CheckCircle2 size={13} /> Selesai
+                                            </span>
+                                        )}
+
+                                        {/* Divider if multiple members */}
+                                        {sortedMembers.length > 1 && (
+                                            <>
+                                                <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />
+
+                                                {!allMembersCompleted ? (
+                                                    <button
+                                                        type="button"
+                                                        disabled={processing}
+                                                        onClick={() => completeTraining(true)}
+                                                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                                                        title="Selesaikan sesi grup untuk semua atlet sekaligus"
+                                                    >
+                                                        <CheckCircle2 size={13} />
+                                                        <span>Selesaikan Semua Atlet</span>
+                                                    </button>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-xs font-bold whitespace-nowrap">
+                                                        <CheckCircle2 size={13} /> Semua Atlet Selesai
+                                                    </span>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>
@@ -1117,17 +1227,23 @@ export default function ShowSession({
                     <div className="bg-white border border-slate-200 rounded-md shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-5">
                         <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
                             <CheckCircle2 className="text-emerald-600" size={16} />
-                            Konfirmasi Selesai Latihan
+                            {completeMode === "all" ? "Konfirmasi Selesai Semua Atlet" : "Konfirmasi Selesai Latihan"}
                         </h2>
                         
                         <div className="mb-3 bg-slate-50 p-3 rounded-md border border-slate-200/80">
                             <p className="text-xs text-slate-700">
-                                Menyelesaikan latihan untuk: <strong className="text-slate-900">{sortedMembers.find((m) => m.id === selectedAthleteId)?.name}</strong>
+                                {completeMode === "all" ? (
+                                    <>Menyelesaikan latihan untuk: <strong className="text-slate-900">Semua Atlet ({sortedMembers.length} orang)</strong></>
+                                ) : (
+                                    <>Menyelesaikan latihan untuk: <strong className="text-slate-900">{currentAthlete?.name}</strong></>
+                                )}
                             </p>
                         </div>
 
                         <p className="text-slate-600 mb-4 text-xs leading-relaxed">
-                            Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan untuk atlet ini? Setelah diserahkan, data aktual sudah <strong className="text-slate-800">tidak bisa diedit lagi</strong>.
+                            {completeMode === "all"
+                                ? "Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan ini untuk SEMUA atlet di sesi grup sekaligus? Status seluruh member akan ditandai selesai."
+                                : "Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan untuk atlet ini? Setelah diserahkan, data aktual atlet ini sudah tidak bisa diedit lagi."}
                         </p>
                         <div className="flex justify-end gap-2">
                             <button
@@ -1142,7 +1258,7 @@ export default function ShowSession({
                                 className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-2xs"
                             >
                                 <CheckCircle2 size={13} />
-                                <span>Ya, Selesai</span>
+                                <span>{completeMode === "all" ? "Ya, Selesaikan Semua" : "Ya, Selesai"}</span>
                             </button>
                         </div>
                         {errors.error && (

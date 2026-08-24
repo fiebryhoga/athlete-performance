@@ -324,7 +324,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                     >
                                         {/* Day Header */}
                                         <div className="flex items-center justify-between mb-1.5">
-                                            <div className={`w-5 h-5 flex items-center justify-center rounded text-xs ${
+                                            <div className={`w-5 h-5 flex items-center justify-center rounded-md text-xs ${
                                                 day.isToday 
                                                     ? 'bg-orange-500 text-white font-bold shadow-2xs' 
                                                     : day.isCurrentMonth 
@@ -336,7 +336,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                             {auth.user.role !== 'athlete' && (
                                                 <Link 
                                                     href={route('admin.group-trainings.session.create', { group: group.id, date: day.dateStr })}
-                                                    className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white transition-all shadow-2xs cursor-pointer"
+                                                    className="w-5 h-5 flex items-center justify-center rounded-md bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white transition-all shadow-2xs cursor-pointer"
                                                     title="Tambah Sesi Grup"
                                                 >
                                                     <Plus size={11} strokeWidth={2.5} />
@@ -351,13 +351,14 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                 const sessionUrl = route('admin.group-trainings.session.show', session.id);
 
                                                 return (
-                                                    <div 
+                                                    <Link 
                                                         key={session.id} 
-                                                        className={`group/session relative rounded-md border text-left flex flex-col transition-all shadow-2xs hover:shadow-xs overflow-hidden ${
+                                                        href={sessionUrl}
+                                                        className={`group/session relative rounded-md border text-left flex flex-col transition-all shadow-2xs hover:shadow-xs overflow-hidden block cursor-pointer ${
                                                             isCompleted
                                                                 ? 'bg-white border-emerald-200 hover:border-emerald-400'
                                                                 : session.is_extra
-                                                                    ? 'bg-white border-amber-200/80 hover:border-amber-400'
+                                                                    ? 'bg-white border-orange-200/90 hover:border-orange-400'
                                                                     : 'bg-white border-indigo-200/80 hover:border-indigo-400'
                                                         }`}
                                                     >
@@ -366,7 +367,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                             isCompleted
                                                                 ? 'bg-emerald-50/70 border-emerald-100 text-emerald-800'
                                                                 : session.is_extra
-                                                                    ? 'bg-amber-50/70 border-amber-100 text-amber-800'
+                                                                    ? 'bg-orange-50/70 border-orange-100 text-orange-800'
                                                                     : 'bg-indigo-50/70 border-indigo-100 text-indigo-800'
                                                         }`}>
                                                             <div className="flex items-center gap-1.5 min-w-0">
@@ -374,7 +375,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                                     isCompleted 
                                                                         ? 'bg-emerald-500' 
                                                                         : session.is_extra 
-                                                                            ? 'bg-amber-500' 
+                                                                            ? 'bg-orange-500' 
                                                                             : 'bg-indigo-500'
                                                                 }`} />
                                                                 <span className="text-[9.5px] font-bold tracking-tight truncate">
@@ -385,7 +386,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                             {/* Action Buttons & Status Icon */}
                                                             <div className="flex items-center gap-0.5 shrink-0">
                                                                 {auth.user.role !== 'athlete' && (
-                                                                    <div className="flex items-center">
+                                                                    <div className="flex items-center" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                                                                         <button
                                                                             type="button"
                                                                             onClick={(e) => {
@@ -395,7 +396,7 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                                                 setDuplicateDate(getLocalDateStr(new Date()));
                                                                                 setDuplicateModalOpen(true);
                                                                             }}
-                                                                            className="p-0.5 rounded hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                                                                            className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                                                                             title="Duplikasi"
                                                                         >
                                                                             <Copy size={10} />
@@ -403,15 +404,19 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                                         <Link
                                                                             href={route('admin.group-trainings.session.edit', session.id)}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className="p-0.5 rounded hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                                                                            className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                                                                             title="Edit"
                                                                         >
                                                                             <Edit2 size={10} />
                                                                         </Link>
                                                                         <button
                                                                             type="button"
-                                                                            onClick={(e) => deleteSession(e, session.id)}
-                                                                            className="p-0.5 rounded hover:bg-white/80 text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
+                                                                                deleteSession(e, session.id);
+                                                                            }}
+                                                                            className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
                                                                             title="Hapus"
                                                                         >
                                                                             <Trash2 size={10} />
@@ -426,39 +431,36 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                             </div>
                                                         </div>
 
-                                                        {/* Card Body Link */}
-                                                        <Link 
-                                                            href={sessionUrl}
-                                                            className="p-2 block w-full hover:bg-slate-50/50 transition-colors"
-                                                        >
+                                                        {/* Card Body */}
+                                                        <div className="p-2 block w-full hover:bg-slate-50/50 transition-colors">
                                                             {/* Title */}
-                                                            <div className="text-[11px] font-bold leading-tight line-clamp-2 text-slate-900 mb-1">
+                                                            <div className="text-[11px] font-bold leading-tight line-clamp-2 text-slate-900 group-hover/session:text-orange-600 transition-colors mb-1">
                                                                 [GRUP] {session.name || group.name}
                                                             </div>
 
                                                             {/* Tags */}
                                                             <div className="flex flex-wrap items-center gap-1 text-[10px] text-slate-500 font-medium">
                                                                 {session.training_type && (
-                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.2 rounded text-[9.5px] truncate max-w-full">
+                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md text-[9.5px] truncate max-w-full">
                                                                         <Dumbbell size={9} className="text-orange-500 shrink-0" />
                                                                         <span className="truncate">{session.training_type}</span>
                                                                     </span>
                                                                 )}
                                                                 {session.location && (
-                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.2 rounded text-[9.5px] truncate max-w-full" title={session.location}>
+                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md text-[9.5px] truncate max-w-full" title={session.location}>
                                                                         <MapPin size={9} className="text-orange-500 shrink-0" />
                                                                         <span className="truncate">{session.location}</span>
                                                                     </span>
                                                                 )}
                                                                 {session.duration_minutes && (
-                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.2 rounded text-[9.5px]">
+                                                                    <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md text-[9.5px]">
                                                                         <Timer size={9} className="text-orange-500 shrink-0" />
                                                                         <span>{session.duration_minutes}m</span>
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                        </Link>
-                                                    </div>
+                                                        </div>
+                                                    </Link>
                                                 );
                                             })}
                                         </div>

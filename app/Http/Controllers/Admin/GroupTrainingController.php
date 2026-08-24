@@ -19,7 +19,7 @@ class GroupTrainingController extends Controller
         $group->load(['package', 'members', 'coaches']);
 
         $trainings = GroupTraining::where('training_group_id', $group->id)
-            ->with(['coach', 'blocks.items.exercise'])
+            ->with(['coach', 'blocks.items.exercise', 'rpe_records'])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();
@@ -188,14 +188,48 @@ class GroupTrainingController extends Controller
     {
         $request->validate([
             'rpes' => 'array',
-            'athlete_id' => 'required|exists:users,id',
+            'athlete_id' => 'nullable|exists:users,id',
+            'apply_to_all' => 'nullable|boolean',
         ]);
+
+        $applyToAll = $request->boolean('apply_to_all') || $request->input('apply_to_all') == '1' || $request->input('apply_to_all') === 'true';
+
+        if ($applyToAll) {
+            $training->load(['members_pivot', 'group.members']);
+            $athleteIds = collect();
+            if (is_array($training->attendee_ids) && count($training->attendee_ids) > 0) {
+                $athleteIds = $athleteIds->merge($training->attendee_ids);
+            }
+            if ($training->members_pivot && $training->members_pivot->count() > 0) {
+                $athleteIds = $athleteIds->merge($training->members_pivot->pluck('athlete_id'));
+            }
+            if ($training->group && $training->group->members) {
+                $athleteIds = $athleteIds->merge($training->group->members->pluck('id'));
+            }
+            $athleteIds = $athleteIds->unique()->filter()->values();
+
+            if ($request->has('rpes')) {
+                foreach ($athleteIds as $athId) {
+                    foreach ($request->rpes as $itemId => $rpeData) {
+                        \App\Models\GroupTrainingRpeRecord::updateOrCreate(
+                            [
+                                'group_training_id' => $training->id,
+                                'athlete_id' => $athId,
+                                'training_block_item_id' => $itemId,
+                            ],
+                            ['rpe_data' => $rpeData]
+                        );
+                    }
+                }
+            }
+
+            return redirect()->back()->with('message', 'Update RPE berhasil diterapkan ke semua atlet.');
+        }
 
         $athleteId = $request->athlete_id;
 
-        if ($request->has('rpes')) {
+        if ($athleteId && $request->has('rpes')) {
             foreach ($request->rpes as $itemId => $rpeData) {
-                // Ensure rpes are saved per athlete
                 \App\Models\GroupTrainingRpeRecord::updateOrCreate(
                     [
                         'group_training_id' => $training->id,
@@ -207,25 +241,69 @@ class GroupTrainingController extends Controller
             }
         }
 
-        // We also want to save group_note or targets if applicable, but targets are usually group-wide
-        // Group Note should be per athlete if they have a specific note. We'll use athlete_note on the pivot.
-
-        return redirect()->back()->with('message', 'RPE saved for athlete.');
+        return redirect()->back()->with('message', 'RPE berhasil disimpan untuk atlet.');
     }
 
     public function completeTraining(Request $request, GroupTraining $training)
     {
         $request->validate([
-            'athlete_id' => 'required|exists:users,id',
+            'athlete_id' => 'nullable|exists:users,id',
+            'apply_to_all' => 'nullable',
             'proof_photo' => 'nullable|image|max:5120',
             'rpes' => 'nullable|array',
             'group_note' => 'nullable|string',
         ]);
 
+        $applyToAll = $request->boolean('apply_to_all') || $request->input('apply_to_all') == '1' || $request->input('apply_to_all') === 'true';
+
+        if ($applyToAll) {
+            $training->load(['members_pivot', 'group.members']);
+            $athleteIds = collect();
+            if (is_array($training->attendee_ids) && count($training->attendee_ids) > 0) {
+                $athleteIds = $athleteIds->merge($training->attendee_ids);
+            }
+            if ($training->members_pivot && $training->members_pivot->count() > 0) {
+                $athleteIds = $athleteIds->merge($training->members_pivot->pluck('athlete_id'));
+            }
+            if ($training->group && $training->group->members) {
+                $athleteIds = $athleteIds->merge($training->group->members->pluck('id'));
+            }
+            $athleteIds = $athleteIds->unique()->filter()->values();
+
+            foreach ($athleteIds as $athId) {
+                if ($request->has('rpes')) {
+                    foreach ($request->rpes as $itemId => $rpeData) {
+                        \App\Models\GroupTrainingRpeRecord::updateOrCreate(
+                            [
+                                'group_training_id' => $training->id,
+                                'athlete_id' => $athId,
+                                'training_block_item_id' => $itemId,
+                            ],
+                            ['rpe_data' => $rpeData]
+                        );
+                    }
+                }
+
+                $memberRecord = \App\Models\GroupTrainingMember::firstOrCreate([
+                    'group_training_id' => $training->id,
+                    'athlete_id' => $athId,
+                ]);
+
+                $memberRecord->is_completed = true;
+                $memberRecord->completed_at = now();
+                $memberRecord->save();
+            }
+
+            $training->status = 'completed';
+            $training->save();
+
+            return redirect()->back()->with('message', 'Sesi latihan grup berhasil diselesaikan untuk semua atlet!');
+        }
+
         $athleteId = $request->athlete_id;
 
         // Save RPE data if present
-        if ($request->has('rpes')) {
+        if ($request->has('rpes') && $athleteId) {
             foreach ($request->rpes as $itemId => $rpeData) {
                 \App\Models\GroupTrainingRpeRecord::updateOrCreate(
                     [
@@ -264,10 +342,7 @@ class GroupTrainingController extends Controller
 
         $memberRecord->save();
 
-        // If all group members have completed, we could potentially set $training->status = 'completed'.
-        // But for now, we leave the group training open or handle it differently.
-        
-        return redirect()->back()->with('message', 'Latihan grup berhasil diselesaikan!');
+        return redirect()->back()->with('message', 'Latihan grup berhasil diselesaikan untuk atlet ini!');
     }
 
     public function editSession(GroupTraining $training)

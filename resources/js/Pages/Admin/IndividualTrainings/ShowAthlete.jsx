@@ -417,7 +417,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                     >
                                         {/* Day Header */}
                                         <div className="flex items-center justify-between mb-1.5">
-                                            <div className={`w-5 h-5 flex items-center justify-center rounded text-xs ${
+                                            <div className={`w-5 h-5 flex items-center justify-center rounded-md text-xs ${
                                                 day.isToday 
                                                     ? 'bg-orange-500 text-white font-bold shadow-2xs' 
                                                     : day.isCurrentMonth 
@@ -429,7 +429,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                             {!isAthlete && (
                                                 <Link 
                                                     href={route('admin.individual-trainings.session.create', { user: athlete.id, date: day.dateStr })}
-                                                    className="w-5 h-5 flex items-center justify-center rounded bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white transition-all shadow-2xs cursor-pointer"
+                                                    className="w-5 h-5 flex items-center justify-center rounded-md bg-slate-100 text-slate-500 opacity-0 group-hover:opacity-100 hover:bg-orange-500 hover:text-white transition-all shadow-2xs cursor-pointer"
                                                     title="Tambah Sesi"
                                                 >
                                                     <Plus size={11} strokeWidth={2.5} />
@@ -450,24 +450,25 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                     : route('admin.individual-trainings.session.show', session.id);
                                                 
                                                 return (
-                                                    <div 
+                                                    <Link 
                                                         key={`${session.type}-${session.id}`} 
-                                                        className={`group/session relative rounded-md border text-left flex flex-col transition-all shadow-2xs hover:shadow-xs overflow-hidden ${
+                                                        href={session.is_absent ? '#' : sessionUrl}
+                                                        className={`group/session relative rounded-md border text-left flex flex-col transition-all shadow-2xs hover:shadow-xs overflow-hidden block cursor-pointer ${
                                                             session.is_absent 
-                                                                ? 'opacity-60 bg-slate-50 border-dashed border-slate-200' 
+                                                                ? 'opacity-60 bg-slate-50 border-dashed border-slate-200 cursor-default' 
                                                                 : isCompleted
                                                                     ? 'bg-white border-emerald-200 hover:border-emerald-400'
                                                                     : isGroup
                                                                         ? 'bg-white border-indigo-200/80 hover:border-indigo-400'
                                                                         : session.is_extra
-                                                                            ? 'bg-white border-amber-200/80 hover:border-amber-400'
+                                                                            ? 'bg-white border-violet-200/90 hover:border-violet-400'
                                                                             : 'bg-white border-slate-200/90 hover:border-orange-300'
                                                         }`}
                                                     >
                                                         {session.is_absent ? (
                                                             <div className="p-1.5 block w-full pointer-events-none">
                                                                 <div className="flex items-start justify-between mb-0.5">
-                                                                    <span className="text-[9px] font-bold px-1 py-0.2 rounded-sm bg-slate-200 text-slate-600">
+                                                                    <span className="text-[9px] font-bold px-1 py-0.2 rounded-md bg-slate-200 text-slate-600">
                                                                         Sesi {session.session_number} (Absen)
                                                                     </span>
                                                                 </div>
@@ -484,7 +485,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                         : isGroup
                                                                             ? 'bg-indigo-50/70 border-indigo-100 text-indigo-800'
                                                                             : session.is_extra
-                                                                                ? 'bg-amber-50/70 border-amber-100 text-amber-800'
+                                                                                ? 'bg-violet-50/70 border-violet-100 text-violet-800'
                                                                                 : 'bg-orange-50/60 border-orange-100/80 text-orange-800'
                                                                 }`}>
                                                                     <div className="flex items-center gap-1.5 min-w-0">
@@ -494,7 +495,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                 : isGroup 
                                                                                     ? 'bg-indigo-500' 
                                                                                     : session.is_extra 
-                                                                                        ? 'bg-amber-500' 
+                                                                                        ? 'bg-violet-500' 
                                                                                         : 'bg-orange-500'
                                                                         }`} />
                                                                         <span className="text-[9.5px] font-bold tracking-tight truncate">
@@ -505,7 +506,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                     {/* Action Buttons & Status Icon */}
                                                                     <div className="flex items-center gap-0.5 shrink-0">
                                                                         {!isAthlete && (
-                                                                            <div className="flex items-center">
+                                                                            <div className="flex items-center" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                                                                                 <button
                                                                                     type="button"
                                                                                     onClick={(e) => {
@@ -515,7 +516,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                         setDuplicateDate(getLocalDateStr(new Date()));
                                                                                         setDuplicateModalOpen(true);
                                                                                     }}
-                                                                                    className="p-0.5 rounded hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                                                                                    className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                                                                                     title="Duplikasi"
                                                                                 >
                                                                                     <Copy size={10} />
@@ -524,7 +525,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                     <Link
                                                                                         href={route('admin.individual-trainings.session.edit', session.id)}
                                                                                         onClick={(e) => e.stopPropagation()}
-                                                                                        className="p-0.5 rounded hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+                                                                                        className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                                                                                         title="Edit"
                                                                                     >
                                                                                         <Edit2 size={10} />
@@ -537,7 +538,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                         e.stopPropagation();
                                                                                         if (!isGroup) deleteSession(e, session.id);
                                                                                     }}
-                                                                                    className="p-0.5 rounded hover:bg-red-100 text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
+                                                                                    className="p-0.5 rounded-md hover:bg-red-100 text-slate-500 hover:text-red-600 transition-colors cursor-pointer"
                                                                                     title="Hapus"
                                                                                 >
                                                                                     <Trash2 size={10} />
@@ -554,35 +555,32 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
 
                                                                 {/* Card Body */}
                                                                 <div className="p-1.5 flex flex-col gap-0.5 bg-white">
-                                                                    <Link 
-                                                                        href={sessionUrl}
-                                                                        className="text-[11px] font-bold leading-tight line-clamp-1 text-slate-900 hover:text-orange-600 transition-colors"
-                                                                    >
+                                                                    <div className="text-[11px] font-bold leading-tight line-clamp-1 text-slate-900 group-hover/session:text-orange-600 transition-colors">
                                                                         {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
                                                                         {session.is_makeup && (
-                                                                            <span className="ml-1 text-[8px] bg-orange-100 text-orange-700 px-1 py-0.2 rounded font-bold uppercase tracking-wider inline-block">
+                                                                            <span className="ml-1 text-[8px] bg-orange-100 text-orange-700 px-1 py-0.2 rounded-md font-bold uppercase tracking-wider inline-block">
                                                                             GUEST
                                                                             </span>
                                                                         )}
-                                                                    </Link>
+                                                                    </div>
 
                                                                     {/* Tags / Metadata */}
                                                                     {(session.location || session.training_type || session.duration_minutes) && (
                                                                         <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                                                                             {session.location && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded" title={session.location}>
+                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md" title={session.location}>
                                                                                     <MapPin size={8.5} className="text-slate-400 shrink-0" />
                                                                                     <span className="truncate max-w-[80px]">{session.location}</span>
                                                                                 </span>
                                                                             )}
                                                                             {session.training_type && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded" title={session.training_type}>
+                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md" title={session.training_type}>
                                                                                     <Dumbbell size={8.5} className="text-slate-400 shrink-0" />
                                                                                     <span className="truncate max-w-[80px]">{session.training_type}</span>
                                                                                 </span>
                                                                             )}
                                                                             {session.duration_minutes && (
-                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded">
+                                                                                <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md">
                                                                                     <Timer size={8.5} className="text-slate-400 shrink-0" />
                                                                                     <span>{session.duration_minutes}m</span>
                                                                                 </span>
@@ -592,7 +590,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                 </div>
                                                             </>
                                                         )}
-                                                    </div>
+                                                    </Link>
                                                 );
                                             })}
                                         </div>

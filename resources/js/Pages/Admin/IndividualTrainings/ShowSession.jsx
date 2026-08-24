@@ -459,7 +459,7 @@ export default function ShowSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={isAthlete ? route("athlete.dashboard") : route("admin.individual-trainings.show", training.user_id)}
+                        href={route("admin.individual-trainings.show", training.user_id || training.athlete_id || training.athlete?.id || auth.user?.id)}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
                         <ChevronLeft size={13} /> Kembali ke Kalender Latihan
@@ -478,7 +478,7 @@ export default function ShowSession({
                                 </span>
                             </div>
                         }
-                        description={`Sesi ${training.session_number} - ${training.date}${training.location ? ` - ${training.location}` : ""}`}
+                        description={`${training.is_extra ? "Sesi Tambahan" : training.session_number ? `Sesi ${training.session_number}` : "Sesi Latihan"} - ${training.date}${training.location ? ` - ${training.location}` : ""}`}
                         actions={
                             <div className="flex items-center gap-2">
                                 <a
@@ -542,7 +542,7 @@ export default function ShowSession({
                                     <div>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Nomor Sesi</span>
                                         <span className="font-bold text-slate-800 text-xs inline-block">
-                                            Sesi {training.session_number}
+                                            {training.is_extra ? "Sesi Tambahan" : training.session_number ? `Sesi ${training.session_number}` : "Sesi Latihan"}
                                         </span>
                                     </div>
                                 </div>

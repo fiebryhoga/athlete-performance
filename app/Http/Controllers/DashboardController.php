@@ -915,6 +915,8 @@ class DashboardController extends Controller
 
         $bestCategory = '-';
         $categoryStats = collect();
+        $strengths = collect();
+        $weaknesses = collect();
         $radarData = [];
         $comparisonData = [];
         $itemAnalysis = [];

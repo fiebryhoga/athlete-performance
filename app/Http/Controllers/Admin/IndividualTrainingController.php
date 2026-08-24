@@ -99,7 +99,7 @@ class IndividualTrainingController extends Controller
                       // OR they are a member of the group
                       ->orWhereIn('training_group_id', $groupIds);
             })
-            ->with(['coach', 'group.package', 'members_pivot' => function ($query) use ($user) {
+            ->with(['coach', 'group.package', 'blocks.items.exercise', 'rpe_records', 'members_pivot' => function ($query) use ($user) {
                 $query->where('athlete_id', $user->id);
             }])
             ->orderBy('date', 'asc')
