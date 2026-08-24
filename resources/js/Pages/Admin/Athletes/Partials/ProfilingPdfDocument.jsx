@@ -31,6 +31,24 @@ const THEME = {
     accentOrange: "#ea580c",
 };
 
+const resolveFullImageUrl = (path) => {
+    if (!path) return null;
+    if (typeof path !== "string") return null;
+    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:") || path.startsWith("blob:")) {
+        return path;
+    }
+    let clean = path;
+    if (!clean.startsWith("/") && !clean.startsWith("storage/")) {
+        clean = `/storage/${clean}`;
+    } else if (!clean.startsWith("/")) {
+        clean = `/${clean}`;
+    }
+    if (typeof window !== "undefined" && window.location?.origin) {
+        return `${window.location.origin}${clean}`;
+    }
+    return clean;
+};
+
 const styles = StyleSheet.create({
     page: {
         paddingTop: 20,
@@ -237,109 +255,99 @@ const styles = StyleSheet.create({
         marginTop: 1,
     },
 
-    // ─── MULTI-DOMAIN ASSESSMENT ───
-    multiDomainBox: {
+    // ─── MULTI-DOMAIN ASSESSMENT (2x2 GRID OF BALANCED CARDS) ───
+    domainGridContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        rowGap: 2.5,
+        marginTop: 2,
+    },
+    domainCard: {
+        width: "49%",
         borderWidth: 0.5,
         borderColor: THEME.borderLight,
-        borderRadius: 2,
-        backgroundColor: "#ffffff",
-        padding: 3.5,
-        marginBottom: 2,
-    },
-    domainSection: {
-        marginBottom: 2.5,
-    },
-    domainHeaderRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 3,
-        marginBottom: 1.5,
-    },
-    domainHeaderDot: {
-        width: 3,
-        height: 3,
         borderRadius: 1.5,
-        backgroundColor: THEME.headerBg,
+        backgroundColor: "#ffffff",
+        overflow: "hidden",
+        minHeight: 34,
     },
-    domainHeader: {
-        fontSize: 4.8,
+    domainCardHeader: {
+        backgroundColor: "#f1f5f9",
+        paddingHorizontal: 3,
+        paddingVertical: 1.8,
+        borderBottomWidth: 0.5,
+        borderBottomColor: "#e2e8f0",
+    },
+    domainCardTitle: {
+        fontSize: 4.6,
         fontFamily: "Helvetica-Bold",
-        color: "#334155",
+        color: THEME.textDark,
         textTransform: "uppercase",
         letterSpacing: 0.2,
+        textAlign: "center",
     },
-    domainSubGrid: {
+    domainCardBody: {
+        flex: 1,
+        paddingHorizontal: 2,
+        paddingVertical: 2.5,
+        backgroundColor: "#ffffff",
+        justifyContent: "center",
+    },
+    domainCardBodyRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        backgroundColor: "#f8fafc",
-        borderWidth: 0.5,
-        borderColor: "#e2e8f0",
-        borderRadius: 1.5,
-        paddingVertical: 2,
-        paddingHorizontal: 2,
+        alignItems: "center",
     },
-    domainSubCol: {
+    domainStatCol: {
         alignItems: "center",
         flex: 1,
     },
-    domainSubLabel: {
+    domainStatLabel: {
         fontSize: 3.8,
         fontFamily: "Helvetica-Bold",
-        color: "#94a3b8",
+        color: "#64748b",
         textTransform: "uppercase",
+        textAlign: "center",
     },
-    domainSubValPrimary: {
+    domainStatVal: {
         fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
         color: THEME.textDark,
-        marginTop: 0.5,
-    },
-    domainSubValAccent: {
-        fontSize: 5.2,
-        fontFamily: "Helvetica-Bold",
-        color: THEME.headerBg,
-        marginTop: 0.5,
-    },
-    domainSubValGreen: {
-        fontSize: 5.2,
-        fontFamily: "Helvetica-Bold",
-        color: "#059669",
-        marginTop: 0.5,
+        marginTop: 0.8,
+        textAlign: "center",
     },
     domainEmpty: {
-        fontSize: 4.5,
+        fontSize: 4.2,
         fontFamily: "Helvetica",
         color: "#94a3b8",
         fontStyle: "italic",
-        paddingVertical: 1.5,
         textAlign: "center",
+        paddingVertical: 4,
     },
 
     // ─── FOOTER ───
     footerBar: {
-        borderTopWidth: 0.8,
-        borderTopColor: THEME.border,
+        position: "absolute",
+        bottom: 8,
+        left: 22,
+        right: 22,
+        borderTopWidth: 0.6,
+        borderTopColor: "#94a3b8",
         paddingTop: 3,
-        marginTop: 3,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
     footerLeft: {
-        fontSize: 6,
-        fontFamily: "Helvetica-Bold",
-        color: THEME.textDark,
-        textTransform: "uppercase",
-        letterSpacing: 0.3,
+        fontSize: 5.2,
+        fontFamily: "Helvetica",
+        color: "#475569",
     },
     footerRight: {
-        fontSize: 5.5,
-        fontFamily: "Helvetica",
-        color: THEME.textDark,
-    },
-    footerBrand: {
+        fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
-        color: THEME.headerBg,
+        color: THEME.textDark,
     },
 });
 
@@ -361,6 +369,16 @@ export default function ProfilingPdfDocument({
 }) {
     // ─── DATES & LABELS ───
     const formattedDate = printDate || new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const now = new Date();
+    const generatedDateStr = now.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+    const generatedTimeStr = now.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
     const athleteName = (athlete?.name || "ATHLETE NAME").toUpperCase();
     const sportName = (
         stats?.sport ||
@@ -373,18 +391,32 @@ export default function ProfilingPdfDocument({
             ? `${window.location.origin}/assets/images/otslogo2.png`
             : "/assets/images/otslogo2.png");
 
+    const calculateAge = (dob) => {
+        if (!dob) return null;
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+    const ageVal =
+        athlete?.age !== undefined && athlete?.age !== null
+            ? `${athlete.age}`
+            : athlete?.date_of_birth
+              ? `${calculateAge(athlete.date_of_birth)}`
+              : "-";
+
     const heightVal = athlete?.height ? `${athlete.height}` : "-";
     const weightVal = athlete?.weight ? `${athlete.weight}` : "-";
-    const bfVal =
-        latest_composition?.body_fat_percentage !== undefined &&
-        latest_composition?.body_fat_percentage !== null
-            ? `${latest_composition.body_fat_percentage}`
-            : "-";
-    const leanMassVal =
-        latest_composition?.muscle_mass !== undefined &&
-        latest_composition?.muscle_mass !== null
-            ? `${latest_composition.muscle_mass}`
-            : "-";
+    const bmrVal =
+        latest_composition?.bmr !== undefined && latest_composition?.bmr !== null
+            ? `${latest_composition.bmr}`
+            : athlete?.bmr
+              ? `${athlete.bmr}`
+              : "-";
 
     // ─── CATEGORY MAPPING ───
     const categoriesMap = {};
@@ -560,6 +592,14 @@ export default function ProfilingPdfDocument({
                                 </View>
                                 <View style={styles.bioRow}>
                                     <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>Age</Text>
+                                    </View>
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>{ageVal}</Text>
+                                    </View>
+                                </View>
+                                <View style={styles.bioRow}>
+                                    <View style={styles.bioLabelCell}>
                                         <Text style={styles.bioLabelText}>Height (cm)</Text>
                                     </View>
                                     <View style={styles.bioValCell}>
@@ -574,28 +614,20 @@ export default function ProfilingPdfDocument({
                                         <Text style={styles.bioValText}>{weightVal}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.bioRow}>
-                                    <View style={styles.bioLabelCell}>
-                                        <Text style={styles.bioLabelText}>BF%</Text>
-                                    </View>
-                                    <View style={styles.bioValCell}>
-                                        <Text style={styles.bioValText}>{bfVal}</Text>
-                                    </View>
-                                </View>
                                 <View style={styles.bioRowLast}>
                                     <View style={styles.bioLabelCell}>
-                                        <Text style={styles.bioLabelText}>Lean Mass (kg)</Text>
+                                        <Text style={styles.bioLabelText}>BMR</Text>
                                     </View>
                                     <View style={styles.bioValCell}>
-                                        <Text style={styles.bioValText}>{leanMassVal}</Text>
+                                        <Text style={styles.bioValText}>{bmrVal}</Text>
                                     </View>
                                 </View>
                             </View>
                         </View>
 
-                        {/* ── B. ATHLETE PROFILE (SPIDER / RADAR CHART) ── */}
+                        {/* ── B. RADAR KATEGORI FISIK (SPIDER / RADAR CHART) ── */}
                         <View style={styles.sectionBanner}>
-                            <Text style={styles.sectionBannerTitle}>ATHLETE PROFILE</Text>
+                            <Text style={styles.sectionBannerTitle}>RADAR KATEGORI FISIK</Text>
                         </View>
 
                         <View style={[styles.radarBox, { height: 140, paddingVertical: 2 }]}>
@@ -830,129 +862,143 @@ export default function ProfilingPdfDocument({
                             </View>
                         </View>
 
-                        {/* ── D. STATUS MULTI-DOMAIN ASESMEN ── */}
+                        {/* ── D. STATUS MULTI-DOMAIN ASESMEN (2x2 BALANCED GRID) ── */}
                         <View style={[styles.sectionBanner, { marginTop: 4 }]}>
                             <Text style={styles.sectionBannerTitle}>STATUS MULTI-DOMAIN ASESMEN</Text>
                         </View>
 
-                        <View style={[styles.multiDomainBox]}>
-                            {/* PHV & Pertumbuhan */}
-                            <View style={styles.domainSection}>
-                                <View style={styles.domainHeaderRow}>
-                                    <View style={styles.domainHeaderDot} />
-                                    <Text style={styles.domainHeader}>PHV & Pertumbuhan (Maturitas)</Text>
+                        <View style={styles.domainGridContainer}>
+                            {/* Card 1: PHV & Pertumbuhan */}
+                            <View style={styles.domainCard}>
+                                <View style={styles.domainCardHeader}>
+                                    <Text style={styles.domainCardTitle}>PHV & PERTUMBUHAN</Text>
                                 </View>
                                 {latest_phv ? (
-                                    <View style={styles.domainSubGrid}>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Maturity Offset</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                {Number(latest_phv.maturity_offset).toFixed(2)} thn
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Prediksi Tinggi</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                {latest_phv.predicted_adult_height || "-"} cm
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Sisa Tumbuh</Text>
-                                            <Text style={styles.domainSubValAccent}>
-                                                +{latest_phv.remaining_growth || "-"} cm
-                                            </Text>
+                                    <View style={styles.domainCardBody}>
+                                        <View style={styles.domainCardBodyRow}>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Offset</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    {Number(latest_phv.maturity_offset).toFixed(1)} thn
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Prediksi</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    {latest_phv.predicted_adult_height || "-"} cm
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Sisa Tumbuh</Text>
+                                                <Text style={[styles.domainStatVal, { color: THEME.headerBg }]}>
+                                                    +{latest_phv.remaining_growth || "-"} cm
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
                                 ) : (
-                                    <Text style={styles.domainEmpty}>Belum ada asesmen PHV</Text>
+                                    <View style={styles.domainCardBody}>
+                                        <Text style={styles.domainEmpty}>Belum ada data PHV</Text>
+                                    </View>
                                 )}
                             </View>
 
-                            {/* Komposisi Tubuh */}
-                            <View style={styles.domainSection}>
-                                <View style={styles.domainHeaderRow}>
-                                    <View style={styles.domainHeaderDot} />
-                                    <Text style={styles.domainHeader}>Komposisi Tubuh</Text>
+                            {/* Card 2: Komposisi Tubuh */}
+                            <View style={styles.domainCard}>
+                                <View style={styles.domainCardHeader}>
+                                    <Text style={styles.domainCardTitle}>KOMPOSISI TUBUH</Text>
                                 </View>
                                 {latest_composition ? (
-                                    <View style={styles.domainSubGrid}>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Body Fat</Text>
-                                            <Text style={styles.domainSubValAccent}>
-                                                {latest_composition.body_fat_percentage ?? "-"}%
-                                            </Text>
+                                    <View style={styles.domainCardBody}>
+                                        <View style={styles.domainCardBodyRow}>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Body Fat</Text>
+                                                <Text style={[styles.domainStatVal, { color: THEME.headerBg }]}>
+                                                    {latest_composition.body_fat_percentage ?? "-"}%
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Muscle</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    {latest_composition.muscle_mass ?? "-"} kg
+                                                </Text>
+                                            </View>
                                         </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Muscle</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                {latest_composition.muscle_mass ?? "-"} kg
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>BMR</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                {latest_composition.bmr ?? "-"} kcal
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Visceral</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                Lvl {latest_composition.visceral_fat_level ?? "-"}
-                                            </Text>
+                                        <View style={[styles.domainCardBodyRow, { marginTop: 2 }]}>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>BMR</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    {latest_composition.bmr ?? "-"} kcal
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Visceral</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    Lvl {latest_composition.visceral_fat_level ?? "-"}
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
                                 ) : (
-                                    <Text style={styles.domainEmpty}>Belum ada tes komposisi tubuh</Text>
+                                    <View style={styles.domainCardBody}>
+                                        <Text style={styles.domainEmpty}>Belum ada data komposisi</Text>
+                                    </View>
                                 )}
                             </View>
 
-                            {/* Beban & Wellness */}
-                            <View style={styles.domainSection}>
-                                <View style={styles.domainHeaderRow}>
-                                    <View style={styles.domainHeaderDot} />
-                                    <Text style={styles.domainHeader}>Beban Latihan & Wellness</Text>
+                            {/* Card 3: Beban Latihan & Wellness */}
+                            <View style={styles.domainCard}>
+                                <View style={styles.domainCardHeader}>
+                                    <Text style={styles.domainCardTitle}>BEBAN LATIHAN & WELLNESS</Text>
                                 </View>
                                 {latest_wellness ? (
-                                    <View style={styles.domainSubGrid}>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Wellness</Text>
-                                            <Text style={styles.domainSubValGreen}>
-                                                {latest_wellness.daily_wellness_score ?? "-"}/30
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Session RPE</Text>
-                                            <Text style={styles.domainSubValPrimary}>
-                                                {latest_wellness.session_rpe ?? "-"}/10
-                                            </Text>
-                                        </View>
-                                        <View style={styles.domainSubCol}>
-                                            <Text style={styles.domainSubLabel}>Daily Load</Text>
-                                            <Text style={styles.domainSubValAccent}>
-                                                {latest_wellness.daily_load ?? 0} AU
-                                            </Text>
+                                    <View style={styles.domainCardBody}>
+                                        <View style={styles.domainCardBodyRow}>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Wellness</Text>
+                                                <Text style={[styles.domainStatVal, { color: "#059669" }]}>
+                                                    {latest_wellness.daily_wellness_score ?? "-"}/30
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Session RPE</Text>
+                                                <Text style={styles.domainStatVal}>
+                                                    {latest_wellness.session_rpe ?? "-"}/10
+                                                </Text>
+                                            </View>
+                                            <View style={styles.domainStatCol}>
+                                                <Text style={styles.domainStatLabel}>Daily Load</Text>
+                                                <Text style={[styles.domainStatVal, { color: THEME.headerBg }]}>
+                                                    {latest_wellness.daily_load ?? 0} AU
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
                                 ) : (
-                                    <Text style={styles.domainEmpty}>Belum ada catatan wellness</Text>
+                                    <View style={styles.domainCardBody}>
+                                        <Text style={styles.domainEmpty}>Belum ada data wellness</Text>
+                                    </View>
                                 )}
                             </View>
 
-                            {/* Postur Dinamis (DPA) */}
-                            <View style={[styles.domainSection, { marginBottom: 0 }]}>
-                                <View style={styles.domainHeaderRow}>
-                                    <View style={styles.domainHeaderDot} />
-                                    <Text style={styles.domainHeader}>Postur Dinamis (DPA)</Text>
+                            {/* Card 4: Postur Dinamis (DPA) */}
+                            <View style={styles.domainCard}>
+                                <View style={styles.domainCardHeader}>
+                                    <Text style={styles.domainCardTitle}>POSTUR DINAMIS (DPA)</Text>
                                 </View>
                                 {latest_dpa ? (
-                                    <View style={[styles.domainSubGrid, { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4 }]}>
-                                        <Text style={styles.domainSubLabel}>Hasil Postur</Text>
-                                        <Text style={[styles.domainSubValPrimary, { marginTop: 0 }]}>
-                                            {latest_dpa.conclusion || "Normal"}
-                                        </Text>
+                                    <View style={styles.domainCardBody}>
+                                        <View style={{ alignItems: "center" }}>
+                                            <Text style={styles.domainStatLabel}>Hasil Postur</Text>
+                                            <Text style={[styles.domainStatVal, { marginTop: 0.8 }]}>
+                                                {latest_dpa.conclusion || "Normal"}
+                                            </Text>
+                                        </View>
                                     </View>
                                 ) : (
-                                    <Text style={styles.domainEmpty}>Belum ada asesmen postur (DPA)</Text>
+                                    <View style={styles.domainCardBody}>
+                                        <Text style={styles.domainEmpty}>Belum ada data postur (DPA)</Text>
+                                    </View>
                                 )}
                             </View>
                         </View>
@@ -1087,9 +1133,9 @@ export default function ProfilingPdfDocument({
                             })()}
                         </View>
 
-                        {/* ── B. ATHLETE FITNESS SCORES (BY CATEGORY) ── */}
+                        {/* ── B. PHYSICAL TEST SCORE (BY CATEGORY) ── */}
                         <View style={styles.sectionBanner}>
-                            <Text style={styles.sectionBannerTitle}>ATHLETE FITNESS SCORES</Text>
+                            <Text style={styles.sectionBannerTitle}>PHYSICAL TEST SCORE</Text>
                         </View>
 
                         {(categoryNames.length > 0
@@ -1279,16 +1325,16 @@ export default function ProfilingPdfDocument({
                     </View>
                 </View>
 
-                {/* ─── 3. GALERI BIOMETRIK ─── */}
-                <View style={{ marginTop: 3 }}>
+                {/* ─── 3. GALERI BIOMETRIK & DOKUMENTASI FISIK (2-GRID HORIZONTAL CARDS) ─── */}
+                <View style={{ marginTop: 4 }}>
                     <View style={styles.sectionBanner}>
                         <Text style={styles.sectionBannerTitle}>GALERI BIOMETRIK & DOKUMENTASI FISIK</Text>
                     </View>
 
-                    <View style={[styles.tableContainer, { padding: 3.5 }]}>
+                    <View style={{ marginTop: 2 }}>
                         {galleries && galleries.length > 0 ? (
-                            <View style={{ flexDirection: "row", gap: 5, justifyContent: "flex-start" }}>
-                                {galleries.slice(0, 4).map((photo, pIdx) => {
+                            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 4 }}>
+                                {galleries.map((photo, pIdx) => {
                                     const photoDate = photo.created_at
                                         ? new Date(photo.created_at).toLocaleDateString("id-ID", {
                                               day: "numeric",
@@ -1296,52 +1342,84 @@ export default function ProfilingPdfDocument({
                                               year: "numeric",
                                           })
                                         : "-";
+                                    const imgSrc = resolveFullImageUrl(photo.image_path);
+
                                     return (
                                         <View
                                             key={pIdx}
+                                            wrap={false}
                                             style={{
-                                                width: `${100 / Math.min(4, Math.max(1, galleries.slice(0, 4).length)) - 1.5}%`,
-                                                borderWidth: 0.5,
+                                                width: "48.8%",
+                                                flexDirection: "row",
+                                                borderWidth: 0.6,
                                                 borderColor: THEME.borderLight,
-                                                borderRadius: 1.5,
-                                                backgroundColor: "#f8fafc",
-                                                padding: 2.5,
+                                                borderRadius: 2,
+                                                backgroundColor: "#ffffff",
+                                                overflow: "hidden",
+                                                marginBottom: 2,
                                             }}
                                         >
-                                            <Image
-                                                src={photo.image_path}
+                                            {/* Gambar di Sisi Kiri */}
+                                            <View
                                                 style={{
-                                                    width: "100%",
-                                                    height: 52,
-                                                    objectFit: "cover",
-                                                    borderRadius: 1,
+                                                    width: "42%",
+                                                    height: 105,
+                                                    backgroundColor: "#f1f5f9",
+                                                    borderRightWidth: 0.5,
+                                                    borderRightColor: THEME.borderLight,
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
                                                 }}
-                                            />
-                                            <View style={{ marginTop: 1.5 }}>
-                                                <Text style={{ fontSize: 4.8, fontFamily: "Helvetica-Bold", color: THEME.textDark }}>
+                                            >
+                                                {imgSrc ? (
+                                                    <Image
+                                                        src={imgSrc}
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            objectFit: "contain",
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Text style={{ fontSize: 5, color: "#94a3b8" }}>No Image</Text>
+                                                )}
+                                            </View>
+
+                                            {/* Keterangan di Sisi Kanan */}
+                                            <View
+                                                style={{
+                                                    width: "58%",
+                                                    padding: 4,
+                                                    backgroundColor: "#f8fafc",
+                                                    justifyContent: "flex-start",
+                                                }}
+                                            >
+                                                <Text style={{ fontSize: 5.8, fontFamily: "Helvetica-Bold", color: THEME.textDark, marginBottom: 1.5 }}>
                                                     {photoDate}
                                                 </Text>
                                                 {photo.notes ? (
                                                     <Text
                                                         style={{
-                                                            fontSize: 4.2,
+                                                            fontSize: 5.0,
                                                             fontFamily: "Helvetica",
-                                                            color: "#64748b",
-                                                            fontStyle: "italic",
-                                                            marginTop: 0.5,
+                                                            color: "#334155",
+                                                            lineHeight: 1.35,
                                                         }}
-                                                        numberOfLines={1}
                                                     >
-                                                        "{photo.notes}"
+                                                        {photo.notes}
                                                     </Text>
-                                                ) : null}
+                                                ) : (
+                                                    <Text style={{ fontSize: 4.8, fontFamily: "Helvetica", color: "#94a3b8", fontStyle: "italic" }}>
+                                                        Tidak ada catatan tambahan.
+                                                    </Text>
+                                                )}
                                             </View>
                                         </View>
                                     );
                                 })}
                             </View>
                         ) : (
-                            <View style={{ paddingVertical: 4, alignItems: "center", justifyContent: "center" }}>
+                            <View style={{ paddingVertical: 4, alignItems: "center", justifyContent: "center", borderWidth: 0.5, borderColor: THEME.borderLight, borderRadius: 1.5, backgroundColor: "#f8fafc" }}>
                                 <Text style={{ fontSize: 5.2, fontFamily: "Helvetica", color: "#94a3b8", fontStyle: "italic" }}>
                                     Belum ada dokumentasi foto biometrik atlet
                                 </Text>
@@ -1351,14 +1429,16 @@ export default function ProfilingPdfDocument({
                 </View>
 
                 {/* ─── 4. BOTTOM FOOTER BAR ─── */}
-                <View style={styles.footerBar}>
-                    <Text style={styles.footerLeft}>PHYSICAL TEST REPORT</Text>
-                    <Text style={styles.footerRight}>
-                        POWERED BY:{" "}
-                        <Text style={styles.footerBrand}>
-                            OLYMPUS PERFORMANCE
-                        </Text>
+                <View style={styles.footerBar} fixed>
+                    <Text style={styles.footerLeft}>
+                        Olympus Training Surabaya - Generated: {generatedDateStr} {generatedTimeStr}
                     </Text>
+                    <Text
+                        style={styles.footerRight}
+                        render={({ pageNumber, totalPages }) =>
+                            `Hal ${pageNumber} / ${totalPages}`
+                        }
+                    />
                 </View>
             </Page>
         </Document>

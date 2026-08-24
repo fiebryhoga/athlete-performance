@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealPlan;
+use App\Models\MealTracking;
 use App\Models\User;
 use App\Models\CompositionTest;
 use Illuminate\Http\Request;
@@ -65,7 +66,23 @@ class MealPlanController extends Controller
 
         $history = MealPlan::where('user_id', $player->id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($plan) {
+                $plan->append('status');
+                return $plan;
+            });
+
+        // Load tracking data for all plans
+        $planIds = $history->pluck('id');
+        $trackings = MealTracking::whereIn('meal_plan_id', $planIds)
+            ->where('user_id', $player->id)
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($t) {
+                $t->date_str = \Carbon\Carbon::parse($t->date)->format('Y-m-d');
+                return $t;
+            })
+            ->groupBy('meal_plan_id');
 
         $latestTest = CompositionTest::where('user_id', $player->id)
             ->orderBy('date', 'desc')
@@ -74,6 +91,7 @@ class MealPlanController extends Controller
         return Inertia::render('Admin/MealPlans/Show', [
             'player' => $player,
             'history' => $history,
+            'trackings' => $trackings,
             'latestTest' => $latestTest
         ]);
     }
@@ -99,12 +117,31 @@ class MealPlanController extends Controller
         $data = $request->all();
         $data['coach_id'] = Auth::id();
 
-        // Hapus rencana makan lama agar terganti dengan yang baru
-        MealPlan::where('user_id', $data['user_id'])->delete();
-
         MealPlan::create($data);
 
         return redirect()->back()->with('success', 'Rencana Makan berhasil disimpan.');
+    }
+
+    public function update(Request $request, MealPlan $mealPlan)
+    {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'recommendation' => 'nullable|string',
+            'target_calories' => 'nullable|integer',
+            'protein_target' => 'nullable|integer',
+            'carbs_target' => 'nullable|integer',
+            'fats_target' => 'nullable|integer',
+            'weekly_plan' => 'nullable|array',
+            'hydration_plan' => 'nullable|array',
+            'supplements_plan' => 'nullable|array',
+            'notes' => 'nullable|string',
+            'warnings' => 'nullable|string',
+        ]);
+
+        $mealPlan->update($request->all());
+
+        return redirect()->back()->with('success', 'Rencana Makan berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -113,5 +150,49 @@ class MealPlanController extends Controller
         $plan->delete();
 
         return redirect()->back()->with('success', 'Rencana Makan berhasil dihapus.');
+    }
+
+    public function saveTracking(Request $request)
+    {
+        $request->validate([
+            'meal_plan_id' => 'required|exists:meal_plans,id',
+            'date' => 'required|date',
+            'tracking_data' => 'required|array',
+        ]);
+
+        $mealPlan = MealPlan::findOrFail($request->meal_plan_id);
+        $athleteId = $mealPlan->user_id;
+
+        // Calculate compliance score
+        $trackingData = $request->tracking_data;
+        $totalItems = 0;
+        $eatenItems = 0;
+
+        foreach ($trackingData['meals'] ?? [] as $meal) {
+            foreach ($meal['items'] ?? [] as $item) {
+                if (!empty($item['status'])) {
+                    $totalItems++;
+                    if ($item['status'] === 'eaten') {
+                        $eatenItems++;
+                    }
+                }
+            }
+        }
+
+        $complianceScore = $totalItems > 0 ? round(($eatenItems / $totalItems) * 100, 1) : 0;
+
+        MealTracking::updateOrCreate(
+            [
+                'meal_plan_id' => $mealPlan->id,
+                'user_id' => $athleteId,
+                'date' => $request->date,
+            ],
+            [
+                'tracking_data' => $trackingData,
+                'compliance_score' => $complianceScore,
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Laporan makan berhasil disimpan.');
     }
 }

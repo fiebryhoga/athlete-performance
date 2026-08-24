@@ -11,9 +11,20 @@ class SubscriptionPackage extends Model
 
     protected $fillable = [
         'name',
+        'package_type',
         'description',
         'session_count',
         'coach_fee_per_session',
         'price',
     ];
+
+    public function isPerSession(): bool
+    {
+        return $this->package_type === 'per_session';
+    }
+
+    public function isQuota(): bool
+    {
+        return $this->package_type !== 'per_session';
+    }
 }

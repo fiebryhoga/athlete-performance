@@ -33,6 +33,7 @@ class ReportController extends Controller
                 $packageSessionCount = $athlete->package->session_count ?? null;
 
                 $athlete->package_name = $athlete->package->name ?? null;
+                $athlete->package_type = $athlete->package->package_type ?? ($athlete->package ? 'quota' : null);
                 $athlete->package_session_count = $packageSessionCount;
                 $athlete->total_sessions = $trainings->count();
                 $athlete->completed_sessions = $trainings->where('status', 'completed')->count();
@@ -83,6 +84,7 @@ class ReportController extends Controller
                 $packageSessionCount = $group->package->session_count ?? null;
 
                 $group->package_name = $group->package->name ?? null;
+                $group->package_type = $group->package->package_type ?? ($group->package ? 'quota' : null);
                 $group->package_session_count = $packageSessionCount;
                 $group->members_count = $group->members->count();
                 $group->total_sessions = $trainings->count();

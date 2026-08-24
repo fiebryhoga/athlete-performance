@@ -194,7 +194,9 @@ Route::middleware([
         // Meal Plans
         Route::get('/admin/meal-plans', [\App\Http\Controllers\Admin\MealPlanController::class, 'index'])->name('admin.meal-plans.index');
         Route::post('/admin/meal-plans', [\App\Http\Controllers\Admin\MealPlanController::class, 'store'])->name('admin.meal-plans.store');
+        Route::put('/admin/meal-plans/{mealPlan}', [\App\Http\Controllers\Admin\MealPlanController::class, 'update'])->name('admin.meal-plans.update');
         Route::delete('/admin/meal-plans/{mealPlan}', [\App\Http\Controllers\Admin\MealPlanController::class, 'destroy'])->name('admin.meal-plans.destroy');
+        Route::post('/admin/meal-plans/tracking', [\App\Http\Controllers\Admin\MealPlanController::class, 'saveTracking'])->name('admin.meal-plans.tracking');
         Route::get('/admin/meal-plans/{user}', [\App\Http\Controllers\Admin\MealPlanController::class, 'show'])->name('admin.meal-plans.show');
 
 

@@ -108,7 +108,9 @@ export default function ShowAthlete({ auth, athlete, trainings, groupTrainings }
         : null;
 
     const packageBadge = athlete.package 
-        ? `Paket: ${athlete.package.name} (Sesi ${maxSession}/${athlete.package.session_count})${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`
+        ? (athlete.package.package_type === 'per_session'
+            ? `Paket: ${athlete.package.name} (Sesi ${maxSession} • Per Pertemuan)${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`
+            : `Paket: ${athlete.package.name} (Sesi ${maxSession}/${athlete.package.session_count || '∞'})${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`)
         : 'Tidak Ada Paket';
 
     return (

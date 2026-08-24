@@ -95,7 +95,9 @@ export default function ShowGroup({ auth, group, trainings, groupTrainings }) {
         : null;
 
     const packageBadge = group.package 
-        ? `Paket: ${group.package.name} (Sesi ${maxSession}/${group.package.session_count})${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`
+        ? (group.package.package_type === 'per_session'
+            ? `Paket: ${group.package.name} (Sesi ${maxSession} • Per Pertemuan)${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`
+            : `Paket: ${group.package.name} (Sesi ${maxSession}/${group.package.session_count || '∞'})${expDate ? ` • Masa Aktif Sampai ${expDate}` : ''}`)
         : 'Tidak Ada Paket';
 
     return (

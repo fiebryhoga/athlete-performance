@@ -15,6 +15,24 @@ import {
     CartesianGrid,
 } from "recharts";
 
+const resolveFullImageUrl = (path) => {
+    if (!path) return null;
+    if (typeof path !== "string") return null;
+    if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:") || path.startsWith("blob:")) {
+        return path;
+    }
+    let clean = path;
+    if (!clean.startsWith("/") && !clean.startsWith("storage/")) {
+        clean = `/storage/${clean}`;
+    } else if (!clean.startsWith("/")) {
+        clean = `/${clean}`;
+    }
+    if (typeof window !== "undefined" && window.location?.origin) {
+        return `${window.location.origin}${clean}`;
+    }
+    return clean;
+};
+
 export default function ProfilingPdf({
     athlete = {},
     stats = {},
@@ -45,18 +63,32 @@ export default function ProfilingPdf({
         "All-Around"
     ).toUpperCase();
 
+    const calculateAge = (dob) => {
+        if (!dob) return null;
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+    const ageVal =
+        athlete?.age !== undefined && athlete?.age !== null
+            ? `${athlete.age}`
+            : athlete?.date_of_birth
+              ? `${calculateAge(athlete.date_of_birth)}`
+              : "-";
+
     const heightVal = athlete?.height ? `${athlete.height}` : "-";
     const weightVal = athlete?.weight ? `${athlete.weight}` : "-";
-    const bfVal =
-        latest_composition?.body_fat_percentage !== undefined &&
-        latest_composition?.body_fat_percentage !== null
-            ? `${latest_composition.body_fat_percentage}`
-            : "-";
-    const leanMassVal =
-        latest_composition?.muscle_mass !== undefined &&
-        latest_composition?.muscle_mass !== null
-            ? `${latest_composition.muscle_mass}`
-            : "-";
+    const bmrVal =
+        latest_composition?.bmr !== undefined && latest_composition?.bmr !== null
+            ? `${latest_composition.bmr}`
+            : athlete?.bmr
+              ? `${athlete.bmr}`
+              : "-";
 
     // Group items by category
     const categoriesMap = {};
@@ -193,6 +225,14 @@ export default function ProfilingPdf({
                                     </div>
                                     <div className="flex divide-x divide-slate-800 min-h-[22px] items-center">
                                         <span className="w-[52%] px-2 py-1 bg-slate-50 font-bold text-[10px] text-slate-800">
+                                            Age
+                                        </span>
+                                        <span className="w-[48%] px-2 py-1 font-bold text-[11px] text-center text-slate-900">
+                                            {ageVal}
+                                        </span>
+                                    </div>
+                                    <div className="flex divide-x divide-slate-800 min-h-[22px] items-center">
+                                        <span className="w-[52%] px-2 py-1 bg-slate-50 font-bold text-[10px] text-slate-800">
                                             Height (cm)
                                         </span>
                                         <span className="w-[48%] px-2 py-1 font-bold text-[11px] text-center text-slate-900">
@@ -209,28 +249,20 @@ export default function ProfilingPdf({
                                     </div>
                                     <div className="flex divide-x divide-slate-800 min-h-[22px] items-center">
                                         <span className="w-[52%] px-2 py-1 bg-slate-50 font-bold text-[10px] text-slate-800">
-                                            BF%
+                                            BMR
                                         </span>
                                         <span className="w-[48%] px-2 py-1 font-bold text-[11px] text-center text-slate-900">
-                                            {bfVal}
-                                        </span>
-                                    </div>
-                                    <div className="flex divide-x divide-slate-800 min-h-[22px] items-center">
-                                        <span className="w-[52%] px-2 py-1 bg-slate-50 font-bold text-[10px] text-slate-800">
-                                            Lean Mass (kg)
-                                        </span>
-                                        <span className="w-[48%] px-2 py-1 font-bold text-[11px] text-center text-slate-900">
-                                            {leanMassVal}
+                                            {bmrVal}
                                         </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* ── B. ATHLETE PROFILE (SPIDER / RADAR CHART) ── */}
+                        {/* ── B. RADAR KATEGORI FISIK (SPIDER / RADAR CHART) ── */}
                         <div>
                             <div className="bg-[#ea580c] text-white text-center py-1 text-[11px] font-bold uppercase tracking-wider">
-                                ATHLETE PROFILE
+                                RADAR KATEGORI FISIK
                             </div>
                             <div className="border border-slate-800 bg-white p-1.5 h-[175px] flex items-center justify-center">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -357,30 +389,28 @@ export default function ProfilingPdf({
                             </div>
                         </div>
 
-                        {/* ── D. STATUS MULTI-DOMAIN ASESMEN ── */}
+                        {/* ── D. STATUS MULTI-DOMAIN ASESMEN (2x2 BALANCED GRID) ── */}
                         <div>
                             <div className="bg-[#ea580c] text-white text-center py-1 text-[11px] font-bold uppercase tracking-wider">
                                 STATUS MULTI-DOMAIN ASESMEN
                             </div>
-                            <div className="border border-slate-800 bg-white p-2 space-y-2">
-                                {/* PHV & Pertumbuhan */}
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-1.5 border-b border-slate-100 pb-0.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-                                        <span className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">
-                                            PHV & Pertumbuhan (Maturitas)
-                                        </span>
+
+                            <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+                                {/* Card 1: PHV & Pertumbuhan */}
+                                <div className="border border-slate-800 bg-white flex flex-col justify-between">
+                                    <div className="bg-slate-100 px-2 py-0.5 border-b border-slate-200 text-[9px] font-bold text-slate-800 uppercase tracking-wide text-center">
+                                        PHV & PERTUMBUHAN
                                     </div>
                                     {latest_phv ? (
-                                        <div className="grid grid-cols-3 gap-1 text-center p-1.5 bg-slate-50 border border-slate-200 rounded-xs text-[9px]">
+                                        <div className="grid grid-cols-3 gap-1 text-center p-1.5 text-[9px] my-auto">
                                             <div>
                                                 <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Offset</span>
                                                 <strong className="text-slate-900 font-bold block">
-                                                    {Number(latest_phv.maturity_offset).toFixed(2)} thn
+                                                    {Number(latest_phv.maturity_offset).toFixed(1)} thn
                                                 </strong>
                                             </div>
                                             <div>
-                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Prediksi Tinggi</span>
+                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Prediksi</span>
                                                 <strong className="text-slate-900 font-bold block">
                                                     {latest_phv.predicted_adult_height || "-"} cm
                                                 </strong>
@@ -393,60 +423,58 @@ export default function ProfilingPdf({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="text-center text-[8.5px] text-slate-400 italic py-1">Belum ada asesmen PHV</div>
+                                        <div className="text-center text-[8.5px] text-slate-400 italic py-3 my-auto">Belum ada data PHV</div>
                                     )}
                                 </div>
 
-                                {/* Komposisi Tubuh */}
-                                <div className="space-y-1 pt-1 border-t border-slate-100">
-                                    <div className="flex items-center gap-1.5 border-b border-slate-100 pb-0.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-                                        <span className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">
-                                            Komposisi Tubuh
-                                        </span>
+                                {/* Card 2: Komposisi Tubuh */}
+                                <div className="border border-slate-800 bg-white flex flex-col justify-between">
+                                    <div className="bg-slate-100 px-2 py-0.5 border-b border-slate-200 text-[9px] font-bold text-slate-800 uppercase tracking-wide text-center">
+                                        KOMPOSISI TUBUH
                                     </div>
                                     {latest_composition ? (
-                                        <div className="grid grid-cols-4 gap-1 text-center p-1.5 bg-slate-50 border border-slate-200 rounded-xs text-[9px]">
-                                            <div>
-                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Body Fat</span>
-                                                <strong className="text-orange-600 font-bold block">
-                                                    {latest_composition.body_fat_percentage ?? "-"}%
-                                                </strong>
+                                        <div className="p-1.5 space-y-1 text-[9px] my-auto">
+                                            <div className="grid grid-cols-2 gap-1 text-center">
+                                                <div>
+                                                    <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Body Fat</span>
+                                                    <strong className="text-orange-600 font-bold block">
+                                                        {latest_composition.body_fat_percentage ?? "-"}%
+                                                    </strong>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Muscle</span>
+                                                    <strong className="text-slate-900 font-bold block">
+                                                        {latest_composition.muscle_mass ?? "-"} kg
+                                                    </strong>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Muscle</span>
-                                                <strong className="text-slate-900 font-bold block">
-                                                    {latest_composition.muscle_mass ?? "-"} kg
-                                                </strong>
-                                            </div>
-                                            <div>
-                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">BMR</span>
-                                                <strong className="text-slate-900 font-bold block">
-                                                    {latest_composition.bmr ?? "-"} kcal
-                                                </strong>
-                                            </div>
-                                            <div>
-                                                <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Visceral</span>
-                                                <strong className="text-slate-900 font-bold block">
-                                                    Lvl {latest_composition.visceral_fat_level ?? "-"}
-                                                </strong>
+                                            <div className="grid grid-cols-2 gap-1 text-center">
+                                                <div>
+                                                    <span className="text-[7.5px] font-bold text-slate-400 uppercase block">BMR</span>
+                                                    <strong className="text-slate-900 font-bold block">
+                                                        {latest_composition.bmr ?? "-"} kcal
+                                                    </strong>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Visceral</span>
+                                                    <strong className="text-slate-900 font-bold block">
+                                                        Lvl {latest_composition.visceral_fat_level ?? "-"}
+                                                    </strong>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="text-center text-[8.5px] text-slate-400 italic py-1">Belum ada tes komposisi tubuh</div>
+                                        <div className="text-center text-[8.5px] text-slate-400 italic py-3 my-auto">Belum ada data komposisi</div>
                                     )}
                                 </div>
 
-                                {/* Beban & Wellness */}
-                                <div className="space-y-1 pt-1 border-t border-slate-100">
-                                    <div className="flex items-center gap-1.5 border-b border-slate-100 pb-0.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-                                        <span className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">
-                                            Beban Latihan & Wellness
-                                        </span>
+                                {/* Card 3: Beban Latihan & Wellness */}
+                                <div className="border border-slate-800 bg-white flex flex-col justify-between">
+                                    <div className="bg-slate-100 px-2 py-0.5 border-b border-slate-200 text-[9px] font-bold text-slate-800 uppercase tracking-wide text-center">
+                                        BEBAN LATIHAN & WELLNESS
                                     </div>
                                     {latest_wellness ? (
-                                        <div className="grid grid-cols-3 gap-1 text-center p-1.5 bg-slate-50 border border-slate-200 rounded-xs text-[9px]">
+                                        <div className="grid grid-cols-3 gap-1 text-center p-1.5 text-[9px] my-auto">
                                             <div>
                                                 <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Wellness</span>
                                                 <strong className="text-emerald-600 font-bold block">
@@ -467,27 +495,24 @@ export default function ProfilingPdf({
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="text-center text-[8.5px] text-slate-400 italic py-1">Belum ada catatan wellness</div>
+                                        <div className="text-center text-[8.5px] text-slate-400 italic py-3 my-auto">Belum ada data wellness</div>
                                     )}
                                 </div>
 
-                                {/* Postur Dinamis (DPA) */}
-                                <div className="space-y-1 pt-1 border-t border-slate-100">
-                                    <div className="flex items-center gap-1.5 border-b border-slate-100 pb-0.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-                                        <span className="text-[9px] font-bold text-slate-800 uppercase tracking-wide">
-                                            Postur Dinamis (DPA)
-                                        </span>
+                                {/* Card 4: Postur Dinamis (DPA) */}
+                                <div className="border border-slate-800 bg-white flex flex-col justify-between">
+                                    <div className="bg-slate-100 px-2 py-0.5 border-b border-slate-200 text-[9px] font-bold text-slate-800 uppercase tracking-wide text-center">
+                                        POSTUR DINAMIS (DPA)
                                     </div>
                                     {latest_dpa ? (
-                                        <div className="flex items-center justify-between p-1.5 bg-slate-50 border border-slate-200 rounded-xs text-[9px]">
-                                            <span className="text-slate-500 font-medium">Hasil Postur:</span>
-                                            <strong className="text-slate-900 font-bold">
+                                        <div className="p-2 text-center text-[9px] my-auto">
+                                            <span className="text-[7.5px] font-bold text-slate-400 uppercase block">Hasil Postur</span>
+                                            <strong className="text-slate-900 font-bold block mt-0.5">
                                                 {latest_dpa.conclusion || "Normal"}
                                             </strong>
                                         </div>
                                     ) : (
-                                        <div className="text-center text-[8.5px] text-slate-400 italic py-1">Belum ada asesmen postur (DPA)</div>
+                                        <div className="text-center text-[8.5px] text-slate-400 italic py-3 my-auto">Belum ada data postur (DPA)</div>
                                     )}
                                 </div>
                             </div>
@@ -611,10 +636,10 @@ export default function ProfilingPdf({
                             </div>
                         </div>
 
-                        {/* ── B. ATHLETE FITNESS SCORES (BY CATEGORY) ── */}
+                        {/* ── B. PHYSICAL TEST SCORE (BY CATEGORY) ── */}
                         <div>
                             <div className="bg-[#ea580c] text-white text-center py-1 text-[11px] font-bold uppercase tracking-wider">
-                                ATHLETE FITNESS SCORES
+                                PHYSICAL TEST SCORE
                             </div>
 
                             <div className="space-y-1.5 mt-1.5">
@@ -775,15 +800,15 @@ export default function ProfilingPdf({
                     </div>
                 </div>
 
-                {/* ─── 3. GALERI BIOMETRIK ─── */}
-                <div>
+                {/* ─── 3. GALERI BIOMETRIK (2-GRID HORIZONTAL CARDS) ─── */}
+                <div className="mt-4">
                     <div className="bg-[#ea580c] text-white text-center py-1 text-[11px] font-bold uppercase tracking-wider">
                         GALERI BIOMETRIK & DOKUMENTASI FISIK
                     </div>
-                    <div className="border border-slate-800 bg-white p-2">
+                    <div className="mt-2">
                         {galleries && galleries.length > 0 ? (
-                            <div className="grid grid-cols-4 gap-2">
-                                {galleries.slice(0, 4).map((photo, pIdx) => {
+                            <div className="grid grid-cols-2 gap-3">
+                                {galleries.map((photo, pIdx) => {
                                     const photoDate = photo.created_at
                                         ? new Date(photo.created_at).toLocaleDateString("id-ID", {
                                               day: "numeric",
@@ -791,34 +816,41 @@ export default function ProfilingPdf({
                                               year: "numeric",
                                           })
                                         : "-";
+                                    const imgSrc = resolveFullImageUrl(photo.image_path);
+
                                     return (
                                         <div
                                             key={pIdx}
-                                            className="border border-slate-200 bg-slate-50 p-1.5 rounded-xs space-y-1"
+                                            className="border border-slate-200 bg-white rounded-xs overflow-hidden flex flex-row shadow-2xs break-inside-avoid"
+                                            style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
                                         >
-                                            <div className="w-full h-20 bg-slate-100 rounded-xs overflow-hidden">
+                                            <div className="w-[42%] h-44 bg-slate-100 border-r border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                                                 <img
-                                                    src={photo.image_path}
+                                                    src={imgSrc}
                                                     alt="Biometric"
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full object-contain"
                                                 />
                                             </div>
-                                            <div className="text-[9px]">
-                                                <span className="font-bold text-slate-800 block">
+                                            <div className="w-[58%] p-3 bg-slate-50 border-l border-slate-100 flex flex-col justify-start">
+                                                <span className="font-bold text-slate-900 block text-[11px] mb-1">
                                                     {photoDate}
                                                 </span>
                                                 {photo.notes ? (
-                                                    <p className="text-[8px] text-slate-500 italic line-clamp-1">
-                                                        "{photo.notes}"
+                                                    <p className="text-[10px] text-slate-700 leading-relaxed">
+                                                        {photo.notes}
                                                     </p>
-                                                ) : null}
+                                                ) : (
+                                                    <p className="text-[9.5px] text-slate-400 italic">
+                                                        Tidak ada catatan tambahan.
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     );
                                 })}
                             </div>
                         ) : (
-                            <div className="py-3 text-center text-[9px] text-slate-400 italic">
+                            <div className="py-3 text-center text-[9px] text-slate-400 italic border border-slate-200 bg-slate-50 rounded-xs">
                                 Belum ada dokumentasi foto biometrik atlet
                             </div>
                         )}
@@ -826,13 +858,12 @@ export default function ProfilingPdf({
                 </div>
 
                 {/* ─── 4. BOTTOM FOOTER BAR ─── */}
-                <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-900">
-                    <span>PHYSICAL TEST REPORT</span>
+                <div className="pt-3 border-t border-slate-300 flex items-center justify-between text-[10px] text-slate-600">
                     <span>
-                        POWERED BY:{" "}
-                        <strong className="text-[#ea580c]">
-                            OLYMPUS PERFORMANCE
-                        </strong>
+                        Olympus Training Surabaya - Generated: {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })} {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <span className="font-bold text-slate-900">
+                        Hal 1 / 1
                     </span>
                 </div>
             </div>

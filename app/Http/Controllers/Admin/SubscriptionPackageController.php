@@ -26,11 +26,16 @@ class SubscriptionPackageController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'package_type' => 'required|in:quota,per_session',
             'description' => 'nullable|string',
-            'session_count' => 'required|integer|min:1',
+            'session_count' => 'nullable|required_if:package_type,quota|integer|min:1',
             'coach_fee_per_session' => 'required|integer|min:0',
             'price' => 'nullable|integer|min:0',
         ]);
+
+        if ($validated['package_type'] === 'per_session') {
+            $validated['session_count'] = null;
+        }
 
         SubscriptionPackage::create($validated);
 
@@ -43,11 +48,16 @@ class SubscriptionPackageController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'package_type' => 'required|in:quota,per_session',
             'description' => 'nullable|string',
-            'session_count' => 'required|integer|min:1',
+            'session_count' => 'nullable|required_if:package_type,quota|integer|min:1',
             'coach_fee_per_session' => 'required|integer|min:0',
             'price' => 'nullable|integer|min:0',
         ]);
+
+        if ($validated['package_type'] === 'per_session') {
+            $validated['session_count'] = null;
+        }
 
         $package->update($validated);
 

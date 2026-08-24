@@ -257,7 +257,16 @@ export default function SessionRecap({
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount || 0);
     };
 
-    const renderProgressBar = (completed, total) => {
+    const renderProgressBar = (completed, total, packageType = 'quota') => {
+        if (packageType === 'per_session') {
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-indigo-700">{completed} Sesi</span>
+                    <span className="text-[10px] text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded font-semibold">Per Pertemuan</span>
+                </div>
+            );
+        }
+
         if (!total) {
             return (
                 <div className="flex items-center gap-2">
@@ -498,7 +507,7 @@ export default function SessionRecap({
                                                     )}
                                                 </td>
                                                 <td className="px-5 py-3.5">
-                                                    {renderProgressBar(athlete.unpaid_sessions, athlete.package_session_count)}
+                                                    {renderProgressBar(athlete.unpaid_sessions, athlete.package_session_count, athlete.package_type)}
                                                 </td>
                                                 <td className="px-5 py-3.5 text-center">
                                                     {athlete.unpaid_sessions > 0 ? (
@@ -639,7 +648,7 @@ export default function SessionRecap({
                                                     )}
                                                 </td>
                                                 <td className="px-5 py-3.5">
-                                                    {renderProgressBar(group.unpaid_sessions, group.package_session_count)}
+                                                    {renderProgressBar(group.unpaid_sessions, group.package_session_count, group.package_type)}
                                                 </td>
                                                 <td className="px-5 py-3.5 text-center">
                                                     {group.unpaid_sessions > 0 ? (

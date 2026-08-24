@@ -190,7 +190,9 @@ export default function GroupList({ groups, packages, allAthletes, coaches }) {
                                 >
                                     <option value="">-- Tidak Ada / Kosongkan --</option>
                                     {packages?.map(pkg => (
-                                        <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
+                                        <option key={pkg.id} value={pkg.id}>
+                                            {pkg.name} ({pkg.package_type === 'per_session' ? 'Per Pertemuan' : `${pkg.session_count} Sesi`})
+                                        </option>
                                     ))}
                                 </select>
                                 {errors.subscription_package_id && <p className="text-red-500 text-xs mt-1">{errors.subscription_package_id}</p>}

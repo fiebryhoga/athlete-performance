@@ -756,7 +756,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                 <option value="">-- Tidak Ada / Kosongkan --</option>
                                                 {packagesList?.map(pkg => (
                                                     <option key={pkg.id} value={pkg.id}>
-                                                        {pkg.name} ({pkg.session_count} Sesi)
+                                                        {pkg.name} ({pkg.package_type === 'per_session' ? 'Per Pertemuan' : `${pkg.session_count} Sesi`})
                                                     </option>
                                                 ))}
                                             </select>
