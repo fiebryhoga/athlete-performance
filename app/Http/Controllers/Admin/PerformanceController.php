@@ -186,13 +186,13 @@ class PerformanceController extends Controller
                 'unit' => $item ? $item->unit : '',
                 'category' => ($item && $item->category) ? $item->category->name : 'Uncategorized',
                 'result_value' => $res->result,
-                'target_value' => $item->target_value,
+                'target_value' => $item ? $item->target_value : null,
                 'score' => $rawScore, 
                 'status' => $rawScore >= 80 ? 'Excellent' : ($rawScore >= 60 ? 'Good' : 'Poor')
             ];
 
-            
             $prevScoreForGrowth = 0; 
+            $prevResultVal = null;
 
             foreach($previousTests as $index => $pt) {
                 $prevRes = $pt->results->where('test_item_id', $res->test_item_id)->first();
@@ -200,14 +200,15 @@ class PerformanceController extends Controller
                 
                 $data['prev_' . $index] = round($pScore, 2);
                 
-                
                 if ($index === $previousTests->count() - 1) {
                     $prevScoreForGrowth = $pScore;
+                    $prevResultVal = $prevRes ? $prevRes->result : null;
                 }
             }
 
             $growth = ($prevScoreForGrowth > 0) ? (($rawScore - $prevScoreForGrowth) / $prevScoreForGrowth) * 100 : 0;
             
+            $data['previous_value'] = $prevResultVal;
             $data['previous_score'] = round($prevScoreForGrowth, 2);
             $data['growth'] = round($growth, 1);
 

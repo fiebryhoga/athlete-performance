@@ -169,7 +169,7 @@ export default function Show({
                                 <button
                                     type="button"
                                     onClick={handleAddRecord}
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-md text-xs font-bold transition-all shadow-sm hover:shadow"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 hover:via-orange-50/40 hover:to-orange-100/60 text-orange-600 border border-slate-200/90 hover:border-orange-300 rounded-md text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
                                     <span>Tambah Data</span>
@@ -415,7 +415,7 @@ export default function Show({
                             <button
                                 type="button"
                                 onClick={handleAddRecord}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-md text-xs font-bold transition-all shadow-sm"
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 hover:via-orange-50/40 hover:to-orange-100/60 text-orange-600 border border-slate-200/90 hover:border-orange-300 rounded-md text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
                                 <span>Input Data Pertama</span>

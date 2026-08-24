@@ -104,6 +104,7 @@ export default function Show({
                     latest_composition={latest_composition}
                     latest_wellness={latest_wellness}
                     latest_dpa={latest_dpa}
+                    galleries={galleries && galleries.length > 0 ? galleries : safeAthlete.galleries || []}
                 />
             );
             const asPdf = pdf();

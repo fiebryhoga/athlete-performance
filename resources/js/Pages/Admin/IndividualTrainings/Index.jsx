@@ -1,203 +1,622 @@
-import React, { useState, useMemo } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
-import { Search, User, ChevronRight, Activity, Users, Dumbbell, Calendar as CalendarIcon } from 'lucide-react';
-import PageHeader from '@/Components/Layout/PageHeader';
+import React, { useState, useMemo } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import PageHeader from "@/Components/Common/PageHeader";
+import PageFooter from "@/Components/Common/PageFooter";
+import {
+    Search,
+    Filter,
+    ChevronDown,
+    Check,
+    X,
+    ArrowUpRight,
+    User,
+    Users,
+    Activity,
+    Calendar as CalendarIcon,
+} from "lucide-react";
 
-export default function Index({ athletes, groups }) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('individual');
+// --- CUSTOM SELECT COMPONENT ---
+function CustomSelect({
+    label,
+    value,
+    options,
+    onChange,
+    placeholder = "Pilih...",
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectedOption = options.find(
+        (opt) => String(opt.value) === String(value),
+    );
+
+    return (
+        <div className="space-y-1 relative">
+            {label && (
+                <label className="block text-[11px] font-bold text-slate-600">
+                    {label}
+                </label>
+            )}
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-800 transition-all text-left shadow-2xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+            >
+                <span className="truncate">
+                    {selectedOption ? selectedOption.label : placeholder}
+                </span>
+                <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 shrink-0 ml-1.5 transition-transform ${
+                        isOpen ? "rotate-180 text-orange-500" : ""
+                    }`}
+                />
+            </button>
+
+            {isOpen && (
+                <>
+                    <div
+                        className="fixed inset-0 z-40 cursor-default"
+                        onClick={() => setIsOpen(false)}
+                    />
+                    <div className="absolute left-0 top-full mt-1 w-full max-h-48 overflow-y-auto bg-white rounded-md shadow-xl border border-slate-200 p-1 z-50 animate-in fade-in zoom-in-95 duration-100 space-y-0.5 custom-scrollbar">
+                        {options.map((opt) => {
+                            const isSelected =
+                                String(opt.value) === String(value);
+                            return (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(opt.value);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs transition-colors text-left ${
+                                        isSelected
+                                            ? "bg-orange-50 text-orange-700 font-bold"
+                                            : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-medium"
+                                    }`}
+                                >
+                                    <span className="truncate">
+                                        {opt.label}
+                                    </span>
+                                    {isSelected && (
+                                        <Check className="w-3.5 h-3.5 text-orange-600 shrink-0 ml-1.5" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+// --- HELPER: INITIALS ---
+function getInitials(name) {
+    if (!name) return "??";
+    const words = name.trim().split(" ");
+    if (words.length >= 2)
+        return `${words[0][0]}${words[1][0]}`.toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+}
+
+export default function Index({ athletes = [], groups = [], sports = [] }) {
+    const { auth } = usePage().props;
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeTab, setActiveTab] = useState("individual");
+    const [selectedSport, setSelectedSport] = useState("ALL");
+    const [sortBy, setSortBy] = useState("name_asc");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    // Options for Filters
+    const sportOptions = useMemo(() => {
+        const list = [{ value: "ALL", label: "Semua Cabor" }];
+        if (sports && sports.length > 0) {
+            sports.forEach((s) => list.push({ value: s.id, label: s.name }));
+        }
+        return list;
+    }, [sports]);
+
+    const sortOptions = [
+        { value: "name_asc", label: "Nama (A - Z)" },
+        { value: "name_desc", label: "Nama (Z - A)" },
+        { value: "sessions_desc", label: "Sesi Terbanyak" },
+    ];
 
     const filteredAthletes = useMemo(() => {
-        if (!searchTerm.trim()) return athletes;
-        const q = searchTerm.toLowerCase();
-        return athletes.filter(athlete => 
-            athlete.name.toLowerCase().includes(q) ||
-            (athlete.sport?.name && athlete.sport.name.toLowerCase().includes(q))
-        );
-    }, [athletes, searchTerm]);
+        return (athletes || [])
+            .filter((athlete) => {
+                if (searchTerm.trim()) {
+                    const q = searchTerm.toLowerCase();
+                    const nameMatch = athlete.name
+                        ?.toLowerCase()
+                        .includes(q);
+                    const sportMatch = athlete.sport?.name
+                        ?.toLowerCase()
+                        .includes(q);
+                    if (!nameMatch && !sportMatch) return false;
+                }
+                if (
+                    selectedSport !== "ALL" &&
+                    String(athlete.sport_id || athlete.sport?.id) !==
+                        String(selectedSport)
+                ) {
+                    return false;
+                }
+                return true;
+            })
+            .sort((a, b) => {
+                if (sortBy === "name_asc")
+                    return (a.name || "").localeCompare(b.name || "");
+                if (sortBy === "name_desc")
+                    return (b.name || "").localeCompare(a.name || "");
+                if (sortBy === "sessions_desc")
+                    return (
+                        (b.total_records || 0) - (a.total_records || 0)
+                    );
+                return 0;
+            });
+    }, [athletes, searchTerm, selectedSport, sortBy]);
 
     const filteredGroups = useMemo(() => {
-        if (!searchTerm.trim()) return groups;
+        if (!searchTerm.trim()) return groups || [];
         const q = searchTerm.toLowerCase();
-        return groups.filter(group => 
-            group.name.toLowerCase().includes(q)
+        return (groups || []).filter((group) =>
+            group.name.toLowerCase().includes(q),
         );
     }, [groups, searchTerm]);
 
-    return (
-        <AppLayout title="Program Latihan">
-            <Head title="Program Latihan" />
-            <PageHeader 
-                title="Program Latihan"
-                subtitle="Pilih athlete atau grup untuk mencatat dan mengelola sesi program latihan mereka."
-                badge="Latihan"
-                icon={Dumbbell}
-                actions={
-                    <div className="relative w-full md:w-64 group">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <Search className="text-slate-400" size={16} />
-                        </div>
-                        <input 
-                            name="search"
-                            type="text" 
-                            placeholder="Cari Athlete atau Grup..." 
-                            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-500 focus:border-slate-400 focus:ring-4 focus:ring-slate-400/10 focus:shadow-sm outline-none transition-all"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                }
-            />
+    const activeFilterCount =
+        (selectedSport !== "ALL" ? 1 : 0) +
+        (sortBy !== "name_asc" ? 1 : 0);
 
-            <div className="pb-12 space-y-6">
-                
-                {/* Tabs */}
-                <div className="flex space-x-1 bg-slate-100/50 p-1 rounded-xl border border-slate-200 w-full sm:w-fit mx-auto md:mx-0">
+    const resetFilters = () => {
+        setSearchTerm("");
+        setSelectedSport("ALL");
+        setSortBy("name_asc");
+    };
+
+    return (
+        <AppLayout
+            title="Program Latihan"
+            description="Pilih athlete atau grup untuk mencatat dan mengelola sesi program latihan mereka."
+        >
+            <Head title="Program Latihan" />
+
+            <div className="space-y-4 pb-6">
+                {/* ─── PAGE HEADER ─── */}
+                <PageHeader
+                    title="Program Latihan"
+                    description="Pilih athlete atau grup untuk mencatat dan mengelola sesi program latihan mereka."
+                    actions={
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* 1. Search Input */}
+                            <div className="relative w-44 sm:w-52">
+                                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
+                                    placeholder="Cari athlete atau grup..."
+                                    className="w-full pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-md text-xs placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all shadow-2xs"
+                                />
+                                {searchTerm && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchTerm("")}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* 2. Filter Dropdown Button & Popover */}
+                            <div className="relative">
+                                {isFilterOpen && (
+                                    <div
+                                        className="fixed inset-0 z-20 cursor-default"
+                                        onClick={() =>
+                                            setIsFilterOpen(false)
+                                        }
+                                    />
+                                )}
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setIsFilterOpen(!isFilterOpen)
+                                    }
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 hover:via-orange-50/40 hover:to-orange-100/60 text-orange-600 border border-slate-200/90 hover:border-orange-300 rounded-md text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                                >
+                                    <Filter className="w-3.5 h-3.5 text-orange-500" />
+                                    <span>Filter</span>
+                                    {activeFilterCount > 0 && (
+                                        <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black flex items-center justify-center">
+                                            {activeFilterCount}
+                                        </span>
+                                    )}
+                                    <ChevronDown
+                                        className={`w-3 h-3 text-orange-400 transition-transform ${
+                                            isFilterOpen
+                                                ? "rotate-180"
+                                                : ""
+                                        }`}
+                                    />
+                                </button>
+
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-slate-200/80 p-4 z-30 animate-in fade-in zoom-in-95 duration-100 space-y-3.5">
+                                        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                            <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                                <Filter className="w-3.5 h-3.5 text-orange-500" />
+                                                Filter Program Latihan
+                                            </h4>
+                                            <div className="flex items-center gap-2">
+                                                {activeFilterCount >
+                                                    0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={
+                                                            resetFilters
+                                                        }
+                                                        className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setIsFilterOpen(
+                                                            false,
+                                                        )
+                                                    }
+                                                    className="text-slate-400 hover:text-slate-600 p-0.5 rounded transition-colors cursor-pointer"
+                                                    title="Tutup"
+                                                >
+                                                    <X className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {sports &&
+                                            sports.length > 0 && (
+                                                <CustomSelect
+                                                    label="Cabang Olahraga"
+                                                    value={selectedSport}
+                                                    options={sportOptions}
+                                                    onChange={
+                                                        setSelectedSport
+                                                    }
+                                                />
+                                            )}
+
+                                        <CustomSelect
+                                            label="Urutkan"
+                                            value={sortBy}
+                                            options={sortOptions}
+                                            onChange={setSortBy}
+                                        />
+
+                                        <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setIsFilterOpen(false)
+                                                }
+                                                className="px-3 py-1.5 bg-gradient-to-r from-white via-white to-orange-50/70 hover:to-orange-100/80 text-orange-600 hover:text-orange-700 border border-slate-200 hover:border-slate-300 rounded-md text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                                            >
+                                                Terapkan
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    }
+                />
+
+                {/* ─── TABS ─── */}
+                <div className="flex space-x-0.5 bg-white/80 p-0.5 rounded-lg border border-slate-200 w-fit">
                     <button
-                        onClick={() => setActiveTab('individual')}
-                        className={`flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                            activeTab === 'individual' 
-                                ? 'bg-white text-slate-900 shadow-sm border border-slate-200' 
-                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                        type="button"
+                        onClick={() => setActiveTab("individual")}
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                            activeTab === "individual"
+                                ? "bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 text-orange-600 border border-slate-200/90 shadow-2xs"
+                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
                         }`}
                     >
-                        <User size={16} /> Klien Individu
+                        <User className="w-3.5 h-3.5" /> Klien Individu
                     </button>
                     <button
-                        onClick={() => setActiveTab('group')}
-                        className={`flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                            activeTab === 'group' 
-                                ? 'bg-white text-slate-900 shadow-sm border border-slate-200' 
-                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                        type="button"
+                        onClick={() => setActiveTab("group")}
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                            activeTab === "group"
+                                ? "bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 text-orange-600 border border-slate-200/90 shadow-2xs"
+                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
                         }`}
                     >
-                        <Users size={16} /> Grup Latihan
+                        <Users className="w-3.5 h-3.5" /> Grup Latihan
                     </button>
                 </div>
 
-                {activeTab === 'individual' ? (
+                {/* ─── INDIVIDUAL TAB ─── */}
+                {activeTab === "individual" ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {filteredAthletes.map(athlete => (
-                                <Link key={athlete.id} href={route('admin.individual-trainings.show', athlete.id)} className="block group">
-                                    <div className="bg-white border border-slate-200 hover:border-slate-900 hover:shadow-md rounded-xl p-5 transition-all shadow-sm flex flex-col h-full relative overflow-hidden group-hover:-translate-y-1">
-                                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                                        <div className="flex justify-between items-start mb-4 relative z-10">
-                                            <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 ">
-                                                {athlete.profile_photo_url ? (
-                                                    <img src={athlete.profile_photo_url} alt={athlete.name} className="h-full w-full object-cover" />
-                                                ) : (
-                                                    <User className="h-6 w-6 text-slate-400" />
-                                                )}
-                                            </div>
-                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-orange-500 transition-colors shadow-sm">
-                                                <ChevronRight size={18} />
-                                            </div>
-                                        </div>
-                                        <div className="relative z-10 mb-6">
-                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">
-                                                {athlete.name}
-                                            </h3>
-                                            <p className="text-xs text-slate-500 font-semibold mt-1">
-                                                {athlete.sport?.name || 'Tidak ada cabang olahraga'}
-                                            </p>
-                                        </div>
-                                        <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 relative z-10">
-                                            <div>
-                                                <p className="text-[10px] font-bold text-slate-400">Total Sesi</p>
-                                                <p className="text-sm font-semibold text-slate-900 mt-1 flex items-center gap-1.5">
-                                                    <Activity size={14} className="text-slate-400" />
-                                                    {athlete.total_records}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-slate-400">Role</p>
-                                                <p className="text-sm font-semibold text-slate-900 mt-1 flex items-center gap-1.5">
-                                                    <Users size={14} className="text-slate-400" />
-                                                    <span className="capitalize">{athlete.role}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-
-                        {filteredAthletes.length === 0 && (
-                            <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
-                                <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                    <Dumbbell className="h-6 w-6 text-slate-400" />
+                        {filteredAthletes.length === 0 ? (
+                            <div className="col-span-full py-16 px-4 flex flex-col items-center justify-center bg-white border border-dashed border-slate-200 rounded-xl text-center space-y-3">
+                                <div className="w-12 h-12 rounded-full bg-orange-50 border border-orange-200/60 flex items-center justify-center text-orange-500 shadow-2xs">
+                                    <Search className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-sm font-bold text-slate-900 ">Tidak ada Athlete ditemukan</h3>
-                                <p className="mt-1 text-xs text-slate-500">Ubah kata kunci pencarian Anda atau pastikan data athlete tersedia.</p>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-bold text-slate-800">
+                                        Tidak ada Athlete ditemukan
+                                    </h4>
+                                    <p className="text-xs text-slate-400 font-medium max-w-sm">
+                                        Ubah kata kunci pencarian Anda
+                                        atau pastikan data athlete
+                                        tersedia.
+                                    </p>
+                                </div>
+                                {activeFilterCount > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={resetFilters}
+                                        className="px-3.5 py-1.5 text-xs font-bold text-orange-600 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-md transition-all shadow-2xs cursor-pointer"
+                                    >
+                                        Reset Semua Filter
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                                {filteredAthletes.map((athlete) => {
+                                    const photo =
+                                        athlete.profile_photo_url ||
+                                        athlete.profile_photo;
+
+                                    return (
+                                        <Link
+                                            key={athlete.id}
+                                            href={route(
+                                                "admin.individual-trainings.show",
+                                                athlete.id,
+                                            )}
+                                            className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                        >
+                                            <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+                                                {/* Athlete Identity Row */}
+                                                <div className="flex items-start gap-2.5">
+                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
+                                                        {photo ? (
+                                                            <img
+                                                                src={
+                                                                    photo
+                                                                }
+                                                                alt={
+                                                                    athlete.name
+                                                                }
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <span className="leading-none select-none">
+                                                                {getInitials(
+                                                                    athlete.name,
+                                                                )}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1 space-y-0.5">
+                                                        <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">
+                                                            {athlete.name}
+                                                        </h3>
+                                                        <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                            {athlete.sport
+                                                                ?.name ||
+                                                                "Tanpa Cabor"}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Metric Tiles */}
+                                                <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
+                                                    <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                            Sesi
+                                                        </span>
+                                                        <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                            <span className="text-[11.5px] font-black text-orange-600 leading-tight">
+                                                                {athlete.total_records ||
+                                                                    0}
+                                                            </span>
+                                                            <span className="text-[8px] font-normal text-slate-400">
+                                                                latihan
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                            Role
+                                                        </span>
+                                                        <div className="mt-0.5">
+                                                            <span className="text-[9.5px] font-bold text-slate-700 leading-tight block truncate capitalize">
+                                                                {athlete.role ||
+                                                                    "-"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Card Footer */}
+                                            <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                                <span className="text-[9.5px] font-bold text-slate-500">
+                                                    Total:{" "}
+                                                    <strong className="text-slate-800">
+                                                        {athlete.total_records ||
+                                                            0}{" "}
+                                                        Sesi
+                                                    </strong>
+                                                </span>
+                                                <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                                                    Program
+                                                    <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         )}
                     </>
                 ) : (
+                    /* ─── GROUP TAB ─── */
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {filteredGroups.map(group => (
-                                <Link key={group.id} href={route('admin.group-trainings.show', group.id)} className="block group">
-                                    <div className="bg-white border border-slate-200 hover:border-slate-900 hover:shadow-md rounded-xl p-5 transition-all shadow-sm flex flex-col h-full relative overflow-hidden group-hover:-translate-y-1">
-                                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
-                                        <div className="flex justify-between items-start mb-4 relative z-10">
-                                            <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 ">
-                                                <Users className="h-6 w-6 text-slate-400" />
-                                            </div>
-                                            <div className="bg-slate-100 p-1.5 rounded-lg text-slate-400 group-hover:text-white group-hover:bg-orange-500 transition-colors shadow-sm">
-                                                <ChevronRight size={18} />
-                                            </div>
-                                        </div>
-                                        <div className="relative z-10 mb-6">
-                                            <h3 className="font-bold text-lg text-slate-900 group-hover:text-orange-500 transition-colors">
-                                                {group.name}
-                                            </h3>
-                                            <p className="text-xs text-slate-500 font-semibold mt-1">
-                                                {group.package?.name || 'Tidak ada paket'}
-                                            </p>
-                                            {group.members && group.members.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5 mt-4">
-                                                    {group.members.map(member => (
-                                                        <span key={member.id} className="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
-                                                            {member.name}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 relative z-10">
-                                            <div>
-                                                <p className="text-[10px] font-bold text-slate-400">Total Sesi</p>
-                                                <p className="text-sm font-semibold text-slate-900 mt-1 flex items-center gap-1.5">
-                                                    <CalendarIcon size={14} className="text-slate-400" />
-                                                    {group.total_records}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold text-slate-400">Total Anggota</p>
-                                                <p className="text-sm font-semibold text-slate-900 mt-1 flex items-center gap-1.5">
-                                                    <Users size={14} className="text-slate-400" />
-                                                    {group.members?.length || 0}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-
-                        {filteredGroups.length === 0 && (
-                            <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
-                                <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                    <Users className="h-6 w-6 text-slate-400" />
+                        {filteredGroups.length === 0 ? (
+                            <div className="col-span-full py-16 px-4 flex flex-col items-center justify-center bg-white border border-dashed border-slate-200 rounded-xl text-center space-y-3">
+                                <div className="w-12 h-12 rounded-full bg-orange-50 border border-orange-200/60 flex items-center justify-center text-orange-500 shadow-2xs">
+                                    <Users className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-sm font-bold text-slate-900 ">Tidak ada Grup ditemukan</h3>
-                                <p className="mt-1 text-xs text-slate-500">Buat grup baru di menu Manajemen Pengguna terlebih dahulu.</p>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-bold text-slate-800">
+                                        Tidak ada Grup ditemukan
+                                    </h4>
+                                    <p className="text-xs text-slate-400 font-medium max-w-sm">
+                                        Buat grup baru di menu Manajemen
+                                        Pengguna terlebih dahulu.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                                {filteredGroups.map((group) => (
+                                    <Link
+                                        key={group.id}
+                                        href={route(
+                                            "admin.group-trainings.show",
+                                            group.id,
+                                        )}
+                                        className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                    >
+                                        <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+                                            {/* Group Identity */}
+                                            <div className="flex items-start gap-2.5">
+                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0">
+                                                    <Users className="w-5 h-5" />
+                                                </div>
+
+                                                <div className="min-w-0 flex-1 space-y-0.5">
+                                                    <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">
+                                                        {group.name}
+                                                    </h3>
+                                                    <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                        {group.package
+                                                            ?.name ||
+                                                            "Tidak ada paket"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Members Preview */}
+                                            {group.members &&
+                                                group.members.length >
+                                                    0 && (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {group.members
+                                                            .slice(0, 4)
+                                                            .map(
+                                                                (
+                                                                    member,
+                                                                ) => (
+                                                                    <span
+                                                                        key={
+                                                                            member.id
+                                                                        }
+                                                                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
+                                                                    >
+                                                                        {
+                                                                            member.name
+                                                                        }
+                                                                    </span>
+                                                                ),
+                                                            )}
+                                                        {group.members
+                                                            .length >
+                                                            4 && (
+                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-50 border border-orange-200/70 text-orange-600">
+                                                                +
+                                                                {group
+                                                                    .members
+                                                                    .length -
+                                                                    4}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                            {/* Metric Tiles */}
+                                            <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
+                                                <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                        Sesi
+                                                    </span>
+                                                    <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                        <span className="text-[11.5px] font-black text-orange-600 leading-tight">
+                                                            {group.total_records ||
+                                                                0}
+                                                        </span>
+                                                        <span className="text-[8px] font-normal text-slate-400">
+                                                            latihan
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                        Anggota
+                                                    </span>
+                                                    <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                        <span className="text-[11.5px] font-black text-teal-700 leading-tight">
+                                                            {group.members
+                                                                ?.length ||
+                                                                0}
+                                                        </span>
+                                                        <span className="text-[8px] font-normal text-slate-400">
+                                                            orang
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Card Footer */}
+                                        <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                            <span className="text-[9.5px] font-bold text-slate-500">
+                                                {group.members?.length ||
+                                                    0}{" "}
+                                                Anggota
+                                            </span>
+                                            <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                                                Program
+                                                <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                            </span>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         )}
                     </>
                 )}
+
+                <PageFooter className="!mt-8 !pt-4 !pb-1" />
             </div>
         </AppLayout>
     );

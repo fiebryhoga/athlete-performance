@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, ClipboardList, Shield, Settings, Activity, HeartPulse, Dumbbell, Scale, Calendar, ChevronLeft, ChevronRight, Target, BarChart3, Package, Flame, Building2
+    LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -65,31 +65,31 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                 { name: 'Dashboard', route: 'dashboard', checkPath: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Profiling', route: 'admin.athletes.index', checkPath: '/admin/athletes', icon: Users, roles: ['superadmin', 'coach'] },
                 { name: 'Profil Fisik', route: 'athlete.profiling', checkPath: '/profiling', icon: Target, roles: ['athlete'] },
-                { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Program Latihan', route: 'admin.individual-trainings.index', checkPath: '/admin/individual-trainings', icon: CalendarDays, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Absensi Gym', route: 'admin.gym-attendance.index', checkPath: '/admin/gym-attendance', icon: Building2, roles: ['superadmin', 'coach'], condition: () => userRole === 'superadmin' || props.auth.user.is_gym_guard },
             ]
         },
         {
             title: 'Tes & Evaluasi',
             items: [
-                { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: ClipboardList, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Tes Fisik', route: 'admin.performance.index', checkPath: '/performance', icon: Timer, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Komposisi Tubuh', route: 'admin.composition-tests.index', checkPath: '/admin/composition', icon: Scale, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Kalkulator PHV', route: 'admin.phv-calculator.index', checkPath: '/admin/phv-calculator', icon: HeartPulse, roles: ['superadmin', 'coach'] },
-                { name: 'Analysis DPA', route: 'admin.athletes.dpa.index', checkPath: '/admin/athletes/dpa', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Kalkulator PHV', route: 'admin.phv-calculator.index', checkPath: '/admin/phv-calculator', icon: Calculator, roles: ['superadmin', 'coach'] },
+                { name: 'Analysis DPA', route: 'admin.athletes.dpa.index', checkPath: '/admin/athletes/dpa', icon: Scan, roles: ['superadmin', 'coach', 'athlete'] },
             ]
         },
         {
             title: 'Nutrisi & Diet',
             items: [
-                { name: 'Rencana Makan', route: 'admin.meal-plans.index', checkPath: '/admin/meal-plans', icon: Flame, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Rencana Makan', route: 'admin.meal-plans.index', checkPath: '/admin/meal-plans', icon: UtensilsCrossed, roles: ['superadmin', 'coach', 'athlete'] },
             ]
         },
         {
             title: 'Recovery Tracking',
             items: [
                 { name: 'Wellness & Beban', route: 'admin.wellness-rpe.index', checkPath: '/admin/wellness-rpe', icon: HeartPulse, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Recovery Strategi', route: 'admin.recovery-strategies.index', checkPath: '/admin/recovery-strategies', icon: Calendar, roles: ['superadmin', 'coach', 'athlete'] },
-                { name: 'Pantauan Harian', route: 'admin.daily-metrics.index', checkPath: '/admin/daily-metrics', icon: Activity, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Recovery Strategi', route: 'admin.recovery-strategies.index', checkPath: '/admin/recovery-strategies', icon: BatteryCharging, roles: ['superadmin', 'coach', 'athlete'] },
+                { name: 'Pantauan Harian', route: 'admin.daily-metrics.index', checkPath: '/admin/daily-metrics', icon: CalendarCheck, roles: ['superadmin', 'coach', 'athlete'] },
                 { name: 'Analisis Beban', route: 'admin.load-analysis.index', checkPath: '/admin/load-analysis', icon: BarChart3, roles: ['superadmin', 'coach', 'athlete'] },
             ]
         },
@@ -98,15 +98,15 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             items: [
                 { name: 'Kategori Olahraga', route: 'admin.sports.index', checkPath: '/admin/sports', icon: Trophy, roles: ['superadmin', 'coach'] },
                 { name: 'Master Exercise', route: 'admin.exercises.index', checkPath: '/admin/exercises', icon: Dumbbell, roles: ['superadmin', 'coach'] },
-                { name: 'DPA Compensations', route: 'admin.dpa-compensations.index', checkPath: '/admin/dpa-compensations', icon: ClipboardList, roles: ['superadmin', 'coach'] },
+                { name: 'DPA Compensations', route: 'admin.dpa-compensations.index', checkPath: '/admin/dpa-compensations', icon: BookOpen, roles: ['superadmin', 'coach'] },
                 { name: 'Manajemen Paket', route: 'admin.packages.index', checkPath: '/admin/packages', icon: Package, roles: ['superadmin'] },
             ]
         },
         {
             title: 'Pengaturan',
             items: [
-                { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: Shield, roles: ['superadmin', 'coach'] },
-                { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: BarChart3, roles: ['superadmin'] },
+                { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: UserCog, roles: ['superadmin', 'coach'] },
+                { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: FileSpreadsheet, roles: ['superadmin'] },
                 { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
             ]
         }

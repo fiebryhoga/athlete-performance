@@ -1,0 +1,98 @@
+import { jsxs, jsx } from "react/jsx-runtime";
+import "react";
+import { Head, Link } from "@inertiajs/react";
+import { A as AppLayout } from "./AppLayout-rxyXD7Jy.js";
+import { P as PageHeader } from "./PageHeader-Dbzk0fkj.js";
+import { Activity, Calendar, CheckCircle2, Circle } from "lucide-react";
+import "axios";
+function AthleteIndex({ auth, days }) {
+  return /* @__PURE__ */ jsxs(
+    AppLayout,
+    {
+      user: auth.user,
+      headerTitle: "Wellness & RPE",
+      headerDescription: "Isi form wellness dan RPE harian Anda.",
+      children: [
+        /* @__PURE__ */ jsx(Head, { title: "Wellness & RPE" }),
+        /* @__PURE__ */ jsxs("div", { className: "pb-12 space-y-6", children: [
+          /* @__PURE__ */ jsx(
+            PageHeader,
+            {
+              title: "Daily Wellness & RPE",
+              subtitle: "Lengkapi data wellness dan latihan harian Anda untuk pemantauan optimal.",
+              badge: "Athlete View",
+              icon: Activity
+            }
+          ),
+          /* @__PURE__ */ jsxs("div", { className: "bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden", children: [
+            /* @__PURE__ */ jsx("div", { className: "p-6 border-b border-slate-100 bg-slate-50 flex items-center justify-between", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsx("div", { className: "p-2.5 bg-white rounded-xl shadow-sm border border-slate-200 text-orange-500", children: /* @__PURE__ */ jsx(Calendar, { size: 20 }) }),
+              /* @__PURE__ */ jsxs("div", { children: [
+                /* @__PURE__ */ jsx("h3", { className: "text-base font-bold text-slate-900 tracking-tight", children: "Riwayat 7 Hari Terakhir" }),
+                /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-slate-500", children: "Pilih hari untuk mengisi atau melihat log." })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsx("div", { className: "divide-y divide-slate-100", children: days.map((day) => /* @__PURE__ */ jsxs(
+              "div",
+              {
+                className: `flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:px-6 hover:bg-orange-50/50 transition-colors group ${day.is_today ? "bg-orange-50/10" : ""}`,
+                children: [
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4", children: [
+                    /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center justify-center w-12 h-12 bg-white rounded-xl border border-slate-200 shadow-sm shrink-0", children: [
+                      /* @__PURE__ */ jsx("span", { className: `text-[10px] font-bold ${day.is_today ? "text-orange-500" : "text-slate-400"}`, children: day.day_name.substring(0, 3) }),
+                      /* @__PURE__ */ jsx("span", { className: `text-lg font-bold leading-none mt-0.5 ${day.is_today ? "text-slate-900" : "text-slate-700"}`, children: day.formatted_date.split(" ")[0] })
+                    ] }),
+                    /* @__PURE__ */ jsxs("div", { children: [
+                      /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2", children: [
+                        /* @__PURE__ */ jsx("h4", { className: `text-sm font-bold ${day.is_today ? "text-orange-500" : "text-slate-900"}`, children: day.is_today ? "Hari Ini" : day.formatted_date }),
+                        day.is_today && /* @__PURE__ */ jsxs("span", { className: "relative flex h-2 w-2", children: [
+                          /* @__PURE__ */ jsx("span", { className: "animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75" }),
+                          /* @__PURE__ */ jsx("span", { className: "relative inline-flex rounded-full h-2 w-2 bg-orange-500" })
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1.5 mt-1", children: [
+                        day.is_filled ? /* @__PURE__ */ jsxs("span", { className: "inline-flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100", children: [
+                          /* @__PURE__ */ jsx(CheckCircle2, { size: 12 }),
+                          " Selesai"
+                        ] }) : /* @__PURE__ */ jsxs("span", { className: "inline-flex items-center gap-1 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200", children: [
+                          /* @__PURE__ */ jsx(Circle, { size: 12 }),
+                          " Belum Diisi Lengkap"
+                        ] }),
+                        day.wellness_score !== null && /* @__PURE__ */ jsxs("span", { className: "text-xs font-semibold text-slate-500", children: [
+                          "• Score: ",
+                          /* @__PURE__ */ jsx("span", { className: "text-slate-700 font-bold", children: day.wellness_score })
+                        ] })
+                      ] })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 mt-2 sm:mt-0", children: [
+                    /* @__PURE__ */ jsx(
+                      Link,
+                      {
+                        href: route("admin.wellness-rpe.session-form", { date: day.date, mode: "wellness" }),
+                        className: "flex-1 sm:flex-none text-center px-4 py-2 bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 hover:border-orange-500 hover:text-orange-500 hover:shadow-sm transition-all",
+                        children: "Isi Wellness"
+                      }
+                    ),
+                    /* @__PURE__ */ jsx(
+                      Link,
+                      {
+                        href: route("admin.wellness-rpe.session-form", { date: day.date, mode: "rpe" }),
+                        className: "flex-1 sm:flex-none text-center px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-orange-500 hover:shadow-md hover:shadow-orange-500/20 transition-all",
+                        children: "Isi RPE"
+                      }
+                    )
+                  ] })
+                ]
+              },
+              day.date
+            )) })
+          ] })
+        ] })
+      ]
+    }
+  );
+}
+export {
+  AthleteIndex as default
+};

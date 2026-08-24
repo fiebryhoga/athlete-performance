@@ -682,7 +682,10 @@ class ReportController extends Controller
         $itemAnalysis = []; 
 
         if ($hasData) {
-            $categoryStats = $allResults->groupBy(function($res) {
+            $latestTest = $tests->last();
+            $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
+
+            $categoryStats = ($latestTest ? $latestTest->results : collect())->groupBy(function($res) {
                 return $res->testItem->category->name ?? 'Uncategorized';
             })->map(function ($items, $catName) {
                 $avg = round($items->avg('score'), 1);
@@ -706,9 +709,6 @@ class ReportController extends Controller
                     'fullMark' => 100
                 ];
             })->values();
-
-            $latestTest = $tests->last();
-            $previousTests = $tests->count() > 1 ? $tests->slice(0, -1)->take(-4)->values() : collect();
 
             $latestCats = $latestTest ? $latestTest->results->groupBy(function($r) {
                 return $r->testItem->category->name ?? 'Uncat';
@@ -736,6 +736,7 @@ class ReportController extends Controller
                     $item = $res->testItem;
                     $rawScore = floatval($res->score);
                     $prevScoreForGrowth = 0;
+                    $prevResultVal = null;
                     $growth = 0;
 
                     if ($previousTests->count() > 0) {
@@ -743,6 +744,7 @@ class ReportController extends Controller
                         $resPrev = $lastPrev->results->where('test_item_id', $item->id)->first();
                         $pScore = $resPrev ? floatval($resPrev->score) : 0;
                         $prevScoreForGrowth = $pScore;
+                        $prevResultVal = $resPrev ? $resPrev->result : null;
                         if ($prevScoreForGrowth > 0) {
                             $growth = (($rawScore - $prevScoreForGrowth) / $prevScoreForGrowth) * 100;
                         }
@@ -756,6 +758,7 @@ class ReportController extends Controller
                         'target_value' => $item->target_value,
                         'result_value' => $res->result,
                         'score' => round($rawScore, 1),
+                        'previous_value' => $prevResultVal,
                         'previous_score' => round($prevScoreForGrowth, 1),
                         'growth' => round($growth, 1)
                     ];

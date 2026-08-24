@@ -257,7 +257,7 @@ class AthleteController extends Controller
                 }
 
                 
-                $categoryStats = $allResults->groupBy(function($res) {
+                $categoryStats = $latestTest->results->groupBy(function($res) {
                         return $res->testItem->category->name ?? 'Uncategorized';
                     })
                     ->map(function ($items, $catName) {
@@ -314,6 +314,7 @@ class AthleteController extends Controller
                     $item = $res->testItem;
                     $rawScore = floatval($res->score);
                     $prevScoreForGrowth = 0;
+                    $prevResultVal = null;
                     $growth = 0;
 
                     $data = [
@@ -333,9 +334,9 @@ class AthleteController extends Controller
                             
                             $data['prev_' . $index] = round($pScore, 1);
                             
-                            
                             if ($index === $previousTests->count() - 1) {
                                 $prevScoreForGrowth = $pScore;
+                                $prevResultVal = $resPrev ? $resPrev->result : null;
                             }
                         }
 
@@ -344,6 +345,7 @@ class AthleteController extends Controller
                         }
                     }
 
+                    $data['previous_value'] = $prevResultVal;
                     $data['previous_score'] = round($prevScoreForGrowth, 1);
                     $data['growth'] = round($growth, 1);
 

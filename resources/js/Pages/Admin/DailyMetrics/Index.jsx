@@ -1,98 +1,442 @@
-import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link } from '@inertiajs/react';
-import { Activity, Search, ChevronRight, CalendarDays } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState, useMemo } from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import PageHeader from "@/Components/Common/PageHeader";
+import PageFooter from "@/Components/Common/PageFooter";
+import {
+    Search,
+    Filter,
+    ChevronDown,
+    Check,
+    X,
+    ArrowUpRight,
+    CalendarDays,
+} from "lucide-react";
 
-export default function Index({ athletes }) {
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const filteredAthletes = athletes?.filter(athlete =>
-        athlete.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+// --- CUSTOM SELECT COMPONENT ---
+function CustomSelect({
+    label,
+    value,
+    options,
+    onChange,
+    placeholder = "Pilih...",
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectedOption = options.find(
+        (opt) => String(opt.value) === String(value),
+    );
 
     return (
-        <AppLayout title="Daily Monitoring">
+        <div className="space-y-1 relative">
+            {label && (
+                <label className="block text-[11px] font-bold text-slate-600">
+                    {label}
+                </label>
+            )}
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-800 transition-all text-left shadow-2xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+            >
+                <span className="truncate">
+                    {selectedOption ? selectedOption.label : placeholder}
+                </span>
+                <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 shrink-0 ml-1.5 transition-transform ${
+                        isOpen ? "rotate-180 text-orange-500" : ""
+                    }`}
+                />
+            </button>
+
+            {isOpen && (
+                <>
+                    <div
+                        className="fixed inset-0 z-40 cursor-default"
+                        onClick={() => setIsOpen(false)}
+                    />
+                    <div className="absolute left-0 top-full mt-1 w-full max-h-48 overflow-y-auto bg-white rounded-md shadow-xl border border-slate-200 p-1 z-50 animate-in fade-in zoom-in-95 duration-100 space-y-0.5 custom-scrollbar">
+                        {options.map((opt) => {
+                            const isSelected =
+                                String(opt.value) === String(value);
+                            return (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(opt.value);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs transition-colors text-left ${
+                                        isSelected
+                                            ? "bg-orange-50 text-orange-700 font-bold"
+                                            : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-medium"
+                                    }`}
+                                >
+                                    <span className="truncate">
+                                        {opt.label}
+                                    </span>
+                                    {isSelected && (
+                                        <Check className="w-3.5 h-3.5 text-orange-600 shrink-0 ml-1.5" />
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+// --- HELPER: INITIALS ---
+function getInitials(name) {
+    if (!name) return "??";
+    const words = name.trim().split(" ");
+    if (words.length >= 2)
+        return `${words[0][0]}${words[1][0]}`.toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+}
+
+export default function Index({ athletes = [], sports = [] }) {
+    const { auth } = usePage().props;
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedSport, setSelectedSport] = useState("ALL");
+    const [sortBy, setSortBy] = useState("name_asc");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    // Options for Filters
+    const sportOptions = useMemo(() => {
+        const list = [{ value: "ALL", label: "Semua Cabor" }];
+        if (sports && sports.length > 0) {
+            sports.forEach((s) => list.push({ value: s.id, label: s.name }));
+        }
+        return list;
+    }, [sports]);
+
+    const sortOptions = [
+        { value: "name_asc", label: "Nama (A - Z)" },
+        { value: "name_desc", label: "Nama (Z - A)" },
+        { value: "records_desc", label: "Record Terbanyak" },
+    ];
+
+    // Filter & Sort Logic
+    const filteredAthletes = useMemo(() => {
+        return (athletes || [])
+            .filter((athlete) => {
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const nameMatch = athlete.name
+                        ?.toLowerCase()
+                        .includes(q);
+                    const sportMatch = athlete.sport?.name
+                        ?.toLowerCase()
+                        .includes(q);
+                    if (!nameMatch && !sportMatch) return false;
+                }
+                if (
+                    selectedSport !== "ALL" &&
+                    String(athlete.sport_id || athlete.sport?.id) !==
+                        String(selectedSport)
+                ) {
+                    return false;
+                }
+                return true;
+            })
+            .sort((a, b) => {
+                if (sortBy === "name_asc")
+                    return (a.name || "").localeCompare(b.name || "");
+                if (sortBy === "name_desc")
+                    return (b.name || "").localeCompare(a.name || "");
+                if (sortBy === "records_desc")
+                    return (b.total_records || 0) - (a.total_records || 0);
+                return 0;
+            });
+    }, [athletes, searchQuery, selectedSport, sortBy]);
+
+    const activeFilterCount =
+        (selectedSport !== "ALL" ? 1 : 0) +
+        (sortBy !== "name_asc" ? 1 : 0);
+
+    const resetFilters = () => {
+        setSearchQuery("");
+        setSelectedSport("ALL");
+        setSortBy("name_asc");
+    };
+
+    return (
+        <AppLayout
+            title="Daily Monitoring"
+            description="Pilih atlet untuk melihat atau mengisi metrik keseharian mereka."
+        >
             <Head title="Daily Monitoring" />
 
-            
-            <div className="bg-white p-5 md:p-8 rounded-lg border border-slate-200 shadow-sm mb-6 md:mb-8 relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 md:gap-6">
-                
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
-                
-                <div className="relative z-10 w-full lg:w-auto">
-                    <span className="text-[10px] font-bold text-orange-500 bg-orange-50 border border-orange-100 px-3 py-1 rounded-full mb-2.5 md:mb-3 inline-block shadow-sm">
-                        Wellness & Readiness
-                    </span>
-                    <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        Daily Monitoring
-                    </h2>
-                    <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">Pilih atlet untuk melihat atau mengisi metrik keseharian mereka.</p>
-                </div>
+            <div className="space-y-4 pb-6">
+                {/* ─── PAGE HEADER ─── */}
+                <PageHeader
+                    title="Daily Monitoring"
+                    description="Pilih atlet untuk melihat atau mengisi metrik keseharian mereka."
+                    actions={
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* 1. Search Input */}
+                            <div className="relative w-44 sm:w-52">
+                                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    placeholder="Cari nama atlet..."
+                                    className="w-full pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-md text-xs placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all shadow-2xs"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery("")}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
+                            </div>
 
-                <div className="relative z-10 w-full lg:w-auto flex items-center gap-3">
-                    <div className="relative w-full sm:w-72 md:w-80">
-                        <Search className="absolute left-3.5 top-3 w-4 h-4 md:w-4 md:h-4 text-slate-400" />
-                        <input 
-                            type="text" 
-                            placeholder="Cari nama atlet..." 
-                            value={searchQuery} 
-                            onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm" 
-                        />
-                    </div>
-                </div>
-            </div>
+                            {/* 2. Filter Dropdown Button & Popover */}
+                            <div className="relative">
+                                {isFilterOpen && (
+                                    <div
+                                        className="fixed inset-0 z-20 cursor-default"
+                                        onClick={() =>
+                                            setIsFilterOpen(false)
+                                        }
+                                    />
+                                )}
 
-            
-            {filteredAthletes.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 animate-in fade-in duration-300">
-                    {filteredAthletes.map((athlete) => (
-                        <Link 
-                            key={athlete.id} 
-                            href={route('admin.daily-metrics.show', athlete.id)} 
-                            className="group bg-white p-4 md:p-5 rounded-lg shadow-sm border border-slate-200 hover:border-orange-200 hover:shadow-lg transition-all hover:-translate-y-1 relative overflow-hidden flex items-center justify-between"
-                        >
-                            <div className="flex items-center gap-3 md:gap-4 min-w-0 pr-4">
-                                
-                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-lg md:text-xl shrink-0 border-2 border-slate-100 shadow-sm group-hover:border-orange-200 transition-colors">
-                                    {athlete.profile_photo_url ? (
-                                        <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        athlete.name.charAt(0).toUpperCase()
-                                    )}
-                                </div>
-                                
-                                <div className="min-w-0">
-                                    <h3 className="font-bold text-slate-800 text-base md:text-lg group-hover:text-orange-500 transition-colors truncate">
-                                        {athlete.name}
-                                    </h3>
-                                    <div className="flex flex-wrap items-center gap-1.5 md:gap-2 mt-1">
-                                        <span className="text-[10px] md:text-xs font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 truncate max-w-[100px] md:max-w-[120px]">
-                                            {athlete.sport?.name || 'Tanpa Cabor'}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setIsFilterOpen(!isFilterOpen)
+                                    }
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 hover:via-orange-50/40 hover:to-orange-100/60 text-orange-600 border border-slate-200/90 hover:border-orange-300 rounded-md text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                                >
+                                    <Filter className="w-3.5 h-3.5 text-orange-500" />
+                                    <span>Filter</span>
+                                    {activeFilterCount > 0 && (
+                                        <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black flex items-center justify-center">
+                                            {activeFilterCount}
                                         </span>
-                                        <span className="text-[9px] md:text-[10px] font-bold text-slate-400 flex items-center gap-1 shrink-0">
-                                            <CalendarDays className="w-2.5 h-2.5 md:w-3 md:h-3" /> {athlete.total_records || 0} Record
+                                    )}
+                                    <ChevronDown
+                                        className={`w-3 h-3 text-orange-400 transition-transform ${
+                                            isFilterOpen
+                                                ? "rotate-180"
+                                                : ""
+                                        }`}
+                                    />
+                                </button>
+
+                                {/* Filter Modal Popover */}
+                                {isFilterOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-slate-200/80 p-4 z-30 animate-in fade-in zoom-in-95 duration-100 space-y-3.5">
+                                        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                            <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                                <Filter className="w-3.5 h-3.5 text-orange-500" />
+                                                Filter Daily Monitoring
+                                            </h4>
+                                            <div className="flex items-center gap-2">
+                                                {activeFilterCount >
+                                                    0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={
+                                                            resetFilters
+                                                        }
+                                                        className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setIsFilterOpen(
+                                                            false,
+                                                        )
+                                                    }
+                                                    className="text-slate-400 hover:text-slate-600 p-0.5 rounded transition-colors cursor-pointer"
+                                                    title="Tutup"
+                                                >
+                                                    <X className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {sports &&
+                                            sports.length > 0 && (
+                                                <CustomSelect
+                                                    label="Cabang Olahraga"
+                                                    value={selectedSport}
+                                                    options={sportOptions}
+                                                    onChange={
+                                                        setSelectedSport
+                                                    }
+                                                />
+                                            )}
+
+                                        <CustomSelect
+                                            label="Urutkan"
+                                            value={sortBy}
+                                            options={sortOptions}
+                                            onChange={setSortBy}
+                                        />
+
+                                        <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setIsFilterOpen(false)
+                                                }
+                                                className="px-3 py-1.5 bg-gradient-to-r from-white via-white to-orange-50/70 hover:to-orange-100/80 text-orange-600 hover:text-orange-700 border border-slate-200 hover:border-slate-300 rounded-md text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                                            >
+                                                Terapkan
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    }
+                />
+
+                {/* ─── ATHLETE CARDS GRID ─── */}
+                {filteredAthletes.length === 0 ? (
+                    <div className="col-span-full py-16 px-4 flex flex-col items-center justify-center bg-white border border-dashed border-slate-200 rounded-xl text-center space-y-3">
+                        <div className="w-12 h-12 rounded-full bg-orange-50 border border-orange-200/60 flex items-center justify-center text-orange-500 shadow-2xs">
+                            <Search className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold text-slate-800">
+                                Tidak ada data atlet yang sesuai
+                            </h4>
+                            <p className="text-xs text-slate-400 font-medium max-w-sm">
+                                Coba ubah kata kunci pencarian atau atur
+                                ulang filter.
+                            </p>
+                        </div>
+                        {activeFilterCount > 0 && (
+                            <button
+                                type="button"
+                                onClick={resetFilters}
+                                className="px-3.5 py-1.5 text-xs font-bold text-orange-600 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-md transition-all shadow-2xs cursor-pointer"
+                            >
+                                Reset Semua Filter
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                        {filteredAthletes.map((athlete) => {
+                            const photo =
+                                athlete.profile_photo_url ||
+                                athlete.profile_photo;
+
+                            return (
+                                <Link
+                                    key={athlete.id}
+                                    href={route(
+                                        "admin.daily-metrics.show",
+                                        athlete.id,
+                                    )}
+                                    className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                >
+                                    <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+                                        {/* Athlete Identity Row */}
+                                        <div className="flex items-start gap-2.5">
+                                            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
+                                                {photo ? (
+                                                    <img
+                                                        src={photo}
+                                                        alt={
+                                                            athlete.name
+                                                        }
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="leading-none select-none">
+                                                        {getInitials(
+                                                            athlete.name,
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="min-w-0 flex-1 space-y-0.5">
+                                                <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">
+                                                    {athlete.name}
+                                                </h3>
+                                                <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                    {athlete.sport
+                                                        ?.name ||
+                                                        "Tanpa Cabor"}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Metric Tiles */}
+                                        <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
+                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                    Record
+                                                </span>
+                                                <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                    <span className="text-[11.5px] font-black text-orange-600 leading-tight">
+                                                        {athlete.total_records ||
+                                                            0}
+                                                    </span>
+                                                    <span className="text-[8px] font-normal text-slate-400">
+                                                        data
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                    Cabor
+                                                </span>
+                                                <div className="mt-0.5">
+                                                    <span className="text-[9.5px] font-bold text-slate-700 leading-tight block truncate">
+                                                        {athlete.sport
+                                                            ?.name ||
+                                                            "-"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Card Footer */}
+                                    <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                        <span className="text-[9.5px] font-bold text-slate-500">
+                                            Total:{" "}
+                                            <strong className="text-slate-800">
+                                                {athlete.total_records ||
+                                                    0}{" "}
+                                                Record
+                                            </strong>
+                                        </span>
+                                        <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                                            Detail
+                                            <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                         </span>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div className="p-1.5 md:p-2 rounded-lg text-slate-300 group-hover:text-orange-500 group-hover:bg-orange-50 transition-all group-hover:translate-x-1 shrink-0">
-                                <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                
-                <div className="flex flex-col items-center justify-center py-16 md:py-20 bg-white rounded-lg border border-dashed border-slate-300 text-center shadow-sm mx-2 md:mx-0">
-                    <div className="p-4 bg-orange-50/50 rounded-full mb-3">
-                        <Search className="w-6 h-6 md:w-8 md:h-8 text-orange-200" />
+                                </Link>
+                            );
+                        })}
                     </div>
-                    <h3 className="text-slate-800 font-bold text-base md:text-lg">Atlet tidak ditemukan</h3>
-                    <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium px-4">Coba gunakan kata kunci pencarian yang lain.</p>
-                </div>
-            )}
+                )}
+
+                <PageFooter className="!mt-8 !pt-4 !pb-1" />
+            </div>
         </AppLayout>
     );
 }

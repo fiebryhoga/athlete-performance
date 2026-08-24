@@ -101,6 +101,7 @@ export default function AthleteProfiling({
                     latest_composition={latest_composition}
                     latest_wellness={latest_wellness}
                     latest_dpa={latest_dpa}
+                    galleries={galleries && galleries.length > 0 ? galleries : user?.galleries || []}
                 />
             );
             const asPdf = pdf();

@@ -915,15 +915,12 @@ class DashboardController extends Controller
 
         $bestCategory = '-';
         $categoryStats = collect();
-        if ($hasData) {
-            $catScores = $tests->flatMap(function ($test) { return $test->results; })
-                ->groupBy(function ($result) { return optional(optional($result->testItem)->category)->name ?? 'General'; })
-                ->map(function ($items) { return $items->avg('score'); })
-                ->sortDesc();
-            $bestCategory = $catScores->keys()->first() ?? '-';
+        $radarData = [];
+        $comparisonData = [];
+        $itemAnalysis = [];
 
-            $allResults = $tests->flatMap(function ($test) { return $test->results; });
-            $categoryStats = $allResults->groupBy(function($res) {
+        if ($latestTest) {
+            $categoryStats = $latestTest->results->groupBy(function($res) {
                 return optional(optional($res->testItem)->category)->name ?? 'General';
             })->map(function ($items, $catName) {
                 $avg = round($items->avg('score'), 1);
@@ -934,16 +931,12 @@ class DashboardController extends Controller
                     'gap' => $avg - 100
                 ];
             });
-        }
 
-        $strengths = $categoryStats->filter(fn($item) => $item['score'] > 70)->sortByDesc('score')->values();
-        $weaknesses = $categoryStats->filter(fn($item) => $item['score'] <= 70)->sortBy('score')->values();
+            $bestCategory = $categoryStats->sortByDesc('score')->keys()->first() ?? '-';
 
-        $radarData = [];
-        $comparisonData = [];
-        $itemAnalysis = [];
+            $strengths = $categoryStats->filter(fn($item) => $item['score'] > 70)->sortByDesc('score')->values();
+            $weaknesses = $categoryStats->filter(fn($item) => $item['score'] <= 70)->sortBy('score')->values();
 
-        if ($latestTest) {
             $latestCats = $latestTest->results->groupBy(function($r) {
                 return optional(optional($r->testItem)->category)->name ?? 'General';
             })->map(function($i) { return round($i->avg('score'), 1); });

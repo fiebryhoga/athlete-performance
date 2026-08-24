@@ -137,7 +137,7 @@ export default function Index({ tests = [], sports = [], filters = {} }) {
         <AppLayout title="Tes Fisik">
             <Head title="Tes Fisik" />
 
-            <div className="space-y-4 max-w-7xl mx-auto">
+            <div className="space-y-4 mx-auto">
                 {/* ─── 1. PAGE HEADER ─── */}
                 <PageHeader
                     title="Tes Fisik"

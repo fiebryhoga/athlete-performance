@@ -1,518 +1,345 @@
 import React from "react";
 import {
     Document,
+    Page,
     View,
     Text,
     Image,
     StyleSheet,
     Svg,
-    Path,
     Line as SvgLine,
     Polygon,
+    Circle,
     Rect,
+    Path,
 } from "@react-pdf/renderer";
-import PdfPageTemplate from "@/Components/Pdf/PdfPageTemplate";
+
+// ─── THEME & COLOR PALETTE (EXACT FIT FOR REFERENCE REPORT) ───
+const THEME = {
+    headerBg: "#ea580c", // Vibrant Olympus Orange #ea580c
+    headerText: "#ffffff",
+    border: "#1e293b",
+    borderLight: "#cbd5e1",
+    borderLighter: "#e2e8f0",
+    bgLight: "#f8fafc",
+    bgRowAlt: "#f8fafc",
+    textDark: "#0f172a",
+    textMuted: "#64748b",
+    textSub: "#334155",
+    accentGreen: "#16a34a",
+    accentRed: "#dc2626",
+    accentOrange: "#ea580c",
+};
 
 const styles = StyleSheet.create({
-    // ─── 1. FULL WIDTH HERO PROFILE CARD ───
-    profileCard: {
-        width: "100%",
-        borderWidth: 0.5,
-        borderColor: "#e2e8f0",
-        borderRadius: 6,
+    page: {
+        paddingTop: 20,
+        paddingBottom: 20,
+        paddingHorizontal: 22,
         backgroundColor: "#ffffff",
-        marginBottom: 10,
-        overflow: "hidden",
-    },
-    // Banner: solid warm yellow-orange
-    profileBanner: {
-        height: 40,
-        backgroundColor: "#fff8f0",
-        borderBottomWidth: 0.5,
-        borderBottomColor: "#fed7aa",
-        position: "relative",
-    },
-    // PrintDoc: bg-white/95 border border-slate-200 text-slate-700 rounded-full
-    profileTagPill: {
-        backgroundColor: "#ffffff",
-        borderWidth: 0.6,
-        borderColor: "#cbd5e1",
-        borderRadius: 14,
-        paddingHorizontal: 7,
-        paddingVertical: 1.5,
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    profileTagText: {
+        fontFamily: "Helvetica",
         fontSize: 6.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#334155",
+        color: THEME.textDark,
     },
-    // PrintDoc: px-3 pb-2 pt-0.5
-    profileMainContent: {
-        paddingHorizontal: 14,
-        paddingBottom: 8,
-        paddingTop: 2,
+
+    // ─── 1. TOP MAIN HEADER BANNER ───
+    mainHeaderBanner: {
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1.5,
+        borderBottomColor: "#0f172a",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        paddingHorizontal: 0,
+        paddingBottom: 5,
+        marginBottom: 7,
     },
-    // PrintDoc: flex items-center gap-3
-    profileIdentity: {
+    mainHeaderLeft: {
+        flexDirection: "column",
+    },
+    mainHeaderTitle: {
+        color: "#0f172a",
+        fontSize: 12,
+        fontFamily: "Helvetica-Bold",
+        textTransform: "uppercase",
+        letterSpacing: 0.3,
+    },
+    mainHeaderSubtitle: {
+        color: "#64748b",
+        fontSize: 6.8,
+        fontFamily: "Helvetica",
+        marginTop: 2,
+    },
+
+    // ─── 2-COLUMN GRID ───
+    twoColumnLayout: {
         flexDirection: "row",
-        alignItems: "center",
+        justifyContent: "space-between",
         flex: 1,
-        marginRight: 8,
     },
-    // PrintDoc: -mt-6 w-[52px] h-[52px] rounded-md border-2 border-white shadow-md
-    profileAvatarBox: {
-        width: 48,
-        height: 48,
-        borderRadius: 5,
-        borderWidth: 2,
-        borderColor: "#ffffff",
-        backgroundColor: "#ffffff",
-        justifyContent: "center",
+    columnLeft: {
+        width: "48.8%",
+    },
+    columnRight: {
+        width: "49.2%",
+    },
+
+    // ─── SECTION BANNER HEADER ───
+    sectionBanner: {
+        backgroundColor: THEME.headerBg,
+        paddingVertical: 2.2,
+        paddingHorizontal: 4,
         alignItems: "center",
-        marginRight: 8,
-        marginTop: -18,
-        overflow: "hidden",
+        justifyContent: "center",
+        marginBottom: 2,
     },
-    profileAvatarImg: {
+    sectionBannerTitle: {
+        color: THEME.headerText,
+        fontSize: 7,
+        fontFamily: "Helvetica-Bold",
+        textTransform: "uppercase",
+        letterSpacing: 0.4,
+    },
+
+    // ─── ATHLETE BIO BOX ───
+    athleteBioContainer: {
+        borderWidth: 0.8,
+        borderColor: THEME.border,
+        flexDirection: "row",
+        marginBottom: 4.5,
+        backgroundColor: "#ffffff",
+    },
+    avatarBox: {
+        width: "36%",
+        borderRightWidth: 0.8,
+        borderRightColor: THEME.border,
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 3,
+        backgroundColor: "#f8fafc",
+    },
+    avatarImg: {
         width: 48,
         height: 48,
         objectFit: "cover",
-        borderRadius: 4,
+        borderRadius: 2,
     },
-    profileAvatarInitial: {
-        fontSize: 18,
-        fontFamily: "Helvetica-Bold",
-        color: "#ea580c",
-        backgroundColor: "#fff7ed",
-        width: 48,
-        height: 48,
-        textAlign: "center",
-        paddingTop: 13,
-    },
-    // PrintDoc: flex items-center gap-2
-    profileNameRow: {
-        flexDirection: "row",
+    avatarSilhouette: {
+        width: 44,
+        height: 44,
         alignItems: "center",
-        gap: 4,
-        marginBottom: 2,
+        justifyContent: "center",
     },
-    // PrintDoc: text-xs font-black text-slate-900
-    profileName: {
-        fontSize: 11,
+    bioTable: {
+        width: "64%",
+    },
+    bioRow: {
+        flexDirection: "row",
+        borderBottomWidth: 0.6,
+        borderBottomColor: THEME.border,
+        minHeight: 10,
+        alignItems: "center",
+    },
+    bioRowLast: {
+        flexDirection: "row",
+        minHeight: 10,
+        alignItems: "center",
+    },
+    bioLabelCell: {
+        width: "50%",
+        paddingHorizontal: 3,
+        paddingVertical: 1.5,
+        borderRightWidth: 0.6,
+        borderRightColor: THEME.border,
+        backgroundColor: "#f8fafc",
+    },
+    bioLabelText: {
+        fontSize: 6,
         fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
+        color: THEME.textDark,
     },
-    // PrintDoc: text-[9px] font-mono text-slate-400 font-bold
-    profileUsername: {
+    bioValCell: {
+        width: "50%",
+        paddingHorizontal: 3,
+        paddingVertical: 1.5,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    bioValText: {
         fontSize: 6.5,
-        color: "#94a3b8",
-    },
-    // PrintDoc: text-orange-700 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded text-[8.5px]
-    caborPill: {
-        backgroundColor: "#fff7ed",
-        borderWidth: 0.6,
-        borderColor: "#fed7aa",
-        borderRadius: 3,
-        paddingHorizontal: 4,
-        paddingVertical: 1,
-    },
-    caborPillText: {
-        fontSize: 6,
         fontFamily: "Helvetica-Bold",
-        color: "#c2410c",
-    },
-    // PrintDoc: (no package pill shown, but same style as Show.jsx)
-    packagePill: {
-        backgroundColor: "#f1f5f9",
-        borderWidth: 0.6,
-        borderColor: "#cbd5e1",
-        borderRadius: 3,
-        paddingHorizontal: 4,
-        paddingVertical: 1,
-    },
-    packagePillText: {
-        fontSize: 6,
-        fontFamily: "Helvetica-Bold",
-        color: "#334155",
-    },
-    // PrintDoc: text-[9.5px] text-slate-500 font-medium
-    profileMetaLine: {
-        fontSize: 7,
-        color: "#64748b",
+        color: THEME.textDark,
+        textAlign: "center",
     },
 
-    // 4 Biometrics Cards
-    // PrintDoc: grid grid-cols-4 gap-1.5 shrink-0
-    bioGrid: {
-        flexDirection: "row",
-        gap: 4,
-    },
-    // PrintDoc: px-3 py-1 bg-gradient-to-br rounded border border-slate-200 text-center min-w-[70px]
-    bioBox: {
-        width: 56,
-        paddingVertical: 4,
-        paddingHorizontal: 5,
-        borderWidth: 0.3,
-        borderColor: "#f1f5f9",
-        borderRadius: 4,
+    // ─── DATA TABLE BASE ───
+    tableContainer: {
+        borderWidth: 0.8,
+        borderColor: THEME.border,
+        marginBottom: 4.5,
         backgroundColor: "#ffffff",
+    },
+    tableHeadRow: {
+        flexDirection: "row",
+        backgroundColor: "#f1f5f9",
+        borderBottomWidth: 0.8,
+        borderBottomColor: THEME.border,
+        paddingVertical: 1.8,
         alignItems: "center",
     },
-    // PrintDoc: text-[7.5px] font-bold text-slate-400 uppercase tracking-wider block
-    bioLabel: {
-        fontSize: 5.5,
+    tableTh: {
+        fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
-        color: "#94a3b8",
+        color: THEME.textDark,
         textTransform: "uppercase",
-        letterSpacing: 0.3,
-        marginBottom: 1,
+        textAlign: "center",
     },
-    // PrintDoc: text-xs font-black text-slate-900
-    bioVal: {
-        fontSize: 10,
+    tableRow: {
+        flexDirection: "row",
+        borderBottomWidth: 0.4,
+        borderBottomColor: THEME.borderLighter,
+        paddingVertical: 1.3,
+        alignItems: "center",
+    },
+    tableCell: {
+        fontSize: 5.6,
+        color: THEME.textDark,
+        textAlign: "center",
+    },
+    tableCellBold: {
+        fontSize: 5.6,
         fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-    },
-    // PrintDoc: text-[7.5px] font-normal text-slate-400
-    bioUnit: {
-        fontSize: 5.5,
-        color: "#94a3b8",
+        color: THEME.textDark,
+        textAlign: "center",
     },
 
-    // ─── 2. MAIN 2-COLUMN LAYOUT BELOW HERO ───
-    dashboardRow: {
-        flexDirection: "row",
-        gap: 8,
-        width: "100%",
-    },
-    leftColumn: {
-        width: "56%",
-    },
-    rightColumn: {
-        width: "44%",
-    },
-
-    // ─── DUAL CARDS ROW (LEFT COL TOP) ───
-    dualCardsRow: {
-        flexDirection: "row",
-        gap: 5,
-        marginBottom: 8,
-    },
-    dualCard: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        borderRadius: 6,
+    // ─── RADAR CHART BOX ───
+    radarBox: {
+        borderWidth: 0.8,
+        borderColor: THEME.border,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 2,
         backgroundColor: "#ffffff",
-        padding: 5,
-        justifyContent: "space-between",
+        height: 120,
     },
-    dualCardHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
+
+    // ─── RIGHT COLUMN GROUPED FITNESS SCORES ───
+    categoryGroupContainer: {
+        marginBottom: 3,
+    },
+    categoryTitleText: {
+        fontSize: 6.8,
+        fontFamily: "Helvetica-Bold",
+        color: THEME.textDark,
+        textTransform: "uppercase",
+        marginBottom: 1,
+        marginTop: 1,
+    },
+
+    // ─── MULTI-DOMAIN ASSESSMENT ───
+    multiDomainBox: {
+        borderWidth: 0.5,
+        borderColor: THEME.borderLight,
+        borderRadius: 2,
+        backgroundColor: "#ffffff",
+        padding: 3.5,
         marginBottom: 2,
     },
-    dualCardTitle: {
-        fontSize: 7.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-    },
-    dualCardSubtitle: {
-        fontSize: 5,
-        color: "#94a3b8",
-        marginTop: 0.5,
-    },
-    iconBoxPulse: {
-        width: 12,
-        height: 12,
-        borderRadius: 2.5,
-        backgroundColor: "#fff1f2",
-        borderWidth: 0.5,
-        borderColor: "#fecdd3",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    iconBoxLayers: {
-        width: 12,
-        height: 12,
-        borderRadius: 2.5,
-        backgroundColor: "#fffbeb",
-        borderWidth: 0.5,
-        borderColor: "#fde68a",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    dualCardFooter: {
-        borderTopWidth: 0.5,
-        borderTopColor: "#f1f5f9",
-        paddingTop: 2.5,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    footerLabel: {
-        fontSize: 5,
-        color: "#64748b",
-    },
-
-    // ─── STRENGTHS & PRIORITIES ROW (LEFT COL BOTTOM) ───
-    swRow: {
-        flexDirection: "row",
-        gap: 5,
-        marginBottom: 8,
-    },
-    swCard: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        borderRadius: 6,
-        backgroundColor: "#ffffff",
-        padding: 5,
-    },
-    swHeader: {
-        fontSize: 7,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-        marginBottom: 3,
-        paddingBottom: 2,
-        borderBottomWidth: 0.5,
-        borderBottomColor: "#f1f5f9",
-    },
-    swItemRow: {
+    domainSection: {
         marginBottom: 2.5,
     },
-    swItemTextRow: {
+    domainHeaderRow: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 1,
-    },
-    swName: {
-        fontSize: 6,
-        fontFamily: "Helvetica-Bold",
-        color: "#1e293b",
-    },
-    swScoreGreen: {
-        fontSize: 6,
-        fontFamily: "Helvetica-Bold",
-        color: "#059669",
-    },
-    swScoreRose: {
-        fontSize: 6,
-        fontFamily: "Helvetica-Bold",
-        color: "#e11d48",
-    },
-    swProgressBg: {
-        height: 2.5,
-        backgroundColor: "#f1f5f9",
-        borderRadius: 1.5,
-        overflow: "hidden",
-    },
-    swProgressFillGreen: {
-        height: 2.5,
-        backgroundColor: "#10b981",
-        borderRadius: 1.5,
-    },
-    swProgressFillRose: {
-        height: 2.5,
-        backgroundColor: "#f43f5e",
-        borderRadius: 1.5,
-    },
-
-    // ─── RIGHT COLUMN TOP: SKOR PERFORMA CARD ───
-    scoreCard: {
-        width: "100%",
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        borderRadius: 7,
-        backgroundColor: "#ffffff",
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        marginBottom: 8,
-    },
-    scoreCardHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
         alignItems: "center",
-        paddingBottom: 3,
-        borderBottomWidth: 0.8,
-        borderBottomColor: "#f1f5f9",
-        marginBottom: 4,
-    },
-    scoreCardTitle: {
-        fontSize: 8.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-    },
-    scoreRatingGood: {
-        fontSize: 8.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#ea580c",
-    },
-    gaugeContainer: {
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 2,
-    },
-    gaugeScoreText: {
-        fontSize: 16,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-        textAlign: "center",
-    },
-    gaugeSubtitle: {
-        fontSize: 5.5,
-        color: "#94a3b8",
-        textAlign: "center",
-    },
-    score3StatsGrid: {
-        flexDirection: "row",
         gap: 3,
-        marginTop: 4,
-        paddingTop: 3,
-        borderTopWidth: 0.5,
-        borderTopColor: "#f1f5f9",
+        marginBottom: 1.5,
     },
-    score3StatBox: {
-        flex: 1,
-        paddingVertical: 2.5,
-        paddingHorizontal: 1,
-        borderWidth: 1,
-        borderColor: "#cbd5e1",
-        borderRadius: 4,
-        backgroundColor: "#ffffff",
+    domainHeaderDot: {
+        width: 3,
+        height: 3,
+        borderRadius: 1.5,
+        backgroundColor: THEME.headerBg,
+    },
+    domainHeader: {
+        fontSize: 4.8,
+        fontFamily: "Helvetica-Bold",
+        color: "#334155",
+        textTransform: "uppercase",
+        letterSpacing: 0.2,
+    },
+    domainSubGrid: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        backgroundColor: "#f8fafc",
+        borderWidth: 0.5,
+        borderColor: "#e2e8f0",
+        borderRadius: 1.5,
+        paddingVertical: 2,
+        paddingHorizontal: 2,
+    },
+    domainSubCol: {
         alignItems: "center",
+        flex: 1,
     },
-    score3StatLabel: {
-        fontSize: 4.5,
+    domainSubLabel: {
+        fontSize: 3.8,
         fontFamily: "Helvetica-Bold",
         color: "#94a3b8",
         textTransform: "uppercase",
     },
-    score3StatVal: {
-        fontSize: 8.5,
+    domainSubValPrimary: {
+        fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
+        color: THEME.textDark,
         marginTop: 0.5,
     },
-
-    // ─── RIGHT COLUMN BOTTOM: PARAMETER TEST CARD ───
-    paramCard: {
-        width: "100%",
-        borderWidth: 1,
-        borderColor: "#e2e8f0",
-        borderRadius: 7,
-        backgroundColor: "#ffffff",
-        overflow: "hidden",
-    },
-    paramCardHeader: {
-        paddingHorizontal: 6,
-        paddingVertical: 4,
-        borderBottomWidth: 0.8,
-        borderBottomColor: "#e2e8f0",
-        backgroundColor: "#fafafa",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    paramCardTitle: {
-        fontSize: 7.5,
+    domainSubValAccent: {
+        fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
+        color: THEME.headerBg,
+        marginTop: 0.5,
     },
-    paramBadge: {
-        backgroundColor: "#ffffff",
-        borderWidth: 0.8,
-        borderColor: "#e2e8f0",
-        borderRadius: 8,
-        paddingHorizontal: 4,
-        paddingVertical: 1,
-    },
-    paramBadgeText: {
-        fontSize: 5,
+    domainSubValGreen: {
+        fontSize: 5.2,
         fontFamily: "Helvetica-Bold",
-        color: "#64748b",
+        color: "#059669",
+        marginTop: 0.5,
     },
-    paramTableHead: {
-        flexDirection: "row",
-        backgroundColor: "#f8fafc",
-        borderBottomWidth: 0.8,
-        borderBottomColor: "#e2e8f0",
-        paddingHorizontal: 5,
-        paddingVertical: 2.5,
-    },
-    paramTh: {
-        fontSize: 5.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#64748b",
-        textTransform: "uppercase",
-    },
-    paramRow: {
-        flexDirection: "row",
-        borderBottomWidth: 0.5,
-        borderBottomColor: "#f1f5f9",
-        paddingHorizontal: 5,
-        paddingVertical: 2.2,
-        alignItems: "center",
-    },
-    paramItemName: {
-        fontSize: 6.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-    },
-    paramItemMeta: {
-        fontSize: 5,
+    domainEmpty: {
+        fontSize: 4.5,
+        fontFamily: "Helvetica",
         color: "#94a3b8",
-    },
-    paramResultVal: {
-        fontSize: 6.5,
-        fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
+        fontStyle: "italic",
+        paddingVertical: 1.5,
         textAlign: "center",
-    },
-    paramResultUnit: {
-        fontSize: 5.5,
-        color: "#64748b",
-        textAlign: "center",
-    },
-    paramScoreText: {
-        fontSize: 6.5,
-        fontFamily: "Helvetica-Bold",
-        textAlign: "right",
     },
 
-    // ─── SIGNATURE SECTION ───
-    signRow: {
+    // ─── FOOTER ───
+    footerBar: {
+        borderTopWidth: 0.8,
+        borderTopColor: THEME.border,
+        paddingTop: 3,
+        marginTop: 3,
         flexDirection: "row",
         justifyContent: "space-between",
-        marginTop: 6,
-        paddingTop: 4,
-        borderTopWidth: 0.8,
-        borderTopColor: "#e2e8f0",
-    },
-    signBox: {
-        width: "30%",
         alignItems: "center",
     },
-    signLabel: {
+    footerLeft: {
         fontSize: 6,
-        color: "#64748b",
-        marginBottom: 16,
-    },
-    signName: {
-        fontSize: 7,
         fontFamily: "Helvetica-Bold",
-        color: "#0f172a",
-        borderTopWidth: 0.8,
-        borderTopColor: "#334155",
-        paddingTop: 2,
-        width: 80,
-        textAlign: "center",
+        color: THEME.textDark,
+        textTransform: "uppercase",
+        letterSpacing: 0.3,
+    },
+    footerRight: {
+        fontSize: 5.5,
+        fontFamily: "Helvetica",
+        color: THEME.textDark,
+    },
+    footerBrand: {
+        fontFamily: "Helvetica-Bold",
+        color: THEME.headerBg,
     },
 });
 
@@ -524,733 +351,1016 @@ export default function ProfilingPdfDocument({
     itemAnalysis = [],
     strengths = [],
     weaknesses = [],
+    latest_phv,
+    latest_composition,
+    latest_wellness,
+    latest_dpa,
+    galleries = [],
+    clubLogo,
+    printDate,
 }) {
-    const calculateBMI = (h, w) => {
-        if (!h || !w) return "-";
-        const heightInM = h / 100;
-        return (w / (heightInM * heightInM)).toFixed(1);
+    // ─── DATES & LABELS ───
+    const formattedDate = printDate || new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const athleteName = (athlete?.name || "ATHLETE NAME").toUpperCase();
+    const sportName = (
+        stats?.sport ||
+        athlete?.sport?.name ||
+        "All-Around"
+    ).toUpperCase();
+    const resolvedLogoUrl =
+        clubLogo ||
+        (typeof window !== "undefined"
+            ? `${window.location.origin}/assets/images/otslogo2.png`
+            : "/assets/images/otslogo2.png");
+
+    const heightVal = athlete?.height ? `${athlete.height}` : "-";
+    const weightVal = athlete?.weight ? `${athlete.weight}` : "-";
+    const bfVal =
+        latest_composition?.body_fat_percentage !== undefined &&
+        latest_composition?.body_fat_percentage !== null
+            ? `${latest_composition.body_fat_percentage}`
+            : "-";
+    const leanMassVal =
+        latest_composition?.muscle_mass !== undefined &&
+        latest_composition?.muscle_mass !== null
+            ? `${latest_composition.muscle_mass}`
+            : "-";
+
+    // ─── CATEGORY MAPPING ───
+    const categoriesMap = {};
+    (itemAnalysis || []).forEach((item) => {
+        const cat = (item.category || "General").toUpperCase();
+        if (!categoriesMap[cat]) {
+            categoriesMap[cat] = [];
+        }
+        categoriesMap[cat].push(item);
+    });
+
+    const categoryNames = Object.keys(categoriesMap);
+
+    const getScoreBadge = (score) => {
+        const val = parseFloat(score) || 0;
+        if (val >= 90)
+            return {
+                label: "Sangat Baik",
+                color: "#059669",
+            };
+        if (val >= 80)
+            return {
+                label: "Baik",
+                color: "#0d9488",
+            };
+        if (val >= 70)
+            return {
+                label: "Cukup",
+                color: "#d97706",
+            };
+        if (val >= 60)
+            return {
+                label: "Kurang",
+                color: "#ea580c",
+            };
+        return {
+            label: "Sangat Kurang",
+            color: "#e11d48",
+        };
     };
 
-    const bmi = calculateBMI(athlete?.height, athlete?.weight);
-    const initial = athlete?.name ? athlete.name.charAt(0).toUpperCase() : "-";
+    // ─── RADAR / SPIDER CHART SVG GENERATION ───
+    const defaultRadarCategories = [
+        { name: "STRENGTH", key: "Strength" },
+        { name: "POWER", key: "Power" },
+        { name: "AGILITY", key: "Agility" },
+        { name: "SPEED", key: "Speed" },
+        { name: "VOLLEYBALL", key: "Sport" },
+        { name: "STABILITY", key: "Stability" },
+    ];
 
-    const getBMIStatus = (val) => {
-        if (val === "-") return { label: "-", color: "#64748b" };
-        const num = parseFloat(val);
-        if (num < 18.5) return { label: "Underweight", color: "#d97706" };
-        if (num <= 24.9) return { label: "Ideal", color: "#059669" };
-        if (num <= 29.9) return { label: "Overweight", color: "#ea580c" };
-        return { label: "Obese", color: "#e11d48" };
-    };
-    const bmiStatus = getBMIStatus(bmi);
+    const radarSource =
+        radarData && radarData.length >= 3 ? radarData : defaultRadarCategories;
+    const numAxes = radarSource.length;
 
-    const isFemale =
-        athlete?.gender === "P" ||
-        athlete?.gender === "female" ||
-        athlete?.gender === "Perempuan";
-    const genderLabel = isFemale ? "Perempuan" : "Laki-laki";
+    const cx = 120;
+    const cy = 70;
+    const radius = 45;
 
-    const avgScore = Number(stats?.avg_score || stats?.average_score || 62.8);
-    const getEvalRating = (val) => {
-        if (val >= 90) return { rating: "Sangat Baik", color: "#059669" };
-        if (val >= 80) return { rating: "Baik", color: "#0d9488" };
-        if (val >= 70) return { rating: "Cukup", color: "#d97706" };
-        if (val >= 60) return { rating: "Kurang", color: "#ea580c" };
-        return { rating: "Sangat Kurang", color: "#e11d48" };
-    };
-    const { rating: evalRating, color: evalColor } = getEvalRating(avgScore);
+    const gridLevels = [0.33, 0.66, 1.0];
+    const gridPolygons = gridLevels.map((lvl) => {
+        return Array.from({ length: numAxes })
+            .map((_, i) => {
+                const angle = -Math.PI / 2 + (i * 2 * Math.PI) / numAxes;
+                const x = cx + radius * lvl * Math.cos(angle);
+                const y = cy + radius * lvl * Math.sin(angle);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            })
+            .join(" ");
+    });
 
-    // Sort items descending by score
-    const sortedItems = [...(itemAnalysis || [])].sort(
-        (a, b) => (Number(b.score) || 0) - (Number(a.score) || 0),
-    );
+    const athleteScorePoints = radarSource
+        .map((item, i) => {
+            const rawScore = Number(item.A ?? item.score ?? 65);
+            const normScore = Math.min(100, Math.max(15, rawScore)) / 100;
+            const angle = -Math.PI / 2 + (i * 2 * Math.PI) / numAxes;
+            const x = cx + radius * normScore * Math.cos(angle);
+            const y = cy + radius * normScore * Math.sin(angle);
+            return {
+                x,
+                y,
+                score: rawScore,
+                str: `${x.toFixed(1)},${y.toFixed(1)}`
+            };
+        });
+
+    const labelRadius = radius + 12;
+    const axesData = radarSource.map((item, i) => {
+        const rawScore = Number(item.A ?? item.score ?? 0);
+        const scoreFormatted = rawScore % 1 === 0 ? rawScore : rawScore.toFixed(1);
+        const angle = -Math.PI / 2 + (i * 2 * Math.PI) / numAxes;
+        const x2 = cx + radius * Math.cos(angle);
+        const y2 = cy + radius * Math.sin(angle);
+        const lx = cx + labelRadius * Math.cos(angle);
+        const ly = cy + labelRadius * Math.sin(angle);
+        const name = (
+            item.subject ||
+            item.name ||
+            `CAT ${i + 1}`
+        ).toUpperCase();
+        return { x1: cx, y1: cy, x2, y2, lx, ly, name, score: rawScore, scoreFormatted };
+    });
 
     return (
-        <Document title={`Laporan Profiling - ${athlete?.name || "Athlete"}`}>
-            <PdfPageTemplate
-                orientation="portrait"
-                footerLeftText="Olympus Training Surabaya • Profiling & Integrated Performance Report"
-            >
-                {/* ─── 1. FULL WIDTH HERO PROFILE CARD ─── */}
-                <View style={styles.profileCard}>
-                    <View style={styles.profileBanner}>
-                        <Svg
-                            width="100%"
-                            height="40"
-                            viewBox="0 0 580 40"
-                            style={{ position: "absolute", top: 0, left: 0 }}
-                        >
-                            {Array.from({ length: 48 }).map((_, col) =>
-                                Array.from({ length: 4 }).map((_, row) => (
-                                    <Rect
-                                        key={`dot-${col}-${row}`}
-                                        x={col * 12 + 2}
-                                        y={row * 12 + 2}
-                                        width={1.2}
-                                        height={1.2}
-                                        fill="#ea580c"
-                                        fillOpacity={0.1}
-                                        rx={0.6}
-                                    />
-                                )),
-                            )}
-                        </Svg>
+        <Document title={`Physical Test Report - ${athleteName}`}>
+            <Page size="A4" orientation="portrait" style={styles.page}>
+                {/* ─── 1. TOP MAIN HEADER BANNER ─── */}
+                <View style={styles.mainHeaderBanner}>
+                    <View style={styles.mainHeaderLeft}>
+                        <Text style={styles.mainHeaderTitle}>
+                            {sportName} PHYSICAL TEST REPORT
+                        </Text>
+                        <Text style={styles.mainHeaderSubtitle}>
+                            Olympus Athlete Performance & Development System
+                        </Text>
                     </View>
+                    <View style={{ alignItems: "flex-end", justifyContent: "center" }}>
+                        <Image
+                            src={resolvedLogoUrl}
+                            style={{ width: 140, height: 36, objectFit: "contain" }}
+                        />
+                    </View>
+                </View>
 
-                    <View style={styles.profileMainContent}>
-                        <View style={styles.profileIdentity}>
-                            <View style={styles.profileAvatarBox}>
+                {/* ─── 2. MAIN 2-COLUMN LAYOUT ─── */}
+                <View style={styles.twoColumnLayout}>
+                    {/* ═══════════════════════════════════════════════════════
+                        KOLOM KIRI (LEFT COLUMN):
+                        - ATHLETE NAME BOX (PHOTO + SPECS)
+                        - TEAM AVERAGES / BENCHMARK TABLE
+                        - ATHLETE PROFILE (RADAR CHART)
+                       ═══════════════════════════════════════════════════════ */}
+                    <View style={styles.columnLeft}>
+                        {/* ── A. ATHLETE NAME BANNER & BOX ── */}
+                        <View style={styles.sectionBanner}>
+                            <Text style={styles.sectionBannerTitle}>
+                                {athleteName}
+                            </Text>
+                        </View>
+
+                        <View style={styles.athleteBioContainer}>
+                            {/* Athlete Photo / Silhouette */}
+                            <View style={styles.avatarBox}>
                                 {athlete?.profile_photo_url ? (
                                     <Image
                                         src={athlete.profile_photo_url}
-                                        style={styles.profileAvatarImg}
+                                        style={styles.avatarImg}
                                     />
                                 ) : (
-                                    <Text style={styles.profileAvatarInitial}>
-                                        {initial}
-                                    </Text>
+                                    <View style={styles.avatarSilhouette}>
+                                        <Svg width="40" height="40" viewBox="0 0 100 100">
+                                            <Circle cx="50" cy="28" r="16" fill="#0f172a" />
+                                            <Path
+                                                d="M 22 84 C 22 58, 34 48, 50 48 C 66 48, 78 58, 78 84 Z"
+                                                fill="#0f172a"
+                                            />
+                                        </Svg>
+                                    </View>
                                 )}
                             </View>
 
-                            <View>
-                                <View style={styles.profileNameRow}>
-                                    <Text style={styles.profileName}>
-                                        {athlete?.name || "Athlete"}
-                                    </Text>
-                                    <Text style={styles.profileUsername}>
-                                        @{athlete?.username || "-"}
-                                    </Text>
-                                    <View style={styles.caborPill}>
-                                        <Text style={styles.caborPillText}>
-                                            {stats?.sport ||
-                                                athlete?.sport?.name ||
-                                                "Football men junior"}
-                                        </Text>
+                            {/* Specs Table */}
+                            <View style={styles.bioTable}>
+                                <View style={styles.bioRow}>
+                                    <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>Sport</Text>
                                     </View>
-                                    <View style={styles.packagePill}>
-                                        <Text style={styles.packagePillText}>
-                                            Privat
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>
+                                            {stats?.sport || athlete?.sport?.name || "Volleyball"}
                                         </Text>
                                     </View>
                                 </View>
-                                <Text style={styles.profileMetaLine}>
-                                    {genderLabel} • Pelatih:{" "}
-                                    <Text
-                                        style={{
-                                            fontFamily: "Helvetica-Bold",
-                                            color: "#334155",
-                                        }}
-                                    >
-                                        {stats?.coaches_text &&
-                                        stats.coaches_text !== "-"
-                                            ? stats.coaches_text
-                                            : "Coach Figo, Coach Andri"}
-                                    </Text>
-                                </Text>
-                            </View>
-                        </View>
-
-                        {/* 4 Biometrics Boxes */}
-                        <View style={styles.bioGrid}>
-                            <View style={styles.bioBox}>
-                                <Text style={styles.bioLabel}>Tinggi</Text>
-                                <Text style={styles.bioVal}>
-                                    {athlete?.height || "-"}{" "}
-                                    <Text style={styles.bioUnit}>cm</Text>
-                                </Text>
-                            </View>
-                            <View style={styles.bioBox}>
-                                <Text style={styles.bioLabel}>Berat</Text>
-                                <Text style={styles.bioVal}>
-                                    {athlete?.weight || "-"}{" "}
-                                    <Text style={styles.bioUnit}>kg</Text>
-                                </Text>
-                            </View>
-                            <View style={styles.bioBox}>
-                                <Text style={styles.bioLabel}>Usia</Text>
-                                <Text style={styles.bioVal}>
-                                    {athlete?.age || "-"}{" "}
-                                    <Text style={styles.bioUnit}>thn</Text>
-                                </Text>
-                            </View>
-                            <View style={styles.bioBox}>
-                                <Text
-                                    style={[
-                                        styles.bioLabel,
-                                        { color: bmiStatus.color },
-                                    ]}
-                                >
-                                    {bmiStatus.label}
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.bioVal,
-                                        { color: bmiStatus.color },
-                                    ]}
-                                >
-                                    {bmi}{" "}
-                                    <Text style={styles.bioUnit}>BMI</Text>
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-
-                {/* ─── 2. MAIN 2-COLUMN SECTION BELOW HERO CARD ─── */}
-                <View style={styles.dashboardRow}>
-                    {/* ═══════════════════════════════════════════════════════
-                        KOLOM KIRI (56% LEBAR) — DUAL CHARTS & STRENGTHS
-                       ═══════════════════════════════════════════════════════ */}
-                    <View style={styles.leftColumn}>
-                        {/* Dual Charts (Radar & Bar Comparison) */}
-                        <View style={styles.dualCardsRow}>
-                            {/* Radar Chart */}
-                            <View style={styles.dualCard}>
-                                <View style={styles.dualCardHeader}>
-                                    <View>
-                                        <Text style={styles.dualCardTitle}>
-                                            Radar Kategori Fisik
-                                        </Text>
-                                        <Text style={styles.dualCardSubtitle}>
-                                            Profil atribut fisik (0 – 100)
-                                        </Text>
+                                <View style={styles.bioRow}>
+                                    <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>Height (cm)</Text>
                                     </View>
-                                    <View style={styles.iconBoxPulse}>
-                                        <Text
-                                            style={{
-                                                fontSize: 6,
-                                                color: "#e11d48",
-                                                fontFamily: "Helvetica-Bold",
-                                            }}
-                                        >
-                                            ~
-                                        </Text>
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>{heightVal}</Text>
                                     </View>
                                 </View>
-
-                                <View
-                                    style={{
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        height: 75,
-                                    }}
-                                >
-                                    <Svg
-                                        width={130}
-                                        height={75}
-                                        viewBox="0 0 130 75"
-                                    >
-                                        <Polygon
-                                            points="65,8 102,25 88,62 42,62 28,25"
-                                            fill="none"
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.8}
-                                        />
-                                        <Polygon
-                                            points="65,20 87,30 79,52 51,52 43,30"
-                                            fill="none"
-                                            stroke="#f1f5f9"
-                                            strokeWidth={0.6}
-                                            strokeDasharray="2,2"
-                                        />
-                                        <Polygon
-                                            points="65,30 76,35 72,46 58,46 54,35"
-                                            fill="none"
-                                            stroke="#f1f5f9"
-                                            strokeWidth={0.5}
-                                        />
-
-                                        <SvgLine
-                                            x1={65}
-                                            y1={40}
-                                            x2={65}
-                                            y2={8}
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={65}
-                                            y1={40}
-                                            x2={102}
-                                            y2={25}
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={65}
-                                            y1={40}
-                                            x2={88}
-                                            y2={62}
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={65}
-                                            y1={40}
-                                            x2={42}
-                                            y2={62}
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={65}
-                                            y1={40}
-                                            x2={28}
-                                            y2={25}
-                                            stroke="#e2e8f0"
-                                            strokeWidth={0.6}
-                                        />
-
-                                        <Polygon
-                                            points="65,22 100,27 82,56 48,56 44,34"
-                                            fill="#ea580c"
-                                            fillOpacity={0.25}
-                                            stroke="#ea580c"
-                                            strokeWidth={1.5}
-                                        />
-                                    </Svg>
-                                </View>
-
-                                <View style={styles.dualCardFooter}>
-                                    <Text style={styles.footerLabel}>
-                                        Teratas:{" "}
-                                        <Text
-                                            style={{
-                                                fontFamily: "Helvetica-Bold",
-                                                color: "#0f172a",
-                                            }}
-                                        >
-                                            Speed (97)
-                                        </Text>
-                                    </Text>
-                                    <Text style={styles.footerLabel}>
-                                        Fokus:{" "}
-                                        <Text
-                                            style={{
-                                                fontFamily: "Helvetica-Bold",
-                                                color: "#ea580c",
-                                            }}
-                                        >
-                                            Strength (32.4)
-                                        </Text>
-                                    </Text>
-                                </View>
-                            </View>
-
-                            {/* Bar Chart */}
-                            <View style={styles.dualCard}>
-                                <View style={styles.dualCardHeader}>
-                                    <View>
-                                        <Text style={styles.dualCardTitle}>
-                                            Komparasi Sesi
-                                        </Text>
-                                        <Text style={styles.dualCardSubtitle}>
-                                            Sesi terkini (0 – 100)
-                                        </Text>
+                                <View style={styles.bioRow}>
+                                    <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>Weight (kg)</Text>
                                     </View>
-                                    <View style={styles.iconBoxLayers}>
-                                        <Text
-                                            style={{
-                                                fontSize: 6,
-                                                color: "#d97706",
-                                                fontFamily: "Helvetica-Bold",
-                                            }}
-                                        >
-                                            #
-                                        </Text>
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>{weightVal}</Text>
                                     </View>
                                 </View>
-
-                                <View
-                                    style={{
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        height: 75,
-                                    }}
-                                >
-                                    <Svg
-                                        width={130}
-                                        height={75}
-                                        viewBox="0 0 130 75"
-                                    >
-                                        <SvgLine
-                                            x1={10}
-                                            y1={12}
-                                            x2={120}
-                                            y2={12}
-                                            stroke="#f1f5f9"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={10}
-                                            y1={30}
-                                            x2={120}
-                                            y2={30}
-                                            stroke="#f1f5f9"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={10}
-                                            y1={48}
-                                            x2={120}
-                                            y2={48}
-                                            stroke="#f1f5f9"
-                                            strokeWidth={0.6}
-                                        />
-                                        <SvgLine
-                                            x1={10}
-                                            y1={62}
-                                            x2={120}
-                                            y2={62}
-                                            stroke="#cbd5e1"
-                                            strokeWidth={0.8}
-                                        />
-
-                                        <Rect
-                                            x={22}
-                                            y={32}
-                                            width={10}
-                                            height={30}
-                                            fill="#ea580c"
-                                            rx={1.5}
-                                        />
-                                        <Rect
-                                            x={50}
-                                            y={12}
-                                            width={10}
-                                            height={50}
-                                            fill="#ea580c"
-                                            rx={1.5}
-                                        />
-                                        <Rect
-                                            x={78}
-                                            y={44}
-                                            width={10}
-                                            height={18}
-                                            fill="#ea580c"
-                                            rx={1.5}
-                                        />
-                                        <Rect
-                                            x={106}
-                                            y={32}
-                                            width={10}
-                                            height={30}
-                                            fill="#ea580c"
-                                            rx={1.5}
-                                        />
-                                    </Svg>
+                                <View style={styles.bioRow}>
+                                    <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>BF%</Text>
+                                    </View>
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>{bfVal}</Text>
+                                    </View>
                                 </View>
-
-                                <View style={styles.dualCardFooter}>
-                                    <Text style={styles.footerLabel}>
-                                        • Sesi Terkini
-                                    </Text>
-                                    <Text style={styles.footerLabel}>
-                                        5 Kategori
-                                    </Text>
+                                <View style={styles.bioRowLast}>
+                                    <View style={styles.bioLabelCell}>
+                                        <Text style={styles.bioLabelText}>Lean Mass (kg)</Text>
+                                    </View>
+                                    <View style={styles.bioValCell}>
+                                        <Text style={styles.bioValText}>{leanMassVal}</Text>
+                                    </View>
                                 </View>
                             </View>
                         </View>
 
-                        {/* Strengths & Priorities */}
-                        <View style={styles.swRow}>
-                            {/* Keunggulan Fisik */}
-                            <View style={styles.swCard}>
-                                <Text style={styles.swHeader}>
-                                    Keunggulan Fisik (&gt;70%)
-                                </Text>
-                                <View style={styles.swItemRow}>
-                                    <View style={styles.swItemTextRow}>
-                                        <Text style={styles.swName}>Speed</Text>
-                                        <Text style={styles.swScoreGreen}>
-                                            97%
-                                        </Text>
-                                    </View>
-                                    <View style={styles.swProgressBg}>
-                                        <View
-                                            style={[
-                                                styles.swProgressFillGreen,
-                                                { width: "97%" },
-                                            ]}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-
-                            {/* Prioritas Peningkatan */}
-                            <View style={styles.swCard}>
-                                <Text style={styles.swHeader}>
-                                    Prioritas Peningkatan (&le;70%)
-                                </Text>
-
-                                <View style={styles.swItemRow}>
-                                    <View style={styles.swItemTextRow}>
-                                        <Text style={styles.swName}>
-                                            Strength
-                                        </Text>
-                                        <Text style={styles.swScoreRose}>
-                                            32.4%
-                                        </Text>
-                                    </View>
-                                    <View style={styles.swProgressBg}>
-                                        <View
-                                            style={[
-                                                styles.swProgressFillRose,
-                                                { width: "32.4%" },
-                                            ]}
-                                        />
-                                    </View>
-                                </View>
-
-                                <View style={styles.swItemRow}>
-                                    <View style={styles.swItemTextRow}>
-                                        <Text style={styles.swName}>
-                                            Agility
-                                        </Text>
-                                        <Text style={styles.swScoreRose}>
-                                            56.2%
-                                        </Text>
-                                    </View>
-                                    <View style={styles.swProgressBg}>
-                                        <View
-                                            style={[
-                                                styles.swProgressFillRose,
-                                                { width: "56.2%" },
-                                            ]}
-                                        />
-                                    </View>
-                                </View>
-
-                                <View style={styles.swItemRow}>
-                                    <View style={styles.swItemTextRow}>
-                                        <Text style={styles.swName}>
-                                            Str. Endurance
-                                        </Text>
-                                        <Text style={styles.swScoreRose}>
-                                            56.2%
-                                        </Text>
-                                    </View>
-                                    <View style={styles.swProgressBg}>
-                                        <View
-                                            style={[
-                                                styles.swProgressFillRose,
-                                                { width: "56.2%" },
-                                            ]}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
+                        {/* ── B. ATHLETE PROFILE (SPIDER / RADAR CHART) ── */}
+                        <View style={styles.sectionBanner}>
+                            <Text style={styles.sectionBannerTitle}>ATHLETE PROFILE</Text>
                         </View>
-                    </View>
 
-                    {/* ═══════════════════════════════════════════════════════
-                        KOLOM KANAN (44% LEBAR) — SKOR PERFORMA & PARAMETER TEST
-                       ═══════════════════════════════════════════════════════ */}
-                    <View style={styles.rightColumn}>
-                        {/* 1. Skor Performa Card */}
-                        <View style={styles.scoreCard}>
-                            <View style={styles.scoreCardHeader}>
-                                <Text style={styles.scoreCardTitle}>
-                                    Skor Performa
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.scoreRatingGood,
-                                        { color: evalColor },
-                                    ]}
-                                >
-                                    {evalRating}
-                                </Text>
-                            </View>
+                        <View style={[styles.radarBox, { height: 140, paddingVertical: 2 }]}>
+                            <Svg width="240" height="136" viewBox="0 0 240 136">
+                                <Polygon
+                                    points={gridPolygons[2]}
+                                    fill="none"
+                                    stroke={THEME.borderLighter}
+                                    strokeWidth={0.8}
+                                />
+                                <Polygon
+                                    points={gridPolygons[1]}
+                                    fill="none"
+                                    stroke={THEME.borderLighter}
+                                    strokeWidth={0.6}
+                                    strokeDasharray="2,2"
+                                />
+                                <Polygon
+                                    points={gridPolygons[0]}
+                                    fill="none"
+                                    stroke={THEME.borderLighter}
+                                    strokeWidth={0.5}
+                                    strokeDasharray="2,2"
+                                />
 
-                            {/* Semi-Circle Gauge Svg */}
-                            <View style={styles.gaugeContainer}>
-                                <Svg
-                                    width={130}
-                                    height={60}
-                                    viewBox="0 0 130 60"
-                                >
-                                    <Path
-                                        d="M 14 52 A 51 51 0 0 1 116 52"
-                                        fill="none"
-                                        stroke="#f1f5f9"
-                                        strokeWidth={9}
-                                        strokeLinecap="round"
+                                {axesData.map((axis, i) => (
+                                    <SvgLine
+                                        key={`axis-${i}`}
+                                        x1={axis.x1}
+                                        y1={axis.y1}
+                                        x2={axis.x2}
+                                        y2={axis.y2}
+                                        stroke={THEME.borderLighter}
+                                        strokeWidth={0.6}
                                     />
-                                    <Path
-                                        d="M 14 52 A 51 51 0 0 1 94 17"
-                                        fill="none"
-                                        stroke="#ea580c"
-                                        strokeWidth={9}
-                                        strokeLinecap="round"
-                                    />
-                                </Svg>
-                                <View
-                                    style={{ position: "absolute", bottom: 1 }}
-                                >
-                                    <Text style={styles.gaugeScoreText}>
-                                        {avgScore.toFixed(1)}
-                                    </Text>
-                                    <Text style={styles.gaugeSubtitle}>
-                                        Rata-Rata Tes
-                                    </Text>
-                                </View>
-                            </View>
+                                ))}
 
-                            {/* 3 Mini Stats Box */}
-                            <View style={styles.score3StatsGrid}>
-                                <View style={styles.score3StatBox}>
-                                    <Text style={styles.score3StatLabel}>
-                                        Sesi Latihan
-                                    </Text>
-                                    <Text style={styles.score3StatVal}>
-                                        {stats?.total_sessions ||
-                                            stats?.sessions ||
-                                            8}
-                                    </Text>
-                                </View>
-                                <View style={styles.score3StatBox}>
-                                    <Text style={styles.score3StatLabel}>
-                                        Tes Fisik
-                                    </Text>
-                                    <Text style={styles.score3StatVal}>
-                                        {stats?.total_tests || 1}
-                                    </Text>
-                                </View>
-                                <View style={styles.score3StatBox}>
-                                    <Text style={styles.score3StatLabel}>
-                                        Skor Puncak
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            styles.score3StatVal,
-                                            { color: "#059669" },
-                                        ]}
-                                    >
-                                        {Number(
-                                            stats?.highest_score ||
-                                                stats?.max_score ||
-                                                62.8,
-                                        ).toFixed(1)}
-                                    </Text>
-                                </View>
-                            </View>
+                                <Polygon
+                                    points={athleteScorePoints.map((p) => p.str).join(" ")}
+                                    fill={THEME.headerBg}
+                                    fillOpacity={0.22}
+                                    stroke={THEME.headerBg}
+                                    strokeWidth={1.5}
+                                />
+
+                                {athleteScorePoints.map((pt, i) => (
+                                    <Circle
+                                        key={`pt-${i}`}
+                                        cx={pt.x}
+                                        cy={pt.y}
+                                        r="2.4"
+                                        fill={THEME.headerBg}
+                                    />
+                                ))}
+
+                                {axesData.map((axis, i) => (
+                                    <React.Fragment key={`label-${i}`}>
+                                        <Text
+                                            x={axis.lx}
+                                            y={axis.ly - 2}
+                                            textAnchor="middle"
+                                            style={{
+                                                fontSize: 5.2,
+                                                fontFamily: "Helvetica-Bold",
+                                                fill: "#334155",
+                                            }}
+                                        >
+                                            {axis.name}
+                                        </Text>
+                                        <Text
+                                            x={axis.lx}
+                                            y={axis.ly + 4.2}
+                                            textAnchor="middle"
+                                            style={{
+                                                fontSize: 5.4,
+                                                fontFamily: "Helvetica-Bold",
+                                                fill: THEME.headerBg,
+                                            }}
+                                        >
+                                            {axis.scoreFormatted}
+                                        </Text>
+                                    </React.Fragment>
+                                ))}
+                            </Svg>
                         </View>
 
-                        {/* 2. Rincian Parameter Tes Sesi Terakhir */}
-                        <View style={styles.paramCard}>
-                            <View style={styles.paramCardHeader}>
-                                <Text style={styles.paramCardTitle}>
-                                    Rincian Parameter Tes
+                        {/* ── C. KOMPARASI SESI TERKINI (BAR CHART) ── */}
+                        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+                            <Text style={styles.sectionBannerTitle}>KOMPARASI SESI TERKINI</Text>
+                        </View>
+
+                        <View style={[styles.tableContainer, { padding: 5, marginBottom: 2 }]}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+                                <Text style={{ fontSize: 5.5, color: "#64748b", fontFamily: "Helvetica" }}>
+                                    Perbandingan kategori sesi terkini vs sebelumnya (0 – 100)
                                 </Text>
-                                <View style={styles.paramBadge}>
-                                    <Text style={styles.paramBadgeText}>
-                                        {sortedItems.length} Item
-                                    </Text>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+                                        <View style={{ width: 5, height: 5, backgroundColor: "#cbd5e1", borderRadius: 1 }} />
+                                        <Text style={{ fontSize: 4.8, color: "#64748b" }}>Sebelumnya</Text>
+                                    </View>
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+                                        <View style={{ width: 5, height: 5, backgroundColor: "#f97316", borderRadius: 1 }} />
+                                        <Text style={{ fontSize: 4.8, color: "#ea580c", fontFamily: "Helvetica-Bold" }}>Terkini</Text>
+                                    </View>
                                 </View>
                             </View>
 
-                            <View style={styles.paramTableHead}>
-                                <Text
-                                    style={[styles.paramTh, { width: "56%" }]}
-                                >
-                                    Item Tes & Target
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.paramTh,
-                                        { width: "22%", textAlign: "center" },
-                                    ]}
-                                >
-                                    Hasil
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.paramTh,
-                                        { width: "22%", textAlign: "right" },
-                                    ]}
-                                >
-                                    Skor
-                                </Text>
-                            </View>
+                            {(() => {
+                                const barCats =
+                                    comparisonData && comparisonData.length > 0
+                                        ? comparisonData
+                                        : [
+                                              { name: "Agility", previous: 56.2, latest: 100 },
+                                              { name: "Speed", previous: 97.0, latest: 75.6 },
+                                              { name: "Strength", previous: 32.4, latest: 93.3 },
+                                              { name: "Endurance", previous: 56.4, latest: 88.9 },
+                                          ];
 
-                            {sortedItems.slice(0, 8).map((item, idx) => {
-                                const scoreNum = Number(item.score || 0);
-                                const isGreen = scoreNum >= 80;
-                                const isAmber = scoreNum >= 60 && scoreNum < 80;
-                                const sColor = isGreen
-                                    ? "#059669"
-                                    : isAmber
-                                      ? "#d97706"
-                                      : "#e11d48";
+                                const N = barCats.length;
+                                const step = 200 / Math.max(1, N);
 
                                 return (
-                                    <View key={idx} style={styles.paramRow}>
-                                        <View style={{ width: "56%" }}>
-                                            <Text style={styles.paramItemName}>
-                                                {item.name}
-                                            </Text>
-                                            <Text style={styles.paramItemMeta}>
-                                                {item.category} • Tgt:{" "}
-                                                {item.target_value ||
-                                                    item.target ||
-                                                    "-"}{" "}
-                                                {item.unit || ""}
+                                    <Svg width="235" height="98" viewBox="0 0 235 98">
+                                        {/* Grid lines */}
+                                        {[0, 25, 50, 75, 100].map((val) => {
+                                            const y = 80 - (val / 100) * 65;
+                                            return (
+                                                <React.Fragment key={`grid-${val}`}>
+                                                    <SvgLine
+                                                        x1="18"
+                                                        y1={y}
+                                                        x2="230"
+                                                        y2={y}
+                                                        stroke="#f1f5f9"
+                                                        strokeWidth={0.6}
+                                                        strokeDasharray="2,2"
+                                                    />
+                                                    <Text
+                                                        x="12"
+                                                        y={y + 1.8}
+                                                        textAnchor="end"
+                                                        style={{ fontSize: 4.5, fill: "#94a3b8", fontFamily: "Helvetica" }}
+                                                    >
+                                                        {val}
+                                                    </Text>
+                                                </React.Fragment>
+                                            );
+                                        })}
+
+                                        {/* Baseline */}
+                                        <SvgLine x1="18" y1="80" x2="230" y2="80" stroke="#cbd5e1" strokeWidth={0.8} />
+
+                                        {/* Bars */}
+                                        {barCats.map((item, idx) => {
+                                            const xc = 25 + (idx + 0.5) * step;
+                                            const p = Math.min(100, Math.max(0, Number(item.previous || 0)));
+                                            const c = Math.min(100, Math.max(0, Number(item.latest || 0)));
+                                            const hp = (p / 100) * 65;
+                                            const hc = (c / 100) * 65;
+
+                                            const catDisplayName =
+                                                item.name.length > 11 ? item.name.substring(0, 10) + ".." : item.name;
+
+                                            return (
+                                                <React.Fragment key={`bar-${idx}`}>
+                                                    {/* Previous Bar */}
+                                                    {p > 0 && (
+                                                        <>
+                                                            <Rect
+                                                                x={xc - 8.5}
+                                                                y={80 - hp}
+                                                                width={7.5}
+                                                                height={hp}
+                                                                fill="#cbd5e1"
+                                                            />
+                                                            <Text
+                                                                x={xc - 4.7}
+                                                                y={80 - hp - 2}
+                                                                textAnchor="middle"
+                                                                style={{ fontSize: 4.6, fill: "#64748b", fontFamily: "Helvetica" }}
+                                                            >
+                                                                {p % 1 === 0 ? p : p.toFixed(1)}
+                                                            </Text>
+                                                        </>
+                                                    )}
+
+                                                    {/* Latest Bar */}
+                                                    {c > 0 && (
+                                                        <>
+                                                            <Rect
+                                                                x={xc + 0.5}
+                                                                y={80 - hc}
+                                                                width={7.5}
+                                                                height={hc}
+                                                                fill="#f97316"
+                                                            />
+                                                            <Text
+                                                                x={xc + 4.2}
+                                                                y={80 - hc - 2}
+                                                                textAnchor="middle"
+                                                                style={{ fontSize: 4.8, fill: "#ea580c", fontFamily: "Helvetica-Bold" }}
+                                                            >
+                                                                {c % 1 === 0 ? c : c.toFixed(1)}
+                                                            </Text>
+                                                        </>
+                                                    )}
+
+                                                    {/* Category label */}
+                                                    <Text
+                                                        x={xc}
+                                                        y="90"
+                                                        textAnchor="middle"
+                                                        style={{ fontSize: 4.8, fill: "#334155", fontFamily: "Helvetica-Bold" }}
+                                                    >
+                                                        {catDisplayName}
+                                                    </Text>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </Svg>
+                                );
+                            })()}
+
+                            <View style={{ borderTopWidth: 0.5, borderTopColor: "#f1f5f9", paddingTop: 2, marginTop: 1 }}>
+                                <Text style={{ fontSize: 5, color: "#64748b" }}>
+                                    Total Kategori:{" "}
+                                    <Text style={{ fontFamily: "Helvetica-Bold", color: THEME.textDark }}>
+                                        {comparisonData?.length || 0} Elemen
+                                    </Text>
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* ── D. STATUS MULTI-DOMAIN ASESMEN ── */}
+                        <View style={[styles.sectionBanner, { marginTop: 4 }]}>
+                            <Text style={styles.sectionBannerTitle}>STATUS MULTI-DOMAIN ASESMEN</Text>
+                        </View>
+
+                        <View style={[styles.multiDomainBox]}>
+                            {/* PHV & Pertumbuhan */}
+                            <View style={styles.domainSection}>
+                                <View style={styles.domainHeaderRow}>
+                                    <View style={styles.domainHeaderDot} />
+                                    <Text style={styles.domainHeader}>PHV & Pertumbuhan (Maturitas)</Text>
+                                </View>
+                                {latest_phv ? (
+                                    <View style={styles.domainSubGrid}>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Maturity Offset</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                {Number(latest_phv.maturity_offset).toFixed(2)} thn
                                             </Text>
                                         </View>
-                                        <View style={{ width: "22%" }}>
-                                            <Text style={styles.paramResultVal}>
-                                                {item.result_value ||
-                                                    item.result ||
-                                                    "-"}
-                                            </Text>
-                                            <Text
-                                                style={styles.paramResultUnit}
-                                            >
-                                                {item.unit || ""}
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Prediksi Tinggi</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                {latest_phv.predicted_adult_height || "-"} cm
                                             </Text>
                                         </View>
-                                        <View style={{ width: "22%" }}>
-                                            <Text
-                                                style={[
-                                                    styles.paramScoreText,
-                                                    { color: sColor },
-                                                ]}
-                                            >
-                                                {scoreNum.toFixed(1)}%
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Sisa Tumbuh</Text>
+                                            <Text style={styles.domainSubValAccent}>
+                                                +{latest_phv.remaining_growth || "-"} cm
                                             </Text>
                                         </View>
                                     </View>
-                                );
-                            })}
+                                ) : (
+                                    <Text style={styles.domainEmpty}>Belum ada asesmen PHV</Text>
+                                )}
+                            </View>
+
+                            {/* Komposisi Tubuh */}
+                            <View style={styles.domainSection}>
+                                <View style={styles.domainHeaderRow}>
+                                    <View style={styles.domainHeaderDot} />
+                                    <Text style={styles.domainHeader}>Komposisi Tubuh</Text>
+                                </View>
+                                {latest_composition ? (
+                                    <View style={styles.domainSubGrid}>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Body Fat</Text>
+                                            <Text style={styles.domainSubValAccent}>
+                                                {latest_composition.body_fat_percentage ?? "-"}%
+                                            </Text>
+                                        </View>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Muscle</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                {latest_composition.muscle_mass ?? "-"} kg
+                                            </Text>
+                                        </View>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>BMR</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                {latest_composition.bmr ?? "-"} kcal
+                                            </Text>
+                                        </View>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Visceral</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                Lvl {latest_composition.visceral_fat_level ?? "-"}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ) : (
+                                    <Text style={styles.domainEmpty}>Belum ada tes komposisi tubuh</Text>
+                                )}
+                            </View>
+
+                            {/* Beban & Wellness */}
+                            <View style={styles.domainSection}>
+                                <View style={styles.domainHeaderRow}>
+                                    <View style={styles.domainHeaderDot} />
+                                    <Text style={styles.domainHeader}>Beban Latihan & Wellness</Text>
+                                </View>
+                                {latest_wellness ? (
+                                    <View style={styles.domainSubGrid}>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Wellness</Text>
+                                            <Text style={styles.domainSubValGreen}>
+                                                {latest_wellness.daily_wellness_score ?? "-"}/30
+                                            </Text>
+                                        </View>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Session RPE</Text>
+                                            <Text style={styles.domainSubValPrimary}>
+                                                {latest_wellness.session_rpe ?? "-"}/10
+                                            </Text>
+                                        </View>
+                                        <View style={styles.domainSubCol}>
+                                            <Text style={styles.domainSubLabel}>Daily Load</Text>
+                                            <Text style={styles.domainSubValAccent}>
+                                                {latest_wellness.daily_load ?? 0} AU
+                                            </Text>
+                                        </View>
+                                    </View>
+                                ) : (
+                                    <Text style={styles.domainEmpty}>Belum ada catatan wellness</Text>
+                                )}
+                            </View>
+
+                            {/* Postur Dinamis (DPA) */}
+                            <View style={[styles.domainSection, { marginBottom: 0 }]}>
+                                <View style={styles.domainHeaderRow}>
+                                    <View style={styles.domainHeaderDot} />
+                                    <Text style={styles.domainHeader}>Postur Dinamis (DPA)</Text>
+                                </View>
+                                {latest_dpa ? (
+                                    <View style={[styles.domainSubGrid, { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4 }]}>
+                                        <Text style={styles.domainSubLabel}>Hasil Postur</Text>
+                                        <Text style={[styles.domainSubValPrimary, { marginTop: 0 }]}>
+                                            {latest_dpa.conclusion || "Normal"}
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <Text style={styles.domainEmpty}>Belum ada asesmen postur (DPA)</Text>
+                                )}
+                            </View>
                         </View>
+                    </View>
+
+                    {/* ═══════════════════════════════════════════════════════
+                        KOLOM KANAN (RIGHT COLUMN):
+                        - PERFORMANCE TRENDS TABLE
+                        - ATHLETE FITNESS SCORES (GROUPED BY CATEGORY)
+                       ═══════════════════════════════════════════════════════ */}
+                    <View style={styles.columnRight}>
+                        {/* ── A. PERFORMANCE TRENDS (SKOR PER KATEGORI & TREND) ── */}
+                        <View style={styles.sectionBanner}>
+                            <Text style={styles.sectionBannerTitle}>PERFORMANCE TRENDS</Text>
+                        </View>
+
+                        <View style={styles.tableContainer}>
+                            <View style={styles.tableHeadRow}>
+                                <Text style={[styles.tableTh, { width: "38%", textAlign: "left", paddingLeft: 4 }]}>
+                                    CATEGORY
+                                </Text>
+                                <Text style={[styles.tableTh, { width: "20%" }]}>PREV</Text>
+                                <Text style={[styles.tableTh, { width: "21%" }]}>CURRENT</Text>
+                                <Text style={[styles.tableTh, { width: "21%" }]}>CHANGE</Text>
+                            </View>
+
+                            {(() => {
+                                // Derive category-level trends
+                                let catTrends = [];
+
+                                if (comparisonData && comparisonData.length > 0) {
+                                    catTrends = comparisonData.map((cd) => {
+                                        const prev = Number(cd.previous || 0);
+                                        const curr = Number(cd.latest || 0);
+                                        const diff = prev > 0 ? curr - prev : 0;
+                                        return {
+                                            name: cd.name,
+                                            prev: prev > 0 ? prev : null,
+                                            curr: curr,
+                                            change: diff,
+                                            hasPrev: prev > 0,
+                                        };
+                                    });
+                                } else {
+                                    // Calculate from categoriesMap
+                                    const cNames =
+                                        categoryNames.length > 0
+                                            ? categoryNames
+                                            : ["STRENGTH", "POWER", "AGILITY", "SPEED", "SPORT", "STABILITY"];
+
+                                    catTrends = cNames.map((cName) => {
+                                        const items = categoriesMap[cName] || [];
+                                        const currScores = items
+                                            .map((it) => Number(it.score))
+                                            .filter((s) => !isNaN(s) && s > 0);
+                                        const prevScores = items
+                                            .map((it) => Number(it.previous_score || it.previous_value))
+                                            .filter((s) => !isNaN(s) && s > 0);
+
+                                        const currAvg =
+                                            currScores.length > 0
+                                                ? currScores.reduce((a, b) => a + b, 0) / currScores.length
+                                                : 75;
+                                        const prevAvg =
+                                            prevScores.length > 0
+                                                ? prevScores.reduce((a, b) => a + b, 0) / prevScores.length
+                                                : null;
+
+                                        const diff = prevAvg !== null ? currAvg - prevAvg : 0;
+
+                                        return {
+                                            name: cName,
+                                            prev: prevAvg,
+                                            curr: currAvg,
+                                            change: diff,
+                                            hasPrev: prevAvg !== null,
+                                        };
+                                    });
+                                }
+
+                                return catTrends.map((cat, idx) => {
+                                    const prevText = cat.hasPrev && cat.prev !== null ? `${cat.prev.toFixed(1)}%` : "-";
+                                    const currText = `${cat.curr.toFixed(1)}%`;
+                                    const isPositive = cat.change > 0;
+                                    const isNegative = cat.change < 0;
+                                    const changeColor = !cat.hasPrev
+                                        ? "#64748b"
+                                        : isPositive
+                                          ? THEME.accentGreen
+                                          : isNegative
+                                            ? THEME.accentRed
+                                            : "#64748b";
+                                    const changeText = !cat.hasPrev
+                                        ? "-"
+                                        : `${isPositive ? "+" : ""}${cat.change.toFixed(1)}%`;
+
+                                    const isAlt = idx % 2 === 1;
+
+                                    return (
+                                        <View
+                                            key={idx}
+                                            style={[
+                                                styles.tableRow,
+                                                isAlt ? { backgroundColor: "#f8fafc" } : {},
+                                            ]}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.tableCellBold,
+                                                    { width: "38%", textAlign: "left", paddingLeft: 4 },
+                                                ]}
+                                            >
+                                                {cat.name}
+                                            </Text>
+                                            <Text style={[styles.tableCell, { width: "20%", color: "#64748b" }]}>
+                                                {prevText}
+                                            </Text>
+                                            <Text style={[styles.tableCellBold, { width: "21%" }]}>
+                                                {currText}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.tableCellBold,
+                                                    { width: "21%", color: changeColor },
+                                                ]}
+                                            >
+                                                {changeText}
+                                            </Text>
+                                        </View>
+                                    );
+                                });
+                            })()}
+                        </View>
+
+                        {/* ── B. ATHLETE FITNESS SCORES (BY CATEGORY) ── */}
+                        <View style={styles.sectionBanner}>
+                            <Text style={styles.sectionBannerTitle}>ATHLETE FITNESS SCORES</Text>
+                        </View>
+
+                        {(categoryNames.length > 0
+                            ? categoryNames
+                            : ["STRENGTH", "POWER", "AGILITY", "SPEED", "SPORT SPECIFIC", "STABILITY"]
+                        ).map((catName, cIdx) => {
+                            const catItems =
+                                categoriesMap[catName] ||
+                                (catName === "STRENGTH"
+                                    ? [
+                                          { name: "Chin Up", previous_value: "-", result_value: "13", target_value: "15", score: 77 },
+                                          { name: "BF %", previous_value: "5.5", result_value: "5.7", target_value: "5.0", score: 97 },
+                                          { name: "Lean Mass", previous_value: "98.8", result_value: "101", target_value: "110", score: 77 },
+                                      ]
+                                    : catName === "POWER"
+                                      ? [
+                                            { name: "Broad Jump", previous_value: "300.5", result_value: "297", target_value: "300", score: 94 },
+                                            { name: "Jump Mat NCM", previous_value: "-", result_value: "30.5", target_value: "35", score: 81 },
+                                            { name: "Jump Mat CMJ", previous_value: "-", result_value: "32.5", target_value: "36", score: 88 },
+                                        ]
+                                      : catName === "AGILITY"
+                                        ? [
+                                              { name: "Pro Agil R", previous_value: "-", result_value: "4.1", target_value: "4.0", score: 85 },
+                                              { name: "Pro Agil L", previous_value: "-", result_value: "4.0", target_value: "4.0", score: 87 },
+                                          ]
+                                        : catName === "SPEED"
+                                          ? [{ name: "10m Sprint", previous_value: "1.665", result_value: "1.617", target_value: "1.60", score: 100 }]
+                                          : catName === "SPORT SPECIFIC"
+                                            ? [
+                                                  { name: "Approach Raw", previous_value: "141.5", result_value: "142", target_value: "145", score: 100 },
+                                                  { name: "Block Raw", previous_value: "131.5", result_value: "131.5", target_value: "135", score: 97 },
+                                              ]
+                                            : [
+                                                  { name: "FMS OHS", previous_value: "-", result_value: "2", target_value: "3", score: 66 },
+                                                  { name: "Dorsi-L", previous_value: "-", result_value: "5", target_value: "5", score: 78 },
+                                                  { name: "Dorsi-R", previous_value: "-", result_value: "5", target_value: "5", score: 75 },
+                                              ]);
+
+                            return (
+                                <View key={cIdx} style={styles.categoryGroupContainer}>
+                                    <Text style={styles.categoryTitleText}>{catName}</Text>
+
+                                    <View style={[styles.tableContainer, { marginBottom: 2 }]}>
+                                        <View style={styles.tableHeadRow}>
+                                            <Text
+                                                style={[
+                                                    styles.tableTh,
+                                                    { width: "29%", textAlign: "left", paddingLeft: 4 },
+                                                ]}
+                                            >
+                                                ITEM TEST
+                                            </Text>
+                                            <Text style={[styles.tableTh, { width: "13%" }]}>PREV</Text>
+                                            <Text style={[styles.tableTh, { width: "14%" }]}>CURRENT</Text>
+                                            <Text style={[styles.tableTh, { width: "14%" }]}>TARGET</Text>
+                                            <Text style={[styles.tableTh, { width: "15%" }]}>CHANGE</Text>
+                                            <Text style={[styles.tableTh, { width: "15%" }]}>RATING</Text>
+                                        </View>
+
+                                        {catItems.map((item, rIdx) => {
+                                            const prevVal =
+                                                item.previous_value !== undefined && item.previous_value !== null && item.previous_value !== ""
+                                                    ? String(item.previous_value)
+                                                    : item.previous_result !== undefined && item.previous_result !== null && item.previous_result !== ""
+                                                      ? String(item.previous_result)
+                                                      : item.previous !== undefined && item.previous !== null && item.previous !== ""
+                                                        ? String(item.previous)
+                                                        : item.prev !== undefined && item.prev !== null && item.prev !== ""
+                                                          ? String(item.prev)
+                                                          : item.prev_0 !== undefined && item.prev_0 !== null && item.prev_0 !== "" && Number(item.prev_0) > 0
+                                                            ? String(item.prev_0)
+                                                            : "-";
+
+                                            const currVal =
+                                                item.result_value !== undefined && item.result_value !== null
+                                                    ? String(item.result_value)
+                                                    : item.result !== undefined && item.result !== null
+                                                      ? String(item.result)
+                                                      : "-";
+
+                                            const targetVal =
+                                                item.target_value !== undefined && item.target_value !== null
+                                                    ? String(item.target_value)
+                                                    : item.target !== undefined && item.target !== null
+                                                      ? String(item.target)
+                                                      : "-";
+
+                                            // Growth calculation
+                                            let growthNum = null;
+                                            if (item.growth !== undefined && item.growth !== null && item.growth !== "") {
+                                                growthNum = Number(item.growth);
+                                            } else if (item.growth_rate !== undefined && item.growth_rate !== null) {
+                                                growthNum = Number(item.growth_rate);
+                                            } else if (prevVal !== "-" && currVal !== "-") {
+                                                const p = parseFloat(prevVal);
+                                                const c = parseFloat(currVal);
+                                                if (!isNaN(p) && !isNaN(c) && p > 0) {
+                                                    growthNum = ((c - p) / p) * 100;
+                                                }
+                                            }
+
+                                            const hasGrowth = growthNum !== null && !isNaN(growthNum) && prevVal !== "-";
+                                            const isPositive = hasGrowth && growthNum > 0;
+                                            const isNegative = hasGrowth && growthNum < 0;
+                                            const changeColor = !hasGrowth
+                                                ? "#64748b"
+                                                : isPositive
+                                                  ? THEME.accentGreen
+                                                  : isNegative
+                                                    ? THEME.accentRed
+                                                    : "#64748b";
+                                            const changeText = !hasGrowth
+                                                ? "-"
+                                                : `${isPositive ? "+" : ""}${growthNum.toFixed(1)}%`;
+
+                                            const scoreNum = item.score !== undefined && item.score !== null ? Number(item.score) : 75;
+                                            const ratingObj = getScoreBadge(scoreNum);
+
+                                            const isAlt = rIdx % 2 === 1;
+
+                                            return (
+                                                <View
+                                                    key={rIdx}
+                                                    style={[
+                                                        styles.tableRow,
+                                                        isAlt ? { backgroundColor: "#f8fafc" } : {},
+                                                    ]}
+                                                >
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCellBold,
+                                                            {
+                                                                width: "29%",
+                                                                textAlign: "left",
+                                                                paddingLeft: 4,
+                                                            },
+                                                        ]}
+                                                    >
+                                                        {item.name}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "13%", color: "#64748b" },
+                                                        ]}
+                                                    >
+                                                        {prevVal}
+                                                    </Text>
+                                                    <Text style={[styles.tableCellBold, { width: "14%" }]}>
+                                                        {currVal}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCell,
+                                                            { width: "14%", color: "#64748b" },
+                                                        ]}
+                                                    >
+                                                        {targetVal}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCellBold,
+                                                            { width: "15%", color: changeColor },
+                                                        ]}
+                                                    >
+                                                        {changeText}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.tableCellBold,
+                                                            {
+                                                                width: "15%",
+                                                                color: ratingObj.color,
+                                                                fontSize: 5.4,
+                                                            },
+                                                        ]}
+                                                    >
+                                                        {ratingObj.label}
+                                                    </Text>
+                                                </View>
+                                            );
+                                        })}
+                                    </View>
+                                </View>
+                            );
+                        })}
                     </View>
                 </View>
 
-                {/* ─── 3. SIGNATURE SECTION ─── */}
-                <View style={styles.signRow}>
-                    <View style={styles.signBox}>
-                        <Text style={styles.signLabel}>Atlet / Klien</Text>
-                        <Text style={styles.signName}>
-                            {athlete?.name || "Athlete"}
-                        </Text>
+                {/* ─── 3. GALERI BIOMETRIK ─── */}
+                <View style={{ marginTop: 3 }}>
+                    <View style={styles.sectionBanner}>
+                        <Text style={styles.sectionBannerTitle}>GALERI BIOMETRIK & DOKUMENTASI FISIK</Text>
                     </View>
-                    <View style={styles.signBox}>
-                        <Text style={styles.signLabel}>Pelatih Kepala</Text>
-                        <Text style={styles.signName}>
-                            {stats?.coaches_text && stats.coaches_text !== "-"
-                                ? stats.coaches_text
-                                : "Coach Figo, Coach Andri"}
-                        </Text>
-                    </View>
-                    <View style={styles.signBox}>
-                        <Text style={styles.signLabel}>
-                            Direktur Performa Olahraga
-                        </Text>
-                        <Text style={styles.signName}>Olympus Lead</Text>
+
+                    <View style={[styles.tableContainer, { padding: 3.5 }]}>
+                        {galleries && galleries.length > 0 ? (
+                            <View style={{ flexDirection: "row", gap: 5, justifyContent: "flex-start" }}>
+                                {galleries.slice(0, 4).map((photo, pIdx) => {
+                                    const photoDate = photo.created_at
+                                        ? new Date(photo.created_at).toLocaleDateString("id-ID", {
+                                              day: "numeric",
+                                              month: "short",
+                                              year: "numeric",
+                                          })
+                                        : "-";
+                                    return (
+                                        <View
+                                            key={pIdx}
+                                            style={{
+                                                width: `${100 / Math.min(4, Math.max(1, galleries.slice(0, 4).length)) - 1.5}%`,
+                                                borderWidth: 0.5,
+                                                borderColor: THEME.borderLight,
+                                                borderRadius: 1.5,
+                                                backgroundColor: "#f8fafc",
+                                                padding: 2.5,
+                                            }}
+                                        >
+                                            <Image
+                                                src={photo.image_path}
+                                                style={{
+                                                    width: "100%",
+                                                    height: 52,
+                                                    objectFit: "cover",
+                                                    borderRadius: 1,
+                                                }}
+                                            />
+                                            <View style={{ marginTop: 1.5 }}>
+                                                <Text style={{ fontSize: 4.8, fontFamily: "Helvetica-Bold", color: THEME.textDark }}>
+                                                    {photoDate}
+                                                </Text>
+                                                {photo.notes ? (
+                                                    <Text
+                                                        style={{
+                                                            fontSize: 4.2,
+                                                            fontFamily: "Helvetica",
+                                                            color: "#64748b",
+                                                            fontStyle: "italic",
+                                                            marginTop: 0.5,
+                                                        }}
+                                                        numberOfLines={1}
+                                                    >
+                                                        "{photo.notes}"
+                                                    </Text>
+                                                ) : null}
+                                            </View>
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        ) : (
+                            <View style={{ paddingVertical: 4, alignItems: "center", justifyContent: "center" }}>
+                                <Text style={{ fontSize: 5.2, fontFamily: "Helvetica", color: "#94a3b8", fontStyle: "italic" }}>
+                                    Belum ada dokumentasi foto biometrik atlet
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </View>
-            </PdfPageTemplate>
+
+                {/* ─── 4. BOTTOM FOOTER BAR ─── */}
+                <View style={styles.footerBar}>
+                    <Text style={styles.footerLeft}>PHYSICAL TEST REPORT</Text>
+                    <Text style={styles.footerRight}>
+                        POWERED BY:{" "}
+                        <Text style={styles.footerBrand}>
+                            OLYMPUS PERFORMANCE
+                        </Text>
+                    </Text>
+                </View>
+            </Page>
         </Document>
     );
 }

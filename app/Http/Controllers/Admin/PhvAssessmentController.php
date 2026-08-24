@@ -12,21 +12,25 @@ class PhvAssessmentController extends Controller
 {
     public function index()
     {
-        // Get all athletes with their latest PHV assessment
+        // Get all athletes with their latest PHV assessment & sport
         $athletes = User::where('role', 'athlete')
-            ->with(['phvAssessments' => function($q) {
+            ->with(['sport', 'phvAssessments' => function($q) {
                 $q->latest('assessment_date');
             }])
             ->orderBy('name')
             ->get();
+
+        $sports = \App\Models\Sport::orderBy('name')->get();
         
         return Inertia::render('Admin/Phv/Index', [
-            'athletes' => $athletes
+            'athletes' => $athletes,
+            'sports' => $sports,
         ]);
     }
 
     public function show(User $user)
     {
+        $user->load(['sport', 'coaches']);
         $assessments = PhvAssessment::where('user_id', $user->id)
             ->orderBy('assessment_date', 'desc')
             ->get();
