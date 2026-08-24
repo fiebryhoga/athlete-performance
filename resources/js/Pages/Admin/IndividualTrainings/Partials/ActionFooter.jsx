@@ -17,32 +17,32 @@ export default function ActionFooter({
 
     if (!isAthlete) {
         return (
-            <div className="sticky bottom-0 z-40 mt-8 p-4 sm:p-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 flex justify-end items-center gap-3 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-2xl">
+            <div className="flex justify-end items-center gap-2.5 pt-2">
                 {recentlySuccessful && (
-                    <span className="text-sm font-bold text-slate-500 flex justify-center items-center gap-1">
-                        <Check size={16} className="text-green-500" /> Tersimpan
+                    <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                        <Check size={14} /> Tersimpan
                     </span>
                 )}
                 {isCompleted && (
-                    <span className="flex justify-center items-center gap-2 px-6 py-2.5 bg-green-50 text-green-700 rounded-xl text-sm font-bold border border-green-200">
-                        <CheckCircle size={16} /> Program Selesai
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-md text-xs font-bold border border-emerald-200">
+                        <CheckCircle size={13} /> Program Selesai
                     </span>
                 )}
                 <button
                     type="submit"
                     disabled={processing}
-                    className="flex justify-center items-center gap-2 px-6 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                    <Save size={16} /> Simpan Update RPE
+                    <Save size={13} /> Simpan Update RPE
                 </button>
                 {!isCompleted && (
                     <button
                         type="button"
                         disabled={processing}
                         onClick={onComplete}
-                        className="flex justify-center items-center gap-2 px-6 py-2.5 bg-green-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/20 disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                        <CheckCircle size={16} /> Selesaikan Latihan
+                        <CheckCircle size={13} /> Selesaikan Latihan
                     </button>
                 )}
             </div>
@@ -52,16 +52,16 @@ export default function ActionFooter({
     const hasSavedDraft = training?.status === "in_progress" || isCompleted;
 
     return (
-        <div className="sticky bottom-0 z-40 mt-8 p-4 sm:p-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 sm:gap-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] rounded-t-2xl">
+        <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2.5 pt-2">
             {isLocked ? (
                 <>
                     {recentlySuccessful && (
-                        <span className="text-sm font-bold text-slate-500 flex justify-center items-center gap-1 mt-2 sm:mt-0">
-                            <Check size={16} className="text-green-500" /> Tersimpan
+                        <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                            <Check size={14} /> Tersimpan
                         </span>
                     )}
-                    <span className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-green-50 text-green-700 rounded-xl text-sm font-bold border border-green-200">
-                        <CheckCircle size={16} /> Program Selesai
+                    <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-md text-xs font-bold border border-emerald-200">
+                        <CheckCircle size={13} /> Program Selesai
                     </span>
 
                     <button
@@ -70,16 +70,16 @@ export default function ActionFooter({
                             e.preventDefault();
                             setIsEditingActuals(true);
                         }}
-                        className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm"
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
                     >
-                        <Edit size={16} /> Edit Hasil Latihan
+                        <Edit size={13} /> Edit Hasil Latihan
                     </button>
                 </>
             ) : (
                 <>
                     {recentlySuccessful && (
-                        <span className="text-sm font-bold text-slate-500 flex justify-center items-center gap-1 mt-2 sm:mt-0">
-                            <Check size={16} className="text-green-500" /> Draft Tersimpan
+                        <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                            <Check size={14} /> Draft Tersimpan
                         </span>
                     )}
 
@@ -90,27 +90,28 @@ export default function ActionFooter({
                                 e.preventDefault();
                                 setIsEditingActuals(false);
                             }}
-                            className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm"
+                            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
                         >
-                            <X size={16} /> Batal Edit
+                            <X size={13} /> Batal Edit
                         </button>
                     )}
 
                     <button
                         type="submit"
                         disabled={processing}
-                        className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                        <Save size={16} /> Simpan Sebagai Draft
+                        <Save size={13} /> Simpan Sebagai Draft
                     </button>
 
                     <button
                         type="button"
                         disabled={processing}
                         onClick={onComplete}
-                        className="flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-2.5 bg-orange-500 text-white border border-transparent rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/20 disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                        Selesaikan Latihan <ArrowRight size={16} />
+                        <span>Selesaikan Latihan</span>
+                        <ArrowRight size={13} />
                     </button>
                 </>
             )}

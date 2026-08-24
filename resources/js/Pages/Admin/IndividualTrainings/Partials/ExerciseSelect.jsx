@@ -91,31 +91,31 @@ export default function ExerciseSelect({ value, options, onChange }) {
                 width: `${coords.width}px`,
                 zIndex: 99999,
             }}
-            className="bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white border border-slate-200 rounded-md shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         >
-            <div className="p-2 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
-                <Search size={14} className="text-slate-400 ml-1 shrink-0" />
+            <div className="p-1.5 border-b border-slate-100 flex items-center gap-1.5 bg-slate-50/80">
+                <Search size={13} className="text-slate-400 ml-1 shrink-0" />
                 <input 
                     autoFocus
                     className="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-xs p-1 text-slate-800 placeholder:text-slate-400 font-medium"
-                    placeholder="Cari atau ketik baru..."
+                    placeholder="Cari latihan..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
             </div>
-
-            <div className="max-h-[250px] overflow-y-auto p-1.5 space-y-1">
+            
+            <div className="max-h-60 overflow-y-auto p-1 space-y-0.5 custom-scrollbar">
                 {filtered.map(opt => (
                     <button
                         key={opt.id}
                         type="button"
                         onClick={() => { onChange(opt.id); setIsOpen(false); setSearch(''); }}
-                        className="w-full text-left px-3 py-2.5 text-xs hover:bg-[#ed4e18]/10 hover:text-[#ed4e18] rounded-lg flex items-center justify-between group transition-all cursor-pointer"
+                        className="w-full text-left px-2.5 py-1.5 text-xs hover:bg-orange-50 hover:text-orange-700 rounded flex items-center justify-between group transition-colors cursor-pointer"
                     >
                         <div className="flex flex-col truncate pr-2">
-                            <span className="font-bold text-slate-800 group-hover:text-[#ed4e18] truncate">{opt.name}</span>
+                            <span className="font-semibold text-slate-800 group-hover:text-orange-700 truncate">{opt.name}</span>
                         </div>
-                        {value == opt.id && <Check size={14} className="text-[#ed4e18] shrink-0 font-bold" />}
+                        {value == opt.id && <Check size={13} className="text-orange-600 shrink-0 font-bold" />}
                     </button>
                 ))}
 
@@ -123,9 +123,9 @@ export default function ExerciseSelect({ value, options, onChange }) {
                     <button
                         type="button"
                         onClick={handleCreateNew}
-                        className="w-full text-left px-3 py-3 text-xs bg-[#ed4e18] text-white rounded-lg flex items-center justify-center gap-2 hover:bg-[#ed4e18]/90 mt-1 shadow-2xs transition-all font-bold cursor-pointer"
+                        className="w-full text-left px-2.5 py-2 text-xs bg-orange-500 text-white rounded flex items-center justify-center gap-1.5 hover:bg-orange-600 mt-1 shadow-2xs transition-all font-semibold cursor-pointer"
                     >
-                        <Plus size={14} className="shrink-0" />
+                        <Plus size={13} className="shrink-0" />
                         <span className="truncate">Tambah "{search}" ke Master</span>
                     </button>
                 )}
@@ -142,7 +142,7 @@ export default function ExerciseSelect({ value, options, onChange }) {
                     if (!isOpen) updateCoords();
                     setIsOpen(!isOpen);
                 }}
-                className="w-full text-left px-3 py-2 text-xs font-bold bg-white rounded-lg border border-slate-200 hover:border-[#ed4e18] shadow-2xs transition-all flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#ed4e18]/20 focus:border-[#ed4e18] cursor-pointer"
+                className="w-full text-left px-2.5 py-1.5 text-xs font-semibold bg-white rounded-md border border-slate-200 hover:border-orange-400 shadow-2xs transition-all flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 cursor-pointer"
             >
                 <span className={value ? "text-slate-800 truncate" : "text-slate-400 font-normal"}>
                     {selectedEx ? selectedEx.name : "Pilih Latihan..."}

@@ -19,13 +19,11 @@ export default function ExerciseQuickModal({ isOpen, onClose, onSuccess, initial
         if (isOpen) {
             setName(initialName);
             setErrors({});
-            // Reset other fields
             setDescription('');
             setCategoryId('');
             setImages([]);
             setVideos(['']);
             
-            // Fetch categories if not loaded
             if (categories.length === 0) {
                 setLoadingCategories(true);
                 axios.get('/admin/exercises/api/categories')
@@ -86,7 +84,6 @@ export default function ExerciseQuickModal({ isOpen, onClose, onSuccess, initial
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            // Success
             if (onSuccess) {
                 onSuccess(res.data);
             }
@@ -103,135 +100,159 @@ export default function ExerciseQuickModal({ isOpen, onClose, onSuccess, initial
     };
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white border border-zinc-200 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-5 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white border border-slate-200/90 rounded-md shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+                {/* Modal Header */}
+                <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
-                        <h3 className="text-lg font-bold tracking-tight text-zinc-900">Tambah Master Latihan</h3>
-                        <p className="text-[10px] text-zinc-500 font-bold mt-0.5 uppercase tracking-wider">Quick Create</p>
+                        <h3 className="text-xs font-bold tracking-tight text-slate-900">Tambah Master Latihan</h3>
                     </div>
-                    <button onClick={onClose} disabled={loading} className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors">
-                        <X size={20}/>
+                    <button 
+                        type="button"
+                        onClick={onClose} 
+                        disabled={loading} 
+                        className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    >
+                        <X size={14} />
                     </button>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Form Body */}
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
                     {/* Basic Info */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <div>
-                            <label className="text-xs text-zinc-500 font-bold mb-1.5 block">Nama Latihan <span className="text-red-500">*</span></label>
+                            <label className="text-[11px] text-slate-600 font-bold mb-1 block">
+                                Nama Latihan <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className={`w-full bg-zinc-50 border rounded-lg text-sm py-2 px-3 outline-none transition-all ${errors.name ? "border-red-500 focus:ring-1 focus:ring-red-500" : "border-zinc-200 focus:ring-1 focus:ring-zinc-900"}`}
+                                placeholder="Contoh: Barbell Bench Press"
+                                className={`w-full bg-white border rounded-md text-xs font-medium py-2 px-3 outline-none transition-all shadow-2xs ${errors.name ? "border-red-400 focus:ring-1 focus:ring-red-400" : "border-slate-200 focus:ring-1 focus:ring-orange-400 focus:border-orange-400"}`}
                                 required
                             />
-                            {errors.name && <span className="text-[10px] text-red-500 font-bold mt-1 block">{errors.name[0]}</span>}
+                            {errors.name && <span className="text-[10px] text-red-500 font-semibold mt-0.5 block">{errors.name[0]}</span>}
                         </div>
 
                         <div>
-                            <label className="text-xs text-zinc-500 font-bold mb-1.5 block">Kategori</label>
+                            <label className="text-[11px] text-slate-600 font-bold mb-1 block">
+                                Kategori
+                            </label>
                             <select
                                 value={categoryId}
                                 onChange={(e) => setCategoryId(e.target.value)}
-                                className="w-full bg-zinc-50 border border-zinc-200 rounded-lg text-sm py-2 px-3 outline-none focus:ring-1 focus:ring-zinc-900"
+                                className="w-full bg-white border border-slate-200 rounded-md text-xs font-medium py-2 px-3 outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs leading-normal cursor-pointer"
                             >
                                 <option value="">Tanpa Kategori</option>
                                 {categories.map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
-                            {loadingCategories && <span className="text-[10px] text-zinc-400 block mt-1">Memuat kategori...</span>}
+                            {loadingCategories && <span className="text-[10px] text-slate-400 block mt-0.5">Memuat kategori...</span>}
                         </div>
 
                         <div>
-                            <label className="text-xs text-zinc-500 font-bold mb-1.5 block">Deskripsi / Instruksi</label>
+                            <label className="text-[11px] text-slate-600 font-bold mb-1 block">
+                                Deskripsi / Instruksi
+                            </label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full bg-zinc-50 border border-zinc-200 rounded-lg text-sm py-2 px-3 outline-none focus:ring-1 focus:ring-zinc-900 min-h-[80px]"
+                                className="w-full bg-white border border-slate-200 rounded-md text-xs font-medium p-2.5 outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs min-h-[70px] leading-relaxed placeholder:text-slate-400"
                                 placeholder="Cara melakukan gerakan ini..."
                             />
                         </div>
                     </div>
 
-                    <div className="border-t border-zinc-100 pt-6 space-y-6">
+                    <div className="border-t border-slate-100 pt-3.5 space-y-3.5">
                         {/* Images */}
                         <div>
-                            <label className="text-xs text-zinc-500 font-bold mb-2 flex items-center gap-1.5">
-                                <ImageIcon size={14} /> Foto Referensi
+                            <label className="text-[11px] text-slate-600 font-bold mb-1.5 flex items-center gap-1.5">
+                                <ImageIcon size={12} className="text-orange-500" /> Foto Referensi
                             </label>
                             
                             {images.length > 0 && (
-                                <div className="grid grid-cols-3 gap-3 mb-3">
+                                <div className="grid grid-cols-4 gap-2 mb-2">
                                     {images.map((file, i) => (
-                                        <div key={i} className="relative aspect-square bg-zinc-100 rounded-lg overflow-hidden group border border-zinc-200">
-                                            <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
+                                        <div key={i} className="relative aspect-square bg-slate-100 rounded-md overflow-hidden group border border-slate-200">
+                                            <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="Preview" />
                                             <button 
                                                 type="button" 
                                                 onClick={() => removeNewImage(i)}
-                                                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white"
+                                                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white cursor-pointer"
                                             >
-                                                <Trash2 size={20} />
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-zinc-200 hover:border-zinc-400 hover:bg-zinc-50 transition-colors rounded-xl cursor-pointer">
-                                <Plus size={20} className="text-zinc-400 mb-1" />
-                                <span className="text-xs font-bold text-zinc-500">Unggah Gambar</span>
+                            <label className="flex flex-col items-center justify-center w-full h-18 border border-dashed border-slate-200 hover:border-orange-400 hover:bg-orange-50/20 transition-colors rounded-md cursor-pointer bg-slate-50/40">
+                                <Plus size={16} className="text-slate-400 mb-0.5" />
+                                <span className="text-[11px] font-semibold text-slate-600">Unggah Gambar</span>
                                 <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                             </label>
-                            {errors['images.0'] && <span className="text-[10px] text-red-500 font-bold mt-1 block">{errors['images.0'][0]}</span>}
+                            {errors['images.0'] && <span className="text-[10px] text-red-500 font-semibold mt-0.5 block">{errors['images.0'][0]}</span>}
                         </div>
 
                         {/* Videos */}
                         <div>
-                            <label className="text-xs text-zinc-500 font-bold mb-2 flex items-center gap-1.5">
-                                <Video size={14} /> Link Video Youtube / Drive
+                            <label className="text-[11px] text-slate-600 font-bold mb-1.5 flex items-center gap-1.5">
+                                <Video size={12} className="text-orange-500" /> Link Video Youtube / Drive
                             </label>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                                 {videos.map((vid, idx) => (
-                                    <div key={idx} className="flex gap-2">
+                                    <div key={idx} className="flex gap-1.5">
                                         <input
                                             type="url"
                                             placeholder="https://..."
                                             value={vid}
                                             onChange={(e) => updateVideoRow(idx, e.target.value)}
-                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-lg text-sm py-2 px-3 outline-none focus:ring-1 focus:ring-zinc-900"
+                                            className="w-full bg-white border border-slate-200 rounded-md text-xs font-medium py-1.5 px-3 outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs"
                                         />
-                                        <button type="button" onClick={() => removeVideoRow(idx)} className="p-2 text-zinc-400 hover:text-red-500 transition-colors shrink-0">
-                                            <Trash2 size={16} />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeVideoRow(idx)} 
+                                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-md transition-colors shrink-0 cursor-pointer"
+                                            title="Hapus Link"
+                                        >
+                                            <Trash2 size={13} />
                                         </button>
                                     </div>
                                 ))}
-                                <button type="button" onClick={addVideoRow} className="text-[11px] font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-1 mt-1">
-                                    <Plus size={12} /> Tambah Link Video Lainnya
+                                <button 
+                                    type="button" 
+                                    onClick={addVideoRow} 
+                                    className="text-[11px] font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1 mt-1 cursor-pointer"
+                                >
+                                    <Plus size={11} /> Tambah Link Video Lainnya
                                 </button>
                             </div>
                         </div>
                     </div>
                 </form>
 
-                <div className="p-5 border-t border-zinc-100 bg-zinc-50/50 flex justify-end gap-3">
+                {/* Modal Footer */}
+                <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-2">
                     <button 
                         type="button" 
                         onClick={onClose}
                         disabled={loading}
-                        className="px-4 py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors"
+                        className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     >
                         Batal
                     </button>
                     <button 
+                        type="button"
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-6 py-2 text-sm font-bold bg-zinc-900 text-white hover:bg-zinc-800 rounded-lg shadow-md transition-colors flex items-center gap-2 disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold bg-orange-500 text-white hover:bg-orange-600 rounded-md shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                        {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                        Simpan ke Master
+                        {loading ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                        <span>Simpan ke Master</span>
                     </button>
                 </div>
             </div>

@@ -230,9 +230,9 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                                     onClick={() =>
                                         setIsFilterOpen(!isFilterOpen)
                                     }
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 hover:via-orange-50/40 hover:to-orange-100/60 text-orange-600 border border-slate-200/90 hover:border-orange-300 rounded-md text-xs font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 hover:text-orange-600 border border-slate-200 rounded-md text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                                 >
-                                    <Filter className="w-3.5 h-3.5 text-orange-500" />
+                                    <Filter className="w-3.5 h-3.5 text-slate-400" />
                                     <span>Filter</span>
                                     {activeFilterCount > 0 && (
                                         <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black flex items-center justify-center">
@@ -321,28 +321,30 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                 />
 
                 {/* ─── TABS ─── */}
-                <div className="flex space-x-0.5 bg-white/80 p-0.5 rounded-lg border border-slate-200 w-fit">
+                <div className="flex items-center gap-2">
                     <button
                         type="button"
                         onClick={() => setActiveTab("individual")}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-2 cursor-pointer ${
                             activeTab === "individual"
-                                ? "bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 text-orange-600 border border-slate-200/90 shadow-2xs"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                                ? "bg-orange-500 text-white font-bold shadow-2xs"
+                                : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
                         }`}
                     >
-                        <User className="w-3.5 h-3.5" /> Klien Individu
+                        <User className="w-3.5 h-3.5" />
+                        <span>Klien Individu</span>
                     </button>
                     <button
                         type="button"
                         onClick={() => setActiveTab("group")}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-2 cursor-pointer ${
                             activeTab === "group"
-                                ? "bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 text-orange-600 border border-slate-200/90 shadow-2xs"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                                ? "bg-orange-500 text-white font-bold shadow-2xs"
+                                : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
                         }`}
                     >
-                        <Users className="w-3.5 h-3.5" /> Grup Latihan
+                        <Users className="w-3.5 h-3.5" />
+                        <span>Grup Latihan</span>
                     </button>
                 </div>
 
@@ -388,12 +390,12 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                                                 "admin.individual-trainings.show",
                                                 athlete.id,
                                             )}
-                                            className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                            className="group relative bg-gradient-to-b from-white via-white to-orange-50/15 rounded-lg border border-slate-200/90 hover:border-orange-200/90 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
                                         >
                                             <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                                 {/* Athlete Identity Row */}
                                                 <div className="flex items-start gap-2.5">
-                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
+                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-orange-50/80 text-orange-600 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
                                                         {photo ? (
                                                             <img
                                                                 src={
@@ -504,12 +506,12 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                                             "admin.group-trainings.show",
                                             group.id,
                                         )}
-                                        className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                        className="group relative bg-gradient-to-b from-white via-white to-orange-50/15 rounded-lg border border-slate-200/90 hover:border-orange-200/90 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
                                     >
                                         <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                             {/* Group Identity */}
                                             <div className="flex items-start gap-2.5">
-                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-orange-50/80 text-orange-600 font-bold text-base flex items-center justify-center shrink-0">
                                                     <Users className="w-5 h-5" />
                                                 </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GripVertical, Trash2, AlignLeft, Copy, AlertCircle, FileText, CheckSquare, MessageSquare } from 'lucide-react';
+import { GripVertical, Trash2, Copy, AlertCircle, FileText, CheckSquare, MessageSquare } from 'lucide-react';
 
 export default function TextBlock({ block, onChange, onRemove, onDuplicate, dragHandleProps }) {
     const getCategoryConfig = (category) => {
@@ -8,9 +8,9 @@ export default function TextBlock({ block, onChange, onRemove, onDuplicate, drag
                 return {
                     label: 'N.B (Penting)',
                     icon: AlertCircle,
-                    badgeStyle: 'bg-[#ed4e18]/10 text-[#ed4e18] border-[#ed4e18]/20',
-                    containerStyle: 'border-[#ed4e18]/30 bg-gradient-to-r from-[#ed4e18]/[0.03] to-transparent',
-                    textareaStyle: 'text-slate-900 font-semibold placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                    badgeStyle: 'bg-orange-50 text-orange-600 border-orange-200/60',
+                    containerStyle: 'border-orange-200/80 bg-white',
+                    textareaStyle: 'text-slate-900 font-medium placeholder:text-slate-400 focus:border-orange-400 focus:ring-1 focus:ring-orange-400',
                 };
             case 'instruction':
                 return {
@@ -18,7 +18,7 @@ export default function TextBlock({ block, onChange, onRemove, onDuplicate, drag
                     icon: CheckSquare,
                     badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
                     containerStyle: 'border-slate-200 bg-white',
-                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-orange-400 focus:ring-1 focus:ring-orange-400',
                 };
             case 'description':
                 return {
@@ -26,7 +26,7 @@ export default function TextBlock({ block, onChange, onRemove, onDuplicate, drag
                     icon: FileText,
                     badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
                     containerStyle: 'border-slate-200 bg-white',
-                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-orange-400 focus:ring-1 focus:ring-orange-400',
                 };
             default:
                 return {
@@ -34,7 +34,7 @@ export default function TextBlock({ block, onChange, onRemove, onDuplicate, drag
                     icon: MessageSquare,
                     badgeStyle: 'bg-slate-100 text-slate-700 border-slate-200',
                     containerStyle: 'border-slate-200 bg-white',
-                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-[#ed4e18] focus:ring-[#ed4e18]/10',
+                    textareaStyle: 'text-slate-700 font-medium placeholder:text-slate-400 focus:border-orange-400 focus:ring-1 focus:ring-orange-400',
                 };
         }
     };
@@ -43,75 +43,70 @@ export default function TextBlock({ block, onChange, onRemove, onDuplicate, drag
     const IconComponent = config.icon;
 
     return (
-        <div className={`rounded-2xl border ${config.containerStyle} shadow-sm hover:shadow-md transition-all duration-300 mb-6 overflow-hidden group/block`}>
+        <div className={`rounded-md border ${config.containerStyle} shadow-2xs mb-4 overflow-hidden group/block`}>
             {/* Header Bar */}
-            <div className="bg-slate-50/80 p-3.5 px-5 border-b border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
+            <div className="bg-slate-50/80 p-2.5 px-3 border-b border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2 flex-1 w-full sm:w-auto">
                     <div 
                         {...dragHandleProps} 
-                        className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-200/50 -ml-1 shrink-0"
+                        className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 transition-colors p-1 rounded hover:bg-slate-200/50 -ml-1 shrink-0"
                         title="Tahan dan geser untuk memindahkan"
                     >
-                        <GripVertical size={18} />
+                        <GripVertical size={16} />
                     </div>
                     
                     <div className="flex items-center gap-2">
-                        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 shadow-2xs ${config.badgeStyle}`}>
-                            <IconComponent size={16} />
+                        <div className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 shadow-2xs ${config.badgeStyle}`}>
+                            <IconComponent size={13} />
                         </div>
 
-                        <div className="relative">
-                            <select 
-                                className="appearance-none bg-white border border-slate-200 text-slate-800 rounded-lg text-xs font-bold py-1.5 pl-3 pr-8 shadow-2xs cursor-pointer hover:border-[#ed4e18] outline-none focus:ring-2 focus:ring-[#ed4e18]/20 focus:border-[#ed4e18] transition-all"
-                                value={block.category || 'note'} 
-                                onChange={e => onChange('category', e.target.value)}
-                            >
-                                <option value="instruction">Instruksi Latihan</option>
-                                <option value="description">Deskripsi Sesi</option>
-                                <option value="nb">N.B (Penting)</option>
-                                <option value="note">Catatan Umum</option>
-                            </select>
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
-                            </div>
-                        </div>
+                        <select 
+                            className="bg-white border border-slate-200 text-slate-800 rounded-md text-xs font-bold py-1 pl-2.5 pr-7 shadow-2xs cursor-pointer hover:border-orange-400 outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all leading-normal"
+                            value={block.category || 'note'} 
+                            onChange={e => onChange('category', e.target.value)}
+                        >
+                            <option value="instruction">Instruksi Latihan</option>
+                            <option value="description">Deskripsi Sesi</option>
+                            <option value="nb">N.B (Penting)</option>
+                            <option value="note">Catatan Umum</option>
+                        </select>
                     </div>
 
-                    <div className="w-px h-5 bg-slate-200 hidden sm:block mx-1"></div>
+                    <div className="w-px h-4 bg-slate-200 hidden sm:block mx-1"></div>
 
                     <input 
                         type="text" 
                         placeholder="Judul blok teks (opsional)..." 
-                        className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm font-bold text-slate-900 placeholder:text-slate-400 w-full hover:bg-white/50 focus:bg-white rounded px-2 py-1 transition-all"
+                        className="bg-transparent border-none focus:outline-none focus:ring-0 text-xs font-semibold text-slate-800 placeholder:text-slate-400 w-full hover:bg-white/50 focus:bg-white rounded px-2 py-0.5 transition-all"
                         value={block.title || ''}
                         onChange={e => onChange('title', e.target.value)}
                     />
                 </div>
 
-                <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                <div className="flex items-center gap-1 self-end sm:self-auto shrink-0 border-l border-slate-200 pl-2">
                     <button 
                         type="button" 
                         onClick={onDuplicate} 
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                         title="Duplikat Blok"
                     >
-                        <Copy size={16} />
+                        <Copy size={13} />
                     </button>
                     <button 
                         type="button" 
                         onClick={onRemove} 
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
                         title="Hapus Blok"
                     >
-                        <Trash2 size={16} />
+                        <Trash2 size={13} />
                     </button>
                 </div>
             </div>
 
             {/* Content Body */}
-            <div className="p-5 bg-white/80">
+            <div className="p-3 bg-white">
                 <textarea 
-                    className={`w-full bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200/80 rounded-xl p-4 text-sm leading-relaxed min-h-[100px] resize-y transition-all outline-none focus:ring-2 ${config.textareaStyle}`}
+                    className={`w-full bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-md p-2.5 text-xs leading-relaxed min-h-[80px] resize-y transition-all outline-none ${config.textareaStyle}`}
                     placeholder={
                         block.category === 'nb' 
                             ? 'Tulis catatan penting atau instruksi krusial yang harus diperhatikan atlet di sini...' 

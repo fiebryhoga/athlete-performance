@@ -27,11 +27,12 @@ import {
 
 import ActionFooter from "../IndividualTrainings/Partials/ActionFooter";
 import ExerciseItem from "../IndividualTrainings/Partials/ExerciseItem";
-import PageHeader from "@/Components/Layout/PageHeader";
+import PageHeader from "@/Components/Common/PageHeader";
 
 export default function ShowSession({
     auth,
     training,
+    group,
     availableAthletes = [],
     coaches = [],
 }) {
@@ -509,125 +510,269 @@ export default function ShowSession({
         <AppLayout title={`Detail Sesi - ${training.name || "Latihan"}`}>
             <Head title={`Detail Sesi - ${training.name || "Latihan"}`} />
 
-            <div className="pb-12 mx-auto space-y-8 relative">
-                <div className="flex flex-col gap-6">
-                    <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 p-6 md:p-10 rounded-3xl border border-indigo-700/50 shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-start justify-between gap-6 text-white">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
-                        
-                        <div className="relative z-10 space-y-5 flex-1">
-                            <div className="flex flex-wrap items-center gap-3">
-                                <button type="button" onClick={() => window.history.back()} className="flex items-center gap-1.5 text-indigo-100 hover:text-white transition-colors text-sm font-semibold mr-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-md">
-                                    <ArrowLeft size={16} /> Kembali
-                                </button>
-                                <span className="text-xs font-bold text-white bg-indigo-500/50 px-3 py-1.5 rounded-full backdrop-blur-md border border-indigo-400/30 shadow-inner tracking-wide">
-                                    Sesi {training.session_number}
+            <div className="space-y-4 pb-12">
+                {/* ─── BREADCRUMB & HEADER ─── */}
+                <div className="space-y-1">
+                    <Link
+                        href={isAthlete ? route("athlete.dashboard") : route("admin.group-trainings.show", group?.id || training?.training_group_id || training?.group?.id || 1)}
+                        className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
+                    >
+                        <ChevronLeft size={13} /> Kembali ke Kalender Latihan Grup
+                    </Link>
+
+                    <PageHeader
+                        title={
+                            <div className="flex items-center gap-2">
+                                <span>{training.name || "Detail Sesi Latihan Grup"}</span>
+                                <span className={`text-xs font-semibold ${
+                                    training.status === "completed" || training.is_completed || isCompleted
+                                        ? "text-emerald-600"
+                                        : "text-orange-500"
+                                }`}>
+                                    ({training.status === "completed" || training.is_completed || isCompleted ? "Selesai" : "Terjadwal"})
                                 </span>
-                                <span className={`text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-md border shadow-inner tracking-wide ${training.status === 'completed' || training.is_completed ? 'bg-emerald-500/30 text-emerald-50 border-emerald-400/30' : 'bg-white/10 text-indigo-50 border-white/20'}`}>
-                                    {training.status === 'completed' || training.is_completed ? 'Selesai' : 'Terjadwal'}
-                                </span>
                             </div>
-                            
-                            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
-                                {training.name || 'Program Latihan Grup'}
-                            </h1>
-                            
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-indigo-100">
-                                <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
-                                    <Calendar size={16} className="text-indigo-300" />
-                                    <span className="font-medium">{training.date}</span>
-                                </div>
-                                {training.training_type && (
-                                    <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
-                                        <Target size={16} className="text-indigo-300" />
-                                        <span className="font-medium">{training.training_type}</span>
-                                    </div>
-                                )}
-                                {training.location && (
-                                    <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
-                                        <MapPin size={16} className="text-indigo-300" />
-                                        <span className="font-medium">{training.location}</span>
-                                    </div>
-                                )}
-                            </div>
-                            
-                            <div className="pt-3 flex flex-wrap items-center gap-3">
-                                <span className="text-xs font-bold text-indigo-200 uppercase tracking-wider">Coach:</span>
-                                {coaches && coaches.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {coaches.map(c => (
-                                            <div key={c.id} className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full py-1 pr-4 pl-1 shadow-sm">
-                                                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-400 to-violet-400 text-white flex items-center justify-center shadow-inner">
-                                                    <User size={14} />
-                                                </div>
-                                                <span className="text-xs font-bold text-white tracking-wide">{c.name}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full py-1 pr-4 pl-1 shadow-sm">
-                                        <div className="w-7 h-7 rounded-full bg-white/20 text-indigo-100 flex items-center justify-center shadow-inner">
-                                            <User size={14} />
-                                        </div>
-                                        <span className="text-xs font-bold text-white tracking-wide">Admin</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        
-                        <div className="relative z-10 flex flex-wrap sm:flex-nowrap items-center justify-end gap-3 md:pt-8 w-full md:w-auto">
-                            <a 
-                                href={route("admin.group-trainings.session.export-pdf", training.id)}
-                                className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white rounded-xl text-sm font-bold shadow-lg transition-all"
-                            >
-                                <FileText size={18} /> Download PDF
-                            </a>
-                            {isCoachOrAdmin && (
-                                <Link
-                                    href={route("admin.group-trainings.session.edit", training.id)}
-                                    className="flex-1 sm:flex-none items-center justify-center flex gap-2 px-5 py-3 bg-white text-indigo-900 border border-transparent rounded-xl text-sm font-extrabold shadow-xl hover:bg-indigo-50 hover:scale-105 transition-all transform duration-200"
+                        }
+                        description={`Sesi ${training.session_number} - ${training.date}${training.location ? ` - ${training.location}` : ""}`}
+                        actions={
+                            <div className="flex items-center gap-2">
+                                <a
+                                    href={route("admin.group-trainings.session.export-pdf", training.id)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors"
                                 >
-                                    <Edit2 size={18} /> Edit Sesi
-                                </Link>
-                            )}
-                        </div>
-                    </div>
+                                    <FileText size={13} />
+                                    <span>Download PDF</span>
+                                </a>
+
+                                {isCoachOrAdmin && (
+                                    <Link
+                                        href={route("admin.group-trainings.session.edit", training.id)}
+                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors"
+                                    >
+                                        <Edit2 size={13} />
+                                        <span>Edit Sesi</span>
+                                    </Link>
+                                )}
+                            </div>
+                        }
+                    />
                 </div>
 
-                {/* Warning / Error Messages */}
-                {(!isCoachOrAdmin || mainTab === "detail") && (
-                    <>
+                {/* ─── TWO-COLUMN LAYOUT ─── */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    {/* ═══════════════════════════════════════════════════════
+                        KOLOM KIRI (4 Kolom di LG) — Informasi Sesi, Anggota & Status
+                       ═══════════════════════════════════════════════════════ */}
+                    <div className="lg:col-span-4 space-y-4">
+                        {/* Card 1: Informasi Sesi Latihan */}
+                        <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                            <div className="bg-slate-50/80 border-b border-slate-200/90 px-3.5 py-2.5 flex items-center justify-between">
+                                <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                    <Activity size={13} className="text-orange-500" />
+                                    <span>Informasi Sesi</span>
+                                </h3>
+                                <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded border ${
+                                    training.status === "completed" || training.is_completed || isCompleted
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200/70"
+                                        : "bg-slate-100 text-slate-700 border-slate-200"
+                                }`}>
+                                    {training.status === "completed" || training.is_completed || isCompleted ? "Selesai" : "Terjadwal"}
+                                </span>
+                            </div>
+
+                            <div className="p-3.5 space-y-3 text-xs">
+                                <div>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Nama Sesi</span>
+                                    <span className="font-bold text-slate-900 text-sm block leading-snug">{training.name || "Program Latihan Grup"}</span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Tanggal</span>
+                                        <div className="flex items-center gap-1 font-semibold text-slate-800">
+                                            <Calendar size={12} className="text-orange-500 shrink-0" />
+                                            <span>{training.date}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Nomor Sesi</span>
+                                        <span className="font-bold text-slate-800 text-xs inline-block">
+                                            Sesi {training.session_number}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Fokus Latihan</span>
+                                        <div className="flex items-center gap-1 font-semibold text-slate-800">
+                                            <Target size={12} className="text-orange-500 shrink-0" />
+                                            <span>{training.training_type || "-"}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Lokasi</span>
+                                        <div className="flex items-center gap-1 font-semibold text-slate-800 truncate" title={training.location}>
+                                            <MapPin size={12} className="text-orange-500 shrink-0" />
+                                            <span className="truncate">{training.location || "-"}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-2 border-t border-slate-100">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Pelatih Pendamping</span>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {coaches && coaches.length > 0 ? (
+                                            coaches.map((c) => (
+                                                <span key={c.id} className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded text-[11px] font-semibold text-slate-700">
+                                                    <User size={11} className="text-orange-500" />
+                                                    <span>{c.name}</span>
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <span className="text-slate-400 italic">Admin</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Card 2: Pilih Atlet Anggota Grup */}
+                        {!isAthlete && sortedMembers.length > 0 && (
+                            <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                                <div className="bg-slate-50/80 border-b border-slate-200/90 px-3.5 py-2.5 flex items-center justify-between">
+                                    <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                        <User size={13} className="text-orange-500" />
+                                        <span>Pilih Atlet (Member)</span>
+                                    </h3>
+                                    <span className="text-[10.5px] font-medium text-slate-500">
+                                        {sortedMembers.length} atlet
+                                    </span>
+                                </div>
+
+                                <div className="p-3">
+                                    <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto custom-scrollbar">
+                                        {sortedMembers.map((member) => {
+                                            const pivot = membersPivot.find((p) => p.athlete_id === member.id);
+                                            const isDone = pivot?.is_completed;
+                                            const isSelected = selectedAthleteId === member.id;
+
+                                            return (
+                                                <button
+                                                    key={member.id}
+                                                    type="button"
+                                                    onClick={() => setSelectedAthleteId(member.id)}
+                                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-orange-500 text-white shadow-2xs font-bold"
+                                                            : "bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200"
+                                                    }`}
+                                                >
+                                                    <span>{member.name}</span>
+                                                    {member.isGuest && (
+                                                        <span className={`text-[9px] px-1 py-0.2 rounded font-bold ${
+                                                            isSelected ? "bg-white/20 text-white" : "bg-orange-100 text-orange-600"
+                                                        }`}>
+                                                            GUEST
+                                                        </span>
+                                                    )}
+                                                    {isDone && (
+                                                        <CheckCircle2 size={12} className={isSelected ? "text-white" : "text-emerald-600"} />
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Card 3: Status & Catatan Feedback Atlet Terpilih */}
+                        <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                            <div className="bg-slate-50/80 border-b border-slate-200/90 px-3.5 py-2.5">
+                                <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                    <AlignLeft size={13} className="text-orange-500" />
+                                    <span>Status & Feedback ({sortedMembers.find((m) => m.id === selectedAthleteId)?.name || "Atlet"})</span>
+                                </h3>
+                            </div>
+
+                            <div className="p-3.5 space-y-3">
+                                {/* Status Box */}
+                                {isCompleted ? (
+                                    <div className="p-2.5 rounded-md border border-emerald-200/80 bg-emerald-50/70 flex items-center gap-2 text-xs text-emerald-800">
+                                        <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                                        <div>
+                                            <span className="font-bold block">Selesai Dikerjakan</span>
+                                            {currentPivot?.completed_at && (
+                                                <span className="text-[10.5px] opacity-80 block">
+                                                    {new Date(currentPivot.completed_at).toLocaleString("id-ID", {
+                                                        day: "numeric",
+                                                        month: "short",
+                                                        year: "numeric",
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : training.status === "in_progress" ? (
+                                    <div className="p-2.5 rounded-md border border-amber-200/80 bg-amber-50/70 flex items-center gap-2 text-xs text-amber-800">
+                                        <Clock size={15} className="text-amber-600 shrink-0" />
+                                        <span className="font-bold">Sedang Dikerjakan</span>
+                                    </div>
+                                ) : (
+                                    <div className="p-2.5 rounded-md border border-slate-200/80 bg-slate-50 flex items-center gap-2 text-xs text-slate-600">
+                                        <Clock size={15} className="text-slate-400 shrink-0" />
+                                        <span className="font-bold">Belum Dikerjakan</span>
+                                    </div>
+                                )}
+
+                                {/* Athlete Note Preview */}
+                                {currentPivot?.athlete_note && (
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Catatan Atlet</span>
+                                        <div className="bg-slate-50 border border-slate-200/80 p-2.5 rounded-md text-xs text-slate-700 italic">
+                                            "{currentPivot.athlete_note}"
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Proof Photo Preview */}
+                                {currentPivot?.proof_photo && (
+                                    <div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Foto Bukti</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => openModal("/storage/" + currentPivot.proof_photo, "image")}
+                                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold transition-colors cursor-pointer"
+                                        >
+                                            <FileImage size={13} className="text-orange-500" />
+                                            <span>Lihat Foto Bukti</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ═══════════════════════════════════════════════════════
+                        KOLOM KANAN (8 Kolom di LG) — Program Latihan & Blok Fase
+                       ═══════════════════════════════════════════════════════ */}
+                    <div className="lg:col-span-8 space-y-4">
+                        {/* Error message */}
                         {errors.error && (
-                            <div className="mb-4 p-4 rounded-xl border border-red-200 bg-red-50 flex items-start gap-3 text-sm text-red-800 shadow-sm">
-                                <X size={20} className="mt-0.5 shrink-0" />
+                            <div className="p-3 rounded-md border border-red-200 bg-red-50 flex items-start gap-2.5 text-xs text-red-800 shadow-2xs">
+                                <X size={16} className="mt-0.5 shrink-0" />
                                 <div>
-                                    <h4 className="font-bold mb-1">
-                                        {"Gagal Menyimpan"}
-                                    </h4>
-                                    <p className="leading-relaxed opacity-90">
-                                        {errors.error}
-                                    </p>
+                                    <h4 className="font-bold mb-0.5">Gagal Menyimpan</h4>
+                                    <p className="leading-relaxed opacity-90">{errors.error}</p>
                                 </div>
                             </div>
                         )}
-                        {isAthlete && training.status === "needs_update" && (
-                            <div className="mb-4 p-4 rounded-xl border border-blue-200 bg-blue-50 flex items-start gap-3 text-sm text-blue-800 shadow-sm">
-                                <Info size={20} className="mt-0.5 shrink-0" />
-                                <div>
-                                    <h4 className="font-bold mb-1">
-                                        {"Pembaruan Latihan"}
-                                    </h4>
-                                    <p className="leading-relaxed opacity-90">
-                                        {
-                                            "Admin atau Pelatih baru saja menambahkan atau mengubah program latihan ini. Silakan lengkapi bagian yang belum dikerjakan, lalu tekan tombol Selesaikan Latihan kembali."
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                        {/* Instructions */}
+
+                        {/* Step 1 Instructions / NB */}
                         {training.blocks
-                            
                             .filter((block) => {
                                 if (block.athlete_ids && Array.isArray(block.athlete_ids) && block.athlete_ids.length > 0) {
                                     if (!block.athlete_ids.includes(selectedAthleteId)) return false;
@@ -635,29 +780,26 @@ export default function ShowSession({
                                 return Number(block.step) === 1;
                             })
                             .map((block, bIdx) => {
-                                const isNB = block.category?.toLowerCase() === 'nb' || block.title?.toLowerCase() === 'nb';
+                                const isNB = block.category?.toLowerCase() === "nb" || block.title?.toLowerCase() === "nb";
                                 return (
                                     <div
                                         key={`inst-${bIdx}`}
-                                        className={`p-5 rounded-2xl border-l-4 shadow-sm mb-4 ${isNB ? 'bg-rose-50 border-rose-500' : 'bg-blue-50 border-blue-500'}`}
+                                        className={`p-3.5 rounded-md border-l-[3px] shadow-2xs ${
+                                            isNB
+                                                ? "bg-rose-50/70 border-rose-500 border border-slate-200/80"
+                                                : "bg-blue-50/70 border-blue-500 border border-slate-200/80"
+                                        }`}
                                     >
-                                        <div className="flex items-start gap-3">
-                                            <div className={`mt-0.5 ${isNB ? 'text-rose-500' : 'text-blue-500'}`}>
-                                                <Info size={20} />
+                                        <div className="flex items-start gap-2.5">
+                                            <div className={`mt-0.5 ${isNB ? "text-rose-500" : "text-blue-500"}`}>
+                                                <Info size={16} />
                                             </div>
-                                            <div className="space-y-1.5 flex-1">
-                                                <div className={`font-extrabold text-sm uppercase tracking-wider ${isNB ? 'text-rose-700' : 'text-blue-700'}`}>
-                                                    {block.title ||
-                                                        block.category
-                                                            .replace("_", " ")
-                                                            .replace(/\b\w/g, (l) =>
-                                                                l.toUpperCase(),
-                                                            )}
+                                            <div className="space-y-1 flex-1">
+                                                <div className={`font-bold text-xs uppercase tracking-wider ${isNB ? "text-rose-700" : "text-blue-700"}`}>
+                                                    {block.title || block.category.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                                                 </div>
-                                                <div className={`text-sm whitespace-pre-wrap leading-relaxed max-w-4xl font-medium ${isNB ? 'text-rose-900/80' : 'text-blue-900/80'}`}>
-                                                    {block.items?.[0]?.note ||
-                                                        block.description ||
-                                                        ""}
+                                                <div className={`text-xs whitespace-pre-wrap leading-relaxed font-medium ${isNB ? "text-rose-900/80" : "text-blue-900/80"}`}>
+                                                    {block.items?.[0]?.note || block.description || ""}
                                                 </div>
                                             </div>
                                         </div>
@@ -665,136 +807,27 @@ export default function ShowSession({
                                 );
                             })}
 
-                        {isAdmin &&
-                            (() => {
-                                const isProgress =
-                                    training.status === "in_progress";
-                                const isNeedsUpdate =
-                                    training.status === "needs_update";
-                                const isExcused = false; // Individual doesn't use excused
-
-                                if (isCompleted) {
-                                    return (
-                                        <div className="mt-4 p-3 rounded-lg border border-emerald-200 bg-emerald-50 flex items-center gap-2 text-sm text-emerald-800">
-                                            <CheckCircle2 size={16} />
-                                            <span className="font-semibold">
-                                                {"Selesai Dikerjakan"}
-                                            </span>
-                                            {currentPivot?.completed_at && (
-                                                <span className="opacity-75">
-                                                    pada{" "}
-                                                    {new Date(
-                                                        currentPivot.completed_at,
-                                                    ).toLocaleString("id-ID", {
-                                                        day: "numeric",
-                                                        month: "short",
-                                                        year: "numeric",
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    })}
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                } else if (isNeedsUpdate) {
-                                    return (
-                                        <div className="mt-4 p-3 rounded-lg border border-blue-200 bg-blue-50 flex items-center gap-2 text-sm text-blue-800">
-                                            <Info size={16} />
-                                            <span className="font-semibold">
-                                                {"Perlu Update"}
-                                            </span>
-                                            {training.updated_at && (
-                                                <span className="opacity-75">
-                                                    {" "}
-                                                    (Terakhir disimpan:{" "}
-                                                    {new Date(
-                                                        training.updated_at,
-                                                    ).toLocaleString("id-ID", {
-                                                        day: "numeric",
-                                                        month: "short",
-                                                        year: "numeric",
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    })}
-                                                    )
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                } else if (isProgress) {
-                                    return (
-                                        <div className="mt-4 p-3 rounded-lg border border-amber-200 bg-amber-50 flex items-center gap-2 text-sm text-amber-800">
-                                            <Clock size={16} />
-                                            <span className="font-semibold">
-                                                {"Sedang Dikerjakan"}
-                                            </span>
-                                            {training.updated_at && (
-                                                <span className="opacity-75">
-                                                    {" "}
-                                                    (Terakhir disimpan:{" "}
-                                                    {new Date(
-                                                        training.updated_at,
-                                                    ).toLocaleString("id-ID", {
-                                                        day: "numeric",
-                                                        month: "short",
-                                                        year: "numeric",
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    })}
-                                                    )
-                                                </span>
-                                            )}
-                                        </div>
-                                    );
-                                } else {
-                                    return (
-                                        <div className="mt-4 p-3 rounded-lg border border-zinc-200 bg-zinc-50 flex items-center gap-2 text-sm text-zinc-600">
-                                            <Clock size={16} />
-                                            <span className="font-semibold">
-                                                {"Belum Dikerjakan"}
-                                            </span>
-                                        </div>
-                                    );
-                                }
-                            })()}
-
-                        {!isAthlete && (
-                            <div className="mt-8 mb-6 bg-slate-50/80 p-3 rounded-2xl border border-slate-200 shadow-inner">
-                                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">
-                                    Pilih Atlet (View By Athlete)
-                                </h2>
-                                <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 px-2">
-                                    {sortedMembers.map((member) => {
-                                        const pivot = membersPivot.find(p => p.athlete_id === member.id);
-                                        const isDone = pivot?.is_completed;
-                                        const isSelected = selectedAthleteId === member.id;
-                                        
-                                        return (
-                                            <button
-                                                key={member.id}
-                                                type="button"
-                                                onClick={() => setSelectedAthleteId(member.id)}
-                                                className={`whitespace-nowrap px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${isSelected ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20 transform scale-[1.02]" : "bg-white text-slate-600 border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50"}`}
-                                            >
-                                                {member.name}
-                                                {member.isGuest && (
-                                                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold ml-1 ${isSelected ? "bg-white/20 text-white" : "bg-orange-100 text-orange-600"}`}>GUEST</span>
-                                                )}
-                                                {isDone && <CheckCircle2 size={16} className={isSelected ? "text-indigo-200" : "text-emerald-500"} />}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                        {/* Section Header */}
+                        <div className="flex justify-between items-center bg-white border border-slate-200/80 rounded-md px-4 py-2.5 shadow-2xs">
+                            <div>
+                                <h3 className="text-xs font-bold text-slate-900">
+                                    Skema & Program Latihan
+                                </h3>
+                                <p className="text-[10.5px] text-slate-400 font-medium">
+                                    {training.blocks.filter((block) => {
+                                        if (block.athlete_ids && Array.isArray(block.athlete_ids) && block.athlete_ids.length > 0) {
+                                            if (!block.athlete_ids.includes(selectedAthleteId)) return false;
+                                        }
+                                        return Number(block.step) === 2;
+                                    }).length} fase latihan tersusun
+                                </p>
                             </div>
-                        )}
-                        {/* Table */}
-                        <form
-                            onSubmit={submitRpe}
-                            className=" rounded-xl shadow-sm mt-4 relative"
-                        >
-                            <div className="flex flex-col gap-5 bg-transparent">
-                                {training.blocks
+                        </div>
 
+                        {/* Form Program Latihan */}
+                        <form onSubmit={submitRpe} className="space-y-4">
+                            <div className="flex flex-col gap-4">
+                                {training.blocks
                                     .filter((block) => {
                                         if (block.athlete_ids && Array.isArray(block.athlete_ids) && block.athlete_ids.length > 0) {
                                             if (!block.athlete_ids.includes(selectedAthleteId)) return false;
@@ -812,41 +845,30 @@ export default function ShowSession({
                                             free_strength: "note_only",
                                             cardio: "cardio",
                                         };
-                                        const columns =
-                                            categoryMap[block.category] ||
-                                            "full";
-                                        const phaseLabel =
-                                            block.title ||
-                                            block.category
-                                                .replace("_", " ")
-                                                .replace(/\b\w/g, (l) =>
-                                                    l.toUpperCase(),
-                                                );
+                                        const columns = categoryMap[block.category] || "full";
+                                        const phaseLabel = block.title || block.category.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
                                         if (columns === "note_only") {
                                             return (
                                                 <div
                                                     key={`block-${bIdx}`}
-                                                    className="bg-white border border-zinc-200 rounded-2xl shadow-sm flex flex-col sm:flex-row overflow-hidden"
+                                                    className="bg-white border border-slate-200/90 rounded-md shadow-2xs flex flex-col sm:flex-row overflow-hidden"
                                                 >
-                                                    <div className="bg-zinc-100/50 border-b sm:border-b-0 sm:border-r border-zinc-200 p-4 sm:w-1/4 flex flex-col justify-center gap-2">
-                                                        <h3 className="font-bold text-zinc-900 text-sm">
+                                                    <div className="bg-slate-50/80 border-b sm:border-b-0 sm:border-r border-slate-200/90 p-3 sm:w-1/4 flex flex-col justify-center gap-1.5">
+                                                        <h3 className="font-bold text-slate-900 text-xs">
                                                             {phaseLabel}
                                                         </h3>
                                                         {block.description && (
-                                                            <div className="bg-white/50 border-l-2 border-zinc-400 pl-3 py-1.5 rounded-r">
-                                                                <p className="text-xs text-zinc-600 leading-relaxed">
-                                                                    {
-                                                                        block.description
-                                                                    }
+                                                            <div className="bg-white border-l-2 border-slate-400 pl-2.5 py-1 rounded-r">
+                                                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                                                    {block.description}
                                                                 </p>
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="p-4 sm:w-3/4 flex items-center">
-                                                        <p className="text-sm text-zinc-700 whitespace-pre-wrap leading-relaxed">
-                                                            {block.items?.[0]
-                                                                ?.note || "-"}
+                                                    <div className="p-3 sm:w-3/4 flex items-center">
+                                                        <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                                                            {block.items?.[0]?.note || "-"}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -856,207 +878,113 @@ export default function ShowSession({
                                         return (
                                             <div
                                                 key={`block-${bIdx}`}
-                                                className="bg-white border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col mb-8"
+                                                className="bg-white border border-slate-200/90 rounded-md shadow-2xs overflow-hidden flex flex-col"
                                             >
-                                                <div className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-100 px-6 py-5 flex flex-col gap-3 relative">
-                                                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500 rounded-l-3xl"></div>
+                                                {/* Phase Header */}
+                                                <div className="bg-slate-50/80 border-b border-slate-200/90 px-3.5 py-2.5 flex flex-col gap-1.5">
                                                     <div className="flex items-center justify-between">
-                                                        <h3 className="font-extrabold text-slate-800 text-lg flex items-center gap-3">
-                                                            <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600">
-                                                                <Target size={18} strokeWidth={2.5} />
-                                                            </div>
-                                                            {phaseLabel}
+                                                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
+                                                            <span className="w-1.5 h-3.5 bg-orange-500 rounded-full inline-block shrink-0" />
+                                                            <span>{phaseLabel}</span>
                                                         </h3>
+                                                        <span className="text-[11px] text-slate-400 font-semibold">
+                                                            {block.items?.length || 0} gerakan
+                                                        </span>
                                                     </div>
                                                     {block.description && (
-                                                        <div className="bg-white border border-slate-100 shadow-sm pl-4 pr-3 py-3 rounded-xl ml-9">
-                                                            <p className="text-sm text-slate-600 font-medium leading-relaxed whitespace-pre-wrap">
-                                                                {
-                                                                    block.description
-                                                                }
+                                                        <div className="bg-white border border-slate-200/80 p-2 rounded-md">
+                                                            <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                                                {block.description}
                                                             </p>
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="divide-y divide-slate-100 ">
-                                                    {block.items.map(
-                                                        (item, iIdx) => {
-                                                            const exercise =
-                                                                item.exercise;
-                                                            const images =
-                                                                exercise?.images ||
-                                                                [];
-                                                            const videos =
-                                                                exercise?.videos?.filter(
-                                                                    (v) =>
-                                                                        v &&
-                                                                        v.trim() !==
-                                                                            "",
-                                                                ) || [];
-                                                            const maxSets =
-                                                                Math.max(
-                                                                    ...(
-                                                                        String(
-                                                                            item.sets ||
-                                                                                "0",
-                                                                        ).match(
-                                                                            /\d+/g,
-                                                                        ) || [0]
-                                                                    ).map(
-                                                                        Number,
-                                                                    ),
-                                                                    0,
-                                                                );
 
-                                                            return (
-                                                                <ExerciseItem
-                                                                    key={`item-${bIdx}-${iIdx}`}
-                                                                    item={item}
-                                                                    bIdx={bIdx}
-                                                                    iIdx={iIdx}
-                                                                    block={
-                                                                        block
-                                                                    }
-                                                                    columns={
-                                                                        columns
-                                                                    }
-                                                                    openModal={
-                                                                        openModal
-                                                                    }
-                                                                    data={data}
-                                                                    isReadOnly={
-                                                                        isReadOnly
-                                                                    }
-                                                                    isCoachOrAdmin={
-                                                                        isCoachOrAdmin
-                                                                    }
-                                                                    rpeRecords={
-                                                                        rpeRecords
-                                                                    }
-                                                                    handleExerciseChange={
-                                                                        handleExerciseChange
-                                                                    }
-                                                                    handleSetRpeChange={
-                                                                        handleSetRpeChange
-                                                                    }
-                                                                    handleExerciseArrayChange={
-                                                                        handleExerciseArrayChange
-                                                                    }
-                                                                    handleTargetChange={
-                                                                        handleTargetChange
-                                                                    }
-                                                                    handleTargetArrayChange={
-                                                                        handleTargetArrayChange
-                                                                    }
-                                                                />
-                                                            );
-                                                        },
-                                                    )}
+                                                <div className="divide-y divide-slate-100">
+                                                    {block.items.map((item, iIdx) => (
+                                                        <ExerciseItem
+                                                            key={`item-${bIdx}-${iIdx}`}
+                                                            item={item}
+                                                            bIdx={bIdx}
+                                                            iIdx={iIdx}
+                                                            block={block}
+                                                            columns={columns}
+                                                            openModal={openModal}
+                                                            data={data}
+                                                            isReadOnly={isReadOnly}
+                                                            isCoachOrAdmin={isCoachOrAdmin}
+                                                            rpeRecords={rpeRecords}
+                                                            handleExerciseChange={handleExerciseChange}
+                                                            handleSetRpeChange={handleSetRpeChange}
+                                                            handleExerciseArrayChange={handleExerciseArrayChange}
+                                                            handleTargetChange={handleTargetChange}
+                                                            handleTargetArrayChange={handleTargetArrayChange}
+                                                        />
+                                                    ))}
                                                 </div>
                                             </div>
                                         );
                                     })}
                             </div>
 
-                            {/* Session Feedback & Proof */}
+                            {/* Session Feedback & Proof for Athlete */}
                             {isAthlete && (
-                                <div className="p-4 sm:p-6 bg-white border-t border-zinc-200 flex flex-col gap-4">
+                                <div className="p-3.5 sm:p-4 bg-white border border-slate-200/90 rounded-md shadow-2xs flex flex-col gap-3">
                                     <div>
-                                        <label className="block text-sm font-bold text-zinc-700 mb-2 flex items-center gap-2">
-                                            Training Feedback Note{" "}
-                                            <span className="text-[10px] bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded-lg font-medium lowercase tracking-normal">
-                                                {"Opsional"}
+                                        <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                                            <span>Training Feedback Note</span>
+                                            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-medium">
+                                                Opsional
                                             </span>
                                         </label>
                                         <textarea
-                                            value={data.group_note}
+                                            value={data.athlete_note}
                                             disabled={isReadOnly}
-                                            onChange={(e) =>
-                                                setData(
-                                                    "group_note",
-                                                    e.target.value,
-                                                )
-                                            }
-                                            placeholder="Tambahkan catatan tambahan mengenai sesi latihanmu..."
-                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 p-3 min-h-[100px] resize-y placeholder:text-zinc-400 focus:ring-1 focus:ring-zinc-900 :ring-zinc-100 disabled:opacity-50"
+                                            onChange={(e) => setData("athlete_note", e.target.value)}
+                                            placeholder="Tambahkan catatan tambahan mengenai sesi latihan grup ini..."
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-900 p-2.5 min-h-[80px] resize-y placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50"
                                         ></textarea>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-zinc-700 mb-2 flex items-center gap-2">
-                                            Proof Photo{" "}
-                                            <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-lg font-bold">
-                                                {"Wajib"}
+                                        <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                                            <span>Foto Bukti</span>
+                                            <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded font-bold">
+                                                Wajib
                                             </span>
                                         </label>
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-3">
                                             {data.proof_photo ? (
                                                 <div className="relative group shrink-0">
                                                     <img
-                                                        src={URL.createObjectURL(
-                                                            data.proof_photo,
-                                                        )}
-                                                        className="h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-lg border border-zinc-200 shadow-sm cursor-pointer"
-                                                        onClick={() =>
-                                                            openModal(
-                                                                URL.createObjectURL(
-                                                                    data.proof_photo,
-                                                                ),
-                                                                "image",
-                                                            )
-                                                        }
+                                                        src={URL.createObjectURL(data.proof_photo)}
+                                                        className="h-16 w-16 object-cover rounded-md border border-slate-200 shadow-2xs cursor-pointer"
+                                                        onClick={() => openModal(URL.createObjectURL(data.proof_photo), "image")}
                                                     />
-                                                    {isCompleted &&
-                                                    isAthlete ? null : (
+                                                    {isCompleted && isAthlete ? null : (
                                                         <button
                                                             type="button"
-                                                            onClick={() =>
-                                                                setData(
-                                                                    "proof_photo",
-                                                                    null,
-                                                                )
-                                                            }
-                                                            className="absolute -top-3 -right-3 w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 rounded-full border-2 border-white shadow-sm hover:bg-red-200 transition-colors"
-                                                            title="Delete Photo"
+                                                            onClick={() => setData("proof_photo", null)}
+                                                            className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center bg-red-100 text-red-600 rounded-full border border-white shadow-2xs hover:bg-red-200 transition-colors"
+                                                            title="Hapus Foto"
                                                         >
-                                                            <X
-                                                                size={14}
-                                                                strokeWidth={3}
-                                                            />
+                                                            <X size={11} strokeWidth={3} />
                                                         </button>
                                                     )}
                                                 </div>
-                                            ) : currentPivot?.proof_photo &&
-                                              !data.remove_proof_photo ? (
+                                            ) : currentPivot?.proof_photo && !data.remove_proof_photo ? (
                                                 <div className="relative group shrink-0">
                                                     <img
-                                                        src={
-                                                            "/storage/" +
-                                                            currentPivot.proof_photo
-                                                        }
-                                                        className="h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-lg border border-zinc-200 shadow-sm cursor-pointer"
-                                                        onClick={() =>
-                                                            openModal(
-                                                                "/storage/" +
-                                                                    currentPivot.proof_photo,
-                                                                "image",
-                                                            )
-                                                        }
+                                                        src={"/storage/" + currentPivot.proof_photo}
+                                                        className="h-16 w-16 object-cover rounded-md border border-slate-200 shadow-2xs cursor-pointer"
+                                                        onClick={() => openModal("/storage/" + currentPivot.proof_photo, "image")}
                                                     />
                                                     <button
                                                         type="button"
-                                                        onClick={() =>
-                                                            setData(
-                                                                "remove_proof_photo",
-                                                                true,
-                                                            )
-                                                        }
-                                                        className="absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        title="Delete Draft Photo"
+                                                        onClick={() => setData("remove_proof_photo", true)}
+                                                        className="absolute -top-2 -right-2 bg-slate-900 text-white rounded-full p-1 shadow-2xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        title="Hapus Foto"
                                                     >
-                                                        <X
-                                                            size={10}
-                                                            strokeWidth={3}
-                                                        />
+                                                        <X size={10} strokeWidth={3} />
                                                     </button>
                                                 </div>
                                             ) : null}
@@ -1071,68 +999,24 @@ export default function ShowSession({
                                                         ...data,
                                                         remove_proof_photo: false,
                                                     }));
-                                                    handlePhotoChange(
-                                                        e.target.files[0],
-                                                    );
+                                                    handlePhotoChange(e.target.files[0]);
                                                 }}
                                             />
                                             <label
                                                 htmlFor="proof-photo"
-                                                className={`flex items-center gap-2 px-4 py-2.5 bg-white text-zinc-700 border border-zinc-200 rounded-lg text-sm font-bold cursor-pointer hover:bg-zinc-50 :bg-zinc-800 transition-colors shadow-sm ${isReadOnly ? "opacity-50 pointer-events-none" : ""}`}
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-700 border border-slate-200 rounded-md text-xs font-semibold cursor-pointer hover:bg-slate-50 transition-colors shadow-2xs ${isReadOnly ? "opacity-50 pointer-events-none" : ""}`}
                                             >
-                                                <FileImage size={16} />{" "}
-                                                {data.proof_photo ||
-                                                (currentPivot?.proof_photo &&
-                                                    !data.remove_proof_photo)
-                                                    ? "Change Photo"
-                                                    : "Upload Proof Photo"}
+                                                <FileImage size={13} className="text-orange-500" />
+                                                <span>
+                                                    {data.proof_photo || (currentPivot?.proof_photo && !data.remove_proof_photo)
+                                                        ? "Ganti Foto"
+                                                        : "Unggah Foto Bukti"}
+                                                </span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             )}
-
-                            {isCoachOrAdmin &&
-                                (currentPivot?.athlete_note ||
-                                    currentPivot?.proof_photo) && (
-                                    <div className="p-4 sm:p-6 bg-zinc-50 border-t border-zinc-200 flex flex-col gap-4">
-                                        <h4 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-                                            <AlignLeft
-                                                size={16}
-                                                className="text-zinc-400"
-                                            />{" "}
-                                            Feedback Atlet
-                                        </h4>
-                                        {currentPivot?.athlete_note && (
-                                            <div className="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm">
-                                                <p className="text-sm text-zinc-700 italic">
-                                                    "{currentPivot.athlete_note}"
-                                                </p>
-                                            </div>
-                                        )}
-                                        {currentPivot?.proof_photo && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    openModal(
-                                                        "/storage/" +
-                                                            currentPivot.proof_photo,
-                                                        "image",
-                                                    )
-                                                }
-                                                className="flex items-center justify-center gap-2 px-4 h-10 w-max bg-white text-zinc-700 border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-colors text-xs font-bold shadow-sm"
-                                            >
-                                                <FileImage size={14} /> Lihat
-                                                Foto Bukti
-                                            </button>
-                                        )}
-                                        {errors.proof_photo && (
-                                            <div className="text-red-500 text-sm mt-2">
-                                                {errors.proof_photo}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
 
                             <ActionFooter
                                 isAthlete={isAthlete}
@@ -1142,63 +1026,58 @@ export default function ShowSession({
                                 processing={processing}
                                 onComplete={completeTraining}
                                 data={data}
-                                isMissingRequiredActuals={() =>
-                                    getMissingRequiredActuals().length > 0
-                                }
+                                isMissingRequiredActuals={() => getMissingRequiredActuals().length > 0}
                                 training={training}
                                 isEditingActuals={isEditingActuals}
                                 setIsEditingActuals={setIsEditingActuals}
                             />
                         </form>
-                    </>
-                )}
+                    </div>
+                </div>
 
-                <div className="text-center pt-8 pb-4">
-                    <p className="text-[10px] font-bold text-zinc-400">
-                        Power by: Olympus Training Surabaya X Unesa | All Rights
-                        Reserved
+                <div className="text-center pt-6 pb-2">
+                    <p className="text-[10.5px] font-medium text-slate-400">
+                        Powered by Olympus Training Surabaya × UNESA
                     </p>
                 </div>
             </div>
 
             {/* Media Modal */}
             {modalMedia && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-zinc-200 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
-                        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50 ">
-                            <h3 className="text-sm font-bold text-zinc-900 ">
-                                {modalMedia.type === "image"
-                                    ? "Preview Image"
-                                    : "Preview Video"}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-md shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                            <h3 className="text-xs font-bold text-slate-900">
+                                {modalMedia.type === "image" ? "Preview Image" : "Preview Video"}
                             </h3>
                             <div className="flex items-center gap-2">
                                 <a
                                     href={modalMedia.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="p-2 text-zinc-500 hover:text-zinc-900 :text-zinc-100 bg-white rounded-lg shadow-sm border border-zinc-200 transition-colors flex items-center gap-2 text-xs font-bold"
+                                    className="p-1.5 text-slate-500 hover:text-slate-900 bg-white rounded-md shadow-2xs border border-slate-200 transition-colors flex items-center gap-1 text-xs font-semibold"
                                 >
-                                    <Eye size={14} /> Buka Tab Baru
+                                    <Eye size={12} /> Buka Tab Baru
                                 </a>
                                 <button
                                     onClick={() => setModalMedia(null)}
-                                    className="p-2 text-zinc-400 hover:text-red-500 transition-colors bg-white rounded-lg shadow-sm border border-zinc-200 "
+                                    className="p-1 text-slate-400 hover:text-slate-700 transition-colors"
                                 >
-                                    Tutup
+                                    <X size={14} />
                                 </button>
                             </div>
                         </div>
-                        <div className="p-4 flex-1 overflow-auto flex items-center justify-center bg-zinc-100 min-h-[50vh]">
+                        <div className="p-4 flex-1 overflow-auto flex items-center justify-center bg-slate-100 min-h-[50vh]">
                             {modalMedia.type === "image" ? (
                                 <img
                                     src={modalMedia.url}
                                     alt="Preview Full"
-                                    className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm bg-white "
+                                    className="max-w-full max-h-[70vh] object-contain rounded-md shadow-2xs bg-white"
                                 />
                             ) : (
                                 <iframe
                                     src={getEmbedUrl(modalMedia.url)}
-                                    className="w-full aspect-video rounded-xl shadow-sm bg-black"
+                                    className="w-full aspect-video rounded-md shadow-2xs bg-black"
                                     allowFullScreen
                                 ></iframe>
                             )}
@@ -1207,23 +1086,24 @@ export default function ShowSession({
                 </div>
             )}
 
+            {/* Warning Message Modal */}
             {warningMessage && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center animate-in fade-in zoom-in-95 duration-200">
-                        <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 border-[4px] border-amber-50">
-                            <span className=" text-2xl">!</span>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-md shadow-2xl w-full max-w-sm overflow-hidden flex flex-col p-5 text-center">
+                        <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-amber-50">
+                            <span className="text-xl font-bold">!</span>
                         </div>
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">
+                        <h3 className="text-sm font-bold text-slate-900 mb-1.5">
                             Peringatan
                         </h3>
-                        <div className="max-h-64 overflow-y-auto mb-6 px-2">
-                            <p className="text-slate-500 text-sm leading-relaxed whitespace-pre-wrap text-left">
+                        <div className="max-h-64 overflow-y-auto mb-4 px-1">
+                            <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap text-left">
                                 {warningMessage}
                             </p>
                         </div>
                         <button
                             onClick={() => setWarningMessage("")}
-                            className="w-full py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors shadow-md shadow-orange-500/20"
+                            className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold transition-colors shadow-2xs"
                         >
                             OK, Mengerti
                         </button>
@@ -1231,51 +1111,48 @@ export default function ShowSession({
                 </div>
             )}
 
-        {confirmComplete && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in-95 duration-200">
-                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <CheckCircle2
-                                className="text-green-500"
-                                size={24}
-                            />
+            {/* Confirm Complete Modal */}
+            {confirmComplete && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-md shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-5">
+                        <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <CheckCircle2 className="text-emerald-600" size={16} />
                             Konfirmasi Selesai Latihan
                         </h2>
                         
-                        <div className="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <p className="text-sm text-slate-700">Menyelesaikan latihan untuk: <strong>{sortedMembers.find(m => m.id === selectedAthleteId)?.name}</strong></p>
+                        <div className="mb-3 bg-slate-50 p-3 rounded-md border border-slate-200/80">
+                            <p className="text-xs text-slate-700">
+                                Menyelesaikan latihan untuk: <strong className="text-slate-900">{sortedMembers.find((m) => m.id === selectedAthleteId)?.name}</strong>
+                            </p>
                         </div>
 
-                        <p className="text-slate-600 mb-6 text-xs leading-relaxed">
-                            Apakah Anda yakin ingin menyelesaikan dan
-                            menyerahkan program latihan untuk atlet ini? Setelah diserahkan,
-                            data aktual sudah{" "}
-                            <strong className="text-slate-800">tidak bisa diedit lagi</strong>.
+                        <p className="text-slate-600 mb-4 text-xs leading-relaxed">
+                            Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan untuk atlet ini? Setelah diserahkan, data aktual sudah <strong className="text-slate-800">tidak bisa diedit lagi</strong>.
                         </p>
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-end gap-2">
                             <button
                                 onClick={() => setConfirmComplete(false)}
-                                className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors"
+                                className="px-3.5 py-1.5 bg-slate-100 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-200 transition-colors"
                             >
                                 Batal
                             </button>
                             <button
                                 onClick={confirmAndComplete}
                                 disabled={processing}
-                                className="px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-orange-500/20"
+                                className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-2xs"
                             >
-                                <CheckCircle2 size={16} /> Ya, Selesai
+                                <CheckCircle2 size={13} />
+                                <span>Ya, Selesai</span>
                             </button>
                         </div>
                         {errors.error && (
-                            <div className="text-red-500 text-sm font-bold text-right mt-3">
+                            <div className="text-red-500 text-xs font-bold text-right mt-2">
                                 {errors.error}
                             </div>
                         )}
                     </div>
                 </div>
             )}
-
-                    </AppLayout>
+        </AppLayout>
     );
 }
