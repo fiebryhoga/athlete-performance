@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use App\Models\Sport;
+use App\Models\SubscriptionPackage;
+use App\Models\TrainingGroup;
 
 class UserManagementController extends Controller
 {
@@ -34,6 +36,7 @@ class UserManagementController extends Controller
 
         $users = User::where('role', $tab)
             ->with(['coaches', 'sport', 'groups.package', 'package'])
+            ->withCount('athletes')
             ->when(auth()->user()->role === 'coach', function($q) {
                 $q->whereHas('coaches', function($subQ) {
                     $subQ->where('coach_id', auth()->id());
@@ -46,7 +49,7 @@ class UserManagementController extends Controller
                 });
             })
             ->orderBy($sortField, $sortDirection)
-            ->paginate(10)
+            ->paginate($request->query('per_page', 25))
             ->withQueryString();
 
         $sports = Sport::all();
@@ -79,6 +82,31 @@ class UserManagementController extends Controller
             'packagesList' => $packages,
             'groupsList' => $groupsList,
             'allAthletes' => $allAthletes,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new user.
+     */
+    public function create(Request $request)
+    {
+        abort_if(auth()->user()->role !== 'superadmin', 403, 'Akses Ditolak.');
+
+        $sports = Sport::orderBy('name')->get();
+        $coachesList = User::where('role', 'coach')->select('id', 'name', 'profile_photo')->get();
+        $packages = SubscriptionPackage::orderBy('name')->get();
+
+        $defaultRole = $request->query('role', 'athlete');
+        if (!in_array($defaultRole, ['superadmin', 'coach', 'athlete'])) {
+            $defaultRole = 'athlete';
+        }
+
+        return Inertia::render('Admin/Users/Form', [
+            'mode' => 'create',
+            'defaultRole' => $defaultRole,
+            'sports' => $sports,
+            'coachesList' => $coachesList,
+            'packagesList' => $packages,
         ]);
     }
 
@@ -151,7 +179,7 @@ class UserManagementController extends Controller
             $user->coaches()->sync($request->coach_ids);
         }
 
-        return redirect()->back()->with('message', 'Pengguna baru berhasil ditambahkan.');
+        return redirect()->route('admin.users.index', ['tab' => $user->role])->with('message', 'Pengguna baru berhasil ditambahkan.');
     }
 
     /**
@@ -226,6 +254,46 @@ class UserManagementController extends Controller
     }
 
     /**
+     * Show the form for editing the specified user.
+     */
+    public function edit(User $user)
+    {
+        if (auth()->user()->role !== 'superadmin' && auth()->user()->role !== 'coach') {
+            abort(403, 'Akses Ditolak.');
+        }
+
+        $user->load(['sport', 'coaches:id,name', 'package', 'groups']);
+
+        $sports = Sport::orderBy('name')->get();
+        $coachesList = User::where('role', 'coach')->select('id', 'name', 'profile_photo')->get();
+        $packages = SubscriptionPackage::orderBy('name')->get();
+
+        return Inertia::render('Admin/Users/Form', [
+            'mode' => 'edit',
+            'targetUser' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'role' => $user->role,
+                'sport_id' => $user->sport_id ? (string)$user->sport_id : '',
+                'gender' => $user->gender ?? 'L',
+                'age' => $user->age ?? '',
+                'height' => $user->height ?? '',
+                'weight' => $user->weight ?? '',
+                'training_exp_date' => $user->training_exp_date ? \Carbon\Carbon::parse($user->training_exp_date)->format('Y-m-d') : '',
+                'subscription_package_id' => $user->subscription_package_id ? (string)$user->subscription_package_id : '',
+                'is_gym_guard' => (bool)$user->is_gym_guard,
+                'gym_fee' => $user->gym_fee ?? '',
+                'profile_photo_url' => $user->profile_photo_url,
+                'coach_ids' => $user->coaches->pluck('id')->toArray(),
+            ],
+            'sports' => $sports,
+            'coachesList' => $coachesList,
+            'packagesList' => $packages,
+        ]);
+    }
+
+    /**
      * Update the specified user in storage.
      */
     public function update(Request $request, User $user)
@@ -248,7 +316,7 @@ class UserManagementController extends Controller
                 'training_exp_date' => $request->training_exp_date,
             ]);
 
-            return redirect()->back()->with('message', 'Data fisik klien berhasil diperbarui.');
+            return redirect()->route('admin.users.index', ['tab' => 'athlete'])->with('message', 'Data fisik klien berhasil diperbarui.');
         }
 
         $rules = [
@@ -321,7 +389,7 @@ class UserManagementController extends Controller
             $user->coaches()->detach();
         }
 
-        return redirect()->back()->with('message', 'Data pengguna berhasil diperbarui.');
+        return redirect()->route('admin.users.index', ['tab' => $user->role])->with('message', 'Data pengguna berhasil diperbarui.');
     }
 
     /**

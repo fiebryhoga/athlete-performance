@@ -1326,7 +1326,7 @@ export default function ProfilingPdfDocument({
                 </View>
 
                 {/* ─── 3. GALERI BIOMETRIK & DOKUMENTASI FISIK (2-GRID HORIZONTAL CARDS) ─── */}
-                <View style={{ marginTop: 4 }}>
+                <View break style={{ marginTop: 6 }}>
                     <View style={styles.sectionBanner}>
                         <Text style={styles.sectionBannerTitle}>GALERI BIOMETRIK & DOKUMENTASI FISIK</Text>
                     </View>

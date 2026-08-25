@@ -328,62 +328,56 @@ export default function Index({ packages }) {
                             return (
                                 <div
                                     key={pkg.id}
-                                    className={`group relative rounded-lg border shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden ${
-                                        isPerSession
-                                            ? 'bg-gradient-to-b from-white via-indigo-50/15 to-indigo-100/25 border-slate-200/90 hover:border-indigo-300/80'
-                                            : 'bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 border-slate-200/90 hover:border-orange-200/80'
-                                    }`}
+                                    className="group relative rounded-md border border-slate-200 bg-white hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden"
                                 >
                                     <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                         {/* Identity Row */}
                                         <div className="flex items-start gap-2.5">
-                                            <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs font-black text-base flex items-center justify-center shrink-0 ${
+                                            <div className={`w-9 h-9 rounded-md border shadow-2xs font-bold text-sm flex items-center justify-center shrink-0 ${
                                                 isPerSession
-                                                    ? 'bg-gradient-to-br from-indigo-50 to-indigo-100/80 text-indigo-600'
-                                                    : 'bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600'
+                                                    ? 'bg-indigo-50/60 border-indigo-200/60 text-indigo-600'
+                                                    : 'bg-orange-50/60 border-orange-200/60 text-orange-600'
                                             }`}>
-                                                {isPerSession ? <CalendarClock className="w-5 h-5" /> : <Package className="w-5 h-5" />}
+                                                {isPerSession ? <CalendarClock className="w-4 h-4" /> : <Package className="w-4 h-4" />}
                                             </div>
-                                            <div className="min-w-0 flex-1 space-y-1">
+                                            <div className="min-w-0 flex-1 space-y-0.5">
                                                 <div className="flex items-center gap-1.5 flex-wrap">
-                                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                                                    <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider ${
                                                         isPerSession
-                                                            ? 'bg-indigo-100 text-indigo-700 border border-indigo-200'
-                                                            : 'bg-orange-100 text-orange-700 border border-orange-200'
+                                                            ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/60'
+                                                            : 'bg-orange-50 text-orange-700 border border-orange-200/60'
                                                     }`}>
                                                         {isPerSession ? 'Per Pertemuan' : 'Paket Kuota'}
                                                     </span>
                                                 </div>
-                                                <h3 className={`font-bold text-slate-900 text-xs sm:text-[13px] truncate transition-colors leading-tight ${
-                                                    isPerSession ? 'group-hover:text-indigo-600' : 'group-hover:text-orange-600'
-                                                }`}>
+                                                <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">
                                                     {pkg.name}
                                                 </h3>
                                                 {pkg.description && (
-                                                    <p className="text-[11px] text-slate-500 font-medium truncate">{pkg.description}</p>
+                                                    <p className="text-[10.5px] text-slate-400 font-medium truncate">{pkg.description}</p>
                                                 )}
                                             </div>
                                         </div>
 
                                         {/* Metric Tiles */}
-                                        <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
-                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                        <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
+                                            <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
                                                     {isPerSession ? 'Model' : 'Kuota'}
                                                 </span>
                                                 <div className="flex items-baseline gap-0.5 mt-0.5">
                                                     {isPerSession ? (
-                                                        <span className="text-[11px] font-black text-indigo-600 leading-tight">Fleksibel</span>
+                                                        <span className="text-[11px] font-bold text-indigo-600 leading-tight">Fleksibel</span>
                                                     ) : (
                                                         <>
-                                                            <span className="text-[11.5px] font-black text-orange-600 leading-tight">{pkg.session_count}</span>
-                                                            <span className="text-[8px] font-normal text-slate-400">sesi</span>
+                                                            <span className="text-[11px] font-bold text-slate-800 leading-tight">{pkg.session_count}</span>
+                                                            <span className="text-[8.5px] font-normal text-slate-400">sesi</span>
                                                         </>
                                                     )}
                                                 </div>
                                             </div>
-                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Fee Pelatih</span>
+                                            <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Fee Pelatih</span>
                                                 <div className="mt-0.5">
                                                     <span className="text-[9.5px] font-bold text-slate-700 leading-tight block truncate">
                                                         {formatCurrency(pkg.coach_fee_per_session)}
@@ -394,15 +388,15 @@ export default function Index({ packages }) {
                                         </div>
 
                                         {pkg.price > 0 && (
-                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                            <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
                                                     {isPerSession ? 'Harga Per Pertemuan' : 'Harga Total Paket'}
                                                 </span>
                                                 <div className="mt-0.5 flex items-baseline gap-1">
-                                                    <span className={`text-[11.5px] font-black leading-tight ${isPerSession ? 'text-indigo-600' : 'text-orange-600'}`}>
+                                                    <span className={`text-[11px] font-bold leading-tight ${isPerSession ? 'text-indigo-600' : 'text-slate-900'}`}>
                                                         {formatCurrency(pkg.price)}
                                                     </span>
-                                                    <span className="text-[8px] text-slate-400 font-medium">
+                                                    <span className="text-[8.5px] text-slate-400 font-medium">
                                                         {isPerSession ? '/ pertemuan' : '/ paket'}
                                                     </span>
                                                 </div>
@@ -411,7 +405,7 @@ export default function Index({ packages }) {
                                     </div>
 
                                     {/* Card Footer */}
-                                    <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                    <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
                                         <div className="flex items-center gap-1.5">
                                             <button
                                                 onClick={() => openModal(pkg)}
@@ -428,8 +422,8 @@ export default function Index({ packages }) {
                                                 <Trash2 className="w-3 h-3" />
                                             </button>
                                         </div>
-                                        <span className={`inline-flex items-center gap-0.5 text-[10.5px] font-bold ${
-                                            isPerSession ? 'text-indigo-600' : 'text-orange-600'
+                                        <span className={`inline-flex items-center gap-0.5 text-[10px] font-bold ${
+                                            isPerSession ? 'text-indigo-600' : 'text-slate-600'
                                         }`}>
                                             {isPerSession ? 'Per Pertemuan' : `${pkg.session_count} Sesi`}
                                         </span>

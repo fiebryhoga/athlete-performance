@@ -801,7 +801,7 @@ export default function ProfilingPdf({
                 </div>
 
                 {/* ─── 3. GALERI BIOMETRIK (2-GRID HORIZONTAL CARDS) ─── */}
-                <div className="mt-4">
+                <div className="mt-4" style={{ breakBefore: "page", pageBreakBefore: "always" }}>
                     <div className="bg-[#ea580c] text-white text-center py-1 text-[11px] font-bold uppercase tracking-wider">
                         GALERI BIOMETRIK & DOKUMENTASI FISIK
                     </div>

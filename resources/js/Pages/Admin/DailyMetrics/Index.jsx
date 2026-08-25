@@ -347,12 +347,12 @@ export default function Index({ athletes = [], sports = [] }) {
                                         "admin.daily-metrics.show",
                                         athlete.id,
                                     )}
-                                    className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                    className="group relative bg-white rounded-md border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden"
                                 >
                                     <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                         {/* Athlete Identity Row */}
                                         <div className="flex items-start gap-2.5">
-                                            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
+                                            <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 font-bold text-sm flex items-center justify-center shrink-0 overflow-hidden">
                                                 {photo ? (
                                                     <img
                                                         src={photo}
@@ -371,10 +371,10 @@ export default function Index({ athletes = [], sports = [] }) {
                                             </div>
 
                                             <div className="min-w-0 flex-1 space-y-0.5">
-                                                <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">
+                                                <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">
                                                     {athlete.name}
                                                 </h3>
-                                                <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                <p className="text-[10.5px] text-slate-400 font-medium truncate">
                                                     {athlete.sport
                                                         ?.name ||
                                                         "Tanpa Cabor"}
@@ -383,28 +383,28 @@ export default function Index({ athletes = [], sports = [] }) {
                                         </div>
 
                                         {/* Metric Tiles */}
-                                        <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
-                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                        <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
+                                            <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
                                                     Record
                                                 </span>
                                                 <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                    <span className="text-[11.5px] font-black text-orange-600 leading-tight">
+                                                    <span className="text-[11px] font-bold text-slate-800 leading-tight">
                                                         {athlete.total_records ||
                                                             0}
                                                     </span>
-                                                    <span className="text-[8px] font-normal text-slate-400">
+                                                    <span className="text-[8.5px] font-normal text-slate-400">
                                                         data
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                            <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">
                                                     Cabor
                                                 </span>
                                                 <div className="mt-0.5">
-                                                    <span className="text-[9.5px] font-bold text-slate-700 leading-tight block truncate">
+                                                    <span className="text-[9.5px] font-medium text-slate-700 leading-tight block truncate">
                                                         {athlete.sport
                                                             ?.name ||
                                                             "-"}
@@ -415,16 +415,16 @@ export default function Index({ athletes = [], sports = [] }) {
                                     </div>
 
                                     {/* Card Footer */}
-                                    <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                        <span className="text-[9.5px] font-bold text-slate-500">
+                                    <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                        <span className="text-[9.5px] font-medium text-slate-400">
                                             Total:{" "}
-                                            <strong className="text-slate-800">
+                                            <strong className="text-slate-700 font-semibold">
                                                 {athlete.total_records ||
                                                     0}{" "}
                                                 Record
                                             </strong>
                                         </span>
-                                        <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-600 group-hover:text-orange-600 transition-colors">
                                             Detail
                                             <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                         </span>

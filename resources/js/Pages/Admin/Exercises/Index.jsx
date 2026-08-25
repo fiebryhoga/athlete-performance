@@ -293,7 +293,7 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                 {filteredExercises.map((ex) => (
                                     <div key={ex.id} onClick={() => router.get(route('admin.exercises.edit', ex.id))}
-                                        className={`group cursor-pointer relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border ${selectedExercises.includes(ex.id) ? 'border-orange-400 ring-1 ring-orange-400' : 'border-slate-200/90 hover:border-orange-200/80'} shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden`}>
+                                        className={`group cursor-pointer relative bg-white rounded-md border ${selectedExercises.includes(ex.id) ? 'border-orange-400 ring-1 ring-orange-400' : 'border-slate-200 hover:border-slate-300'} shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden`}>
                                         {canModify && (
                                             <div className="absolute top-2.5 right-2.5 z-10">
                                                 <input type="checkbox" className="w-3.5 h-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
@@ -304,35 +304,35 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                                         )}
                                         <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                             <div className="flex items-start gap-2.5">
-                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
-                                                    {ex.images && ex.images.length > 0 ? <img src={ex.images[0]} alt={ex.name} className="w-full h-full object-cover" /> : <Dumbbell className="w-5 h-5" />}
+                                                <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 font-bold text-sm flex items-center justify-center shrink-0 overflow-hidden">
+                                                    {ex.images && ex.images.length > 0 ? <img src={ex.images[0]} alt={ex.name} className="w-full h-full object-cover" /> : <Dumbbell className="w-4 h-4" />}
                                                 </div>
                                                 <div className="min-w-0 flex-1 space-y-0.5 pr-4">
-                                                    <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">{ex.name}</h3>
-                                                    <p className="text-[11px] text-slate-500 font-medium truncate">{ex.category?.name || "Tanpa Kategori"}</p>
+                                                    <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">{ex.name}</h3>
+                                                    <p className="text-[10.5px] text-slate-400 font-medium truncate">{ex.category?.name || "Tanpa Kategori"}</p>
                                                 </div>
                                             </div>
 
-                                            {ex.description && <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed">{ex.description}</p>}
+                                            {ex.description && <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">{ex.description}</p>}
 
-                                            <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
-                                                <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Gambar</span>
+                                            <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
+                                                <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Gambar</span>
                                                     <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                        <span className="text-[11.5px] font-black text-orange-600 leading-tight">{Array.isArray(ex.images) ? ex.images.length : 0}</span>
+                                                        <span className="text-[11px] font-bold text-slate-800 leading-tight">{Array.isArray(ex.images) ? ex.images.length : 0}</span>
                                                     </div>
                                                 </div>
-                                                <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Video</span>
+                                                <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                    <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Video</span>
                                                     <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                        <span className="text-[11.5px] font-black text-teal-700 leading-tight">{Array.isArray(ex.videos) ? ex.videos.length : 0}</span>
+                                                        <span className="text-[11px] font-bold text-slate-800 leading-tight">{Array.isArray(ex.videos) ? ex.videos.length : 0}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                            <span className="text-[9.5px] font-bold text-slate-500 truncate">{ex.category?.name || "Tanpa Kategori"}</span>
+                                        <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                            <span className="text-[9.5px] font-medium text-slate-400 truncate">{ex.category?.name || "Tanpa Kategori"}</span>
                                             <div className="flex items-center gap-1.5">
                                                 {canModify && (
                                                     <button onClick={(e) => handleDeleteExercise(e, ex.id)} className="text-slate-400 hover:text-rose-500 transition-colors p-0.5"><Trash2 className="w-3 h-3" /></button>
@@ -357,15 +357,15 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                 {filteredCategories.map((cat) => (
-                                    <div key={cat.id} className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                                    <div key={cat.id} className="group relative bg-white rounded-md border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden">
                                         <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                             <div className="flex items-start gap-2.5">
-                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 flex items-center justify-center shrink-0"><Edit className="w-5 h-5" /></div>
-                                                <div className="min-w-0 flex-1"><h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">{cat.name}</h3></div>
+                                                <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 flex items-center justify-center shrink-0"><Edit className="w-4 h-4" /></div>
+                                                <div className="min-w-0 flex-1"><h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">{cat.name}</h3></div>
                                             </div>
                                         </div>
-                                        <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                            <span className="text-[9.5px] font-bold text-slate-500">Kategori</span>
+                                        <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                            <span className="text-[9.5px] font-medium text-slate-400">Kategori</span>
                                             <div className="flex items-center gap-1.5">
                                                 {canModify && (
                                                     <>
@@ -393,18 +393,18 @@ export default function Index({ auth, exercises, categories = [], packages = [],
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                 {filteredPackages.map((pkg) => (
-                                    <div key={pkg.id} className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                                    <div key={pkg.id} className="group relative bg-white rounded-md border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden">
                                         <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                             <div className="flex items-start gap-2.5">
-                                                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 flex items-center justify-center shrink-0"><Package className="w-5 h-5" /></div>
+                                                <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 flex items-center justify-center shrink-0"><Package className="w-4 h-4" /></div>
                                                 <div className="min-w-0 flex-1 space-y-0.5">
-                                                    <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">{pkg.name}</h3>
-                                                    <p className="text-[11px] text-slate-500 font-medium">{pkg.exercises?.length || 0} Latihan</p>
+                                                    <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">{pkg.name}</h3>
+                                                    <p className="text-[10.5px] text-slate-400 font-medium">{pkg.exercises?.length || 0} Latihan</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                            <span className="text-[9.5px] font-bold text-slate-500">{pkg.exercises?.length || 0} Latihan</span>
+                                        <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                            <span className="text-[9.5px] font-medium text-slate-400">{pkg.exercises?.length || 0} Latihan</span>
                                             <div className="flex items-center gap-1.5">
                                                 {canModify && (
                                                     <>

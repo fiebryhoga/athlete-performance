@@ -340,7 +340,7 @@ export default function Navbar({ onMobileMenuClick }) {
                                 </button>
                                 
                                 {/* Breadcrumb Navigation */}
-                                <nav className="flex items-center gap-1.5 text-xs" aria-label="Breadcrumb">
+                                <nav className="hidden md:flex items-center gap-1.5 text-xs" aria-label="Breadcrumb">
                                     <Link 
                                         href="/dashboard" 
                                         className="text-slate-400 hover:text-slate-700 flex items-center gap-1 shrink-0 transition-colors p-1 rounded-md hover:bg-slate-50"

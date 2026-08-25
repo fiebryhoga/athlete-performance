@@ -1,41 +1,37 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
 import { 
     LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
-    
     const { url, props } = usePage();
-    const scrollContainerRef = useRef(null);
+    const userRole = props.auth?.user?.role || 'athlete';
+    const appSettings = props.app_settings || props.appSettings || {};
+    const appLogo = appSettings?.logo || props.club_logo_url || '/assets/images/otslogo.png';
+    const appName = appSettings?.name || props.club_name || "OTS Performance";
+
+    // Tooltip State untuk Desktop saat Sidebar Mengecil (Collapsed)
     const [tooltip, setTooltip] = useState({ show: false, text: '', top: 0, left: 0 });
+    const scrollContainerRef = useRef(null);
 
-    // Persist sidebar scroll position across navigation
+    // Otomatis scroll ke menu yang aktif saat halaman dimuat
     useEffect(() => {
-        const container = scrollContainerRef.current;
-        if (!container) return;
-
-        const savedScroll = sessionStorage.getItem('sidebarScrollPos');
-        if (savedScroll) {
-            container.scrollTop = parseInt(savedScroll, 10);
+        if (scrollContainerRef.current) {
+            const activeElement = scrollContainerRef.current.querySelector('.active-menu-item');
+            if (activeElement) {
+                activeElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
+    }, [url]);
 
-        const handleScroll = () => {
-            sessionStorage.setItem('sidebarScrollPos', container.scrollTop.toString());
-        };
-
-        container.addEventListener('scroll', handleScroll);
-        return () => container.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const userRole = props.auth.user.role; 
-    const appSettings = props.app_settings || {}; 
-    const appName = appSettings?.name || 'Olympus Training';
-    const appLogo = appSettings?.logo;
-
+    // Deteksi menu aktif
     const isActive = (path) => {
+        if (path === '/dashboard' || path === 'dashboard') {
+            return url === '/dashboard' || url === '/';
+        }
         if (path === '/admin/athletes/dpa') {
-            return url.startsWith('/admin/athletes/dpa') || (url.startsWith('/admin/athletes/') && url.includes('/dpa'));
+            return url.startsWith('/admin/athletes/dpa');
         }
         if (path === '/admin/athletes') {
             return url.startsWith('/admin/athletes') && !url.includes('/dpa');
@@ -44,7 +40,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
     };
 
     const handleMouseEnter = (e, text) => {
-        if (!isCollapsed) return;
+        if (!isCollapsed || (typeof window !== 'undefined' && window.innerWidth < 1024)) return;
         const rect = e.currentTarget.getBoundingClientRect();
         setTooltip({
             show: true,
@@ -112,11 +108,11 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
         }
     ];
 
-    // Gaya dasar sidebar
+    // Gaya dasar sidebar: Di mobile (< lg) SELALU full-width (w-[245px]), collapse hanya berlaku di Desktop (>= lg)
     const sidebarClasses = `
         fixed top-0 left-0 h-screen bg-white border-r border-slate-200/80 shadow-[1px_0_10px_rgba(0,0,0,0.02)]
         flex flex-col z-40 transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-[70px]' : 'w-[235px]'}
+        w-[245px] ${isCollapsed ? 'lg:w-[70px]' : 'lg:w-[235px]'}
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
     `;
 
@@ -124,7 +120,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
         <aside className={sidebarClasses}>
             
             {/* Header (Logo & Brand) */}
-            <div className={`h-16 flex items-center border-b border-slate-100 px-3.5 relative transition-all ${isCollapsed ? 'justify-center' : 'justify-start gap-2.5'}`}>
+            <div className={`h-16 flex items-center border-b border-slate-100 px-3.5 relative transition-all justify-start gap-2.5 ${isCollapsed ? 'lg:justify-center lg:gap-0' : 'lg:justify-start lg:gap-2.5'}`}>
                 {appLogo ? (
                     <div className="flex-shrink-0 flex items-center justify-center">
                         <img src={appLogo} alt="Logo" className="w-8 h-8 object-contain" />
@@ -134,17 +130,15 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                         {appName.charAt(0)}
                     </div>
                 )}
-                {!isCollapsed && (
-                    <div className="flex flex-col animate-in fade-in duration-300 truncate min-w-0 pr-3">
-                        <span className="font-bold text-slate-900 text-xs truncate leading-tight">{appName}</span>
-                        <span className="text-[10px] font-medium text-slate-400 capitalize">{userRole} Hub</span>
-                    </div>
-                )}
+                <div className={`flex flex-col animate-in fade-in duration-300 truncate min-w-0 pr-3 ${isCollapsed ? 'lg:hidden' : 'block'}`}>
+                    <span className="font-bold text-slate-900 text-xs truncate leading-tight">{appName}</span>
+                    <span className="text-[10px] font-medium text-slate-400 capitalize">{userRole} Hub</span>
+                </div>
                 
                 {/* Desktop Toggle Button */}
                 <button 
                     onClick={onToggleCollapse} 
-                    className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-500 shadow-xs transition-colors z-50 group"
+                    className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-500 shadow-xs transition-colors z-50 group cursor-pointer"
                     title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
                 >
                     {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> : <ChevronLeft className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />}
@@ -163,13 +157,15 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
 
                     return (
                         <div key={groupIdx} className="space-y-0.5">
-                            {group.title && !isCollapsed && (
-                                <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 tracking-wider">
-                                    {group.title}
-                                </div>
-                            )}
-                            {group.title && isCollapsed && (
-                                <div className="w-4 h-px bg-slate-100 mx-auto my-2"></div>
+                            {group.title && (
+                                <>
+                                    <div className={`px-2.5 py-1 text-[10px] font-semibold text-slate-400 tracking-wider ${isCollapsed ? 'lg:hidden' : 'block'}`}>
+                                        {group.title}
+                                    </div>
+                                    {isCollapsed && (
+                                        <div className="hidden lg:block w-4 h-px bg-slate-100 mx-auto my-2"></div>
+                                    )}
+                                </>
                             )}
                             
                             {filteredItems.map((item, index) => {
@@ -181,24 +177,23 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                                             href={route(item.route)}
                                             onMouseEnter={(e) => handleMouseEnter(e, item.name)}
                                             onMouseLeave={handleMouseLeave}
-                                            onClick={() => { if(window.innerWidth < 1024) onMobileClose() }}
+                                            onClick={() => { if(typeof window !== 'undefined' && window.innerWidth < 1024) onMobileClose() }}
                                             className={`
                                                 relative flex items-center rounded-md transition-all duration-150
-                                                ${isCollapsed ? 'justify-center p-2 mx-auto w-9 h-9' : 'justify-start px-2.5 py-2 gap-2.5 w-full'}
+                                                justify-start px-2.5 py-2 gap-2.5 w-full
+                                                ${isCollapsed ? 'lg:justify-center lg:p-2 lg:mx-auto lg:w-9 lg:h-9' : 'lg:justify-start lg:px-2.5 lg:py-2 lg:gap-2.5 lg:w-full'}
                                                 ${active 
-                                                    ? 'text-orange-600 font-semibold border border-orange-100/70 shadow-2xs bg-orange-20/80' 
+                                                    ? 'text-orange-600 font-semibold border border-orange-100/70 shadow-2xs bg-orange-20/80 active-menu-item' 
                                                     : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'}
                                             `}
                                         >
                                             <Icon className={`flex-shrink-0 transition-all w-4 h-4 ${active ? 'text-orange-500 stroke-[2.2]' : 'text-slate-400 group-hover:text-slate-600 stroke-[1.8]'}`} />
                                             
-                                            {!isCollapsed && (
-                                                <span className="truncate text-xs">{item.name}</span>
-                                            )}
+                                            <span className={`truncate text-xs ${isCollapsed ? 'lg:hidden' : 'block'}`}>{item.name}</span>
 
                                             {/* Subtle indicator dot on active when expanded */}
-                                            {active && !isCollapsed && (
-                                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                                            {active && (
+                                                <div className={`ml-auto w-1.5 h-1.5 rounded-full bg-orange-500 ${isCollapsed ? 'lg:hidden' : 'block'}`}></div>
                                             )}
                                         </Link>
                                     </div>
@@ -218,20 +213,21 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
                     onMouseEnter={(e) => handleMouseEnter(e, 'Keluar Sesi')}
                     onMouseLeave={handleMouseLeave}
                     className={`
-                        flex items-center rounded-md transition-all duration-150 w-full
+                        flex items-center rounded-md transition-all duration-150 w-full cursor-pointer
                         text-rose-500 hover:bg-rose-50/80 hover:text-rose-600 font-medium text-xs
-                        ${isCollapsed ? 'justify-center p-2 mx-auto w-9 h-9' : 'justify-start px-2.5 py-2 gap-2.5'}
+                        justify-start px-2.5 py-2 gap-2.5
+                        ${isCollapsed ? 'lg:justify-center lg:p-2 lg:mx-auto lg:w-9 lg:h-9' : 'lg:justify-start lg:px-2.5 lg:py-2 lg:gap-2.5'}
                     `}
                 >
                     <LogOut className="flex-shrink-0 w-4 h-4" />
-                    {!isCollapsed && <span className="text-xs font-medium">Keluar Sesi</span>}
+                    <span className={`text-xs font-medium ${isCollapsed ? 'lg:hidden' : 'block'}`}>Keluar Sesi</span>
                 </Link>
             </div>
 
-            {/* Fixed Tooltip for Collapsed Mode */}
+            {/* Fixed Tooltip for Collapsed Mode on Desktop */}
             {tooltip.show && (
                 <div 
-                    className="fixed z-[100] px-2.5 py-1 bg-slate-900 text-white text-[11px] font-semibold rounded-md shadow-lg whitespace-nowrap pointer-events-none animate-in fade-in duration-100"
+                    className="fixed z-[100] px-2.5 py-1 bg-slate-900 text-white text-[11px] font-semibold rounded-md shadow-lg whitespace-nowrap pointer-events-none animate-in fade-in duration-100 hidden lg:block"
                     style={{ top: tooltip.top, left: tooltip.left, transform: 'translateY(-50%)' }}
                 >
                     {tooltip.text}

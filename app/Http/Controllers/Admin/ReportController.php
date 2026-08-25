@@ -36,12 +36,16 @@ class ReportController extends Controller
                 $athlete->package_type = $athlete->package->package_type ?? ($athlete->package ? 'quota' : null);
                 $athlete->package_session_count = $packageSessionCount;
                 $athlete->total_sessions = $trainings->count();
+                $athlete->regular_sessions = $trainings->where('is_extra', false)->count();
+                $athlete->extra_sessions = $trainings->where('is_extra', true)->count();
                 $athlete->completed_sessions = $trainings->where('status', 'completed')->count();
                 $athlete->scheduled_sessions = $trainings->whereNotIn('status', ['completed'])->count();
-                $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
+                $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
+                $athlete->unpaid_regular_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
+                $athlete->unpaid_extra_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', true)->count();
 
                 // Session list for drill-down (hanya yang belum dibayar)
-                $athlete->sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->map(function ($t) {
+                $athlete->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -63,6 +67,7 @@ class ReportController extends Controller
                         'training_type' => $t->training_type,
                         'coaches' => array_unique($coachNames),
                         'is_paid' => (bool) $t->is_athlete_paid,
+                        'is_extra' => (bool) $t->is_extra,
                     ];
                 })->values();
 
@@ -88,11 +93,15 @@ class ReportController extends Controller
                 $group->package_session_count = $packageSessionCount;
                 $group->members_count = $group->members->count();
                 $group->total_sessions = $trainings->count();
+                $group->regular_sessions = $trainings->where('is_extra', false)->count();
+                $group->extra_sessions = $trainings->where('is_extra', true)->count();
                 $group->completed_sessions = $trainings->where('status', 'completed')->count();
-                $group->unpaid_sessions = $trainings->where('is_group_paid', false)->where('is_extra', false)->count();
+                $group->unpaid_sessions = $trainings->where('is_group_paid', false)->count();
+                $group->unpaid_regular_sessions = $trainings->where('is_group_paid', false)->where('is_extra', false)->count();
+                $group->unpaid_extra_sessions = $trainings->where('is_group_paid', false)->where('is_extra', true)->count();
 
                 // Session list for drill-down (hanya yang belum dibayar)
-                $group->sessions = $trainings->where('is_group_paid', false)->where('is_extra', false)->map(function ($t) {
+                $group->sessions = $trainings->where('is_group_paid', false)->map(function ($t) {
                     $coachNames = [];
                     if ($t->coach) {
                         $coachNames[] = $t->coach->name;
@@ -113,6 +122,7 @@ class ReportController extends Controller
                         'name' => $t->name,
                         'coaches' => array_unique($coachNames),
                         'is_paid' => (bool) $t->is_group_paid,
+                        'is_extra' => (bool) $t->is_extra,
                     ];
                 })->values();
 
@@ -336,12 +346,73 @@ class ReportController extends Controller
             ];
         });
 
+        // ─── CURRENT MONTH KPI METRICS ───
+        $currentMonthKey = Carbon::now()->format('Y-m');
+        $currentMonthLabel = ($monthNames[(int)Carbon::now()->format('n')] ?? 'Bulan Ini') . ' ' . Carbon::now()->format('Y');
+
+        $currentMonthSummary = $globalMonthlySummary->firstWhere('month_key', $currentMonthKey) ?? [
+            'month_key' => $currentMonthKey,
+            'month_label' => $currentMonthLabel,
+            'total_fee' => 0,
+            'paid_fee' => 0,
+            'unpaid_fee' => 0,
+            'total_sessions' => 0,
+        ];
+
+        $thisMonthIndRegularCount = IndividualTraining::whereYear('date', Carbon::now()->year)
+            ->whereMonth('date', Carbon::now()->month)
+            ->where('is_extra', false)
+            ->count();
+
+        $thisMonthIndExtraCount = IndividualTraining::whereYear('date', Carbon::now()->year)
+            ->whereMonth('date', Carbon::now()->month)
+            ->where('is_extra', true)
+            ->count();
+
+        $thisMonthGroupRegularCount = GroupTraining::whereYear('date', Carbon::now()->year)
+            ->whereMonth('date', Carbon::now()->month)
+            ->where('is_extra', false)
+            ->count();
+
+        $thisMonthGroupExtraCount = GroupTraining::whereYear('date', Carbon::now()->year)
+            ->whereMonth('date', Carbon::now()->month)
+            ->where('is_extra', true)
+            ->count();
+
+        $activeCoachesMonth = 0;
+        foreach ($coaches as $coach) {
+            $hasSession = collect($coach->monthly_breakdown)->first(function ($mb) use ($currentMonthKey) {
+                return $mb['month_key'] === $currentMonthKey && $mb['total_sessions'] > 0;
+            });
+            if ($hasSession) {
+                $activeCoachesMonth++;
+            }
+        }
+        if ($activeCoachesMonth === 0) {
+            $activeCoachesMonth = $coaches->where('total_sessions', '>', 0)->count();
+        }
+
+        $currentMonthData = [
+            'key' => $currentMonthKey,
+            'label' => $currentMonthLabel,
+            'total_individual_sessions' => $thisMonthIndRegularCount + $thisMonthIndExtraCount,
+            'regular_individual_sessions' => $thisMonthIndRegularCount,
+            'extra_individual_sessions' => $thisMonthIndExtraCount,
+            'total_group_sessions' => $thisMonthGroupRegularCount + $thisMonthGroupExtraCount,
+            'regular_group_sessions' => $thisMonthGroupRegularCount,
+            'extra_group_sessions' => $thisMonthGroupExtraCount,
+            'active_coaches_count' => $activeCoachesMonth,
+            'unpaid_coach_earnings' => $currentMonthSummary['unpaid_fee'] ?? 0,
+            'total_coach_earnings' => $currentMonthSummary['total_fee'] ?? 0,
+        ];
+
         return Inertia::render('Admin/Reports/SessionRecap', [
             'athletes' => $athletes,
             'groups' => $groups,
             'coaches' => $coaches,
             'available_months' => $distinctMonths,
             'monthly_summary' => $globalMonthlySummary,
+            'current_month' => $currentMonthData,
         ]);
     }
 
@@ -841,17 +912,23 @@ class ReportController extends Controller
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
         ];
 
+        $filterMonth = $request->query('month'); // e.g. '2026-08' or null
+
         // Individual sessions
-        $individualTrainings = IndividualTraining::where('coach_id', $coach->id)
-            ->orWhereJsonContains('coach_ids', (string)$coach->id)
-            ->orWhereJsonContains('coach_ids', $coach->id)
+        $individualTrainings = IndividualTraining::where(function($q) use ($coach) {
+                $q->where('coach_id', $coach->id)
+                  ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                  ->orWhereJsonContains('coach_ids', $coach->id);
+            })
             ->with(['user.package', 'user.sport'])
             ->get();
 
         // Group sessions
-        $groupTrainings = GroupTraining::where('coach_id', $coach->id)
-            ->orWhereJsonContains('coach_ids', (string)$coach->id)
-            ->orWhereJsonContains('coach_ids', $coach->id)
+        $groupTrainings = GroupTraining::where(function($q) use ($coach) {
+                $q->where('coach_id', $coach->id)
+                  ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                  ->orWhereJsonContains('coach_ids', $coach->id);
+            })
             ->with(['group.package'])
             ->get();
 
@@ -863,7 +940,7 @@ class ReportController extends Controller
             ->get();
 
         // Map Individual
-        $allIndividual = $individualTrainings->where('is_extra', false)->map(function ($session) use ($coach) {
+        $allIndividual = $individualTrainings->map(function ($session) use ($coach) {
             $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
             $paidIds = $paidIds ?? [];
             $isPaid = in_array($coach->id, $paidIds) || in_array((string)$coach->id, $paidIds);
@@ -878,17 +955,19 @@ class ReportController extends Controller
                 'month_key' => $monthKey,
                 'client_name' => $clientName,
                 'client_sport' => $session->user?->sport?->name ?? null,
-                'name' => $session->name ?: 'Program Latihan',
+                'name' => $session->name ?: 'Program Latihan Individu',
                 'session_number' => $session->session_number,
                 'status' => $session->status,
                 'type' => 'Individu',
                 'fee' => $fee,
                 'is_paid' => $isPaid,
+                'is_extra' => (bool) $session->is_extra,
+                'notes' => $session->coach_notes ?: $session->athlete_note,
             ];
         });
 
         // Map Group
-        $allGroup = $groupTrainings->where('is_extra', false)->map(function ($session) {
+        $allGroup = $groupTrainings->map(function ($session) {
             $fee = (int)($session->group?->package?->coach_fee_per_session ?? 0);
             $dateStr = $session->date ? $session->date->format('Y-m-d') : null;
             $monthKey = $session->date ? $session->date->format('Y-m') : null;
@@ -907,6 +986,8 @@ class ReportController extends Controller
                 'type' => 'Grup',
                 'fee' => $fee,
                 'is_paid' => $isPaid,
+                'is_extra' => (bool) $session->is_extra,
+                'notes' => $session->notes,
             ];
         });
 
@@ -931,11 +1012,25 @@ class ReportController extends Controller
                 'type' => 'Jaga Gym',
                 'fee' => $gymShiftFee,
                 'is_paid' => $isPaid,
+                'is_extra' => false,
                 'notes' => $shift->notes
             ];
         });
 
-        $allSessions = $allIndividual->concat($allGroup)->concat($allGym)->sortByDesc('date')->values();
+        $allRawSessions = $allIndividual->concat($allGroup)->concat($allGym)->sortByDesc('date')->values();
+
+        // If specific month is requested, filter
+        $targetMonthLabel = "Semua Periode";
+        if ($filterMonth && $filterMonth !== 'all') {
+            $allSessions = $allRawSessions->where('month_key', $filterMonth)->values();
+            if (str_contains($filterMonth, '-')) {
+                [$y, $m] = explode('-', $filterMonth);
+                $targetMonthLabel = ($monthNames[(int)$m] ?? $m) . ' ' . $y;
+            }
+        } else {
+            $allSessions = $allRawSessions;
+        }
+
         $unpaidSessions = $allSessions->where('is_paid', false)->values();
         $paidSessions = $allSessions->where('is_paid', true)->values();
 
@@ -943,8 +1038,15 @@ class ReportController extends Controller
         $unpaidFee = $unpaidSessions->sum('fee');
         $paidFee = $paidSessions->sum('fee');
 
+        // Detailed count breakdown
+        $indRegularSessions = $allSessions->where('type', 'Individu')->where('is_extra', false);
+        $indExtraSessions = $allSessions->where('type', 'Individu')->where('is_extra', true);
+        $grpRegularSessions = $allSessions->where('type', 'Grup')->where('is_extra', false);
+        $grpExtraSessions = $allSessions->where('type', 'Grup')->where('is_extra', true);
+        $gymSessions = $allSessions->where('type', 'Jaga Gym');
+
         // Monthly Breakdown
-        $monthlyGroups = $allSessions->groupBy(function ($item) {
+        $monthlyGroups = $allRawSessions->groupBy(function ($item) {
             return $item['month_key'] ?: 'other';
         });
 
@@ -960,7 +1062,11 @@ class ReportController extends Controller
                 'month_label' => $mLabel,
                 'total_sessions' => $items->count(),
                 'individual_sessions' => $items->where('type', 'Individu')->count(),
+                'individual_regular' => $items->where('type', 'Individu')->where('is_extra', false)->count(),
+                'individual_extra' => $items->where('type', 'Individu')->where('is_extra', true)->count(),
                 'group_sessions' => $items->where('type', 'Grup')->count(),
+                'group_regular' => $items->where('type', 'Grup')->where('is_extra', false)->count(),
+                'group_extra' => $items->where('type', 'Grup')->where('is_extra', true)->count(),
                 'gym_sessions' => $items->where('type', 'Jaga Gym')->count(),
                 'total_fee' => $items->sum('fee'),
                 'paid_fee' => $items->where('is_paid', true)->sum('fee'),
@@ -972,6 +1078,16 @@ class ReportController extends Controller
         usort($monthlyBreakdown, function ($a, $b) {
             return strcmp($b['month_key'], $a['month_key']);
         });
+
+        // Determine Payout Status
+        $payoutStatus = 'UNPAID'; // UNPAID, PARTIAL, PAID
+        if ($totalFee > 0 && $unpaidFee === 0) {
+            $payoutStatus = 'PAID';
+        } elseif ($paidFee > 0 && $unpaidFee > 0) {
+            $payoutStatus = 'PARTIAL';
+        }
+
+        $lastPayout = \App\Models\CoachPayout::where('user_id', $coach->id)->latest('paid_at')->first();
 
         // Club logo
         $otsLogoPath = public_path('assets/images/otslogo2.png');
@@ -988,16 +1104,26 @@ class ReportController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.coach_session_recap_pdf', [
             'coach' => $coach,
             'clubLogo' => $clubLogo,
+            'filterMonth' => $filterMonth,
+            'targetMonthLabel' => $targetMonthLabel,
+            'payoutStatus' => $payoutStatus,
+            'lastPayout' => $lastPayout,
             'allSessions' => $allSessions,
             'unpaidSessions' => $unpaidSessions,
             'paidSessions' => $paidSessions,
             'totalFee' => $totalFee,
             'unpaidFee' => $unpaidFee,
             'paidFee' => $paidFee,
+            'indRegularSessions' => $indRegularSessions,
+            'indExtraSessions' => $indExtraSessions,
+            'grpRegularSessions' => $grpRegularSessions,
+            'grpExtraSessions' => $grpExtraSessions,
+            'gymSessions' => $gymSessions,
             'monthlyBreakdown' => $monthlyBreakdown,
         ])->setPaper('A4', 'portrait');
 
         $cleanCoachName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $coach->name);
-        return $pdf->download('Rekap_Honor_' . $cleanCoachName . '_' . date('Ymd') . '.pdf');
+        $filename = 'Slip_Honor_' . $cleanCoachName . ($filterMonth ? '_' . $filterMonth : '') . '_' . date('Ymd') . '.pdf';
+        return $pdf->download($filename);
     }
 }

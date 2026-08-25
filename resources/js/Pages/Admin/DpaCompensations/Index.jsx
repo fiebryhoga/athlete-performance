@@ -91,33 +91,33 @@ export default function DpaIndex({ auth, compensations }) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                         {catItems.map((item) => (
                                             <div key={item.id}
-                                                className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                                                className="group relative bg-white rounded-md border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden">
                                                 <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                                     {/* Identity Row */}
                                                     <div className="flex items-start gap-2.5">
-                                                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0 overflow-hidden">
+                                                        <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 font-bold text-sm flex items-center justify-center shrink-0 overflow-hidden">
                                                             {item.image_path ? (
                                                                 <img src={`/storage/${item.image_path}`} className="w-full h-full object-cover" alt={item.name} />
                                                             ) : (
-                                                                <ImageIcon className="w-5 h-5" />
+                                                                <ImageIcon className="w-4 h-4" />
                                                             )}
                                                         </div>
                                                         <div className="min-w-0 flex-1 space-y-0.5">
-                                                            <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">{item.name}</h3>
+                                                            <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">{item.name}</h3>
                                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{item.category}</p>
                                                         </div>
                                                     </div>
 
                                                     {/* Muscle Info Tiles */}
-                                                    <div className="space-y-1.5 pt-0.5 border-t border-slate-100/90">
-                                                        <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Overactive</span>
+                                                    <div className="space-y-1.5 pt-1 border-t border-slate-100">
+                                                        <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Overactive</span>
                                                             <p className="text-[9.5px] font-medium text-slate-700 leading-tight mt-0.5 line-clamp-2">
                                                                 {item.overactive_muscles || <span className="text-slate-400 italic">None specified</span>}
                                                             </p>
                                                         </div>
-                                                        <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Underactive</span>
+                                                        <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Underactive</span>
                                                             <p className="text-[9.5px] font-medium text-slate-700 leading-tight mt-0.5 line-clamp-2">
                                                                 {item.underactive_muscles || <span className="text-slate-400 italic">None specified</span>}
                                                             </p>
@@ -126,8 +126,8 @@ export default function DpaIndex({ auth, compensations }) {
                                                 </div>
 
                                                 {/* Card Footer */}
-                                                <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                                    <span className="text-[9.5px] font-bold text-slate-500">{item.category}</span>
+                                                <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                                    <span className="text-[9.5px] font-medium text-slate-400">{item.category}</span>
                                                     <div className="flex items-center gap-1.5">
                                                         {canUpdate && (
                                                             <Link href={route('admin.dpa-compensations.edit', item.id)} className="text-slate-400 hover:text-orange-500 transition-colors p-0.5" title="Edit">

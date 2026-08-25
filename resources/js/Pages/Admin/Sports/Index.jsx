@@ -195,21 +195,21 @@ export default function Index({ sports }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                         {filteredSports.map((sport) => (
                             <Link key={sport.id} href={route('admin.sports.show', sport.id)}
-                                className="group relative bg-gradient-to-b from-white via-orange-50/20 to-orange-100/30 rounded-lg border border-slate-200/90 hover:border-orange-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                                className="group relative bg-white rounded-md border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between overflow-hidden">
                                 <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                     <div className="flex items-start gap-2.5">
-                                        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border-2 border-white shadow-2xs bg-gradient-to-br from-orange-50 to-orange-100/70 text-orange-600 font-black text-base flex items-center justify-center shrink-0">
-                                            <Dumbbell className="w-5 h-5" />
+                                        <div className="w-9 h-9 rounded-md border border-orange-200/60 shadow-2xs bg-orange-50/60 text-orange-600 font-bold text-sm flex items-center justify-center shrink-0">
+                                            <Dumbbell className="w-4 h-4" />
                                         </div>
                                         <div className="min-w-0 flex-1 space-y-0.5">
-                                            <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-orange-600 transition-colors leading-tight">{sport.name}</h3>
-                                            <p className="text-[11px] text-slate-500 font-medium truncate line-clamp-1">{sport.description || 'Tidak ada deskripsi'}</p>
+                                            <h3 className="font-bold text-slate-900 text-xs truncate group-hover:text-orange-600 transition-colors leading-tight">{sport.name}</h3>
+                                            <p className="text-[10.5px] text-slate-400 font-medium truncate line-clamp-1">{sport.description || 'Tidak ada deskripsi'}</p>
                                         </div>
                                     </div>
 
                                     {/* Action buttons for superadmin */}
                                     {isSuperadmin && (
-                                        <div className="flex items-center gap-1 pt-1">
+                                        <div className="flex items-center gap-1 pt-0.5">
                                             <button onClick={(e) => openDuplicateModal(e, sport)} className="p-1 rounded text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-all z-10 relative" title="Duplicate">
                                                 <Copy className="w-3 h-3" />
                                             </button>
@@ -222,27 +222,27 @@ export default function Index({ sports }) {
                                         </div>
                                     )}
 
-                                    <div className="grid grid-cols-2 gap-1.5 pt-0.5 border-t border-slate-100/90">
-                                        <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Athletes</span>
+                                    <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
+                                        <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Athletes</span>
                                             <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                <span className="text-[11.5px] font-black text-orange-600 leading-tight">{sport.athletes_count}</span>
-                                                <span className="text-[8px] font-normal text-slate-400">orang</span>
+                                                <span className="text-[11px] font-bold text-slate-800 leading-tight">{sport.athletes_count}</span>
+                                                <span className="text-[8.5px] font-normal text-slate-400">orang</span>
                                             </div>
                                         </div>
-                                        <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
-                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">Tests</span>
+                                        <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
+                                            <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Tests</span>
                                             <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                <span className="text-[11.5px] font-black text-teal-700 leading-tight">{sport.test_items_count}</span>
-                                                <span className="text-[8px] font-normal text-slate-400">item</span>
+                                                <span className="text-[11px] font-bold text-slate-800 leading-tight">{sport.test_items_count}</span>
+                                                <span className="text-[8.5px] font-normal text-slate-400">item</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                    <span className="text-[9.5px] font-bold text-slate-500">{sport.athletes_count} Athletes</span>
-                                    <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+                                <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
+                                    <span className="text-[9.5px] font-medium text-slate-400">{sport.athletes_count} Athletes</span>
+                                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-600 group-hover:text-orange-600 transition-colors">
                                         Detail
                                         <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                     </span>
