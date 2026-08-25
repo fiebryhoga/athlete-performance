@@ -55,6 +55,15 @@ class UserManagementController extends Controller
         $groupsList = \App\Models\TrainingGroup::with(['members', 'coaches', 'package'])->get();
         $allAthletes = User::where('role', 'athlete')->with('sport')->orderBy('name')->get();
 
+        $tabCounts = [
+            'superadmin' => User::where('role', 'superadmin')->count(),
+            'coach' => User::where('role', 'coach')->count(),
+            'athlete' => auth()->user()->role === 'coach'
+                ? User::where('role', 'athlete')->whereHas('coaches', fn($subQ) => $subQ->where('coach_id', auth()->id()))->count()
+                : User::where('role', 'athlete')->count(),
+            'group' => \App\Models\TrainingGroup::count(),
+        ];
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'filters' => [
@@ -64,6 +73,7 @@ class UserManagementController extends Controller
                 'sort_direction' => $sortDirection,
             ],
             'activeTab' => $tab,
+            'tabCounts' => $tabCounts,
             'sports' => $sports,
             'coachesList' => $coachesList,
             'packagesList' => $packages,

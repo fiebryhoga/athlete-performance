@@ -1,19 +1,25 @@
+import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { Calendar, User, BarChart3, AlertTriangle, Check, X, CalendarDays, Activity } from 'lucide-react';
-import { useState } from 'react';
-
-
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
+import { 
+    Calendar, 
+    User, 
+    AlertTriangle, 
+    Check, 
+    ChevronLeft,
+    CalendarDays, 
+    Activity,
+    Save
+} from 'lucide-react';
+import PageHeader from '@/Components/Common/PageHeader';
 import HistoryTable from './Partials/HistoryTable';
 import AnalyticsDashboard from './Partials/AnalyticsDashboard';
 import DailyMetricModal from './Partials/DailyMetricModal';
 
 export default function Show({ athlete, dailyHistory }) {
-    
     const { auth } = usePage().props;
     const isAthlete = auth.user.role === 'athlete';
 
-    
     const [isConfirmDateOpen, setIsConfirmDateOpen] = useState(false);
     const formStartDate = useForm({ training_start_date: athlete?.training_start_date || '' });
 
@@ -29,16 +35,18 @@ export default function Show({ athlete, dailyHistory }) {
         });
     };
 
-    
     const [activeTab, setActiveTab] = useState('analytics');
-
-    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDateLabel, setSelectedDateLabel] = useState('');
-    
 
     const formMetric = useForm({
-        user_id: athlete?.id, record_date: '', rhr: '', spo2: '', weight: '', vj: '', notes: ''
+        user_id: athlete?.id, 
+        record_date: '', 
+        rhr: '', 
+        spo2: '', 
+        weight: '', 
+        vj: '', 
+        notes: ''
     });
 
     const openModal = (historyItem) => {
@@ -72,31 +80,45 @@ export default function Show({ athlete, dailyHistory }) {
     };
 
     return (
-        <AppLayout title={`Monitoring - ${athlete?.name || 'Athlete'}`}>
-            <Head title={`Monitoring - ${athlete?.name || 'Athlete'}`} />
+        <AppLayout title={`Pantauan Harian - ${athlete?.name || 'Athlete'}`}>
+            <Head title={`Pantauan Harian - ${athlete?.name || 'Athlete'}`} />
 
-            <div className="max-w-7xl mx-auto animate-in fade-in duration-500">
-                
-                {/* Header Profile Section - Clean Minimalist */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6 mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6">
-                    <div className="flex items-center gap-4 md:gap-5">
-                        {/* Avatar menggunakan warna Orange */}
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-xl md:text-2xl border-4 border-white shadow-sm shrink-0">
+            <div className="space-y-4 pb-16">
+                {/* ─── 1. PAGE HEADER ─── */}
+                <PageHeader 
+                    title={`Pantauan Harian: ${athlete?.name || 'Loading...'}`}
+                    description="Pantau performa harian, kesiapan fisik, dan riwayat status pemulihan atlet."
+                    actions={
+                        <Link
+                            href={route("admin.daily-metrics.index")}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/90 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+                        >
+                            <ChevronLeft size={14} />
+                            <span>Daftar Atlet</span>
+                        </Link>
+                    }
+                />
+
+                {/* ─── 2. ATHLETE INFO & START DATE BANNER ─── */}
+                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-md overflow-hidden bg-orange-50 text-orange-600 flex items-center justify-center font-black text-base border border-orange-200/80 shadow-2xs shrink-0">
                             {athlete?.profile_photo_url ? (
                                 <img src={athlete.profile_photo_url} alt={athlete.name} className="w-full h-full object-cover" />
                             ) : (
-                                athlete?.name?.charAt(0).toUpperCase() || <User className="w-6 h-6 md:w-8 md:h-8"/>
+                                athlete?.name?.charAt(0).toUpperCase() || <User size={18} />
                             )}
                         </div>
                         <div>
-                            <h2 className="text-lg md:text-xl font-bold text-slate-800 tracking-tight">{athlete?.name || 'Loading...'}</h2>
-                            <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1.5 md:mt-2">
-                                <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] md:text-xs font-medium border border-slate-200">
+                            <h2 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                                {athlete?.name || 'Loading...'}
+                            </h2>
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10.5px] font-bold border border-slate-200">
                                     {athlete?.sport?.name || 'Tanpa Cabor'}
                                 </span>
                                 {athlete?.weight && (
-                                    <span className="text-[10px] md:text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                    <span className="text-[11px] font-semibold text-slate-500">
                                         BB: {athlete.weight} kg
                                     </span>
                                 )}
@@ -104,67 +126,61 @@ export default function Show({ athlete, dailyHistory }) {
                         </div>
                     </div>
 
-                    {/* Form Setup Tanggal (Hanya Admin) */}
+                    {/* Setup Tanggal Form (Admin Only) */}
                     {!isAthlete && (
-                        <form onSubmit={handleOpenConfirmDate} className="flex flex-col sm:flex-row items-end sm:items-center gap-2 md:gap-3 shrink-0 mt-2 md:mt-0">
-                            <div className="w-full sm:w-auto">
-                                <label className="text-[10px] md:text-xs font-medium text-slate-500 mb-1 md:mb-1.5 flex items-center gap-1.5">
-                                    <CalendarDays className="w-3.5 h-3.5 text-slate-400" /> Start Program
+                        <form onSubmit={handleOpenConfirmDate} className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 shrink-0">
+                            <div>
+                                <label className="text-[10.5px] font-bold text-slate-500 mb-1 flex items-center gap-1">
+                                    <CalendarDays size={12} className="text-slate-400" /> Start Program
                                 </label>
-                                {/* Input Ring Focus Orange */}
                                 <input 
                                     type="date" 
                                     value={formStartDate.data.training_start_date} 
                                     onChange={e => formStartDate.setData('training_start_date', e.target.value)} 
-                                    className="w-full text-xs md:text-sm font-medium text-slate-700 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all bg-white px-3 py-2" 
+                                    className="text-xs font-semibold text-slate-800 rounded-md border border-slate-200 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-slate-50 focus:bg-white px-2.5 py-1.5" 
                                     required
                                 />
                             </div>
                             <button 
                                 type="submit" 
                                 disabled={formStartDate.processing || formStartDate.data.training_start_date === athlete?.training_start_date} 
-                                className="w-full sm:w-auto mt-2 sm:mt-auto bg-slate-800 text-white px-5 py-2 rounded-lg text-xs md:text-sm font-medium hover:bg-slate-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="inline-flex items-center justify-center gap-1 bg-orange-500 text-white px-3.5 py-1.5 rounded-md text-xs font-bold hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs cursor-pointer"
                             >
-                                Simpan
+                                <Save size={13} />
+                                <span>Simpan</span>
                             </button>
                         </form>
                     )}
                 </div>
 
-                {/* Tabs Navigation - Responsive Padding & Font Size */}
-                <div className="flex gap-1 md:gap-2 mb-6 border-b border-slate-200 pb-px overflow-x-auto custom-scrollbar">
+                {/* ─── 3. TABS NAVIGATION ─── */}
+                <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2.5">
                     <button 
                         onClick={() => setActiveTab('analytics')} 
-                        className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 text-[11px] md:text-sm font-medium transition-all relative whitespace-nowrap ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                             activeTab === 'analytics' 
-                                ? 'text-orange-500' 
-                                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-t-lg'
+                                ? 'bg-orange-500 text-white shadow-2xs' 
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'
                         }`}
                     >
-                        <Activity className="w-3.5 h-3.5 md:w-4 md:h-4" /> 
-                        Dashboard Analitik
-                        {activeTab === 'analytics' && (
-                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full"></span>
-                        )}
+                        <Activity size={13} /> 
+                        <span>Dashboard Analitik</span>
                     </button>
                     <button 
                         onClick={() => setActiveTab('history')} 
-                        className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 text-[11px] md:text-sm font-medium transition-all relative whitespace-nowrap ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                             activeTab === 'history' 
-                                ? 'text-orange-500' 
-                                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-t-lg'
+                                ? 'bg-orange-500 text-white shadow-2xs' 
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'
                         }`}
                     >
-                        <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" /> 
-                        Kalender Input
-                        {activeTab === 'history' && (
-                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full"></span>
-                        )}
+                        <Calendar size={13} /> 
+                        <span>Kalender Input</span>
                     </button>
                 </div>
 
-                {/* Content Area */}
-                <div className="min-h-[500px]">
+                {/* ─── 4. TAB CONTENT ─── */}
+                <div>
                     {activeTab === 'history' ? (
                         <HistoryTable 
                             dailyHistory={dailyHistory} 
@@ -191,46 +207,40 @@ export default function Show({ athlete, dailyHistory }) {
             {/* Confirmation Modal */}
             {isConfirmDateOpen && !isAthlete && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsConfirmDateOpen(false)}></div>
-                    <div className="relative bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-5 md:p-6">
-                            <div className="flex items-start gap-3 md:gap-4">
-                                <div className="p-2 md:p-3 bg-amber-50 text-amber-600 rounded-full shrink-0">
-                                    <AlertTriangle className="w-5 h-5 md:w-6 md:h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="text-base md:text-lg font-semibold text-slate-800">Konfirmasi Perubahan Tanggal</h3>
-                                    <p className="text-xs md:text-sm text-slate-600 mt-1.5 md:mt-2">
-                                        Anda akan mengubah tanggal mulai latihan menjadi <span className="font-semibold text-slate-800">{formatDateToIndo(formStartDate.data.training_start_date, 'full')}</span>.
-                                    </p>
-                                    <div className="mt-3 md:mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                        <p className="text-[10px] md:text-xs text-slate-500 flex items-start gap-2">
-                                            <span className="font-medium text-slate-700 shrink-0">Catatan:</span>
-                                            Perubahan ini dapat memengaruhi pengelompokan minggu pada laporan analitik.
-                                        </p>
-                                    </div>
+                    <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-xs" onClick={() => setIsConfirmDateOpen(false)} />
+                    <div className="relative bg-white w-full max-w-md rounded-md border border-slate-200 shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 p-4 space-y-3">
+                        <div className="flex items-start gap-3">
+                            <div className="p-2 bg-amber-50 text-amber-600 rounded-md border border-amber-200 shrink-0">
+                                <AlertTriangle size={18} />
+                            </div>
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-bold text-slate-900">Konfirmasi Perubahan Tanggal</h3>
+                                <p className="text-xs text-slate-600 mt-1">
+                                    Anda akan mengubah tanggal mulai latihan menjadi <strong className="text-slate-900">{formatDateToIndo(formStartDate.data.training_start_date, 'full')}</strong>.
+                                </p>
+                                <div className="mt-2.5 p-2 bg-slate-50 rounded border border-slate-200 text-[11px] text-slate-500">
+                                    Perubahan ini dapat memengaruhi pengelompokan minggu pada laporan analitik.
                                 </div>
                             </div>
-                            
-                            <div className="flex justify-end gap-2 md:gap-3 mt-5 md:mt-6">
-                                <button 
-                                    type="button" 
-                                    onClick={() => setIsConfirmDateOpen(false)} 
-                                    className="px-3 md:px-4 py-2 bg-white border border-slate-200 text-slate-700 font-medium text-xs md:text-sm rounded-lg hover:bg-slate-50 transition-colors"
-                                >
-                                    Batal
-                                </button>
-                                {/* Tombol Simpan Modal Menggunakan Orange */}
-                                <button 
-                                    type="button" 
-                                    onClick={submitStartDate} 
-                                    disabled={formStartDate.processing} 
-                                    className="px-3 md:px-4 py-2 bg-orange-500 text-white font-medium text-xs md:text-sm rounded-lg shadow-sm hover:bg-orange-600 transition-colors flex items-center gap-1.5 md:gap-2"
-                                >
-                                    {formStartDate.processing ? <span className="w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : <Check className="w-3.5 h-3.5 md:w-4 md:h-4" />}
-                                    Simpan Perubahan
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                            <button 
+                                type="button" 
+                                onClick={() => setIsConfirmDateOpen(false)} 
+                                className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-md hover:bg-slate-50 transition-colors cursor-pointer"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={submitStartDate} 
+                                disabled={formStartDate.processing} 
+                                className="px-3.5 py-1.5 bg-orange-500 text-white font-bold text-xs rounded-md shadow-2xs hover:bg-orange-600 transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                                {formStartDate.processing ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check size={13} />}
+                                <span>Simpan Perubahan</span>
+                            </button>
                         </div>
                     </div>
                 </div>

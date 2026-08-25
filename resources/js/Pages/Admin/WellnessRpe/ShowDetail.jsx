@@ -1,10 +1,10 @@
 import React from "react";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, Link } from "@inertiajs/react";
-import PageHeader from "@/Components/Layout/PageHeader";
+import PageHeader from "@/Components/Common/PageHeader";
 import BodyHighlighter from "@/Components/BodyHighlighter";
 import {
-    ArrowLeft,
+    ChevronLeft,
     HeartPulse,
     Activity,
     Moon,
@@ -14,9 +14,10 @@ import {
     Clock,
     User,
     CheckCircle2,
-    FileEdit,
     Zap,
-    Smile
+    Smile,
+    Calendar,
+    AlertCircle
 } from "lucide-react";
 
 export default function ShowDetail({
@@ -27,18 +28,18 @@ export default function ShowDetail({
     formattedDate,
 }) {
     const renderScoreCard = (title, icon, score, colorClass, max = 5) => (
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg ${colorClass} bg-opacity-10`}>
+        <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3">
+            <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-slate-700">{title}</span>
+                <div className={`p-1 rounded ${colorClass} bg-opacity-15`}>
                     {icon}
                 </div>
-                <h4 className="text-sm font-bold text-slate-700">{title}</h4>
             </div>
-            <div className="flex items-end gap-2">
-                <span className="text-3xl font-bold text-slate-900 leading-none">
+            <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-slate-900 leading-none">
                     {score || '-'}
                 </span>
-                <span className="text-sm font-bold text-slate-400 mb-1">/ {max}</span>
+                <span className="text-[10px] font-bold text-slate-400">/ {max}</span>
             </div>
         </div>
     );
@@ -46,106 +47,143 @@ export default function ShowDetail({
     return (
         <AppLayout
             user={auth.user}
-            headerTitle={`Detail Wellness: ${athlete.name}`}
-            headerDescription={`Data wellness dan RPE untuk tanggal ${formattedDate}`}
+            title={`Detail Wellness - ${athlete.name}`}
         >
             <Head title={`Wellness - ${athlete.name}`} />
 
-            <div className="pb-12 space-y-6">
+            <div className="space-y-4 pb-16">
+                {/* ─── 1. PAGE HEADER ─── */}
                 <PageHeader 
-                    title={`Wellness Detail: ${athlete.name}`}
-                    subtitle={`Data kesehatan dan intensitas latihan untuk tanggal ${formattedDate}`}
-                    badge={formattedDate}
-                    icon={HeartPulse}
+                    title={`Detail Log: ${athlete.name}`}
+                    description={`Rekap metrik pemulihan dan beban latihan untuk ${formattedDate}.`}
                     actions={
                         <div className="flex items-center gap-2">
                             <Link
                                 href={route("admin.wellness-rpe.athlete.show", athlete.id)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/90 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs"
                             >
-                                <ArrowLeft size={16} /> Kembali ke Kalender
+                                <ChevronLeft size={14} />
+                                <span>Kembali ke Kalender</span>
                             </Link>
                             <Link
-                                href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'wellness', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 text-white rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-sm"
+                                href={route("admin.wellness-rpe.session-form", { 
+                                    date: selectedDate, 
+                                    athlete_id: athlete.id, 
+                                    mode: 'wellness', 
+                                    redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) 
+                                })}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs"
                             >
-                                <HeartPulse size={16} /> {log && log.daily_wellness_score ? 'Edit Wellness' : 'Isi Wellness'}
+                                <HeartPulse size={13} className="text-rose-500" />
+                                <span>{log && log.daily_wellness_score ? 'Edit Wellness' : 'Isi Wellness'}</span>
                             </Link>
                             <Link
-                                href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'rpe', redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) })}
-                                className="flex items-center gap-2 px-4 py-2.5 border border-orange-500 text-orange-500 rounded-lg text-sm font-bold hover:bg-orange-500 hover:text-white cursor-pointer transition-all shadow-sm"
+                                href={route("admin.wellness-rpe.session-form", { 
+                                    date: selectedDate, 
+                                    athlete_id: athlete.id, 
+                                    mode: 'rpe', 
+                                    redirect_to: route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: selectedDate }) 
+                                })}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white rounded-md text-xs font-bold hover:bg-orange-600 transition-colors shadow-2xs"
                             >
-                                <Dumbbell size={16} /> {log && log.daily_load ? 'Edit RPE' : 'Isi RPE'}
+                                <Dumbbell size={13} />
+                                <span>{log && log.daily_load ? 'Edit RPE' : 'Isi RPE'}</span>
                             </Link>
                         </div>
                     }
                 />
 
                 {!log ? (
-                    <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
-                        <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                            <Activity className="h-6 w-6 text-slate-400" />
+                    <div className="bg-white rounded-md border border-slate-200/80 p-8 text-center shadow-2xs space-y-2">
+                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                            <Activity size={20} />
                         </div>
-                        <h3 className="text-sm font-bold text-slate-900">Belum Ada Data</h3>
-                        <p className="mt-1 text-xs text-slate-500">Athlete belum mengisi form wellness/RPE pada tanggal ini.</p>
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900">Belum Ada Data Log</h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Atlet belum mengisi log wellness dan sesi latihan untuk tanggal {formattedDate}.
+                        </p>
+                        <div className="pt-2">
+                            <Link
+                                href={route("admin.wellness-rpe.session-form", { date: selectedDate, athlete_id: athlete.id, mode: 'all' })}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-500 text-white text-xs font-bold rounded-md hover:bg-orange-600 transition-colors shadow-2xs"
+                            >
+                                <span>Isi Log Sekarang</span>
+                            </Link>
+                        </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Kiri: Wellness Metrics */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <HeartPulse className="text-orange-500" size={20} />
-                                    Wellness Metrics
-                                    <span className="ml-auto text-sm font-bold bg-orange-50 text-orange-500 px-3 py-1 rounded-full border border-orange-100">
-                                        Total Score: {log.daily_wellness_score || '-'} / 30
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                        {/* ─── LEFT COLUMN: WELLNESS & RPE METRICS ─── */}
+                        <div className="lg:col-span-7 space-y-4">
+                            {/* Wellness Metrics Card */}
+                            <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-1.5">
+                                        <HeartPulse size={14} className="text-rose-500" />
+                                        <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                                            Parameter Wellness
+                                        </h3>
+                                    </div>
+                                    <span className="text-[10.5px] font-bold text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded shadow-2xs">
+                                        Total Skor: <strong className="text-slate-900">{log.daily_wellness_score || '-'}</strong> / 30
                                     </span>
-                                </h3>
+                                </div>
                                 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    {renderScoreCard("Kualitas Tidur", <Moon size={18} className="text-indigo-500" />, log.quality_of_sleep, "bg-indigo-500")}
-                                    {renderScoreCard("Tingkat Stres", <Brain size={18} className="text-rose-500" />, log.stress, "bg-rose-500")}
-                                    {renderScoreCard("Kelelahan", <Activity size={18} className="text-amber-500" />, log.fatigue, "bg-amber-500")}
-                                    {renderScoreCard("Nyeri Otot", <Flame size={18} className="text-red-500" />, log.muscle_soreness, "bg-red-500")}
-                                    {renderScoreCard("Motivasi", <Zap size={18} className="text-yellow-500" />, log.motivation, "bg-yellow-500")}
-                                    {renderScoreCard("Kondisi Mood", <Smile size={18} className="text-sky-500" />, log.mood_state, "bg-sky-500")}
+                                <div className="p-3.5 sm:p-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                    {renderScoreCard("Kualitas Tidur", <Moon size={14} className="text-indigo-600" />, log.quality_of_sleep, "bg-indigo-100")}
+                                    {renderScoreCard("Tingkat Stres", <Brain size={14} className="text-rose-600" />, log.stress, "bg-rose-100")}
+                                    {renderScoreCard("Kelelahan (Fatigue)", <Activity size={14} className="text-amber-600" />, log.fatigue, "bg-amber-100")}
+                                    {renderScoreCard("Nyeri Otot (Soreness)", <Flame size={14} className="text-red-600" />, log.muscle_soreness, "bg-red-100")}
+                                    {renderScoreCard("Motivasi Latihan", <Zap size={14} className="text-yellow-600" />, log.motivation, "bg-yellow-100")}
+                                    {renderScoreCard("Kondisi Mood", <Smile size={14} className="text-sky-600" />, log.mood_state, "bg-sky-100")}
                                 </div>
                             </div>
 
-                            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <Dumbbell className="text-orange-500" size={20} />
-                                    RPE & Load
-                                    <span className="ml-auto text-sm font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200">
-                                        Daily Load: <span className="text-orange-500 ml-1">{log.daily_load || '-'}</span>
+                            {/* RPE & Training Load Card */}
+                            <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-1.5">
+                                        <Dumbbell size={14} className="text-orange-500" />
+                                        <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                                            RPE & Beban Latihan
+                                        </h3>
+                                    </div>
+                                    <span className="text-[10.5px] font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded">
+                                        Daily Load: <strong className="text-orange-900">{log.daily_load ? `${log.daily_load} AU` : '-'}</strong>
                                     </span>
-                                </h3>
+                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="border border-slate-100 bg-slate-50 rounded-xl p-5">
-                                        <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Sesi Pagi (AM)</h4>
-                                        <div className="space-y-3">
+                                <div className="p-3.5 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {/* AM Session */}
+                                    <div className="border border-slate-200/80 bg-slate-50/60 rounded-md p-3 space-y-2">
+                                        <h4 className="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1.5">
+                                            Sesi Pagi (AM)
+                                        </h4>
+                                        <div className="space-y-1 text-xs">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-semibold text-slate-500">RPE (1-10)</span>
-                                                <span className="text-sm font-bold text-slate-900">{log.am_rpe || '-'}</span>
+                                                <span className="text-slate-500 font-medium">Skor RPE (1–10)</span>
+                                                <span className="font-black text-slate-900">{log.am_rpe || '-'}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-semibold text-slate-500">Durasi (Menit)</span>
-                                                <span className="text-sm font-bold text-slate-900 flex items-center gap-1"><Clock size={14} className="text-slate-400"/> {log.am_duration || '-'}</span>
+                                                <span className="text-slate-500 font-medium">Durasi Latihan</span>
+                                                <span className="font-bold text-slate-900">{log.am_duration ? `${log.am_duration} Menit` : '-'}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="border border-slate-100 bg-slate-50 rounded-xl p-5">
-                                        <h4 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Sesi Sore (PM)</h4>
-                                        <div className="space-y-3">
+                                    {/* PM Session */}
+                                    <div className="border border-slate-200/80 bg-slate-50/60 rounded-md p-3 space-y-2">
+                                        <h4 className="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1.5">
+                                            Sesi Sore / Malam (PM)
+                                        </h4>
+                                        <div className="space-y-1 text-xs">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-semibold text-slate-500">RPE (1-10)</span>
-                                                <span className="text-sm font-bold text-slate-900">{log.pm_rpe || '-'}</span>
+                                                <span className="text-slate-500 font-medium">Skor RPE (1–10)</span>
+                                                <span className="font-black text-slate-900">{log.pm_rpe || '-'}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-semibold text-slate-500">Durasi (Menit)</span>
-                                                <span className="text-sm font-bold text-slate-900 flex items-center gap-1"><Clock size={14} className="text-slate-400"/> {log.pm_duration || '-'}</span>
+                                                <span className="text-slate-500 font-medium">Durasi Latihan</span>
+                                                <span className="font-bold text-slate-900">{log.pm_duration ? `${log.pm_duration} Menit` : '-'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -153,41 +191,60 @@ export default function ShowDetail({
                             </div>
                         </div>
 
-                        {/* Kanan: Body Pain Map */}
-                        <div className="space-y-6">
-                            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full flex flex-col">
-                                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                    <User className="text-orange-500" size={20} />
-                                    Area Nyeri Otot
-                                </h3>
-                                
-                                <div className="flex-1 flex flex-col items-center justify-center min-h-[300px]">
-                                    {(!log.muscle_pain_areas || log.muscle_pain_areas.length === 0) ? (
-                                        <div className="text-center">
-                                            <div className="inline-flex h-12 w-12 bg-green-50 rounded-full items-center justify-center mb-3">
-                                                <CheckCircle2 className="h-6 w-6 text-green-500" />
-                                            </div>
-                                            <p className="text-sm font-bold text-slate-700">Tidak ada keluhan nyeri</p>
-                                        </div>
-                                    ) : (
-                                        <div className="w-full flex justify-center scale-90 origin-top">
-                                            <BodyHighlighter 
-                                                selectedAreas={log.muscle_pain_areas || []} 
-                                                onAreaToggle={() => {}} 
-                                            />
-                                        </div>
+                        {/* ─── RIGHT COLUMN: BODY PAIN MAP ─── */}
+                        <div className="lg:col-span-5 space-y-4">
+                            <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                    <div className="flex items-center gap-1.5">
+                                        <User size={14} className="text-slate-700" />
+                                        <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                                            Keluhan & Area Nyeri Otot
+                                        </h3>
+                                    </div>
+                                    {log.muscle_pain_areas && log.muscle_pain_areas.length > 0 && (
+                                        <span className="text-[10px] font-bold text-orange-600 bg-orange-50 border border-orange-200 px-1.5 py-0.2 rounded">
+                                            {log.muscle_pain_areas.length} Titik
+                                        </span>
                                     )}
                                 </div>
                                 
-                                {log.muscle_pain_areas && log.muscle_pain_areas.length > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
-                                        {log.muscle_pain_areas.map((area, idx) => (
-                                            <span key={idx} className="inline-block px-2.5 py-1 bg-red-50 text-red-600 text-[10px] font-bold rounded-full border border-red-100">
-                                                {area}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="p-3.5 sm:p-4 space-y-3">
+                                    {(!log.muscle_pain_areas || log.muscle_pain_areas.length === 0) ? (
+                                        <div className="text-center py-6 border border-dashed border-slate-200 rounded-md">
+                                            <CheckCircle2 className="h-6 w-6 text-emerald-500 mx-auto mb-1.5" />
+                                            <p className="text-xs font-bold text-slate-700">Tidak Ada Keluhan Nyeri</p>
+                                            <p className="text-[10.5px] text-slate-400 mt-0.5">Otot dalam kondisi bugar tanpa titik nyeri.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {/* Visual Anterior & Posterior Model */}
+                                            <div className="rounded-md border border-slate-200/80 bg-slate-50/50 p-2.5 flex items-center justify-around">
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[9px] font-bold text-slate-400 tracking-wider mb-1">DEPAN</span>
+                                                    <div className="w-[110px]">
+                                                        <BodyHighlighter type="anterior" selectedAreas={log.muscle_pain_areas || []} onSelectArea={() => {}} />
+                                                    </div>
+                                                </div>
+                                                <div className="w-px h-24 bg-slate-200" />
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-[9px] font-bold text-slate-400 tracking-wider mb-1">BELAKANG</span>
+                                                    <div className="w-[110px]">
+                                                        <BodyHighlighter type="posterior" selectedAreas={log.muscle_pain_areas || []} onSelectArea={() => {}} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Tags List */}
+                                            <div className="flex flex-wrap gap-1">
+                                                {log.muscle_pain_areas.map((area, idx) => (
+                                                    <span key={idx} className="inline-block px-2 py-0.5 bg-orange-50 text-orange-700 text-[10.5px] font-bold rounded border border-orange-200">
+                                                        {area}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

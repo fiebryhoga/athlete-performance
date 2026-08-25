@@ -1,13 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, useForm, Link, router, usePage } from '@inertiajs/react';
-import { ChevronLeft, Plus, History, Activity, Edit, Trash2, Download, AlertTriangle, ShieldAlert, Dumbbell, MoveRight, Zap, Target, ArrowRight, FileText } from 'lucide-react';
-import PageHeader from "@/Components/Layout/PageHeader";
-
+import { Head, useForm, Link, router } from '@inertiajs/react';
+import { 
+    ChevronLeft, 
+    Plus, 
+    History, 
+    Activity, 
+    Edit, 
+    Trash2, 
+    ShieldAlert, 
+    Dumbbell, 
+    Zap, 
+    Target, 
+    FileText,
+    Flame,
+    CheckCircle2
+} from 'lucide-react';
+import PageHeader from "@/Components/Common/PageHeader";
 import AssessmentForm from './Partials/AssessmentForm';
 
-export default function DpaShow({ auth, player, assessments, compensations }) {
-    const t = (text) => text;
+export default function DpaShow({ auth, player, assessments = [], compensations = [] }) {
     const isAuthorized = auth?.user?.role === 'superadmin' || auth?.user?.role === 'coach';
     const isAthlete = auth?.user?.role === 'athlete';
     const canCreate = isAuthorized;
@@ -95,258 +107,294 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
     };
 
     return (
-        <AppLayout title={`DPA - ${player.name}`}>
+        <AppLayout title={`Analisis DPA - ${player.name}`}>
             <Head title={`DPA - ${player.name}`} />
 
-            <div className="space-y-6">
-                
-            <PageHeader 
-                title={`Analisis DPA ${player.name}`}
-                subtitle={`Analisis detail tentang Dynamic Posture Assessment (DPA) untuk ${player.name}.`}
-                badge="Detail Evaluasi"
-                icon={Activity}
-                actions={
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
-                        {!isAthlete && (
-                            <Link 
-                                href={route('admin.athletes.dpa.index')}
-                                className="inline-flex flex-1 md:flex-none items-center justify-center rounded-xl text-sm font-bold transition-colors border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900 h-10 px-5 shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-2"
-                            >
-                                <ChevronLeft size={16} className="mr-1.5" />
-                                {"Kembali"}
-                            </Link>
-                        )}
-                        {isAuthorized && (
-                            <div className="flex items-center bg-slate-100 p-1 rounded-xl w-full sm:w-auto h-10">
-                                <button 
-                                    onClick={cancelEdit}
-                                    className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
-                                        activeTab === 'analysis' 
-                                        ? 'bg-white text-orange-500 shadow-sm ring-1 ring-slate-900/5' 
-                                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                                    }`}
+            <div className="space-y-4 pb-16">
+                {/* ─── 1. PAGE HEADER ─── */}
+                <PageHeader 
+                    title={`Analisis DPA: ${player.name}`}
+                    description={`Evaluasi Dynamic Posture Assessment, ketidakseimbangan otot, dan rekomendasi latihan korektif.`}
+                    actions={
+                        <div className="flex items-center gap-2">
+                            {!isAthlete && (
+                                <Link 
+                                    href={route('admin.athletes.dpa.index')}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/90 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
                                 >
-                                    <Activity size={16} /> {t("Analisis")}
-                                </button>
-                                {canCreate && (
+                                    <ChevronLeft size={14} />
+                                    <span>Daftar Klien</span>
+                                </Link>
+                            )}
+
+                            {isAuthorized && (
+                                <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-md border border-slate-200">
                                     <button 
-                                        onClick={() => { setActiveTab('input'); setIsEditMode(false); reset(); }}
-                                        className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ease-out ${
-                                            activeTab === 'input' && !isEditMode 
-                                            ? 'bg-white text-orange-500 shadow-sm ring-1 ring-slate-900/5' 
-                                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                                        type="button"
+                                        onClick={cancelEdit}
+                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                                            activeTab === 'analysis' 
+                                                ? 'bg-orange-500 text-white shadow-2xs' 
+                                                : 'text-slate-600 hover:text-slate-900'
                                         }`}
                                     >
-                                        <Plus size={16} strokeWidth={3} /> {t("Input Evaluasi")}
+                                        <Activity size={13} />
+                                        <span>Analisis</span>
                                     </button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                }
-            />
+
+                                    {canCreate && (
+                                        <button 
+                                            type="button"
+                                            onClick={() => { setActiveTab('input'); setIsEditMode(false); reset(); }}
+                                            className={`inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                                                activeTab === 'input' && !isEditMode 
+                                                    ? 'bg-orange-500 text-white shadow-2xs' 
+                                                    : 'text-slate-600 hover:text-slate-900'
+                                            }`}
+                                        >
+                                            <Plus size={13} />
+                                            <span>Input Evaluasi</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    }
+                />
 
                 {activeTab === 'analysis' && (
-                    <div className="space-y-8 animate-in fade-in duration-500">
+                    <div className="space-y-4">
                         {analysis ? (
                             <>
-                                {/* OVERALL ANALYSIS */}
-                                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                                    <div className="border-b border-slate-200 p-5 bg-slate-50 ">
-                                        <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                            <Activity size={18} className="text-slate-500" /> {t("Profil Ketidakseimbangan Keseluruhan")}
-                                        </h3>
-                                        <p className="text-xs text-slate-500 mt-1">{t("Agregasi otot dan risiko cedera dari semua kompensasi yang terdeteksi.")}</p>
+                                {/* ─── 2. OVERALL MUSCLE IMBALANCE PROFILE ─── */}
+                                <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-3 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
+                                        <div>
+                                            <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                                                <Activity size={14} className="text-orange-500" />
+                                                <span>Profil Ketidakseimbangan Keseluruhan</span>
+                                            </h3>
+                                            <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                                                Agregasi otot overactive, underactive, dan potensi risiko cedera dari kompensasi terdeteksi.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200 ">
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
-                                                    <Activity size={14} />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Otot Overactive")}</h4>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-3.5 sm:p-4 gap-4 md:gap-0">
+                                        {/* Overactive Muscles */}
+                                        <div className="md:pr-4 space-y-2.5">
+                                            <div className="flex items-center gap-1.5">
+                                                <Flame size={14} className="text-rose-500" />
+                                                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Otot Overactive</h4>
+                                                <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200 ml-auto">
+                                                    {analysis.overactive.length}
+                                                </span>
                                             </div>
-                                            <ul className="space-y-2">
+                                            <div className="flex flex-wrap gap-1">
                                                 {analysis.overactive.map((m, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 ">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 flex-shrink-0"></span>
+                                                    <span key={idx} className="inline-block px-2 py-0.5 text-xs font-medium text-rose-800 bg-rose-50/80 border border-rose-200/80 rounded">
                                                         {m}
-                                                    </li>
+                                                    </span>
                                                 ))}
-                                                {analysis.overactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
-                                            </ul>
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
-                                                    <Dumbbell size={14} />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Otot Underactive")}</h4>
+                                                {analysis.overactive.length === 0 && (
+                                                    <span className="text-slate-400 text-xs italic">Tidak ada kompensasi overactive</span>
+                                                )}
                                             </div>
-                                            <ul className="space-y-2">
+                                        </div>
+
+                                        {/* Underactive Muscles */}
+                                        <div className="md:px-4 space-y-2.5">
+                                            <div className="flex items-center gap-1.5">
+                                                <Dumbbell size={14} className="text-emerald-500" />
+                                                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Otot Underactive</h4>
+                                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 ml-auto">
+                                                    {analysis.underactive.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
                                                 {analysis.underactive.map((m, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 ">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 flex-shrink-0"></span>
+                                                    <span key={idx} className="inline-block px-2 py-0.5 text-xs font-medium text-emerald-800 bg-emerald-50/80 border border-emerald-200/80 rounded">
                                                         {m}
-                                                    </li>
+                                                    </span>
                                                 ))}
-                                                {analysis.underactive.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
-                                            </ul>
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-600 ">
-                                                    <ShieldAlert size={14} />
-                                                </div>
-                                                <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">{t("Risiko Cedera")}</h4>
+                                                {analysis.underactive.length === 0 && (
+                                                    <span className="text-slate-400 text-xs italic">Tidak ada kompensasi underactive</span>
+                                                )}
                                             </div>
-                                            <ul className="space-y-2">
+                                        </div>
+
+                                        {/* Possible Injuries */}
+                                        <div className="md:pl-4 space-y-2.5">
+                                            <div className="flex items-center gap-1.5">
+                                                <ShieldAlert size={14} className="text-amber-500" />
+                                                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Risiko Cedera</h4>
+                                                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200 ml-auto">
+                                                    {analysis.injuries.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
                                                 {analysis.injuries.map((m, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 ">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 flex-shrink-0"></span>
+                                                    <span key={idx} className="inline-block px-2 py-0.5 text-xs font-medium text-amber-800 bg-amber-50/80 border border-amber-200/80 rounded">
                                                         {m}
-                                                    </li>
+                                                    </span>
                                                 ))}
-                                                {analysis.injuries.length === 0 && <span className="text-slate-400 text-sm italic">{t("Tidak ada")}</span>}
-                                            </ul>
+                                                {analysis.injuries.length === 0 && (
+                                                    <span className="text-slate-400 text-xs italic">Tidak ada risiko cedera terdeteksi</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* PER COMPENSATION ANALYSIS */}
-                                <div className="space-y-6">
-                                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 px-2">
-                                        <Target size={18} className="text-slate-500" /> {t("Analisis Kompensasi Spesifik")}
+                                {/* ─── 3. SPECIFIC COMPENSATION BREAKDOWN ─── */}
+                                <div className="space-y-3">
+                                    <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                                        <Target size={14} className="text-orange-500" />
+                                        <span>Analisis Kompensasi Spesifik</span>
                                     </h3>
                                     
                                     {analysis.compensations.map((comp, idx) => (
-                                        <div key={idx} className="bg-white border border-slate-200 hover:border-orange-500 transition-colors rounded-2xl shadow-sm overflow-hidden group">
-                                            <div className="bg-gradient-to-r from-slate-50 to-white p-5 border-b border-slate-100 flex items-center justify-between">
-                                                <div>
-                                                    <span className="text-[10px] font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full uppercase tracking-wider">{comp.category}</span>
-                                                    <h4 className="text-lg font-bold text-slate-900 mt-2">{comp.name}</h4>
+                                        <div key={idx} className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                                            {/* Compensation Header */}
+                                            <div className="px-4 py-2.5 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-2 py-0.2 rounded border border-orange-200 uppercase tracking-wider">
+                                                        {comp.category}
+                                                    </span>
+                                                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                                                        {comp.name}
+                                                    </h4>
                                                 </div>
                                             </div>
                                             
-                                            <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                                {/* Imbalances for this comp */}
-                                                <div className="lg:col-span-4 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-100 pb-6 lg:pb-0 lg:pr-8">
+                                            <div className="p-3.5 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+                                                {/* Left Column: Visual Image & Imbalances */}
+                                                <div className="lg:col-span-4 space-y-3 lg:border-r border-slate-100 lg:pr-4">
                                                     {comp.image_path && (
-                                                        <div className="bg-white border border-slate-200/80 rounded-xl p-2 shadow-sm">
+                                                        <div className="bg-white border border-slate-200/80 rounded-md p-1.5 shadow-2xs">
                                                             <img 
                                                                 src={`/storage/${comp.image_path}`} 
                                                                 alt={comp.name} 
-                                                                className="w-full h-48 object-contain rounded-lg"
+                                                                className="w-full h-40 object-contain rounded"
                                                             />
                                                         </div>
                                                     )}
 
-                                                    <div>
-                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Otot Overactive")}</h5>
-                                                        <div className="flex flex-wrap gap-1.5">
+                                                    <div className="space-y-1">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Otot Overactive</span>
+                                                        <div className="flex flex-wrap gap-1">
                                                             {splitItems(comp.overactive_muscles).map((m, i) => (
-                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">{m}</span>
+                                                                <span key={i} className="inline-block px-1.5 py-0.2 rounded text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                                                                    {m}
+                                                                </span>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Otot Underactive")}</h5>
-                                                        <div className="flex flex-wrap gap-1.5">
+
+                                                    <div className="space-y-1">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Otot Underactive</span>
+                                                        <div className="flex flex-wrap gap-1">
                                                             {splitItems(comp.underactive_muscles).map((m, i) => (
-                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">{m}</span>
+                                                                <span key={i} className="inline-block px-1.5 py-0.2 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                                    {m}
+                                                                </span>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <h5 className="text-[11px] font-bold text-slate-500 uppercase mb-3">{t("Kemungkinan Cedera")}</h5>
-                                                        <div className="flex flex-wrap gap-1.5">
+
+                                                    <div className="space-y-1">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Potensi Cedera</span>
+                                                        <div className="flex flex-wrap gap-1">
                                                             {splitItems(comp.possible_injuries).map((m, i) => (
-                                                                <span key={i} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">{m}</span>
+                                                                <span key={i} className="inline-block px-1.5 py-0.2 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                                                    {m}
+                                                                </span>
                                                             ))}
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                {/* Corrective Exercises for this comp */}
-                                                <div className="lg:col-span-8 space-y-6">
-                                                    <h5 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                                        <Zap size={16} className="text-slate-500" /> {t("Latihan Korektif")}
+                                                {/* Right Column: Corrective Exercises 4-Phase */}
+                                                <div className="lg:col-span-8 space-y-2.5">
+                                                    <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                                        <Zap size={13} className="text-orange-500" />
+                                                        <span>Protokol Latihan Korektif (4 Fase)</span>
                                                     </h5>
                                                     
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                        {/* Phase 1 */}
-                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
-                                                            <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">1</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 1: Inhibit (SMR)")}</h6>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                        {/* Phase 1: Inhibit */}
+                                                        <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3 space-y-1.5">
+                                                            <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-1">
+                                                                <span className="w-4 h-4 rounded bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">1</span>
+                                                                <h6 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Inhibit (SMR)</h6>
                                                             </div>
-                                                            <ul className="space-y-2">
+                                                            <ul className="space-y-1 text-xs text-slate-600">
                                                                 {splitItems(comp.exercises_smr).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
-                                                                        {m}
+                                                                    <li key={i} className="flex items-start gap-1">
+                                                                        <span className="text-orange-500 font-bold">•</span>
+                                                                        <span>{m}</span>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                             {comp.image_smr && (
-                                                                <img src={`/storage/${comp.image_smr}`} alt="SMR" className="mt-4 w-full h-auto object-contain rounded-lg border border-slate-200 " />
+                                                                <img src={`/storage/${comp.image_smr}`} alt="SMR" className="mt-2 w-full h-auto object-contain rounded border border-slate-200" />
                                                             )}
                                                         </div>
 
-                                                        {/* Phase 2 */}
-                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
-                                                            <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">2</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 2: Lengthen (Peregangan)")}</h6>
+                                                        {/* Phase 2: Lengthen */}
+                                                        <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3 space-y-1.5">
+                                                            <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-1">
+                                                                <span className="w-4 h-4 rounded bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">2</span>
+                                                                <h6 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Lengthen (Peregangan)</h6>
                                                             </div>
-                                                            <ul className="space-y-2">
+                                                            <ul className="space-y-1 text-xs text-slate-600">
                                                                 {splitItems(comp.exercises_stretching).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
-                                                                        {m}
+                                                                    <li key={i} className="flex items-start gap-1">
+                                                                        <span className="text-orange-500 font-bold">•</span>
+                                                                        <span>{m}</span>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                             {comp.image_stretching && (
-                                                                <img src={`/storage/${comp.image_stretching}`} alt="Stretch" className="mt-4 w-full h-auto object-contain rounded-lg border border-slate-200 " />
+                                                                <img src={`/storage/${comp.image_stretching}`} alt="Stretch" className="mt-2 w-full h-auto object-contain rounded border border-slate-200" />
                                                             )}
                                                         </div>
 
-                                                        {/* Phase 3 */}
-                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
-                                                            <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">3</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 3: Activate")}</h6>
+                                                        {/* Phase 3: Activate */}
+                                                        <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3 space-y-1.5">
+                                                            <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-1">
+                                                                <span className="w-4 h-4 rounded bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">3</span>
+                                                                <h6 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Activate (Aktivasi)</h6>
                                                             </div>
-                                                            <ul className="space-y-2">
+                                                            <ul className="space-y-1 text-xs text-slate-600">
                                                                 {splitItems(comp.exercises_isometrics).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
-                                                                        {m}
+                                                                    <li key={i} className="flex items-start gap-1">
+                                                                        <span className="text-orange-500 font-bold">•</span>
+                                                                        <span>{m}</span>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                             {comp.image_isometrics && (
-                                                                <img src={`/storage/${comp.image_isometrics}`} alt="Activate" className="mt-4 w-full h-auto object-contain rounded-lg border border-slate-200 " />
+                                                                <img src={`/storage/${comp.image_isometrics}`} alt="Activate" className="mt-2 w-full h-auto object-contain rounded border border-slate-200" />
                                                             )}
                                                         </div>
 
-                                                        {/* Phase 4 */}
-                                                        <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 hover:border-slate-300 transition-colors">
-                                                            <div className="flex items-center gap-2 mb-3">
-                                                                <span className="w-5 h-5 rounded bg-orange-100 text-orange-500 text-[10px] font-bold flex items-center justify-center">4</span>
-                                                                <h6 className="text-xs font-bold text-slate-800 uppercase">{t("Fase 4: Integrate")}</h6>
+                                                        {/* Phase 4: Integrate */}
+                                                        <div className="bg-slate-50/70 border border-slate-200/80 rounded-md p-3 space-y-1.5">
+                                                            <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-1">
+                                                                <span className="w-4 h-4 rounded bg-orange-500 text-white text-[10px] font-black flex items-center justify-center">4</span>
+                                                                <h6 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Integrate (Integrasi)</h6>
                                                             </div>
-                                                            <ul className="space-y-2">
+                                                            <ul className="space-y-1 text-xs text-slate-600">
                                                                 {splitItems(comp.exercises_integrated).map((m, i) => (
-                                                                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                                                                        <span className="text-orange-500 font-bold mt-0.5">•</span>
-                                                                        {m}
+                                                                    <li key={i} className="flex items-start gap-1">
+                                                                        <span className="text-orange-500 font-bold">•</span>
+                                                                        <span>{m}</span>
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                             {comp.image_integrated && (
-                                                                <img src={`/storage/${comp.image_integrated}`} alt="Integrate" className="mt-4 w-full h-auto object-contain rounded-lg border border-slate-200 " />
+                                                                <img src={`/storage/${comp.image_integrated}`} alt="Integrate" className="mt-2 w-full h-auto object-contain rounded border border-slate-200" />
                                                             )}
                                                         </div>
                                                     </div>
@@ -356,76 +404,84 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                                     ))}
 
                                     {analysis.compensations.length === 0 && (
-                                        <div className="p-10 text-center flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl shadow-sm">
-                                            <Activity size={32} className="text-slate-300 mb-3" />
-                                            <p className="text-sm font-bold text-slate-900 ">{t("Tidak Ada Kompensasi")}</p>
-                                            <p className="text-xs text-slate-500 mt-1">{t("Postur tubuh pemain sangat baik.")}</p>
+                                        <div className="p-8 text-center bg-white border border-slate-200/80 rounded-md shadow-2xs space-y-1">
+                                            <CheckCircle2 size={24} className="text-emerald-500 mx-auto mb-1.5" />
+                                            <p className="text-xs sm:text-sm font-bold text-slate-900">Tidak Ada Kompensasi Gerakan</p>
+                                            <p className="text-xs text-slate-500">Postur dan mekanika gerak atlet dinilai sangat optimal.</p>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* ASSESSMENT NOTES */}
+                                {/* ─── 4. CLINICAL NOTES ─── */}
                                 {latest.notes && (
-                                    <div className="bg-slate-50 border border-slate-200 rounded-2xl shadow-sm p-6 mt-8">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 ">
-                                                <FileText size={14} />
-                                            </div>
-                                            <h3 className="text-sm font-bold text-slate-900 ">{t("Catatan Klinis")}</h3>
+                                    <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs p-4 space-y-2">
+                                        <div className="flex items-center gap-1.5">
+                                            <FileText size={14} className="text-slate-500" />
+                                            <h3 className="text-xs font-bold text-slate-900">Catatan Klinis & Observasi</h3>
                                         </div>
                                         <div 
-                                            className="text-sm text-slate-600 leading-relaxed pl-1 prose prose-slate max-w-none"
+                                            className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded border border-slate-200 prose prose-slate max-w-none"
                                             dangerouslySetInnerHTML={{ __html: latest.notes }}
                                         />
                                     </div>
                                 )}
 
-                                {/* ASSESSMENT RECORDS */}
-                                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mt-8">
-                                    <div className="p-5 border-b border-slate-200 bg-slate-50 ">
-                                        <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                            <History size={18} className="text-slate-500" /> {t("Riwayat Evaluasi")}
-                                        </h3>
+                                {/* ─── 5. EVALUATION HISTORY ─── */}
+                                <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">
+                                    <div className="px-4 py-2.5 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <History size={14} className="text-slate-500" />
+                                            <h3 className="text-xs font-bold text-slate-900">Riwayat Evaluasi DPA</h3>
+                                        </div>
                                     </div>
                                     
-                                    <div className="divide-y divide-slate-100 ">
+                                    <div className="divide-y divide-slate-100 text-xs">
                                         {assessments.length > 0 ? assessments.map((item, idx) => (
-                                            <div key={idx} className="p-4 md:px-6 flex items-center justify-between hover:bg-slate-50/50 hover:bg-orange-50 transition-colors group">
+                                            <div key={idx} className="p-3 sm:px-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                                                 <div>
-                                                    <p className="text-sm font-bold text-slate-900 ">
+                                                    <p className="font-bold text-slate-900">
                                                         {new Date(item.assessment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                     </p>
-                                                    <div className="text-xs text-slate-500 mt-0.5">
-                                                        {item.details.length} Kompensasi terdeteksi
-                                                    </div>
+                                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                                        {item.details.length} kompensasi terdeteksi
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                                <div className="flex items-center gap-1">
                                                     {canUpdate && (
-                                                        <button onClick={() => handleEdit(item)} className="p-2 bg-white text-slate-600 border border-slate-200 rounded-lg shadow-sm hover:text-slate-900 :text-white transition-colors">
-                                                            <Edit size={14} />
+                                                        <button 
+                                                            onClick={() => handleEdit(item)} 
+                                                            className="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                                                            title="Edit Evaluasi"
+                                                        >
+                                                            <Edit size={13} />
                                                         </button>
                                                     )}
                                                     {canDelete && (
-                                                        <button onClick={() => handleDelete(item.id)} className="p-2 bg-white text-slate-600 border border-slate-200 rounded-lg shadow-sm hover:text-rose-600 :text-rose-500 transition-colors">
-                                                            <Trash2 size={14} />
+                                                        <button 
+                                                            onClick={() => handleDelete(item.id)} 
+                                                            className="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                                            title="Hapus Evaluasi"
+                                                        >
+                                                            <Trash2 size={13} />
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         )) : (
-                                            <div className="p-10 text-center flex flex-col items-center justify-center">
-                                                <History size={24} className="text-slate-300 mb-2" />
-                                                <p className="text-xs font-bold text-slate-500 ">{t("Belum ada riwayat evaluasi")}</p>
+                                            <div className="p-6 text-center text-slate-400 text-xs font-medium">
+                                                Belum ada riwayat evaluasi.
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             </>
                         ) : (
-                            <div className="p-10 text-center flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl shadow-sm h-full">
-                                <Activity size={32} className="text-slate-300 mb-3" />
-                                <p className="text-sm font-bold text-slate-900 ">{t("Tidak Ada Data Analisis")}</p>
-                                <p className="text-xs text-slate-500 mt-1">{t("Silakan tambahkan evaluasi DPA baru terlebih dahulu.")}</p>
+                            <div className="p-8 text-center bg-white border border-slate-200/80 rounded-md shadow-2xs space-y-2">
+                                <Activity size={28} className="text-slate-300 mx-auto" />
+                                <h3 className="text-xs sm:text-sm font-bold text-slate-800">Belum Ada Data Analisis DPA</h3>
+                                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                    Silakan tambahkan evaluasi DPA pertama untuk pemain ini dengan mengklik tombol "Input Evaluasi".
+                                </p>
                             </div>
                         )}
                     </div>
@@ -434,9 +490,12 @@ export default function DpaShow({ auth, player, assessments, compensations }) {
                 {activeTab === 'input' && (
                     <AssessmentForm 
                         compensations={compensations}
-                        data={data} setData={setData} 
-                        submit={submit} processing={processing} 
-                        isEditMode={isEditMode} cancelEdit={cancelEdit} 
+                        data={data} 
+                        setData={setData} 
+                        submit={submit} 
+                        processing={processing} 
+                        isEditMode={isEditMode} 
+                        cancelEdit={cancelEdit} 
                     />
                 )}
             </div>

@@ -1,5 +1,40 @@
-import { Link, usePage, useForm } from '@inertiajs/react';
-import { Search, Menu, LogOut, User, Lock, X, Settings, ChevronDown, Save, Shield, Loader2, ArrowRight, Camera, UploadCloud, ChevronRight, Home, Plus, Calendar, Dumbbell, ClipboardList, Users, Flame } from 'lucide-react';
+import { Link, usePage, useForm, router } from '@inertiajs/react';
+import { 
+    Search, 
+    Menu, 
+    LogOut, 
+    User, 
+    Lock, 
+    X, 
+    Settings, 
+    ChevronDown, 
+    Save, 
+    Shield, 
+    Loader2, 
+    ArrowRight, 
+    Camera, 
+    UploadCloud, 
+    ChevronRight, 
+    Home, 
+    Plus, 
+    Calendar, 
+    Dumbbell, 
+    ClipboardList, 
+    Users, 
+    Flame,
+    Compass,
+    Trophy,
+    Utensils,
+    Package,
+    Activity,
+    CornerDownLeft,
+    Calculator,
+    Scale,
+    HeartPulse,
+    CalendarDays,
+    CalendarCheck,
+    BatteryCharging
+} from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import axios from 'axios'; 
 
@@ -13,6 +48,7 @@ export default function Navbar({ onMobileMenuClick }) {
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
     
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -106,12 +142,112 @@ export default function Navbar({ onMobileMenuClick }) {
             const response = await axios.get(route('global.search'), {
                 params: { query }
             });
-            setResults(response.data);
+            setResults(response.data || []);
+            setSelectedIndex(0);
             setShowResults(true);
         } catch (error) {
             console.error("Search error:", error);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (!showResults || results.length === 0) {
+            if (e.key === 'Escape') {
+                setShowResults(false);
+                if (isMobileSearchOpen) setIsMobileSearchOpen(false);
+            }
+            return;
+        }
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex((prev) => (prev + 1) % results.length);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (results[selectedIndex]) {
+                router.visit(results[selectedIndex].url);
+                setShowResults(false);
+                setKeyword('');
+                setIsMobileSearchOpen(false);
+            }
+        } else if (e.key === 'Escape') {
+            setShowResults(false);
+            if (isMobileSearchOpen) setIsMobileSearchOpen(false);
+        }
+    };
+
+    const renderSearchIcon = (type) => {
+        switch (type) {
+            case 'Menu':
+                return <Compass size={14} className="text-orange-600" />;
+            case 'Athlete':
+                return <User size={14} className="text-indigo-600" />;
+            case 'Exercise':
+                return <Dumbbell size={14} className="text-emerald-600" />;
+            case 'DPA':
+                return <Activity size={14} className="text-rose-600" />;
+            case 'PHV':
+                return <Calculator size={14} className="text-purple-600" />;
+            case 'Composition':
+                return <Scale size={14} className="text-teal-600" />;
+            case 'Wellness':
+                return <HeartPulse size={14} className="text-pink-600" />;
+            case 'Training':
+                return <CalendarDays size={14} className="text-sky-600" />;
+            case 'DailyMetric':
+                return <CalendarCheck size={14} className="text-emerald-600" />;
+            case 'Recovery':
+                return <BatteryCharging size={14} className="text-amber-600" />;
+            case 'Sport':
+                return <Trophy size={14} className="text-amber-600" />;
+            case 'Group':
+                return <Users size={14} className="text-sky-600" />;
+            case 'Meal':
+                return <Utensils size={14} className="text-lime-700" />;
+            case 'Package':
+                return <Package size={14} className="text-purple-600" />;
+            default:
+                return <Search size={14} className="text-slate-500" />;
+        }
+    };
+
+    const getBadgeStyle = (type) => {
+        switch (type) {
+            case 'Menu':
+                return 'bg-orange-50 text-orange-700 border-orange-200';
+            case 'Athlete':
+                return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+            case 'Exercise':
+                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'DPA':
+                return 'bg-rose-50 text-rose-700 border-rose-200';
+            case 'PHV':
+                return 'bg-purple-50 text-purple-700 border-purple-200';
+            case 'Composition':
+                return 'bg-teal-50 text-teal-700 border-teal-200';
+            case 'Wellness':
+                return 'bg-pink-50 text-pink-700 border-pink-200';
+            case 'Training':
+                return 'bg-sky-50 text-sky-700 border-sky-200';
+            case 'DailyMetric':
+                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'Recovery':
+                return 'bg-amber-50 text-amber-700 border-amber-200';
+            case 'Sport':
+                return 'bg-amber-50 text-amber-700 border-amber-200';
+            case 'Group':
+                return 'bg-sky-50 text-sky-700 border-sky-200';
+            case 'Meal':
+                return 'bg-lime-50 text-lime-800 border-lime-200';
+            case 'Package':
+                return 'bg-purple-50 text-purple-700 border-purple-200';
+            default:
+                return 'bg-slate-100 text-slate-700 border-slate-200';
         }
     };
 
@@ -144,21 +280,55 @@ export default function Navbar({ onMobileMenuClick }) {
                     
                     {/* Mobile Search Overlay */}
                     {isMobileSearchOpen ? (
-                        <div className="absolute inset-0 bg-white z-50 flex items-center px-4 gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
-                            <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                                <input 
-                                    ref={mobileInputRef}
-                                    type="text" 
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-1.5 bg-slate-100 border-none rounded-lg focus:ring-2 focus:ring-orange-500 text-xs outline-none transition-all"
-                                    placeholder="Cari atlet, data tes, jadwal..."
-                                />
+                        <div className="absolute inset-0 bg-white z-50 flex flex-col justify-start px-4 pt-3 pb-4 gap-3 animate-in fade-in slide-in-from-top-1 duration-150 shadow-lg">
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 relative">
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                                    <input 
+                                        ref={mobileInputRef}
+                                        type="text" 
+                                        value={keyword} 
+                                        onChange={(e) => setKeyword(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        className="w-full pl-9 pr-4 py-1.5 bg-slate-100 border border-transparent rounded-lg focus:border-slate-300 focus:bg-white focus:ring-1 focus:ring-slate-400 text-xs outline-none transition-all"
+                                        placeholder="Cari menu, atlet, tes fisik, latihan, nutrisi..."
+                                    />
+                                </div>
+                                <button onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); setShowResults(false); }} className="p-2 text-slate-500 hover:text-slate-800 rounded-lg">
+                                    <span className="text-xs font-semibold">Batal</span>
+                                </button>
                             </div>
-                            <button onClick={() => { setIsMobileSearchOpen(false); setKeyword(''); }} className="p-2 text-slate-500 hover:text-slate-800 rounded-lg">
-                                <span className="text-xs font-semibold">Batal</span>
-                            </button>
+
+                            {/* Mobile Results List */}
+                            {showResults && (
+                                <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 rounded-md border border-slate-200 bg-white shadow-2xs custom-scrollbar">
+                                    {results.length > 0 ? (
+                                        results.map((result) => (
+                                            <Link 
+                                                key={result.id} 
+                                                href={result.url} 
+                                                onClick={() => { setShowResults(false); setKeyword(''); setIsMobileSearchOpen(false); }}
+                                                className="flex items-center justify-between p-2.5 hover:bg-slate-50 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-2.5 min-w-0">
+                                                    <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center shrink-0">
+                                                        {renderSearchIcon(result.type)}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-xs font-bold text-slate-900 truncate">{result.title}</p>
+                                                        <p className="text-[10px] text-slate-400 font-medium truncate">{result.subtitle}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded border shrink-0 ml-2 ${getBadgeStyle(result.type)}`}>
+                                                    {result.badge || result.type}
+                                                </span>
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        <div className="p-4 text-center text-xs font-medium text-slate-500">Tidak ada hasil untuk "{keyword}".</div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <>
@@ -202,43 +372,85 @@ export default function Navbar({ onMobileMenuClick }) {
                             {/* Center Search Bar - Well Proportioned */}
                             <div className="hidden md:flex justify-center max-w-[420px] w-full mx-4" ref={searchRef}>
                                 <div className="w-full relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        {isLoading ? <Loader2 className="h-4 w-4 text-orange-500 animate-spin" /> : <Search className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />}
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        {isLoading ? (
+                                            <Loader2 className="h-3.5 w-3.5 text-slate-500 animate-spin" />
+                                        ) : (
+                                            <Search className="h-3.5 w-3.5 text-slate-400 group-focus-within:text-slate-600 transition-colors" />
+                                        )}
                                     </div>
                                     <input 
                                         ref={searchInputRef} 
                                         type="text" 
                                         value={keyword} 
                                         onChange={(e) => setKeyword(e.target.value)}
+                                        onKeyDown={handleKeyDown}
                                         onFocus={() => { if(results.length > 0) setShowResults(true); }}
-                                        placeholder={isAthlete ? "Cari fitur, jadwal, atau analisis..." : "Cari atlet, tes fisik, atau jadwal..."} 
-                                        className="block w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200/90 bg-slate-50 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 focus:bg-white transition-all font-medium text-xs shadow-2xs hover:bg-white"
+                                        placeholder={isAthlete ? "Cari fitur, jadwal, latihan, nutrisi..." : "Cari menu, atlet, tes fisik, latihan, nutrisi..."} 
+                                        className="block w-full pl-9 pr-8 py-1.5 rounded-md border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 focus:bg-white transition-all font-medium text-xs shadow-2xs hover:bg-white hover:border-slate-300"
                                     />
+                                    {keyword && (
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setKeyword(''); setResults([]); setShowResults(false); }}
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                        >
+                                            <X size={13} />
+                                        </button>
+                                    )}
 
+                                    {/* Rich Search Dropdown */}
                                     {showResults && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden animate-in fade-in zoom-in-95 duration-100 z-50">
+                                        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-md shadow-xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-100 z-50">
                                             {results.length > 0 ? (
-                                                <ul className="py-1 divide-y divide-slate-50">
-                                                    <li className="px-3.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">Hasil Pencarian</li>
-                                                    {results.map((result) => (
-                                                        <li key={result.id}>
-                                                            <Link href={result.url} onClick={() => { setShowResults(false); setKeyword(''); }} className="flex items-center justify-between px-3.5 py-2.5 hover:bg-orange-50/60 transition-colors group">
-                                                                <div className="flex items-center gap-2.5 min-w-0">
-                                                                    <div className="h-7 w-7 rounded-md bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs shrink-0">
-                                                                        {result.title.charAt(0)}
-                                                                    </div>
-                                                                    <div className="min-w-0">
-                                                                        <p className="text-xs font-bold text-slate-800 group-hover:text-orange-600 transition-colors truncate">{result.title}</p>
-                                                                        <p className="text-[10px] text-slate-400 font-medium truncate">{result.subtitle}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-500 -translate-x-1 group-hover:translate-x-0 transition-all opacity-0 group-hover:opacity-100 shrink-0" />
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                                <>
+                                                    <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hasil Pencarian</span>
+                                                        <span className="text-[10px] font-semibold text-slate-400">{results.length} item ditemukan</span>
+                                                    </div>
+                                                    <ul className="py-1 max-h-[380px] overflow-y-auto divide-y divide-slate-50 custom-scrollbar">
+                                                        {results.map((result, idx) => {
+                                                            const isSelected = selectedIndex === idx;
+                                                            return (
+                                                                <li key={result.id}>
+                                                                    <Link 
+                                                                        href={result.url} 
+                                                                        onClick={() => { setShowResults(false); setKeyword(''); }} 
+                                                                        className={`flex items-center justify-between px-3 py-2 transition-colors ${
+                                                                            isSelected ? 'bg-orange-50/80 text-orange-950' : 'hover:bg-slate-50'
+                                                                        }`}
+                                                                    >
+                                                                        <div className="flex items-center gap-2.5 min-w-0">
+                                                                            <div className="w-7 h-7 rounded bg-slate-100/90 border border-slate-200/80 flex items-center justify-center shrink-0">
+                                                                                {renderSearchIcon(result.type)}
+                                                                            </div>
+                                                                            <div className="min-w-0">
+                                                                                <p className="text-xs font-bold text-slate-900 truncate">{result.title}</p>
+                                                                                <p className="text-[10.5px] text-slate-400 font-medium truncate">{result.subtitle}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                                            <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded border ${getBadgeStyle(result.type)}`}>
+                                                                                {result.badge || result.type}
+                                                                            </span>
+                                                                            <ArrowRight size={12} className={`text-slate-300 transition-transform ${isSelected ? 'translate-x-0.5 text-orange-500' : ''}`} />
+                                                                        </div>
+                                                                    </Link>
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                    <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-medium">
+                                                        <span className="flex items-center gap-1">
+                                                            <CornerDownLeft size={10} /> Tekan <strong>Enter</strong> untuk membuka
+                                                        </span>
+                                                        <span><strong>↑↓</strong> Navigasi • <strong>ESC</strong> Tutup</span>
+                                                    </div>
+                                                </>
                                             ) : (
-                                                <div className="p-4 text-center text-xs font-medium text-slate-500">Tidak ada hasil untuk "{keyword}".</div>
+                                                <div className="p-6 text-center text-xs font-medium text-slate-500">
+                                                    Tidak ditemukan hasil untuk "{keyword}".
+                                                </div>
                                             )}
                                         </div>
                                     )}

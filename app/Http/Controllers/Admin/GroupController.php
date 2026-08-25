@@ -8,6 +8,11 @@ use App\Models\TrainingGroup;
 
 class GroupController extends Controller
 {
+    public function show(TrainingGroup $group)
+    {
+        return redirect()->route('admin.group-trainings.show', $group->id);
+    }
+
     public function store(Request $request)
     {
         abort_if(auth()->user()->role !== 'superadmin', 403);

@@ -1,151 +1,147 @@
-import React, { useState } from "react";
+import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
-import PageHeader from "@/Components/Layout/PageHeader";
+import PageHeader from "@/Components/Common/PageHeader";
 import {
     Calendar as CalendarIcon,
+    ChevronLeft,
     TrendingUp,
     Eye,
-    Edit3,
     Plus,
-    X,
     Activity,
-    LineChart
 } from "lucide-react";
 
 export default function AthleteAnalysis({
     auth,
     athlete,
-    weeklyData
+    weeklyData = []
 }) {
-    const [viewingEntry, setViewingEntry] = useState(null);
-
     const getAcwrBadgeClass = (acwr) => {
-        if (!acwr || acwr === 0) return 'text-slate-400 bg-transparent';
-        if (acwr < 0.8) return 'text-orange-500 font-bold';
-        if (acwr >= 0.8 && acwr <= 1.3) return 'text-emerald-500 font-bold';
-        if (acwr > 1.3 && acwr <= 1.5) return 'text-yellow-500 font-bold';
-        return 'text-red-600 font-bold';
+        if (!acwr || acwr === 0) return 'text-slate-400 font-semibold';
+        if (acwr < 0.8) return 'text-orange-600 font-black';
+        if (acwr >= 0.8 && acwr <= 1.3) return 'text-emerald-600 font-black';
+        if (acwr > 1.3 && acwr <= 1.5) return 'text-amber-600 font-black';
+        return 'text-rose-600 font-black';
     };
 
     const getDailyLoadBadgeClass = (val) => {
-        if (!val || val === 0) return 'text-slate-900 bg-slate-100 border-slate-200';
-        if (val < 1500) return 'text-emerald-700 bg-emerald-100 border-emerald-200';
-        if (val <= 3000) return 'text-amber-700 bg-amber-100 border-amber-200';
-        return 'text-red-700 bg-red-100 border-red-200';
+        if (!val || val === 0) return 'text-slate-700 bg-slate-100 border-slate-200';
+        if (val < 1500) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+        if (val <= 3000) return 'text-amber-700 bg-amber-50 border-amber-200';
+        return 'text-rose-700 bg-rose-50 border-rose-200';
     };
 
     const getDailyWellnessColor = (score) => {
         if (!score && score !== 0) return { text: 'text-slate-500', bg: 'bg-slate-100', border: 'border-slate-300', label: 'N/A' };
-        if (score <= 9) return { text: 'text-teal-700', bg: 'bg-teal-100', border: 'border-teal-200', label: "Sangat Baik" };
-        if (score <= 13) return { text: 'text-emerald-700', bg: 'bg-emerald-100', border: 'border-emerald-200', label: "Baik" };
-        if (score <= 17) return { text: 'text-sky-700', bg: 'bg-sky-100', border: 'border-sky-200', label: "Agak Baik" };
-        if (score <= 20) return { text: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', label: "Sedang" };
-        if (score <= 23) return { text: 'text-amber-700', bg: 'bg-amber-100', border: 'border-amber-200', label: "Agak Buruk" };
-        if (score <= 27) return { text: 'text-orange-700', bg: 'bg-orange-100', border: 'border-orange-200', label: "Buruk" };
-        return { text: 'text-red-700', bg: 'bg-red-100', border: 'border-red-200', label: "Sangat Buruk" };
+        if (score <= 9) return { text: 'text-emerald-800', bg: 'bg-emerald-100', border: 'border-emerald-200', label: "Sangat Baik" };
+        if (score <= 13) return { text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', label: "Baik" };
+        if (score <= 17) return { text: 'text-sky-700', bg: 'bg-sky-50', border: 'border-sky-200', label: "Agak Baik" };
+        if (score <= 20) return { text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', label: "Sedang" };
+        if (score <= 23) return { text: 'text-amber-800', bg: 'bg-amber-100', border: 'border-amber-300', label: "Agak Buruk" };
+        if (score <= 27) return { text: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200', label: "Buruk" };
+        return { text: 'text-rose-700', bg: 'bg-rose-50', border: 'border-rose-200', label: "Sangat Buruk" };
     };
 
     return (
         <AppLayout
             user={auth.user}
-            headerTitle={`Analisis ACWR: ${athlete.name}`}
-            headerDescription="Pantau data historis dan analisis beban latihan atlet."
+            title={`Analisis ACWR - ${athlete.name}`}
         >
             <Head title={`Analisis ${athlete.name}`} />
 
-            <div className="pb-12 space-y-6">
+            <div className="space-y-4 pb-16">
+                {/* ─── 1. PAGE HEADER ─── */}
                 <PageHeader 
                     title={`Analisis ACWR: ${athlete.name}`}
-                    subtitle="Evaluasi data wellness mingguan, riwayat RPE harian, dan metrik monitoring."
-                    badge="Analytics"
-                    icon={LineChart}
+                    description="Evaluasi data beban latihan mingguan (Acute:Chronic Workload Ratio), monotoni, dan strain."
+                    actions={
+                        <Link
+                            href={route("admin.wellness-rpe.athlete.show", athlete.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200/90 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-50 transition-colors shadow-2xs"
+                        >
+                            <ChevronLeft size={14} />
+                            <span>Kembali ke Kalender</span>
+                        </Link>
+                    }
                 />
 
-                {/* TABS NAVIGATION */}
-                <div className="flex items-center gap-2 border-b border-slate-200 mb-6 pb-4">
+                {/* ─── 2. TABS NAVIGATION ─── */}
+                <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2.5">
                     <Link
                         href={route('admin.wellness-rpe.athlete.show', athlete.id)}
-                        className="px-5 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-2"
+                        className="px-3.5 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                        <CalendarIcon size={16} />
-                        Kalender Harian
+                        <CalendarIcon size={13} className="text-slate-400" />
+                        <span>Kalender Harian</span>
                     </Link>
-                    <div className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-orange-500 shadow-md shadow-orange-500/20 flex items-center gap-2 cursor-default">
-                        <TrendingUp size={16} />
-                        Analisis ACWR
+                    <div className="px-3.5 py-1.5 rounded-md text-xs font-bold text-white bg-orange-500 shadow-2xs flex items-center gap-1.5 cursor-default">
+                        <TrendingUp size={13} />
+                        <span>Analisis ACWR</span>
                     </div>
                 </div>
 
-                <div className="space-y-8 animate-in fade-in duration-300">
+                {/* ─── 3. WEEKLY DATA & ACWR MONITORING ─── */}
+                <div className="space-y-4">
                     {weeklyData && weeklyData.length > 0 ? weeklyData.map((week, idx) => (
-                        <div key={idx} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div key={idx} className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col">
                             {/* Header per minggu */}
-                            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 font-bold text-xs">
-                                        W{week.week_number}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-slate-900 text-sm">Minggu Ke-{week.week_number}</h3>
-                                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">{week.start_date} s/d {week.end_date}</p>
-                                    </div>
+                            <div className="px-4 py-2.5 bg-slate-50/70 border-b border-slate-100 flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                                        Minggu Ke-{week.week_number}
+                                    </h4>
+                                    <span className="px-2 py-0.5 rounded bg-white text-[10.5px] font-bold text-slate-500 border border-slate-200 shadow-2xs">
+                                        {week.start_date} s/d {week.end_date}
+                                    </span>
                                 </div>
                             </div>
                             
                             {/* Table harian */}
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-xs whitespace-nowrap">
-                                    <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-100">
+                                    <thead className="bg-slate-50/50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-100">
                                         <tr>
-                                            <th className="px-6 py-4">Hari</th>
-                                            <th className="px-4 py-4 text-center">Wellness</th>
-                                            <th className="px-4 py-4 text-center">AM Load</th>
-                                            <th className="px-4 py-4 text-center">PM Load</th>
-                                            <th className="px-4 py-4 text-center">Daily Load</th>
-                                            <th className="px-6 py-4 text-right">Aksi</th>
+                                            <th className="px-4 py-2.5">Hari</th>
+                                            <th className="px-3 py-2.5 text-center">Wellness</th>
+                                            <th className="px-3 py-2.5 text-center">AM Load</th>
+                                            <th className="px-3 py-2.5 text-center">PM Load</th>
+                                            <th className="px-3 py-2.5 text-center">Daily Load</th>
+                                            <th className="px-4 py-2.5 text-right">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-50">
+                                    <tbody className="divide-y divide-slate-100 text-xs">
                                         {week.chartData.map((day, dayIdx) => (
-                                            <tr key={dayIdx} className="hover:bg-slate-50/80 transition-colors">
-                                                <td className="px-6 py-3">
-                                                    <div className="font-bold text-slate-900 text-xs">{day.dayName}</div>
-                                                    <div className="text-[10px] text-slate-400 font-bold">{day.dateLabel}</div>
+                                            <tr key={dayIdx} className="hover:bg-slate-50/60 transition-colors">
+                                                <td className="px-4 py-2.5">
+                                                    <div className="font-bold text-slate-900">{day.dayName}</div>
+                                                    <div className="text-[10px] text-slate-400 font-medium">{day.dateLabel}</div>
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-3 py-2.5 text-center">
                                                     {day.wellness > 0 ? (
-                                                        <div className="flex flex-col items-center gap-1">
-                                                            <span className={`font-bold px-2.5 py-0.5 rounded text-[11px] border ${getDailyWellnessColor(day.wellness).bg} ${getDailyWellnessColor(day.wellness).text} ${getDailyWellnessColor(day.wellness).border}`}>
-                                                                {day.wellness}
-                                                            </span>
-                                                            <span className={`text-[9px] font-bold ${getDailyWellnessColor(day.wellness).text}`}>
-                                                                {getDailyWellnessColor(day.wellness).label}
+                                                        <div className="inline-flex items-center gap-1">
+                                                            <span className={`font-bold px-2 py-0.5 rounded text-[10.5px] border ${getDailyWellnessColor(day.wellness).bg} ${getDailyWellnessColor(day.wellness).text} ${getDailyWellnessColor(day.wellness).border}`}>
+                                                                {day.wellness} ({getDailyWellnessColor(day.wellness).label})
                                                             </span>
                                                         </div>
                                                     ) : <span className="text-slate-300">-</span>}
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    {day.amLoad > 0 ? (
-                                                        <div className="font-bold text-slate-700 text-xs">{day.amLoad} <span className="text-[9px] text-slate-400 font-normal">AU</span></div>
-                                                    ) : <span className="text-slate-300">-</span>}
+                                                <td className="px-3 py-2.5 text-center font-bold text-slate-700">
+                                                    {day.amLoad > 0 ? `${day.amLoad} AU` : <span className="text-slate-300">-</span>}
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    {day.pmLoad > 0 ? (
-                                                        <div className="font-bold text-slate-700 text-xs">{day.pmLoad} <span className="text-[9px] text-slate-400 font-normal">AU</span></div>
-                                                    ) : <span className="text-slate-300">-</span>}
+                                                <td className="px-3 py-2.5 text-center font-bold text-slate-700">
+                                                    {day.pmLoad > 0 ? `${day.pmLoad} AU` : <span className="text-slate-300">-</span>}
                                                 </td>
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-3 py-2.5 text-center">
                                                     {day.load > 0 ? (
-                                                        <span className={`font-bold px-2.5 py-1 rounded text-xs border ${getDailyLoadBadgeClass(day.load)}`}>
-                                                            {day.load}
+                                                        <span className={`font-bold px-2 py-0.5 rounded text-[11px] border ${getDailyLoadBadgeClass(day.load)}`}>
+                                                            {day.load} AU
                                                         </span>
                                                     ) : <span className="text-slate-300">-</span>}
                                                 </td>
-                                                <td className="px-6 py-3 text-right">
+                                                <td className="px-4 py-2.5 text-right">
                                                     <Link 
                                                         href={route('admin.wellness-rpe.athlete.date.show', { user: athlete.id, date: day.dateStr })}
-                                                        className="inline-flex items-center gap-1 bg-white border border-slate-200 text-slate-700 text-[10px] font-bold px-2.5 py-1.5 rounded hover:bg-slate-50 transition-colors shadow-sm"
+                                                        className="inline-flex items-center gap-1 bg-white border border-slate-200 text-slate-700 text-xs font-semibold px-2 py-1 rounded-md hover:bg-slate-50 transition-colors shadow-2xs"
                                                     >
                                                         {day.hasData ? <><Eye size={12} /> Detail</> : <><Plus size={12} /> Isi</>}
                                                     </Link>
@@ -157,48 +153,47 @@ export default function AthleteAnalysis({
                             </div>
 
                             {/* Monitoring Metrics Block */}
-                            <div className="bg-slate-50 p-6 text-slate-900 border-t border-slate-200 relative overflow-hidden">
-                                <div className="absolute right-0 top-0 w-32 h-32 bg-orange-500 opacity-5 rounded-bl-full pointer-events-none"></div>
-                                <div className="flex items-center gap-2 mb-6">
-                                    <Activity className="w-5 h-5 text-orange-500" />
-                                    <h4 className="text-sm font-bold tracking-tight text-slate-900">Load Metrics & Monitoring</h4>
+                            <div className="bg-slate-50/70 p-3.5 sm:p-4 border-t border-slate-100">
+                                <div className="flex items-center gap-1.5 mb-3">
+                                    <Activity className="w-4 h-4 text-orange-500" />
+                                    <h4 className="text-xs font-bold text-slate-900">Metrik Beban & Monitoring ACWR</h4>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-6 gap-y-6 gap-x-4">
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Weekly Load</p>
-                                        <p className="text-2xl font-bold text-slate-900">{week.weekly_load}</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Weekly Load</p>
+                                        <p className="text-base font-black text-slate-900 mt-0.5">{week.weekly_load} <span className="text-[10px] font-medium text-slate-400">AU</span></p>
                                     </div>
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">ACWR Ratio</p>
-                                        <p className={`text-2xl font-bold ${getAcwrBadgeClass(week.acwr)} inline-block`}>
-                                            {week.acwr > 0 ? week.acwr : <span className="text-slate-400 text-lg">0.00</span>}
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio ACWR</p>
+                                        <p className={`text-base mt-0.5 ${getAcwrBadgeClass(week.acwr)}`}>
+                                            {week.acwr > 0 ? week.acwr : '0.00'}
                                         </p>
                                     </div>
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Mean Daily Load</p>
-                                        <p className="text-xl font-bold mt-1 text-slate-700">{week.mean_daily_load}</p>
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rata-rata Load</p>
+                                        <p className="text-base font-bold text-slate-800 mt-0.5">{week.mean_daily_load} <span className="text-[10px] font-medium text-slate-400">AU</span></p>
                                     </div>
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Std Deviation</p>
-                                        <p className="text-xl font-bold mt-1 text-slate-700">{week.standard_deviation}</p>
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Std Deviation</p>
+                                        <p className="text-base font-bold text-slate-800 mt-0.5">{week.standard_deviation}</p>
                                     </div>
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Monotony</p>
-                                        <p className="text-xl font-bold mt-1 text-orange-500">{week.training_monotony}</p>
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monotony</p>
+                                        <p className="text-base font-bold text-orange-600 mt-0.5">{week.training_monotony}</p>
                                     </div>
-                                    <div className="px-2 md:px-4 md:border-r border-slate-200 last:border-0">
-                                        <p className="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Strain</p>
-                                        <p className="text-xl font-bold mt-1 text-red-500">{week.strain}</p>
+                                    <div className="bg-white border border-slate-200/80 rounded-md p-2.5">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Strain</p>
+                                        <p className="text-base font-bold text-rose-600 mt-0.5">{week.strain}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     )) : (
-                        <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                            <Activity className="mx-auto h-12 w-12 text-slate-300" />
-                            <h3 className="mt-4 text-sm font-bold text-slate-900">Belum ada riwayat</h3>
-                            <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-                                Analisis beban mingguan akan muncul di sini setelah atlet memiliki setidaknya satu log latihan mingguan.
+                        <div className="text-center py-12 bg-white rounded-md border border-slate-200/80 p-8 shadow-2xs space-y-2">
+                            <Activity className="mx-auto h-8 w-8 text-slate-300" />
+                            <h3 className="text-xs sm:text-sm font-bold text-slate-900">Belum Ada Riwayat Latihan</h3>
+                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                                Analisis beban mingguan akan otomatis muncul setelah atlet mengisi log latihan.
                             </p>
                         </div>
                     )}

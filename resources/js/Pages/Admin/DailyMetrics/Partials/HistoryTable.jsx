@@ -1,106 +1,103 @@
+import React, { useState } from 'react';
 import { Activity, Plus, Edit3, Zap, Eye, X, HeartPulse, FileText } from 'lucide-react';
-import { useState } from 'react';
 
 export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal, isAthlete }) {
     const totalActiveDays = dailyHistory?.filter(i => i.data && i.data.recovery_status !== 'KOSONG').length || 0;
-
-    
     const [detailItem, setDetailItem] = useState(null);
 
-    
     const getRecoveryColors = (status) => {
         if (status === 'RECOVERY BAIK') return {
-            border: 'border-emerald-100',
+            border: 'border-emerald-200',
             bg: 'bg-emerald-50',
-            text: 'text-emerald-500'
+            text: 'text-emerald-700'
         };
         if (status === 'RECOVERY CUKUP') return {
-            border: 'border-amber-100',
+            border: 'border-amber-200',
             bg: 'bg-amber-50',
-            text: 'text-amber-500'
+            text: 'text-amber-700'
         };
         if (status === 'RECOVERY KURANG') return {
-            border: 'border-red-100',
-            bg: 'bg-red-50',
-            text: 'text-red-500'
+            border: 'border-rose-200',
+            bg: 'bg-rose-50',
+            text: 'text-rose-700'
         };
-        
         return {
-            border: 'border-slate-100',
+            border: 'border-slate-200',
             bg: 'bg-slate-50',
-            text: 'text-slate-400'
+            text: 'text-slate-500'
         };
     };
 
     return (
-        <div className="w-full bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
-            <div className="p-4 md:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2 text-base md:text-lg">
-                    <Activity className="w-4 h-4 md:w-5 md:h-5 text-orange-500"/> Kalender Metrik Harian
+        <div className="w-full bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div className="p-3 sm:p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <h3 className="font-bold text-slate-900 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <Activity size={14} className="text-orange-500"/> 
+                    <span>Kalender Riwayat Metrik Harian</span>
                 </h3>
-                {totalActiveDays > 0 && <p className="text-xs md:text-sm text-slate-500 font-medium">Total Data: {totalActiveDays} Hari Aktif</p>}
+                {totalActiveDays > 0 && (
+                    <span className="text-[11px] text-slate-500 font-semibold bg-white border border-slate-200 px-2 py-0.5 rounded shadow-2xs">
+                        Total: {totalActiveDays} Hari Terisi
+                    </span>
+                )}
             </div>
             
             <div className="overflow-x-auto w-full">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-white border-b border-slate-100 text-slate-500 text-[9px] md:text-[10px] font-bold">
+                <table className="w-full text-left text-xs whitespace-nowrap">
+                    <thead className="bg-slate-50/50 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                         <tr>
-                            <th className="px-3 md:px-4 py-4">Waktu (WIB)</th>
-                            
-                            
-                            <th className="hidden md:table-cell px-3 md:px-4 py-4 text-center">RHR</th>
-                            <th className="hidden md:table-cell px-3 md:px-4 py-4 text-center">SpO2</th>
-                            <th className="hidden lg:table-cell px-3 md:px-4 py-4 text-center text-orange-500">Peak Power</th>
-                            
-                            <th className="px-3 md:px-4 py-4 text-center">Recovery</th>
-                            
-                            
-                            <th className="hidden xl:table-cell px-3 md:px-4 py-4">Catatan</th>
-                            
-                            <th className="px-3 md:px-4 py-4 text-right">Aksi</th>
+                            <th className="px-4 py-2.5">Waktu (WIB)</th>
+                            <th className="hidden md:table-cell px-3 py-2.5 text-center">RHR</th>
+                            <th className="hidden md:table-cell px-3 py-2.5 text-center">SpO2</th>
+                            <th className="hidden lg:table-cell px-3 py-2.5 text-center">Peak Power</th>
+                            <th className="px-4 py-2.5 text-center">Status Recovery</th>
+                            <th className="hidden xl:table-cell px-3 py-2.5">Catatan</th>
+                            <th className="px-4 py-2.5 text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 text-xs">
                         {dailyHistory && dailyHistory.length > 0 ? dailyHistory.map((item, index) => (
-                            <tr key={index} className={`hover:bg-slate-50 transition-colors ${item.is_today ? 'bg-orange-50/40' : ''}`}>
-                                <td className="px-3 md:px-4 py-3 align-middle">
-                                    <div className="font-bold text-slate-800 flex items-center gap-2 text-xs md:text-sm">
-                                        {formatDateToIndo(item.record_date, 'short')}
-                                        {item.is_today && <span className="text-[8px] md:text-[9px] bg-orange-500 text-white px-1.5 md:px-2 py-0.5 rounded-md shadow-sm">Hari Ini</span>}
+                            <tr key={index} className={`hover:bg-slate-50/70 transition-colors ${item.is_today ? 'bg-orange-50/30' : ''}`}>
+                                <td className="px-4 py-2.5 align-middle">
+                                    <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                        <span>{formatDateToIndo(item.record_date, 'short')}</span>
+                                        {item.is_today && (
+                                            <span className="text-[9px] bg-orange-500 text-white font-bold px-1.5 py-0.2 rounded shadow-2xs">
+                                                Hari Ini
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="text-[10px] md:text-[11px] text-orange-500 font-bold mt-0.5">{item.week_label}</div>
+                                    <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{item.week_label}</div>
                                 </td>
                                 
-                                
-                                <td className="hidden md:table-cell px-3 md:px-4 py-3 text-center font-bold text-slate-700 text-xs md:text-sm">
-                                    {item.data?.recovery_status === 'KOSONG' ? <span className="text-slate-300">-</span> : item.data?.rhr}
+                                <td className="hidden md:table-cell px-3 py-2.5 text-center font-bold text-slate-700">
+                                    {item.data?.recovery_status === 'KOSONG' ? <span className="text-slate-300">-</span> : `${item.data?.rhr} bpm`}
                                 </td>
-                                <td className="hidden md:table-cell px-3 md:px-4 py-3 text-center font-bold text-slate-700 text-xs md:text-sm">
+                                <td className="hidden md:table-cell px-3 py-2.5 text-center font-bold text-slate-700">
                                     {item.data?.recovery_status === 'KOSONG' ? <span className="text-slate-300">-</span> : `${item.data?.spo2}%`}
                                 </td>
-                                <td className="hidden lg:table-cell px-3 md:px-4 py-3 text-center font-bold text-slate-800 text-xs md:text-sm bg-slate-50/50">
+                                <td className="hidden lg:table-cell px-3 py-2.5 text-center font-bold text-slate-800">
                                     {item.data?.recovery_status === 'KOSONG' ? <span className="text-slate-300">-</span> : (
-                                        <span className="flex items-center justify-center gap-1">
-                                            {Number(item.data?.peak_power).toLocaleString('id-ID', { minimumFractionDigits: 0 })} <Zap className="w-3 md:w-3.5 h-3 md:h-3.5 text-amber-500"/>
+                                        <span className="inline-flex items-center gap-0.5">
+                                            {Number(item.data?.peak_power).toLocaleString('id-ID')} <span className="text-[10px] font-normal text-slate-400">W</span>
                                         </span>
                                     )}
                                 </td>
                                 
-                                <td className="px-3 md:px-4 py-3 text-center align-middle">
-                                    <span className={`inline-flex items-center gap-1.5 px-2 md:px-3 py-1.5 text-[9px] md:text-[10px] font-bold rounded-xl border shadow-sm ${
-                                        item.data?.recovery_status === 'RECOVERY BAIK' ? 'bg-green-50 text-green-700 border-green-200' : 
-                                        item.data?.recovery_status === 'RECOVERY CUKUP' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
-                                        item.data?.recovery_status === 'RECOVERY KURANG' ? 'bg-red-50 text-red-700 border-red-200' : 
-                                        'bg-slate-100 text-slate-400 border-slate-200 shadow-none'
+                                <td className="px-4 py-2.5 text-center align-middle">
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10.5px] font-bold rounded border ${
+                                        item.data?.recovery_status === 'RECOVERY BAIK' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                                        item.data?.recovery_status === 'RECOVERY CUKUP' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
+                                        item.data?.recovery_status === 'RECOVERY KURANG' ? 'bg-rose-50 text-rose-700 border-rose-200' : 
+                                        'bg-slate-100 text-slate-400 border-slate-200'
                                     }`}>
-                                        {item.data?.recovery_status === 'KOSONG' ? 'LIBUR / KOSONG' : <>{item.data?.quick_recovery_score}% <span className="hidden md:inline w-1 h-1 rounded-full bg-current opacity-50"></span> <span className="hidden md:inline">{item.data?.recovery_status}</span></>}
+                                        {item.data?.recovery_status === 'KOSONG' ? 'KOSONG' : `${item.data?.quick_recovery_score}% (${item.data?.recovery_status.replace('RECOVERY ', '')})`}
                                     </span>
                                 </td>
                                 
-                                
-                                <td className="hidden xl:table-cell px-3 md:px-4 py-3 align-middle">
+                                <td className="hidden xl:table-cell px-3 py-2.5 align-middle">
                                     {item.data?.recovery_status !== 'KOSONG' && item.data?.notes ? (
-                                        <div className="max-w-[150px] truncate text-[11px] text-slate-500 italic bg-slate-100 px-2 py-1 rounded border border-slate-200" title={item.data.notes}>
+                                        <div className="max-w-[150px] truncate text-[11px] text-slate-500 font-medium bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200" title={item.data.notes}>
                                             {item.data.notes}
                                         </div>
                                     ) : (
@@ -108,128 +105,113 @@ export default function HistoryTable({ dailyHistory, formatDateToIndo, openModal
                                     )}
                                 </td>
                                 
-                                
-                                <td className="px-3 md:px-4 py-3 text-right align-middle">
-                                    <div className="flex items-center justify-end gap-1 md:gap-2">
-                                        
+                                <td className="px-4 py-2.5 text-right align-middle">
+                                    <div className="flex items-center justify-end gap-1.5">
                                         {item.data?.recovery_status !== 'KOSONG' && (
-                                            <button onClick={() => setDetailItem(item)} className="p-1.5 md:p-2 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-transparent hover:border-orange-200" title="Lihat Detail Lengkap">
-                                                <Eye className="w-4 h-4 md:w-4 md:h-4" />
+                                            <button 
+                                                onClick={() => setDetailItem(item)} 
+                                                className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors cursor-pointer" 
+                                                title="Lihat Detail"
+                                            >
+                                                <Eye size={13} />
                                             </button>
                                         )}
                                         
-                                        
                                         {!isAthlete && (
-                                            <button onClick={() => openModal(item)} className={`flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1.5 md:py-1.5 rounded-xl shadow-sm transition-all whitespace-nowrap ${
-                                                item.data?.recovery_status === 'KOSONG' ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-white border border-slate-200 text-slate-500 hover:text-orange-500 hover:bg-orange-50'
-                                            }`}>
-                                                {item.data?.recovery_status === 'KOSONG' ? <><Plus className="w-3 h-3" /> Isi Data</> : <><Edit3 className="w-3 h-3" /> Edit</>}
+                                            <button 
+                                                onClick={() => openModal(item)} 
+                                                className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md shadow-2xs transition-all cursor-pointer ${
+                                                    item.data?.recovery_status === 'KOSONG' 
+                                                        ? 'bg-orange-500 text-white hover:bg-orange-600 font-bold' 
+                                                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                                                }`}
+                                            >
+                                                {item.data?.recovery_status === 'KOSONG' ? <><Plus size={12} /> Isi Data</> : <><Edit3 size={12} /> Edit</>}
                                             </button>
                                         )}
                                     </div>
                                 </td>
                             </tr>
                         )) : (
-                            <tr><td colSpan={isAthlete ? "5" : "7"} className="text-center py-16 text-slate-500 text-xs md:text-sm">Belum ada data monitoring.</td></tr>
+                            <tr>
+                                <td colSpan={isAthlete ? 5 : 7} className="text-center py-12 text-slate-400 text-xs font-medium">
+                                    Belum ada data monitoring.
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
-            
-            
-            
+            {/* Detail Popup Modal */}
             {detailItem && (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setDetailItem(null)}></div>
-                    <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        
-                        
-                        <div className="px-4 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
-                            <div className="flex items-center gap-3">
-                                
-                                <div className="p-2 bg-orange-100 text-orange-500 rounded-xl">
-                                    <Activity className="w-4 h-4 md:w-5 md:h-5" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-base md:text-lg text-slate-800 leading-tight">Detail Metrik Harian</h3>
-                                    <p className="text-[10px] md:text-xs font-medium text-slate-500 mt-0.5">{formatDateToIndo(detailItem.record_date, 'full')} • {detailItem.week_label}</p>
-                                </div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-xs" onClick={() => setDetailItem(null)} />
+                    <div className="relative bg-white w-full max-w-md rounded-md border border-slate-200 shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 p-4 space-y-3">
+                        <div className="flex justify-between items-center pb-2.5 border-b border-slate-100">
+                            <div>
+                                <h3 className="font-bold text-xs sm:text-sm text-slate-900">Detail Metrik Harian</h3>
+                                <p className="text-[10.5px] text-slate-500">{formatDateToIndo(detailItem.record_date, 'full')} • {detailItem.week_label}</p>
                             </div>
-                            <button onClick={() => setDetailItem(null)} className="p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 rounded-full transition-all">
-                                <X className="w-5 h-5" />
+                            <button onClick={() => setDetailItem(null)} className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors cursor-pointer">
+                                <X size={15} />
                             </button>
                         </div>
 
-                        
-                        <div className="p-4 md:p-6 max-h-[80vh] overflow-y-auto">
-                            
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
-                                <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1">RHR</p>
-                                    <p className="font-bold text-slate-800 text-lg md:text-xl">{detailItem.data?.rhr} <span className="text-[10px] md:text-xs font-medium text-slate-500">bpm</span></p>
-                                </div>
-                                <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1">SpO2</p>
-                                    <p className="font-bold text-slate-800 text-lg md:text-xl">{detailItem.data?.spo2}<span className="text-[10px] md:text-xs font-medium text-slate-500">%</span></p>
-                                </div>
-                                <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1">Berat Badan</p>
-                                    <p className="font-bold text-slate-800 text-lg md:text-xl">{detailItem.data?.weight} <span className="text-[10px] md:text-xs font-medium text-slate-500">kg</span></p>
-                                </div>
-                                <div className="bg-slate-50 p-3 md:p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mb-1">Vertical Jump</p>
-                                    <p className="font-bold text-slate-800 text-lg md:text-xl">{detailItem.data?.vj} <span className="text-[10px] md:text-xs font-medium text-slate-500">cm</span></p>
-                                </div>
-                                
-                                
-                                <div className="bg-orange-50 p-3 md:p-4 rounded-2xl border border-orange-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-orange-500 mb-1">VO2Max</p>
-                                    <p className="font-bold text-orange-600 text-lg md:text-xl">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</p>
-                                </div>
-                                <div className="bg-amber-50 p-3 md:p-4 rounded-2xl border border-amber-100">
-                                    <p className="text-[9px] md:text-[10px] font-bold text-amber-500 mb-1 flex items-center gap-1"><Zap className="w-3 h-3"/> Power</p>
-                                    <p className="font-bold text-amber-700 text-lg md:text-xl">{Number(detailItem.data?.peak_power).toLocaleString('id-ID', { minimumFractionDigits: 0 })} <span className="text-[10px] md:text-xs font-medium">W</span></p>
-                                </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">RHR</span>
+                                <span className="text-sm font-black text-slate-900">{detailItem.data?.rhr} <small className="text-[9px] font-normal text-slate-400">bpm</small></span>
                             </div>
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">SpO2</span>
+                                <span className="text-sm font-black text-slate-900">{detailItem.data?.spo2}%</span>
+                            </div>
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">Berat Badan</span>
+                                <span className="text-sm font-black text-slate-900">{detailItem.data?.weight} <small className="text-[9px] font-normal text-slate-400">kg</small></span>
+                            </div>
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">Vertical Jump</span>
+                                <span className="text-sm font-black text-slate-900">{detailItem.data?.vj} <small className="text-[9px] font-normal text-slate-400">cm</small></span>
+                            </div>
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">VO2Max</span>
+                                <span className="text-sm font-black text-slate-900">{Number(detailItem.data?.vo2_max).toLocaleString('id-ID', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="bg-slate-50 p-2 rounded-md border border-slate-200/80 text-center">
+                                <span className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block">Peak Power</span>
+                                <span className="text-sm font-black text-slate-900">{Number(detailItem.data?.peak_power).toLocaleString('id-ID')} <small className="text-[9px] font-normal text-slate-400">W</small></span>
+                            </div>
+                        </div>
 
-                            
-                            {(() => {
-                                const recColors = getRecoveryColors(detailItem.data?.recovery_status);
-                                return (
-                                    <div className={`flex items-center justify-between p-3 md:p-4 rounded-2xl border mb-6 bg-white shadow-sm ${recColors.border}`}>
-                                        <div className="flex items-center gap-2 md:gap-3">
-                                            <div className={`p-2 rounded-lg ${recColors.bg} ${recColors.text}`}>
-                                                <HeartPulse className="w-4 h-4 md:w-5 md:h-5"/>
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] md:text-xs font-bold text-slate-500">Recovery Score</p>
-                                                <p className={`text-xs md:text-sm font-bold mt-0.5 ${recColors.text}`}>{detailItem.data?.recovery_status}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`text-2xl md:text-3xl font-bold ${recColors.text}`}>{detailItem.data?.quick_recovery_score}%</span>
-                                        </div>
+                        {(() => {
+                            const recColors = getRecoveryColors(detailItem.data?.recovery_status);
+                            return (
+                                <div className={`flex items-center justify-between p-2.5 rounded-md border ${recColors.border} ${recColors.bg}`}>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Recovery Score</p>
+                                        <p className={`text-xs font-black ${recColors.text}`}>{detailItem.data?.recovery_status}</p>
                                     </div>
-                                );
-                            })()}
+                                    <span className={`text-xl font-black ${recColors.text}`}>{detailItem.data?.quick_recovery_score}%</span>
+                                </div>
+                            );
+                        })()}
 
-                            
-                            {detailItem.data?.notes ? (
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                    <div className="flex items-center gap-2 mb-2 text-slate-600">
-                                        <FileText className="w-4 h-4" />
-                                        <h4 className="text-[10px] md:text-xs font-bold">Catatan Tambahan</h4>
-                                    </div>
-                                    <p className="text-xs md:text-sm text-slate-700 leading-relaxed italic border-l-2 border-orange-500 pl-3 ml-1 whitespace-pre-wrap">
-                                        "{detailItem.data.notes}"
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="text-center py-2 text-slate-400 text-xs italic">
-                                    Tidak ada catatan untuk hari ini.
-                                </div>
-                            )}
+                        {detailItem.data?.notes && (
+                            <div className="bg-slate-50 p-2.5 rounded-md border border-slate-200 text-xs">
+                                <span className="font-bold text-slate-700 block mb-0.5">Catatan:</span>
+                                <p className="text-slate-600 italic">"{detailItem.data.notes}"</p>
+                            </div>
+                        )}
+
+                        <div className="flex justify-end pt-2 border-t border-slate-100">
+                            <button 
+                                onClick={() => setDetailItem(null)} 
+                                className="px-3.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-bold transition-colors cursor-pointer"
+                            >
+                                Tutup
+                            </button>
                         </div>
                     </div>
                 </div>

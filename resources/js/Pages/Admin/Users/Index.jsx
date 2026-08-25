@@ -1,12 +1,13 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, useForm, Link } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package, Building2
+    Plus, Search, Edit3, Trash2, Shield, X, Lock, User, UserCog, Camera, UploadCloud, Users, ChevronRight, UserCheck, ArrowUpDown, ArrowUp, ArrowDown, Package, Building2, Dumbbell
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import GroupList from './Components/GroupList';
+import PageHeader from '@/Components/Common/PageHeader';
 
-export default function Index({ auth, users, filters, activeTab, sports, coachesList, packagesList, groupsList, allAthletes }) {
+export default function Index({ auth, users, filters, activeTab, tabCounts, sports, coachesList, packagesList, groupsList, allAthletes }) {
     const [search, setSearch] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); 
@@ -21,7 +22,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         username: '', 
         password: '',
         profile_photo: null,
-        role: activeTab,
+        role: activeTab === 'group' ? 'athlete' : activeTab,
         is_gym_guard: false,
         gym_fee: '',
         sport_id: '',
@@ -96,7 +97,7 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             username: '',
             password: '',
             profile_photo: null,
-            role: activeTab,
+            role: activeTab === 'group' ? 'athlete' : activeTab,
             is_gym_guard: false,
             gym_fee: '',
             sport_id: '',
@@ -191,68 +192,93 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
         <AppLayout title={auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}>
             <Head title={auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'} />
 
-            <div className="w-full max-w-[1400px] mx-auto pb-12">
+            <div className="space-y-5 pb-8 max-w-[1600px] mx-auto">
                 
-                {/* Header Section */}
-                <div className="bg-white p-5 md:p-8 rounded-xl border border-slate-200 shadow-sm mb-6 relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 md:gap-6 w-full">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
-                    
-                    <div className="relative z-10 w-full lg:w-auto">
-                        <span className="text-[9px] md:text-[10px] font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full mb-2 md:mb-3 inline-block">System & Security</span>
-                        <h2 className="text-xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                            {auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}
-                        </h2>
-                        <p className="text-slate-500 font-medium mt-1 text-xs md:text-sm">
-                            {auth.user.role === 'superadmin' ? 'Kelola akun dan hak akses pengguna secara terpusat.' : 'Kelola data fisik klien yang berada di bawah pantauan Anda.'}
-                        </p>
-                    </div>
+                {/* Modern PageHeader */}
+                <PageHeader
+                    title={auth.user.role === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien'}
+                    description={auth.user.role === 'superadmin' 
+                        ? 'Kelola akun pengguna, hak akses, data privat klien, dan penugasan pelatih secara terpusat.' 
+                        : 'Kelola data fisik klien yang berada di bawah pendampingan dan pantauan Anda.'
+                    }
+                    actions={
+                        <div className="flex flex-wrap items-center gap-2">
+                            {/* Search Input */}
+                            <div className="relative w-48 sm:w-56">
+                                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Cari nama atau username..."
+                                    className="w-full pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-md text-xs placeholder:text-slate-400 focus:ring-1 focus:ring-slate-400 focus:border-slate-400 outline-none transition-all shadow-2xs"
+                                />
+                                {search && (
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setSearch('')} 
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                )}
+                            </div>
 
-                    <div className="relative z-10 w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <div className="relative w-full sm:w-72 shrink-0">
-                            <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
-                            <input 
-                                type="text" 
-                                placeholder="Cari nama atau ID..." 
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-xs md:text-sm focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none shadow-sm touch-manipulation" 
-                            />
+                            {/* Bulk Add Button for Superadmin & Athlete Tab */}
+                            {auth.user.role === 'superadmin' && activeTab === 'athlete' && (
+                                <Link 
+                                    href={route('admin.users.bulkCreate')}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-md text-xs font-semibold shadow-2xs transition-all"
+                                >
+                                    <UploadCloud className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>Bulk Add Klien</span>
+                                </Link>
+                            )}
+
+                            {/* Tambah Akun Button */}
+                            {auth.user.role === 'superadmin' && activeTab !== 'group' && (
+                                <button 
+                                    onClick={openCreateModal}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95"
+                                >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    <span>Tambah Akun</span>
+                                </button>
+                            )}
                         </div>
-                        {auth.user.role === 'superadmin' && activeTab === 'athlete' && (
-                            <Link 
-                                href={route('admin.users.bulkCreate')}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-50 border border-orange-200 text-orange-600 px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-sm hover:bg-orange-100 hover:text-orange-700 transition-all active:scale-95 touch-manipulation shrink-0"
-                            >
-                                <UploadCloud className="w-4 h-4 md:w-5 md:h-5" /> Bulk Add Klien
-                            </Link>
-                        )}
-                        {auth.user.role === 'superadmin' && (
-                            <button 
-                                onClick={openCreateModal}
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-orange-500 text-white px-5 py-2.5 md:py-3 rounded-lg font-bold text-xs md:text-sm shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all active:scale-95 touch-manipulation shrink-0"
-                            >
-                                <Plus className="w-4 h-4 md:w-5 md:h-5" /> Tambah Akun
-                            </button>
-                        )}
-                    </div>
-                </div>
+                    }
+                />
 
-                {/* Tabs Section */}
+                {/* Modern Segmented Navigation Tabs */}
                 {auth.user.role === 'superadmin' && (
-                    <div className="flex border-b border-slate-200 mb-6 overflow-x-auto custom-scrollbar pb-1">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={`px-6 py-3 text-sm font-bold whitespace-nowrap transition-colors border-b-2 ${
-                                    activeTab === tab.id 
-                                    ? 'border-orange-500 text-orange-500' 
-                                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                    <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                        <div className="inline-flex p-1 bg-slate-100/90 rounded-lg border border-slate-200/60 gap-1 overflow-x-auto custom-scrollbar">
+                            {tabs.map((tab) => {
+                                const isActive = activeTab === tab.id;
+                                const count = tabCounts ? tabCounts[tab.id] : null;
+
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => handleTabChange(tab.id)}
+                                        className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-bold rounded-md transition-all whitespace-nowrap ${
+                                            isActive 
+                                                ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/50' 
+                                                : 'text-slate-500 hover:text-slate-800'
+                                        }`}
+                                    >
+                                        <span>{tab.label}</span>
+                                        {count !== null && count !== undefined && (
+                                            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                                                isActive ? 'bg-orange-100 text-orange-700' : 'bg-slate-200/70 text-slate-600'
+                                            }`}>
+                                                {count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
 
@@ -266,30 +292,30 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                     />
                 ) : (
                 <>
-                <div className="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="hidden md:block bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500">
-                                    <th className="px-6 py-4 w-[40%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('name')}>
+                                <tr className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <th className="px-5 py-3 w-[40%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('name')}>
                                         Nama Lengkap <SortIcon field="name" />
                                     </th>
-                                    <th className="px-6 py-4 w-[25%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('username')}>
-                                        Login ID <SortIcon field="username" />
+                                    <th className="px-5 py-3 w-[25%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('username')}>
+                                        Login ID (Username) <SortIcon field="username" />
                                     </th>
-                                    <th className="px-6 py-4 text-center w-[20%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('role')}>
-                                        Role <SortIcon field="role" />
+                                    <th className="px-5 py-3 text-center w-[20%] cursor-pointer hover:bg-slate-100/50 transition-colors" onClick={() => handleSort('role')}>
+                                        Role / Status <SortIcon field="role" />
                                     </th>
-                                    <th className="px-6 py-4 text-right w-[15%]">Aksi</th>
+                                    <th className="px-5 py-3 text-right w-[15%]">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 bg-white">
                                 {users.data.length > 0 ? (
                                     users.data.map((user) => (
-                                        <tr key={user.id} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-6 py-4 align-middle">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-sm border border-orange-100 shadow-sm overflow-hidden">
+                                        <tr key={user.id} className="hover:bg-slate-50/70 transition-colors group">
+                                            <td className="px-5 py-3.5 align-middle">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs border border-slate-200/80 shadow-2xs overflow-hidden">
                                                         {user.profile_photo_url ? (
                                                             <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                                         ) : (
@@ -297,20 +323,25 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <span className="font-bold text-slate-800 text-sm group-hover:text-orange-500 transition-colors">{user.name}</span>
+                                                        <span className="font-bold text-slate-800 text-xs group-hover:text-orange-600 transition-colors">{user.name}</span>
                                                         {user.role === 'athlete' && (
-                                                            <div className="flex flex-col gap-1 mt-1.5">
+                                                            <div className="flex flex-wrap items-center gap-1 mt-1">
+                                                                {user.sport && (
+                                                                    <span className="text-[10px] text-slate-500 font-medium mr-1">
+                                                                        {user.sport.name}
+                                                                    </span>
+                                                                )}
                                                                 {user.package && (
-                                                                    <div className="inline-flex items-center gap-1.5 text-[10px] text-teal-700 bg-teal-50/80 px-2 py-0.5 rounded border border-teal-100 font-medium w-fit">
-                                                                        <Package className="w-3 h-3" /> Privat ({user.package.name})
-                                                                        {user.training_exp_date && <span className="text-rose-500 font-bold ml-1">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                                    <div className="inline-flex items-center gap-1 text-[9.5px] text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60 font-medium">
+                                                                        <Package className="w-2.5 h-2.5" /> Privat ({user.package.name})
+                                                                        {user.training_exp_date && <span className="text-rose-600 font-bold ml-1">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
                                                                     </div>
                                                                 )}
                                                                 {user.groups?.map(g => (
-                                                                    <div key={g.id} className="inline-flex items-center gap-1.5 text-[10px] text-indigo-700 bg-indigo-50/80 px-2 py-0.5 rounded border border-indigo-100 font-medium w-fit">
-                                                                        <Users className="w-3 h-3" /> Grup: {g.name}
+                                                                    <div key={g.id} className="inline-flex items-center gap-1 text-[9.5px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/60 font-medium">
+                                                                        <Users className="w-2.5 h-2.5" /> {g.name}
                                                                         {g.package && <span className="opacity-75">({g.package.name})</span>}
-                                                                        {g.expiration_date && <span className="text-rose-500 font-bold ml-1">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                                        {g.expiration_date && <span className="text-rose-600 font-bold ml-1">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -318,39 +349,41 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 align-middle text-slate-500 text-xs font-medium">
+                                            <td className="px-5 py-3.5 align-middle text-slate-600 text-xs font-mono">
                                                 {user.username}
                                             </td>
-                                            <td className="px-6 py-4 align-middle text-center">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border ${
-                                                    user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                                                    user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                                    'bg-orange-50 text-orange-500 border-orange-100'
+                                            <td className="px-5 py-3.5 align-middle text-center">
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                                    user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-700 border-indigo-200/70' :
+                                                    user.role === 'coach' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' :
+                                                    'bg-orange-50 text-orange-700 border-orange-200/70'
                                                 }`}>
-                                                    <Shield className="w-3 h-3"/> {user.role}
+                                                    <Shield className="w-2.5 h-2.5"/> {user.role}
                                                 </span>
                                                 {user.role === 'coach' && user.is_gym_guard && (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border bg-amber-50 text-amber-600 border-amber-100 mt-1">
-                                                        <Building2 className="w-3 h-3" /> Penjaga Gym
-                                                    </span>
+                                                    <div className="mt-1">
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border bg-amber-50 text-amber-700 border-amber-200/70">
+                                                            <Building2 className="w-2.5 h-2.5" /> Penjaga Gym
+                                                        </span>
+                                                    </div>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 align-middle text-right">
-                                                <div className="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <td className="px-5 py-3.5 align-middle text-right">
+                                                <div className="flex justify-end items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                                                     <button 
                                                         onClick={() => openEditModal(user)} 
-                                                        className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                                                        className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors border border-transparent hover:border-amber-200"
                                                         title="Edit Pengguna"
                                                     >
-                                                        <Edit3 className="w-4 h-4" />
+                                                        <Edit3 className="w-3.5 h-3.5" />
                                                     </button>
                                                     {auth.user.role === 'superadmin' && (
                                                         <button 
                                                             onClick={() => handleDelete(user.id)} 
-                                                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors border border-transparent hover:border-rose-200"
                                                             title="Hapus Pengguna"
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
+                                                            <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
                                                     )}
                                                 </div>
@@ -359,13 +392,13 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-20 text-center text-slate-400">
+                                        <td colSpan="4" className="px-6 py-16 text-center text-slate-400">
                                             <div className="flex flex-col items-center justify-center">
-                                                <div className="p-4 bg-slate-50 rounded-full mb-3">
-                                                    <Users className="w-8 h-8 text-slate-300" />
+                                                <div className="p-3 bg-slate-50 rounded-full mb-2 border border-slate-100">
+                                                    <Users className="w-6 h-6 text-slate-300" />
                                                 </div>
-                                                <h3 className="text-sm font-bold text-slate-700">Tidak ada pengguna ditemukan</h3>
-                                                <p className="text-xs text-slate-500 mt-1 font-medium">Coba sesuaikan kata kunci pencarian atau ganti tab.</p>
+                                                <h3 className="text-xs font-bold text-slate-700">Tidak ada pengguna ditemukan</h3>
+                                                <p className="text-[11px] text-slate-400 mt-0.5">Coba sesuaikan kata kunci pencarian atau ganti tab peran.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -376,13 +409,13 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="md:hidden flex flex-col gap-3">
+                <div className="md:hidden flex flex-col gap-2.5">
                     {users.data.length > 0 ? (
                         users.data.map((user) => (
-                            <div key={user.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                            <div key={user.id} className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col gap-3">
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-base border border-orange-100 shadow-sm overflow-hidden">
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs border border-slate-200 shadow-2xs overflow-hidden">
                                             {user.profile_photo_url ? (
                                                 <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -390,48 +423,48 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                                             )}
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-800 text-sm">{user.name}</h3>
-                                            <p className="text-slate-500 text-xs mt-0.5">{user.username}</p>
+                                            <h3 className="font-bold text-slate-800 text-xs">{user.name}</h3>
+                                            <p className="text-slate-400 text-[11px] font-mono mt-0.5">{user.username}</p>
                                             {user.role === 'athlete' && (
-                                                <div className="flex flex-col gap-1 mt-2">
+                                                <div className="flex flex-col gap-1 mt-1.5">
                                                     {user.package && (
-                                                        <div className="inline-flex items-center gap-1 text-[9px] text-teal-700 bg-teal-50/80 px-1.5 py-0.5 rounded border border-teal-100 font-medium whitespace-nowrap w-fit">
-                                                            <Package className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[120px]">Privat ({user.package.name})</span>
-                                                            {user.training_exp_date && <span className="text-rose-500 font-bold ml-0.5 shrink-0">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                        <div className="inline-flex items-center gap-1 text-[9px] text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60 font-medium whitespace-nowrap w-fit">
+                                                            <Package className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[130px]">Privat ({user.package.name})</span>
+                                                            {user.training_exp_date && <span className="text-rose-600 font-bold ml-0.5 shrink-0">Exp: {new Date(user.training_exp_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
                                                         </div>
                                                     )}
                                                     {user.groups?.map(g => (
-                                                        <div key={g.id} className="inline-flex items-center gap-1 text-[9px] text-indigo-700 bg-indigo-50/80 px-1.5 py-0.5 rounded border border-indigo-100 font-medium whitespace-nowrap w-fit">
-                                                            <Users className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[120px]">Grup: {g.name} {g.package && `(${g.package.name})`}</span>
-                                                            {g.expiration_date && <span className="text-rose-500 font-bold ml-0.5 shrink-0">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
+                                                        <div key={g.id} className="inline-flex items-center gap-1 text-[9px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/60 font-medium whitespace-nowrap w-fit">
+                                                            <Users className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[130px]">{g.name}</span>
+                                                            {g.expiration_date && <span className="text-rose-600 font-bold ml-0.5 shrink-0">Exp: {new Date(g.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}</span>}
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold border ${
-                                            user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
-                                            user.role === 'coach' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                                            'bg-orange-50 text-orange-500 border-orange-100'
+                                    <div className="flex flex-col items-end gap-1">
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9.5px] font-bold border ${
+                                            user.role === 'superadmin' ? 'bg-indigo-50 text-indigo-700 border-indigo-200/70' :
+                                            user.role === 'coach' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' :
+                                            'bg-orange-50 text-orange-700 border-orange-200/70'
                                         }`}>
-                                            <Shield className="w-3 h-3"/> {user.role}
+                                            <Shield className="w-2.5 h-2.5"/> {user.role}
                                         </span>
                                     </div>
                                 </div>
                                 
-                                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                                     <button 
                                         onClick={() => openEditModal(user)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-amber-50 hover:text-amber-600 rounded-lg transition-colors border border-slate-200 hover:border-amber-200"
+                                        className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-amber-50 hover:text-amber-700 rounded-md transition-colors border border-slate-200 hover:border-amber-200"
                                     >
                                         <Edit3 className="w-3.5 h-3.5" /> Edit
                                     </button>
                                     {auth.user.role === 'superadmin' && (
                                         <button 
                                             onClick={() => handleDelete(user.id)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors border border-slate-200 hover:border-rose-200"
+                                            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-rose-50 hover:text-rose-700 rounded-md transition-colors border border-slate-200 hover:border-rose-200"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" /> Hapus
                                         </button>
@@ -440,28 +473,28 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
                             </div>
                         ))
                     ) : (
-                        <div className="bg-white p-10 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center">
-                            <div className="p-4 bg-slate-50 rounded-full mb-3">
-                                <Users className="w-8 h-8 text-slate-300" />
+                        <div className="bg-white p-8 rounded-xl border border-slate-200/90 text-center">
+                            <div className="p-3 bg-slate-50 rounded-full mb-2 border border-slate-100 inline-block">
+                                <Users className="w-5 h-5 text-slate-300" />
                             </div>
-                            <h3 className="text-sm font-bold text-slate-700">Tidak ada pengguna</h3>
-                            <p className="text-xs text-slate-500 mt-1 font-medium">Coba sesuaikan pencarian.</p>
+                            <h3 className="text-xs font-bold text-slate-700">Tidak ada pengguna</h3>
+                            <p className="text-[11px] text-slate-400 mt-0.5">Coba sesuaikan kata kunci pencarian.</p>
                         </div>
                     )}
                 </div>
 
-                {/* Pagination */}
+                {/* Clean Modern Pagination */}
                 {users.links && users.links.length > 3 && (
-                    <div className="mt-6 flex justify-center">
-                        <div className="inline-flex gap-1 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm">
+                    <div className="mt-4 flex justify-center">
+                        <div className="inline-flex gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
                             {users.links.map((link, index) => (
                                 <button
                                     key={index}
                                     onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
                                     disabled={!link.url}
-                                    className={`px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-bold rounded-md transition-all ${
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
                                         link.active 
-                                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' 
+                                        ? 'bg-orange-500 text-white shadow-2xs' 
                                         : link.url 
                                             ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' 
                                             : 'text-slate-300 cursor-not-allowed'
@@ -479,316 +512,277 @@ export default function Index({ auth, users, filters, activeTab, sports, coaches
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-                    <div className={`relative bg-white w-full ${data.role === 'athlete' ? 'max-w-3xl' : 'max-w-md'} rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto flex flex-col`}>
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" onClick={() => setIsModalOpen(false)}></div>
+                    <div className={`relative bg-white w-full ${data.role === 'athlete' ? 'max-w-3xl' : 'max-w-md'} rounded-xl shadow-xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto flex flex-col`}>
                         
-                        <div className="px-5 md:px-6 py-4 md:py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10">
+                        <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/70 sticky top-0 z-10">
                             <div>
-                                <h3 className="font-bold text-base md:text-lg text-slate-800 flex items-center gap-2">
-                                    <UserCog className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />
-                                    {modalMode === 'create' ? 'Tambah Akun' : 'Edit Akun'}
+                                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                                    <UserCog className="w-4 h-4 text-orange-500" />
+                                    {modalMode === 'create' ? 'Tambah Akun Pengguna' : 'Edit Akun Pengguna'}
                                 </h3>
-                                <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">
-                                    {modalMode === 'create' ? 'Buat akun pengguna baru.' : 'Ubah informasi akun pengguna.'}
+                                <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                                    {modalMode === 'create' ? 'Isi formulir untuk menambahkan akun baru ke sistem.' : 'Perbarui data akun pengguna.'}
                                 </p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded-lg hover:bg-rose-50 touch-manipulation">
-                                <X className="w-4 h-4 md:w-5 md:h-5" />
+                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-1.5 rounded-md hover:bg-slate-100 transition-colors">
+                                <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="flex flex-col max-h-[75vh] overflow-y-auto custom-scrollbar">
-                            <div className="p-5 md:p-6 lg:p-8">
-                                <div className="flex flex-col items-center mb-6 md:mb-8">
-                                <div 
-                                    onClick={() => auth.user.role === 'superadmin' && fileInputRef.current?.click()}
-                                    className={`w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-slate-50 overflow-hidden relative group transition-all ${auth.user.role === 'superadmin' ? 'border-slate-300 cursor-pointer hover:border-orange-500 hover:bg-orange-50' : 'border-slate-200 cursor-not-allowed opacity-70'}`}
-                                >
-                                    {photoPreview ? (
-                                        <>
-                                            <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Camera className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                            <div className="p-5 sm:p-6">
+                                <div className="flex flex-col items-center mb-6">
+                                    <div 
+                                        onClick={() => auth.user.role === 'superadmin' && fileInputRef.current?.click()}
+                                        className={`w-20 h-20 rounded-full border-2 border-dashed flex flex-col items-center justify-center bg-slate-50 overflow-hidden relative group transition-all ${auth.user.role === 'superadmin' ? 'border-slate-300 cursor-pointer hover:border-orange-500 hover:bg-orange-50/50' : 'border-slate-200 cursor-not-allowed opacity-70'}`}
+                                    >
+                                        {photoPreview ? (
+                                            <>
+                                                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Camera className="w-5 h-5 text-white" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
+                                                <UploadCloud className="w-5 h-5 mb-1" />
+                                                <span className="text-[10px] font-bold">Foto Profil</span>
                                             </div>
-                                        </>
-                                    ) : (
-                                        <div className="flex flex-col items-center text-slate-400 group-hover:text-orange-500">
-                                            <UploadCloud className="w-5 h-5 md:w-6 md:h-6 mb-1" />
-                                            <span className="text-[9px] md:text-[10px] font-bold mt-0.5 md:mt-1">Photo</span>
-                                        </div>
-                                    )}
-                                </div>
-                                <input type="file" ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" className="hidden" />
-                                {errors.profile_photo && <p className="text-rose-500 text-[10px] md:text-xs mt-2 font-bold">{errors.profile_photo}</p>}
-                            </div>
-
-                            <div className={data.role === 'athlete' ? 'grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8' : 'space-y-4 md:space-y-5'}>
-                                {/* Account Information Column */}
-                                <div className="space-y-4 md:space-y-5">
-                                    {data.role === 'athlete' && <h4 className="text-[10px] font-bold text-orange-500 mb-2 border-b border-orange-100 pb-2">Account Information</h4>}
-                                    
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Role / Jabatan</label>
-                                        <select
-                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                                            value={data.role}
-                                            onChange={e => setData('role', e.target.value)}
-                                            disabled={auth.user.role !== 'superadmin'}
-                                        >
-                                            <option value="superadmin">Superadmin</option>
-                                            <option value="coach">Coach (Pelatih)</option>
-                                            <option value="athlete">Athlete / Klien</option>
-                                        </select>
-                                        {errors.role && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.role}</p>}
+                                        )}
                                     </div>
+                                    <input type="file" ref={fileInputRef} onChange={handlePhotoChange} accept="image/*" className="hidden" />
+                                    {errors.profile_photo && <p className="text-rose-500 text-[11px] mt-1.5 font-semibold">{errors.profile_photo}</p>}
+                                </div>
 
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Nama Lengkap</label>
-                                        <div className="relative group">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                <User className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                                <div className={data.role === 'athlete' ? 'grid grid-cols-1 md:grid-cols-2 gap-5' : 'space-y-4'}>
+                                    {/* Account Information Column */}
+                                    <div className="space-y-3.5">
+                                        {data.role === 'athlete' && <h4 className="text-xs font-bold text-slate-900 pb-1.5 border-b border-slate-100">Informasi Akun</h4>}
+                                        
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Role / Peran</label>
+                                            <select
+                                                className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all font-medium text-slate-800 outline-none text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                                                value={data.role}
+                                                onChange={e => setData('role', e.target.value)}
+                                                disabled={auth.user.role !== 'superadmin'}
+                                            >
+                                                <option value="superadmin">Superadmin</option>
+                                                <option value="coach">Coach (Pelatih)</option>
+                                                <option value="athlete">Athlete / Klien</option>
+                                            </select>
+                                            {errors.role && <p className="text-rose-500 text-[11px] mt-1 font-semibold">{errors.role}</p>}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+                                            <div className="relative group">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <User className="h-3.5 w-3.5 text-slate-400" />
+                                                </div>
+                                                <input 
+                                                    type="text" 
+                                                    className="block w-full pl-8 pr-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all font-medium text-slate-800 outline-none text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    value={data.name}
+                                                    onChange={e => setData('name', e.target.value)}
+                                                    placeholder="Nama lengkap..."
+                                                    disabled={auth.user.role !== 'superadmin'}
+                                                />
                                             </div>
+                                            {errors.name && <p className="text-rose-500 text-[11px] mt-1 font-semibold">{errors.name}</p>}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-700 mb-1">Login ID (Username)</label>
                                             <input 
                                                 type="text" 
-                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
-                                                value={data.name}
-                                                onChange={e => setData('name', e.target.value)}
-                                                placeholder="e.g. John Doe"
+                                                className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all text-xs text-slate-800 outline-none font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                                                value={data.username}
+                                                onChange={e => setData('username', e.target.value)}
+                                                placeholder="Username login..."
                                                 disabled={auth.user.role !== 'superadmin'}
                                             />
+                                            {errors.username && <p className="text-rose-500 text-[11px] mt-1 font-semibold">{errors.username}</p>}
                                         </div>
-                                        {errors.name && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.name}</p>}
-                                    </div>
 
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Login ID (Username)</label>
-                                        <input 
-                                            type="text" 
-                                            className="block w-full px-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all text-xs md:text-sm text-slate-800 outline-none font-medium disabled:opacity-60 touch-manipulation disabled:cursor-not-allowed"
-                                            value={data.username}
-                                            onChange={e => setData('username', e.target.value)}
-                                            placeholder="e.g. admin_01"
-                                            disabled={auth.user.role !== 'superadmin'}
-                                        />
-                                        {errors.username && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.username}</p>}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1 flex justify-between items-end">
-                                            Password
-                                            {modalMode === 'edit' && <span className="text-slate-400 font-medium normal-case tracking-normal text-[9px]">(Kosongkan jika tidak diganti)</span>}
-                                        </label>
-                                        <div className="relative group">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-700 mb-1 flex justify-between items-end">
+                                                Password
+                                                {modalMode === 'edit' && <span className="text-slate-400 font-normal text-[10px]">(Kosongkan bila tidak diganti)</span>}
+                                            </label>
+                                            <div className="relative group">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <Lock className="h-3.5 w-3.5 text-slate-400" />
+                                                </div>
+                                                <input 
+                                                    type="password" 
+                                                    className="block w-full pl-8 pr-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all font-medium text-slate-800 outline-none text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    value={data.password}
+                                                    onChange={e => setData('password', e.target.value)}
+                                                    placeholder="••••••••"
+                                                    disabled={auth.user.role !== 'superadmin'}
+                                                />
                                             </div>
-                                            <input 
-                                                type="password" 
-                                                className="block w-full pl-10 pr-4 py-3 md:py-2.5 rounded-lg border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all font-medium text-slate-800 outline-none text-xs md:text-sm touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
-                                                value={data.password}
-                                                onChange={e => setData('password', e.target.value)}
-                                                placeholder="••••••••"
-                                                disabled={auth.user.role !== 'superadmin'}
-                                            />
+                                            {errors.password && <p className="text-rose-500 text-[11px] mt-1 font-semibold">{errors.password}</p>}
                                         </div>
-                                        {errors.password && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.password}</p>}
+
+                                        {/* Gym Guard Toggle (Only for Coach) */}
+                                        {data.role === 'coach' && (
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+                                                <label className="flex items-center gap-2.5 cursor-pointer">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={data.is_gym_guard}
+                                                        onChange={e => setData('is_gym_guard', e.target.checked)}
+                                                        className="w-4 h-4 rounded text-orange-500 border-slate-300 focus:ring-orange-400"
+                                                    />
+                                                    <div>
+                                                        <span className="text-xs font-bold text-slate-800">Petugas Jaga Gym</span>
+                                                        <p className="text-[10px] text-slate-400">Izinkan akses absensi & scan gym member.</p>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Gym Guard Toggle (Only for Coach) */}
-                                    {data.role === 'coach' && (
-                                        <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-200">
-                                            <label 
-                                                className={`flex items-center gap-3 ${auth.user.role === 'superadmin' ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
-                                                onClick={() => auth.user.role === 'superadmin' && setData('is_gym_guard', !data.is_gym_guard)}
-                                            >
-                                                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                                                    data.is_gym_guard 
-                                                        ? 'bg-orange-500 border-orange-500' 
-                                                        : 'border-slate-300 bg-white'
-                                                }`}>
-                                                    {data.is_gym_guard && (
-                                                        <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
-                                                            <path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        </svg>
-                                                    )}
+                                    {/* Athlete Specific Column */}
+                                    {data.role === 'athlete' && (
+                                        <div className="space-y-3.5">
+                                            <h4 className="text-xs font-bold text-slate-900 pb-1.5 border-b border-slate-100">Profil & Langganan</h4>
+                                            
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Cabang Olahraga</label>
+                                                    <select
+                                                        className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                        value={data.sport_id}
+                                                        onChange={e => setData('sport_id', e.target.value)}
+                                                    >
+                                                        <option value="">Pilih Cabor...</option>
+                                                        {sports?.map(s => (
+                                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
+                                                    <select
+                                                        className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                        value={data.gender}
+                                                        onChange={e => setData('gender', e.target.value)}
+                                                    >
+                                                        <option value="L">Laki-laki</option>
+                                                        <option value="P">Perempuan</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-2.5">
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Usia (thn)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                        value={data.age}
+                                                        onChange={e => setData('age', e.target.value)}
+                                                        placeholder="18"
+                                                    />
                                                 </div>
                                                 <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <Building2 className="w-4 h-4 text-slate-500" />
-                                                        <span className="text-xs font-bold text-slate-700">Bertugas sebagai Penjaga Gym</span>
-                                                    </div>
-                                                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 ml-6">Coach ini akan bisa dijadwalkan untuk piket jaga gym</p>
+                                                    <label className="block text-xs font-semibold text-slate-700 mb-1">TB (cm)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.1"
+                                                        className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                        value={data.height}
+                                                        onChange={e => setData('height', e.target.value)}
+                                                        placeholder="175"
+                                                    />
                                                 </div>
-                                            </label>
-
-                                            {data.is_gym_guard && (
-                                                <div className="mt-3 pt-3 border-t border-slate-200/80 pl-8">
-                                                    <label className="block text-[10px] font-bold text-slate-600 mb-1">
-                                                        Tarif Khusus Jaga Gym (Rp / shift)
-                                                    </label>
-                                                    <div className="relative">
-                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
-                                                        <input 
-                                                            type="number"
-                                                            value={data.gym_fee || ''}
-                                                            onChange={e => setData('gym_fee', e.target.value)}
-                                                            placeholder="Kosongkan untuk tarif default gym"
-                                                            className="w-full pl-9 pr-3 py-1.5 rounded-md border-slate-200 text-xs focus:ring-orange-500 focus:border-orange-500"
-                                                            min="0"
-                                                            disabled={auth.user.role !== 'superadmin'}
-                                                        />
-                                                    </div>
-                                                    <p className="text-[9.5px] text-slate-400 font-medium mt-1">Kosongkan jika ingin mengikuti tarif default global gym.</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {data.role === 'athlete' && (
-                                        <>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Sport Category</label>
-                                                <div className="relative">
-                                                    <select 
-                                                        value={data.sport_id} 
-                                                        onChange={e => setData('sport_id', e.target.value)} 
-                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                                                        disabled={auth.user.role !== 'superadmin'}
-                                                    >
-                                                        <option value="">-- Select Sport --</option>
-                                                        {sports && sports.map(sport => <option key={sport.id} value={sport.id}>{sport.name}</option>)}
-                                                    </select>
-                                                    <ChevronRight className="absolute right-3 top-3.5 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
+                                                <div>
+                                                    <label className="block text-xs font-semibold text-slate-700 mb-1">BB (kg)</label>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.1"
+                                                        className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                        value={data.weight}
+                                                        onChange={e => setData('weight', e.target.value)}
+                                                        placeholder="68"
+                                                    />
                                                 </div>
                                             </div>
 
                                             <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Assign Coaches (Max 2)</label>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {coachesList && coachesList.map((coach) => (
-                                                        <label key={coach.id} onClick={() => auth.user.role === 'superadmin' && handleCoachToggle(coach.id)} className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs md:text-sm font-medium select-none ${auth.user.role === 'superadmin' ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed opacity-60'} ${data.coach_ids.includes(coach.id) ? 'border-orange-500 bg-orange-50 text-orange-500' : 'border-slate-200 text-slate-700'}`}>
-                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${data.coach_ids.includes(coach.id) ? 'bg-orange-500 border-orange-500' : 'border-slate-300'}`}>
-                                                                {data.coach_ids.includes(coach.id) && <UserCheck className="w-3 h-3 text-white" />}
-                                                            </div>
-                                                            {coach.name}
-                                                        </label>
+                                                <label className="block text-xs font-semibold text-slate-700 mb-1">Paket Latihan Privat</label>
+                                                <select
+                                                    className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                    value={data.subscription_package_id}
+                                                    onChange={e => setData('subscription_package_id', e.target.value)}
+                                                >
+                                                    <option value="">Tanpa Paket Privat</option>
+                                                    {packagesList?.map(p => (
+                                                        <option key={p.id} value={p.id}>{p.name} ({p.session_count ? `${p.session_count} sesi` : 'Membership'})</option>
                                                     ))}
-                                                </div>
-                                                {errors.coach_ids && <p className="text-rose-500 text-[10px] md:text-xs mt-1 font-bold ml-1">{errors.coach_ids}</p>}
+                                                </select>
                                             </div>
-                                        </>
-                                    )}
-                                </div>
 
-                                {/* Physical Metrics Column (Only for Athlete) */}
-                                {data.role === 'athlete' && (
-                                    <div className="space-y-4 md:space-y-5 border-t border-slate-100 pt-5 md:pt-0 md:border-t-0 md:border-l md:pl-6 lg:pl-8">
-                                        <h4 className="text-[10px] font-bold text-orange-500 mb-2 border-b border-orange-100 pb-2">Physical Metrics</h4>
-                                        
-                                        <div className="grid grid-cols-2 gap-3 md:gap-4">
                                             <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Gender</label>
-                                                <div className="relative">
-                                                    <select 
-                                                        value={data.gender} 
-                                                        onChange={e => setData('gender', e.target.value)} 
-                                                        className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm appearance-none bg-white transition-all outline-none shadow-sm font-medium"
-                                                    >
-                                                        <option value="L">Male</option>
-                                                        <option value="P">Female</option>
-                                                    </select>
-                                                    <ChevronRight className="absolute right-3 top-3.5 w-4 h-4 text-slate-400 pointer-events-none rotate-90" />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Age</label>
-                                                <input 
-                                                    type="number" 
-                                                    value={data.age} 
-                                                    onChange={e => setData('age', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
-                                                    placeholder="e.g. 25" 
-                                                />
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-3 md:gap-4">
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Height (cm)</label>
-                                                <input 
-                                                    type="number" 
-                                                    step="0.01" 
-                                                    value={data.height} 
-                                                    onChange={e => setData('height', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
-                                                    placeholder="e.g. 175" 
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Weight (kg)</label>
-                                                <input 
-                                                    type="number" 
-                                                    step="0.01" 
-                                                    value={data.weight} 
-                                                    onChange={e => setData('weight', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
-                                                    placeholder="e.g. 70" 
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Masa Aktif Latihan (Opsional)</label>
+                                                <label className="block text-xs font-semibold text-slate-700 mb-1">Kedaluwarsa Paket Privat</label>
                                                 <input 
                                                     type="date" 
-                                                    value={data.training_exp_date} 
-                                                    onChange={e => setData('training_exp_date', e.target.value)} 
-                                                    className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm" 
+                                                    className="block w-full px-3 py-2 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 outline-none"
+                                                    value={data.training_exp_date}
+                                                    onChange={e => setData('training_exp_date', e.target.value)}
                                                 />
                                             </div>
-                                        </div>
 
-                                        <div className="mt-4">
-                                            <label className="block text-[10px] font-bold text-slate-500 mb-1.5 ml-1">Paket Latihan (Opsional)</label>
-                                            <select 
-                                                value={data.subscription_package_id} 
-                                                onChange={e => setData('subscription_package_id', e.target.value)} 
-                                                className="w-full px-4 py-2.5 md:py-3 rounded-lg border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-xs md:text-sm transition-all outline-none font-medium shadow-sm"
-                                            >
-                                                <option value="">-- Tidak Ada / Kosongkan --</option>
-                                                {packagesList?.map(pkg => (
-                                                    <option key={pkg.id} value={pkg.id}>
-                                                        {pkg.name} ({pkg.package_type === 'per_session' ? 'Per Pertemuan' : `${pkg.session_count} Sesi`})
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            <div>
+                                                <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex justify-between">
+                                                    <span>Pelatih Pendamping</span>
+                                                    <span className="text-[10px] text-slate-400 font-normal">(Maksimal 2 pelatih)</span>
+                                                </label>
+                                                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2 bg-slate-50 rounded-md border border-slate-200 custom-scrollbar">
+                                                    {coachesList?.map(c => {
+                                                        const isSelected = data.coach_ids.includes(c.id);
+                                                        return (
+                                                            <button
+                                                                key={c.id}
+                                                                type="button"
+                                                                onClick={() => handleCoachToggle(c.id)}
+                                                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold border transition-all ${
+                                                                    isSelected 
+                                                                        ? 'bg-orange-500 text-white border-orange-500 shadow-2xs' 
+                                                                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                                                                }`}
+                                                            >
+                                                                {isSelected && <UserCheck className="w-3 h-3" />}
+                                                                <span>{c.name}</span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
 
-                                        <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-100 flex gap-2.5 md:gap-3 mt-4">
-                                            <Shield className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                                            <p className="text-[10px] md:text-xs text-slate-500 font-medium leading-relaxed">
-                                                Physical data is used for performance baselines and body composition algorithms.
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            </div>
-                            
-                            {/* Submit Area */}
-                            <div className="p-5 md:p-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 md:gap-3 sticky bottom-0 z-10">
-                                <button 
+                            <div className="px-5 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2 sticky bottom-0">
+                                <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-5 py-2.5 text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 font-bold text-sm rounded-lg transition-colors touch-manipulation"
+                                    className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-md transition-colors"
                                 >
                                     Batal
                                 </button>
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     disabled={processing}
-                                    className="px-6 py-2.5 bg-orange-500 text-white font-bold text-sm rounded-lg shadow-lg shadow-orange-500/20 hover:bg-orange-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
+                                    className="px-4 py-2 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-md shadow-2xs transition-colors disabled:opacity-50 flex items-center gap-1.5"
                                 >
-                                    {processing && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
-                                    {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Buat Akun' : 'Simpan Perubahan')}
+                                    {processing ? 'Menyimpan...' : (modalMode === 'create' ? 'Simpan Pengguna' : 'Perbarui Pengguna')}
                                 </button>
                             </div>
                         </form>
