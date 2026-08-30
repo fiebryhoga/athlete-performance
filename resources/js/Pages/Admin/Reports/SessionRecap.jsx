@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import PageHeader from '@/Components/Common/PageHeader';
 import { 
-    Users, UserCheck, User, Activity, Search, Trophy, CheckCircle2, Calendar, 
+    Users, UsersRound, UserCheck, User, Activity, Search, Trophy, CheckCircle2, Calendar, 
     Banknote, ChevronDown, ChevronRight, Package, Dumbbell, Filter, 
     Clock, DollarSign, Layers, Eye, ShieldCheck, Sparkles, TrendingUp, FileText,
     X, Loader2
@@ -15,18 +15,70 @@ import CoachSalarySlipPdfDocument from './Partials/CoachSalarySlipPdfDocument';
 export default function SessionRecap({ 
     athletes = [], 
     groups = [], 
+    sharedPackages = [],
     coaches = [], 
     available_months = [], 
     monthly_summary = [],
     current_month = null
 }) {
-    const [activeTab, setActiveTab] = useState('individual'); // 'individual', 'group', 'coach'
+    // Initializer functions that read from URL query param or localStorage
+    const getInitialTab = () => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tabParam = params.get('tab');
+            if (tabParam && ['individual', 'group', 'shared_package', 'coach'].includes(tabParam)) {
+                return tabParam;
+            }
+            const saved = localStorage.getItem('session_recap_active_tab');
+            if (saved && ['individual', 'group', 'shared_package', 'coach'].includes(saved)) {
+                return saved;
+            }
+        }
+        return 'individual';
+    };
+
+    const getInitialMonth = () => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const monthParam = params.get('month');
+            if (monthParam) return monthParam;
+            const saved = localStorage.getItem('session_recap_selected_month');
+            if (saved) return saved;
+        }
+        return 'all';
+    };
+
+    const [activeTab, setActiveTab] = useState(getInitialTab);
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedRows, setExpandedRows] = useState(new Set());
-    const [selectedMonth, setSelectedMonth] = useState('all'); // 'all' or '2026-08', '2026-07', etc.
+    const [selectedMonth, setSelectedMonth] = useState(getInitialMonth);
     const [expandedCoachTab, setExpandedCoachTab] = useState({}); // coachId => 'monthly' | 'unpaid' | 'all'
     const [expandedMonthDetail, setExpandedMonthDetail] = useState(new Set()); // 'coachId-monthKey'
     const [exportingCoachKey, setExportingCoachKey] = useState(null);
+
+    // Sync activeTab to localStorage and URL query param
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('session_recap_active_tab', activeTab);
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', activeTab);
+            window.history.replaceState({}, '', url.toString());
+        }
+    }, [activeTab]);
+
+    // Sync selectedMonth to localStorage and URL query param
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('session_recap_selected_month', selectedMonth);
+            const url = new URL(window.location.href);
+            if (selectedMonth && selectedMonth !== 'all') {
+                url.searchParams.set('month', selectedMonth);
+            } else {
+                url.searchParams.delete('month');
+            }
+            window.history.replaceState({}, '', url.toString());
+        }
+    }, [selectedMonth]);
 
     const { post, processing } = useForm();
 
@@ -147,12 +199,14 @@ export default function SessionRecap({
             grouped[mKey].sessions.push(s);
         });
 
-        return Object.values(grouped).sort((a, b) => b.month_key.localeCompare(a.month_key));
+        return Object.values(grouped)
+            .sort((a, b) => b.month_key.localeCompare(a.month_key))
+            .slice(0, 4);
     };
 
-    // Calculate Dynamic Available Months if not provided by backend
+    // Calculate Dynamic Available Months if not provided by backend (limit to last 4 months)
     const computedAvailableMonths = useMemo(() => {
-        if (available_months && available_months.length > 0) return available_months;
+        if (available_months && available_months.length > 0) return available_months.slice(0, 4);
 
         const monthsSet = new Set();
         coaches.forEach(c => {
@@ -163,15 +217,16 @@ export default function SessionRecap({
         return Array.from(monthsSet)
             .filter(k => k !== 'other')
             .sort((a, b) => b.localeCompare(a))
+            .slice(0, 4)
             .map(k => {
                 const [y, m] = k.split('-');
                 return { key: k, label: `${monthNamesMap[m] || m} ${y}` };
             });
     }, [coaches, available_months]);
 
-    // Calculate Dynamic Monthly Summary
+    // Calculate Dynamic Monthly Summary (limit to last 4 months)
     const computedMonthlySummary = useMemo(() => {
-        if (monthly_summary && monthly_summary.length > 0) return monthly_summary;
+        if (monthly_summary && monthly_summary.length > 0) return monthly_summary.slice(0, 4);
 
         const map = {};
         coaches.forEach(c => {
@@ -194,7 +249,9 @@ export default function SessionRecap({
             });
         });
 
-        return Object.values(map).sort((a, b) => b.month_key.localeCompare(a.month_key));
+        return Object.values(map)
+            .sort((a, b) => b.month_key.localeCompare(a.month_key))
+            .slice(0, 4);
     }, [coaches, monthly_summary]);
 
     // Filtered lists based on search and active tab
@@ -217,6 +274,16 @@ export default function SessionRecap({
             (g.member_names && g.member_names.some(m => m.toLowerCase().includes(q)))
         );
     }, [groups, searchQuery]);
+
+    const filteredSharedPackages = useMemo(() => {
+        if (!searchQuery) return sharedPackages;
+        const q = searchQuery.toLowerCase();
+        return sharedPackages.filter(sp => 
+            sp.name?.toLowerCase().includes(q) || 
+            sp.package_name?.toLowerCase().includes(q) ||
+            (sp.member_names && sp.member_names.some(m => m.toLowerCase().includes(q)))
+        );
+    }, [sharedPackages, searchQuery]);
 
     const filteredCoaches = useMemo(() => {
         let list = coaches;
@@ -279,6 +346,23 @@ export default function SessionRecap({
         }).then((result) => {
             if (result.isConfirmed) {
                 post(route('admin.reports.pay-group', group.id));
+            }
+        });
+    };
+
+    const handlePaySharedPackage = (sp) => {
+        Swal.fire({
+            title: 'Konfirmasi Pelunasan Paket Bersama',
+            text: `Tandai seluruh sesi belum bayar untuk paket bersama "${sp.name}" sebagai LUNAS?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Tandai Lunas',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#7c3aed',
+            cancelButtonColor: '#64748b',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                post(route('admin.reports.pay-shared-package', sp.id));
             }
         });
     };
@@ -546,6 +630,19 @@ export default function SessionRecap({
 
                         <button
                             type="button"
+                            onClick={() => setActiveTab('shared_package')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                                activeTab === 'shared_package' 
+                                    ? 'bg-white text-violet-700 shadow-2xs border border-slate-200/70' 
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                            }`}
+                        >
+                            <UsersRound size={13.5} />
+                            <span>Paket Bersama</span>
+                        </button>
+
+                        <button
+                            type="button"
                             onClick={() => setActiveTab('coach')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                 activeTab === 'coach' 
@@ -561,12 +658,12 @@ export default function SessionRecap({
                     {/* Month Filter (Active in Coach Tab) */}
                     {activeTab === 'coach' && computedAvailableMonths && computedAvailableMonths.length > 0 && (
                         <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-md border border-slate-200/80 shadow-2xs">
-                            <Calendar className="w-3.5 h-3.5 text-orange-500" />
-                            <span className="text-xs font-bold text-slate-700">Filter Bulan:</span>
+                            <Calendar className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                            <span className="text-xs font-bold text-slate-700 whitespace-nowrap">Filter Bulan:</span>
                             <select 
                                 value={selectedMonth} 
                                 onChange={(e) => setSelectedMonth(e.target.value)}
-                                className="text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-md py-1 px-2.5 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none cursor-pointer"
+                                className="min-w-[155px] text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-md py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none cursor-pointer"
                             >
                                 <option value="all">Semua Bulan</option>
                                 {computedAvailableMonths.map(m => (
@@ -584,7 +681,7 @@ export default function SessionRecap({
                             <h3 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                                 <Calendar className="w-3.5 h-3.5 text-orange-500" /> Rekapitulasi Honor Pelatih Per Bulan
                             </h3>
-                            <span className="text-xs text-slate-400 font-medium">Total {computedMonthlySummary.length} Bulan Terekam</span>
+                            <span className="text-xs text-slate-400 font-medium">{computedMonthlySummary.length} Bulan Terakhir</span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -602,7 +699,7 @@ export default function SessionRecap({
                                     >
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-xs font-bold text-slate-900">{month.month_label}</span>
-                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/60">
+                                            <span className="text-xs font-semibold text-slate-600">
                                                 {month.total_sessions} Sesi
                                             </span>
                                         </div>
@@ -662,8 +759,7 @@ export default function SessionRecap({
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {athlete.package_name ? (
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[11px] font-semibold">
-                                                            <Package size={11} className="text-slate-400" />
+                                                        <span className="text-slate-700 text-xs font-medium">
                                                             {athlete.package_name}
                                                         </span>
                                                     ) : (
@@ -675,8 +771,8 @@ export default function SessionRecap({
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
                                                     {athlete.unpaid_sessions > 0 ? (
-                                                        <span className="inline-flex min-w-[1.75rem] px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 font-bold text-xs border border-orange-200/60">
-                                                            {athlete.unpaid_sessions}
+                                                        <span className="font-bold text-orange-600 text-xs">
+                                                            {athlete.unpaid_sessions} Sesi
                                                         </span>
                                                     ) : (
                                                         <span className="text-slate-300">-</span>
@@ -687,12 +783,12 @@ export default function SessionRecap({
                                                         <button
                                                             onClick={() => handlePayAthlete(athlete)}
                                                             disabled={processing}
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white rounded-md text-xs font-bold transition-all disabled:opacity-50 border border-orange-200/70 shadow-2xs cursor-pointer"
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-xs font-semibold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
                                                         >
                                                             <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
                                                         </button>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+                                                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                                                             <CheckCircle2 size={13} /> Lunas
                                                         </span>
                                                     )}
@@ -719,9 +815,9 @@ export default function SessionRecap({
                                                                                         <span className="font-bold text-slate-900">
                                                                                             {session.session_number ? `Sesi ${session.session_number}:` : '•'}
                                                                                         </span>
-                                                                                        <span className="text-slate-600">{session.name || 'Program Latihan'}</span>
+                                                                                        <span className="text-slate-700">{session.name || 'Program Latihan'}</span>
                                                                                         {session.is_extra && (
-                                                                                            <span className="text-[9.5px] font-bold text-orange-700 bg-orange-50 border border-orange-200/70 px-1.5 py-0.2 rounded">
+                                                                                            <span className="text-[10px] font-semibold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60">
                                                                                                 Sesi Tambahan
                                                                                             </span>
                                                                                         )}
@@ -732,16 +828,22 @@ export default function SessionRecap({
                                                                                 </td>
                                                                                 <td className="px-3.5 py-2 w-28">
                                                                                     {session.status === 'completed' ? (
-                                                                                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[10px]">Selesai</span>
+                                                                                        <span className="text-emerald-600 font-semibold inline-flex items-center gap-1 text-[11px]">
+                                                                                            <CheckCircle2 size={12} /> Selesai
+                                                                                        </span>
                                                                                     ) : (
-                                                                                        <span className="text-orange-700 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60 text-[10px]">Terjadwal</span>
+                                                                                        <span className="text-amber-600 font-semibold text-[11px]">
+                                                                                            Terjadwal
+                                                                                        </span>
                                                                                     )}
                                                                                 </td>
                                                                                 <td className="px-3.5 py-2 w-28 text-right">
                                                                                     {session.is_paid ? (
-                                                                                        <span className="text-emerald-600 font-bold text-xs"><CheckCircle2 size={12} className="inline mr-1" /> Lunas</span>
+                                                                                        <span className="text-emerald-600 font-semibold text-xs inline-flex items-center gap-1">
+                                                                                            <CheckCircle2 size={12} /> Lunas
+                                                                                        </span>
                                                                                     ) : (
-                                                                                        <span className="text-slate-400 font-bold text-xs">Belum Bayar</span>
+                                                                                        <span className="text-rose-600 font-semibold text-xs">Belum Bayar</span>
                                                                                     )}
                                                                                 </td>
                                                                             </tr>
@@ -812,8 +914,7 @@ export default function SessionRecap({
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {group.package_name ? (
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[11px] font-semibold">
-                                                            <Package size={11} className="text-slate-400" />
+                                                        <span className="text-slate-700 text-xs font-medium">
                                                             {group.package_name}
                                                         </span>
                                                     ) : (
@@ -825,8 +926,8 @@ export default function SessionRecap({
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
                                                     {group.unpaid_sessions > 0 ? (
-                                                        <span className="inline-flex min-w-[1.75rem] px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 font-bold text-xs border border-orange-200/60">
-                                                            {group.unpaid_sessions}
+                                                        <span className="font-bold text-orange-600 text-xs">
+                                                            {group.unpaid_sessions} Sesi
                                                         </span>
                                                     ) : (
                                                         <span className="text-slate-300">-</span>
@@ -837,12 +938,12 @@ export default function SessionRecap({
                                                         <button
                                                             onClick={() => handlePayGroup(group)}
                                                             disabled={processing}
-                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white rounded-md text-xs font-bold transition-all disabled:opacity-50 border border-orange-200/70 shadow-2xs cursor-pointer"
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-xs font-semibold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
                                                         >
                                                             <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
                                                         </button>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+                                                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                                                             <CheckCircle2 size={13} /> Lunas
                                                         </span>
                                                     )}
@@ -858,6 +959,15 @@ export default function SessionRecap({
                                                             </div>
                                                             {group.sessions && group.sessions.length > 0 ? (
                                                                 <table className="w-full text-left">
+                                                                    <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                                                                        <tr>
+                                                                            <th className="px-3.5 py-2">Tanggal</th>
+                                                                            <th className="px-3.5 py-2">Program Latihan</th>
+                                                                            <th className="px-3.5 py-2">Pelatih</th>
+                                                                            <th className="px-3.5 py-2 w-28">Status</th>
+                                                                            <th className="px-3.5 py-2 w-28 text-right">Pembayaran</th>
+                                                                        </tr>
+                                                                    </thead>
                                                                     <tbody className="divide-y divide-slate-100 text-xs">
                                                                         {group.sessions.map(session => (
                                                                             <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
@@ -869,29 +979,35 @@ export default function SessionRecap({
                                                                                         <span className="font-bold text-slate-900">
                                                                                             {session.session_number ? `Sesi ${session.session_number}:` : '•'}
                                                                                         </span>
-                                                                                        <span className="text-slate-600">{session.name || 'Program Latihan Grup'}</span>
+                                                                                        <span className="text-slate-700">{session.name || 'Program Latihan Grup'}</span>
                                                                                         {session.is_extra && (
-                                                                                            <span className="text-[9.5px] font-bold text-blue-700 bg-blue-50 border border-blue-200/70 px-1.5 py-0.2 rounded">
+                                                                                            <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/60">
                                                                                                 Sesi Tambahan
                                                                                             </span>
                                                                                         )}
                                                                                     </div>
                                                                                 </td>
                                                                                 <td className="px-3.5 py-2 text-slate-500">
-                                                                                    {session.coaches.length > 0 ? session.coaches.join(', ') : '-'}
+                                                                                    {session.coaches && session.coaches.length > 0 ? session.coaches.join(', ') : '-'}
                                                                                 </td>
                                                                                 <td className="px-3.5 py-2 w-28">
                                                                                     {session.status === 'completed' ? (
-                                                                                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[10px]">Selesai</span>
+                                                                                        <span className="text-emerald-600 font-semibold inline-flex items-center gap-1 text-[11px]">
+                                                                                            <CheckCircle2 size={12} /> Selesai
+                                                                                        </span>
                                                                                     ) : (
-                                                                                        <span className="text-orange-700 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60 text-[10px]">Terjadwal</span>
+                                                                                        <span className="text-amber-600 font-semibold text-[11px]">
+                                                                                            Terjadwal
+                                                                                        </span>
                                                                                     )}
                                                                                 </td>
                                                                                 <td className="px-3.5 py-2 w-28 text-right">
                                                                                     {session.is_paid ? (
-                                                                                        <span className="text-emerald-600 font-bold text-xs"><CheckCircle2 size={12} className="inline mr-1" /> Lunas</span>
+                                                                                        <span className="text-emerald-600 font-semibold text-xs inline-flex items-center gap-1">
+                                                                                            <CheckCircle2 size={12} /> Lunas
+                                                                                        </span>
                                                                                     ) : (
-                                                                                        <span className="text-slate-400 font-bold text-xs">Belum Bayar</span>
+                                                                                        <span className="text-rose-600 font-semibold text-xs">Belum Bayar</span>
                                                                                     )}
                                                                                 </td>
                                                                             </tr>
@@ -899,7 +1015,7 @@ export default function SessionRecap({
                                                                     </tbody>
                                                                 </table>
                                                             ) : (
-                                                                <div className="p-4 text-center text-xs text-slate-400 italic">Belum ada riwayat sesi grup.</div>
+                                                                <div className="p-4 text-center text-xs text-slate-400 italic">Belum ada riwayat sesi.</div>
                                                             )}
                                                         </div>
                                                     </td>
@@ -916,7 +1032,181 @@ export default function SessionRecap({
                         </div>
                     )}
 
-                    {/* ── 3. COACH TAB (WITH RICH MONTHLY BREAKDOWN) ── */}
+                    {/* ── 3. SHARED PACKAGE TAB ── */}
+                    {activeTab === 'shared_package' && (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[700px]">
+                                <thead className="bg-slate-50/70 border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <tr>
+                                        <th className="px-4 py-2.5 w-10"></th>
+                                        <th className="px-4 py-2.5">Nama Paket Bersama</th>
+                                        <th className="px-4 py-2.5">Anggota (Private Pool)</th>
+                                        <th className="px-4 py-2.5">Paket Master</th>
+                                        <th className="px-4 py-2.5">Progress Sesi Pool</th>
+                                        <th className="px-4 py-2.5 text-center">Belum Bayar</th>
+                                        <th className="px-4 py-2.5 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-xs">
+                                    {filteredSharedPackages.length > 0 ? filteredSharedPackages.map(sp => (
+                                        <React.Fragment key={sp.id}>
+                                            <tr className="hover:bg-slate-50/60 transition-colors group/row">
+                                                <td className="px-4 py-3">
+                                                    <button onClick={() => toggleRow(`shared-${sp.id}`)} className="p-1 text-slate-400 hover:text-slate-800 rounded cursor-pointer">
+                                                        {expandedRows.has(`shared-${sp.id}`) ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                                                    </button>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <Link 
+                                                        href={route('admin.shared-packages.show', sp.id)} 
+                                                        className="font-bold text-xs text-slate-900 hover:text-violet-600 transition-colors flex items-center gap-1"
+                                                    >
+                                                        <span>{sp.name}</span>
+                                                    </Link>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex -space-x-1.5 overflow-hidden">
+                                                        {sp.member_names?.slice(0, 3).map((name, i) => (
+                                                            <div key={i} className="inline-block h-5 w-5 rounded-full ring-2 ring-white bg-violet-100 flex items-center justify-center text-[7.5px] font-bold text-violet-700" title={name}>
+                                                                {name.substring(0, 2).toUpperCase()}
+                                                            </div>
+                                                        ))}
+                                                        {sp.member_names?.length > 3 && (
+                                                            <div className="inline-block h-5 w-5 rounded-full ring-2 ring-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500">
+                                                                +{sp.member_names.length - 3}
+                                                            </div>
+                                                        )}
+                                                        {(!sp.member_names || sp.member_names.length === 0) && (
+                                                            <span className="text-xs text-slate-400">0 Anggota</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {sp.package_name ? (
+                                                        <span className="text-slate-700 text-xs font-medium">
+                                                            {sp.package_name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-400 italic">Tanpa Paket</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {renderProgressBar(sp.unpaid_sessions, sp.package_session_count, sp.package_type)}
+                                                </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    {sp.unpaid_sessions > 0 ? (
+                                                        <span className="font-bold text-violet-700 text-xs">
+                                                            {sp.unpaid_sessions} Sesi
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-slate-300">-</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    {sp.unpaid_sessions > 0 ? (
+                                                        <button
+                                                            onClick={() => handlePaySharedPackage(sp)}
+                                                            disabled={processing}
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white hover:bg-violet-700 rounded-md text-xs font-semibold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
+                                                        >
+                                                            <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
+                                                        </button>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                                                            <CheckCircle2 size={13} /> Lunas
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                            {/* Expanded Details */}
+                                            {expandedRows.has(`shared-${sp.id}`) && (
+                                                <tr className="bg-violet-50/20">
+                                                    <td colSpan="7" className="px-6 py-3 border-b border-slate-100">
+                                                        <div className="bg-white border border-slate-200/80 rounded-md overflow-hidden shadow-2xs space-y-3 p-3">
+                                                            {/* Breakdown per Member */}
+                                                            {sp.member_usage && sp.member_usage.length > 0 && (
+                                                                <div>
+                                                                    <div className="text-[11px] font-bold text-slate-700 mb-1.5">
+                                                                        Penggunaan Sesi per Anggota:
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {sp.member_usage.map(mu => (
+                                                                            <span key={mu.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs">
+                                                                                <strong className="text-slate-800">{mu.name}:</strong>
+                                                                                <span className="text-violet-700 font-bold">{mu.sessions_used} Sesi</span>
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            <div className="border-t border-slate-100 pt-2">
+                                                                <div className="text-[11px] font-bold text-slate-700 mb-1">
+                                                                    Daftar Sesi Latihan Belum Dibayar:
+                                                                </div>
+                                                                {sp.sessions && sp.sessions.length > 0 ? (
+                                                                    <table className="w-full text-left">
+                                                                        <thead className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase">
+                                                                            <tr>
+                                                                                <th className="px-3 py-1.5">Sesi Ke (Pool)</th>
+                                                                                <th className="px-3 py-1.5">Atlet</th>
+                                                                                <th className="px-3 py-1.5">Tanggal</th>
+                                                                                <th className="px-3 py-1.5">Judul Latihan</th>
+                                                                                <th className="px-3 py-1.5">Pelatih</th>
+                                                                                <th className="px-3 py-1.5 text-right">Status</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody className="divide-y divide-slate-100 text-xs">
+                                                                            {sp.sessions.map((session, idx) => (
+                                                                                <tr key={idx} className="hover:bg-slate-50/40">
+                                                                                    <td className="px-3 py-2 font-bold text-violet-700">
+                                                                                        {session.is_extra ? 'Tambahan' : `Sesi ${session.session_number || (idx + 1)}`}
+                                                                                    </td>
+                                                                                    <td className="px-3 py-2 text-slate-800 font-semibold">
+                                                                                        {session.athlete_name || '-'}
+                                                                                    </td>
+                                                                                    <td className="px-3 py-2 text-slate-600">
+                                                                                        {session.date || '-'}
+                                                                                    </td>
+                                                                                    <td className="px-3 py-2 text-slate-800 font-medium">
+                                                                                        {session.name || 'Program Latihan'}
+                                                                                    </td>
+                                                                                    <td className="px-3 py-2 text-slate-600">
+                                                                                        {session.coaches?.join(', ') || '-'}
+                                                                                    </td>
+                                                                                    <td className="px-3 py-2 text-right">
+                                                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-violet-700">
+                                                                                            Belum Bayar
+                                                                                        </span>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                ) : (
+                                                                    <div className="p-3 text-center text-xs text-slate-400 italic">
+                                                                        Tidak ada sesi latihan yang belum dibayar.
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan="7" className="px-4 py-8 text-center text-slate-400 text-xs font-medium italic">
+                                                Tidak ada data paket bersama yang ditemukan.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* ── 3. COACH TAB (CLEAN, MODERN, BADGE-FREE RECAP) ── */}
                     {activeTab === 'coach' && (
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse min-w-[850px]">
@@ -964,7 +1254,7 @@ export default function SessionRecap({
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         <div className="flex items-center gap-2.5">
-                                                            <div className="w-8 h-8 rounded-md bg-orange-100 text-orange-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-orange-200/60">
+                                                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 font-bold text-[11px] flex items-center justify-center shrink-0">
                                                                 {coach.name.substring(0, 2).toUpperCase()}
                                                             </div>
                                                             <div>
@@ -974,47 +1264,49 @@ export default function SessionRecap({
                                                         </div>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className="inline-flex min-w-[1.75rem] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/60">
-                                                            {displayIndSessions}
+                                                        <span className={displayIndSessions > 0 ? "font-semibold text-slate-700" : "text-slate-300"}>
+                                                            {displayIndSessions || '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className="inline-flex min-w-[1.75rem] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/60">
-                                                            {displayGrpSessions}
+                                                        <span className={displayGrpSessions > 0 ? "font-semibold text-slate-700" : "text-slate-300"}>
+                                                            {displayGrpSessions || '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className="inline-flex min-w-[1.75rem] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200/60">
-                                                            {displayGymSessions}
+                                                        <span className={displayGymSessions > 0 ? "font-semibold text-slate-700" : "text-slate-300"}>
+                                                            {displayGymSessions || '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className="inline-flex min-w-[2rem] px-2 py-0.5 rounded-md bg-orange-50 text-orange-700 font-black text-xs border border-orange-200/60">
+                                                        <span className="font-bold text-slate-900">
                                                             {displayTotalSessions}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-right">
-                                                        <span className="font-bold text-emerald-700 text-xs">{formatCurrency(coach.last_payout_amount || 0)}</span>
+                                                        <span className="font-medium text-slate-600 text-xs">
+                                                            {coach.last_payout_amount ? formatCurrency(coach.last_payout_amount) : '-'}
+                                                        </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-right">
                                                         {displayUnpaidEarnings > 0 ? (
-                                                            <span className="font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md text-xs border border-rose-200/60">
+                                                            <span className="font-bold text-rose-600 text-xs">
                                                                 {formatCurrency(displayUnpaidEarnings)}
                                                             </span>
                                                         ) : (
-                                                            <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
-                                                                Lunas
+                                                            <span className="text-emerald-600 font-medium text-xs inline-flex items-center gap-1">
+                                                                <CheckCircle2 size={13} /> Lunas
                                                             </span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-right">
-                                                        <div className="flex items-center justify-end gap-1.5">
+                                                        <div className="flex items-center justify-end gap-2">
                                                             {selectedMonth !== 'all' && (
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => handleDownloadCoachPdf(coach, selectedMonth)}
                                                                     disabled={exportingCoachKey === `${coach.id}-${selectedMonth}`}
-                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold transition-all border border-slate-200/90 shadow-2xs cursor-pointer disabled:opacity-50"
+                                                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold transition-all border border-slate-200/90 shadow-2xs cursor-pointer disabled:opacity-50"
                                                                     title={`Download Slip Gaji PDF (${selectedMonth})`}
                                                                 >
                                                                     {exportingCoachKey === `${coach.id}-${selectedMonth}` ? (
@@ -1029,12 +1321,12 @@ export default function SessionRecap({
                                                                 <button
                                                                     onClick={() => handlePayCoach(coach)}
                                                                     disabled={processing}
-                                                                    className="inline-flex items-center gap-1 px-3 py-1 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-xs font-bold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-xs font-semibold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
                                                                 >
                                                                     <Banknote className="w-3.5 h-3.5" /> Cairkan
                                                                 </button>
                                                             ) : (
-                                                                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+                                                                <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
                                                                     <CheckCircle2 size={13} /> Lunas
                                                                 </span>
                                                             )}
@@ -1044,52 +1336,53 @@ export default function SessionRecap({
 
                                                 {/* ── Coach Expanded Details (Tabs for Monthly Recap & Session Details) ── */}
                                                 {expandedRows.has(`coach-${coach.id}`) && (
-                                                    <tr className="bg-slate-50/40">
-                                                        <td colSpan="9" className="px-6 py-3 border-b border-slate-100">
-                                                            <div className="bg-white border border-slate-200/80 rounded-md overflow-hidden shadow-2xs">
+                                                    <tr className="bg-slate-50/50">
+                                                        <td colSpan="9" className="px-5 py-4 border-b border-slate-100">
+                                                            <div className="bg-white border border-slate-200/80 rounded-lg overflow-hidden shadow-2xs">
                                                                 
                                                                 {/* Sub Tabs in Coach Drill-down */}
-                                                                <div className="px-3.5 py-2.5 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
-                                                                    <div className="flex items-center gap-1.5">
+                                                                <div className="px-4 py-2.5 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                                                                    <div className="flex items-center gap-1">
                                                                         <button
                                                                             onClick={() => setCoachDetailTab(coach.id, 'monthly')}
-                                                                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                                                                                 activeCoachView === 'monthly'
-                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/70'
+                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80 font-bold'
                                                                                     : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                                                             }`}
                                                                         >
                                                                             <Calendar size={13} className={activeCoachView === 'monthly' ? 'text-orange-600' : 'text-slate-400'} />
-                                                                            <span>Rekapitulasi Per Bulan ({monthlyList.length} Bulan)</span>
+                                                                            <span>Rekapitulasi Per Bulan</span>
+                                                                            <span className="text-[11px] text-slate-400 font-normal">({monthlyList.length})</span>
                                                                         </button>
                                                                         <button
                                                                             onClick={() => setCoachDetailTab(coach.id, 'unpaid')}
-                                                                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                                                                                 activeCoachView === 'unpaid'
-                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/70'
+                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80 font-bold'
                                                                                     : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                                                             }`}
                                                                         >
                                                                             <Clock size={13} className={activeCoachView === 'unpaid' ? 'text-orange-600' : 'text-slate-400'} />
-                                                                            <span>Sesi Belum Dicairkan ({unpaidSessionsList.length})</span>
+                                                                            <span>Sesi Belum Dicairkan</span>
+                                                                            <span className="text-[11px] text-slate-400 font-normal">({unpaidSessionsList.length})</span>
                                                                         </button>
                                                                         <button
                                                                             onClick={() => setCoachDetailTab(coach.id, 'all')}
-                                                                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                                                                                 activeCoachView === 'all'
-                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/70'
+                                                                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80 font-bold'
                                                                                     : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                                                             }`}
                                                                         >
                                                                             <Layers size={13} className={activeCoachView === 'all' ? 'text-orange-600' : 'text-slate-400'} />
-                                                                            <span>Seluruh Riwayat ({allSessionsList.length})</span>
+                                                                            <span>Seluruh Riwayat</span>
+                                                                            <span className="text-[11px] text-slate-400 font-normal">({allSessionsList.length})</span>
                                                                         </button>
                                                                     </div>
 
-                                                                    <div className="flex items-center gap-2">
-                                                                        <div className="text-xs font-bold text-slate-700">
-                                                                            Pelatih: <span className="text-orange-600">{coach.name}</span>
-                                                                        </div>
+                                                                    <div className="text-xs font-medium text-slate-500">
+                                                                        Pelatih: <span className="font-bold text-slate-800">{coach.name}</span>
                                                                     </div>
                                                                 </div>
 
@@ -1130,40 +1423,50 @@ export default function SessionRecap({
                                                                                                             <span>{mb.month_label}</span>
                                                                                                         </div>
                                                                                                     </td>
-                                                                                                    <td className="px-4 py-2.5 text-center text-slate-600">{mb.individual_sessions}</td>
-                                                                                                    <td className="px-4 py-2.5 text-center text-slate-600">{mb.group_sessions}</td>
-                                                                                                    <td className="px-4 py-2.5 text-center text-slate-600">{mb.gym_sessions}</td>
                                                                                                     <td className="px-4 py-2.5 text-center">
-                                                                                                        <span className="font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
-                                                                                                            {mb.total_sessions}
+                                                                                                        <span className={mb.individual_sessions > 0 ? "font-medium text-slate-700" : "text-slate-300"}>
+                                                                                                            {mb.individual_sessions || '-'}
                                                                                                         </span>
                                                                                                     </td>
-                                                                                                    <td className="px-4 py-2.5 text-right font-black text-slate-900">
+                                                                                                    <td className="px-4 py-2.5 text-center">
+                                                                                                        <span className={mb.group_sessions > 0 ? "font-medium text-slate-700" : "text-slate-300"}>
+                                                                                                            {mb.group_sessions || '-'}
+                                                                                                        </span>
+                                                                                                    </td>
+                                                                                                    <td className="px-4 py-2.5 text-center">
+                                                                                                        <span className={mb.gym_sessions > 0 ? "font-medium text-slate-700" : "text-slate-300"}>
+                                                                                                            {mb.gym_sessions || '-'}
+                                                                                                        </span>
+                                                                                                    </td>
+                                                                                                    <td className="px-4 py-2.5 text-center font-bold text-slate-900">
+                                                                                                        {mb.total_sessions}
+                                                                                                    </td>
+                                                                                                    <td className="px-4 py-2.5 text-right font-bold text-slate-900">
                                                                                                         {formatCurrency(mb.total_fee)}
                                                                                                     </td>
                                                                                                     <td className="px-4 py-2.5 text-right">
-                                                                                                        <div className="flex items-center justify-end gap-2">
+                                                                                                        <div className="flex items-center justify-end gap-2.5">
                                                                                                             {mb.unpaid_fee > 0 ? (
                                                                                                                 <div className="inline-flex flex-col items-end">
-                                                                                                                    <span className="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200/60 text-[10.5px]">
+                                                                                                                    <span className="font-semibold text-rose-600 text-[11px]">
                                                                                                                         Belum: {formatCurrency(mb.unpaid_fee)}
                                                                                                                     </span>
                                                                                                                     {mb.paid_fee > 0 && (
-                                                                                                                        <span className="text-[9.5px] text-slate-400 font-medium mt-0.5">
+                                                                                                                        <span className="text-[10px] text-slate-400 font-medium">
                                                                                                                             Sudah: {formatCurrency(mb.paid_fee)}
                                                                                                                         </span>
                                                                                                                     )}
                                                                                                                 </div>
                                                                                                             ) : (
-                                                                                                                <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[10.5px]">
-                                                                                                                    Lunas
+                                                                                                                <span className="font-semibold text-emerald-600 text-[11px] inline-flex items-center gap-1">
+                                                                                                                    <CheckCircle2 size={12} /> Lunas
                                                                                                                 </span>
                                                                                                             )}
                                                                                                             <button
                                                                                                                 type="button"
                                                                                                                 onClick={() => handleDownloadCoachPdf(coach, mb.month_key, mb.month_label, mb.sessions)}
                                                                                                                 disabled={exportingCoachKey === `${coach.id}-${mb.month_key}`}
-                                                                                                                className="inline-flex items-center gap-1 px-2 py-1 bg-white hover:bg-orange-50 hover:text-orange-600 border border-slate-200 rounded text-[11px] font-bold text-slate-700 shadow-2xs cursor-pointer disabled:opacity-50"
+                                                                                                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-md text-[11px] font-semibold text-slate-700 shadow-2xs cursor-pointer disabled:opacity-50"
                                                                                                                 title={`Download Slip Gaji ${mb.month_label}`}
                                                                                                             >
                                                                                                                 {exportingCoachKey === `${coach.id}-${mb.month_key}` ? (
@@ -1179,51 +1482,64 @@ export default function SessionRecap({
 
                                                                                                 {/* Sub-row for Month Drill-down */}
                                                                                                 {isMonthExpanded && (
-                                                                                                    <tr className="bg-orange-50/20">
-                                                                                                        <td colSpan="7" className="px-6 py-2.5 border-b border-orange-100">
-                                                                                                            <div className="bg-white border border-slate-200/80 rounded-md p-3 shadow-2xs">
-                                                                                                                <h4 className="text-[10.5px] font-bold text-slate-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
-                                                                                                                    <Calendar size={12} className="text-orange-600" />
-                                                                                                                    Daftar Sesi Periode {mb.month_label} ({mb.sessions.length} Sesi)
-                                                                                                                </h4>
-                                                                                                                <div className="divide-y divide-slate-100">
-                                                                                                                    {mb.sessions.map((item, idx) => (
-                                                                                                                        <div key={idx} className="py-2 flex items-center justify-between text-xs hover:bg-slate-50/80 px-2 rounded-md transition-colors gap-3">
-                                                                                                                            <div className="flex items-center gap-2 min-w-0 flex-wrap sm:flex-nowrap">
-                                                                                                                                <span className="font-mono text-slate-500 w-20 shrink-0 font-bold">
-                                                                                                                                    {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}
-                                                                                                                                </span>
-                                                                                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
-                                                                                                                                    item.type === 'Grup' ? 'bg-orange-50 text-orange-700 border border-orange-200/60' :
-                                                                                                                                    item.type === 'Jaga Gym' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' :
-                                                                                                                                    'bg-blue-50 text-blue-700 border border-blue-200/60'
-                                                                                                                                }`}>
-                                                                                                                                    {item.type}
-                                                                                                                                </span>
-
-                                                                                                                                <div className="flex items-center gap-1 shrink-0">
-                                                                                                                                    <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded text-xs border border-slate-200 flex items-center gap-1">
-                                                                                                                                        <User size={11} className="text-slate-500" />
-                                                                                                                                        {item.client_name || item.user_name || 'Klien'}
-                                                                                                                                    </span>
-                                                                                                                                </div>
-
-                                                                                                                                <span className="font-medium text-slate-700 truncate">
-                                                                                                                                    {item.session_number ? <span className="font-bold text-orange-600 mr-1">#{item.session_number}</span> : ''}
-                                                                                                                                    {item.name}
-                                                                                                                                </span>
-                                                                                                                            </div>
-                                                                                                                            <div className="flex items-center gap-3 shrink-0">
-                                                                                                                                <span className="font-black text-slate-900">{formatCurrency(item.fee)}</span>
-                                                                                                                                {item.is_paid ? (
-                                                                                                                                    <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">Lunas</span>
-                                                                                                                                ) : (
-                                                                                                                                    <span className="text-[10px] text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200/60">Belum</span>
-                                                                                                                                )}
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    ))}
+                                                                                                    <tr className="bg-slate-50/70">
+                                                                                                        <td colSpan="7" className="px-6 py-3 border-b border-slate-100">
+                                                                                                            <div className="bg-white border border-slate-200/80 rounded-md p-3.5 shadow-2xs">
+                                                                                                                <div className="flex items-center justify-between pb-2.5 mb-2 border-b border-slate-100">
+                                                                                                                    <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                                                                                                                        <Calendar size={13} className="text-orange-500" />
+                                                                                                                        Daftar Sesi Periode {mb.month_label}
+                                                                                                                    </h4>
+                                                                                                                    <span className="text-[11px] text-slate-400 font-medium">
+                                                                                                                        {mb.sessions.length} Sesi Terselesaikan
+                                                                                                                    </span>
                                                                                                                 </div>
+                                                                                                                
+                                                                                                                <table className="w-full text-left text-xs">
+                                                                                                                    <tbody className="divide-y divide-slate-100">
+                                                                                                                        {mb.sessions.map((item, idx) => (
+                                                                                                                            <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
+                                                                                                                                <td className="py-2 pr-3 font-medium text-slate-500 w-24">
+                                                                                                                                    {item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '-'}
+                                                                                                                                </td>
+                                                                                                                                <td className="py-2 px-3 w-24">
+                                                                                                                                    <span className={`text-[11px] font-semibold ${
+                                                                                                                                        item.type === 'Grup' ? 'text-orange-600' :
+                                                                                                                                        item.type === 'Jaga Gym' ? 'text-emerald-600' :
+                                                                                                                                        'text-blue-600'
+                                                                                                                                    }`}>
+                                                                                                                                        {item.type}
+                                                                                                                                    </span>
+                                                                                                                                </td>
+                                                                                                                                <td className="py-2 px-3 w-40 font-bold text-slate-800">
+                                                                                                                                    {item.client_name || item.user_name || 'Klien'}
+                                                                                                                                </td>
+                                                                                                                                <td className="py-2 px-3 text-slate-700">
+                                                                                                                                    {item.session_number && (
+                                                                                                                                        <span className="font-semibold text-orange-600 mr-1.5">
+                                                                                                                                            #{item.session_number}
+                                                                                                                                        </span>
+                                                                                                                                    )}
+                                                                                                                                    <span>{item.name}</span>
+                                                                                                                                </td>
+                                                                                                                                <td className="py-2 px-3 text-right font-bold text-slate-900 w-28">
+                                                                                                                                    {formatCurrency(item.fee)}
+                                                                                                                                </td>
+                                                                                                                                <td className="py-2 pl-3 text-right w-20">
+                                                                                                                                    {item.is_paid ? (
+                                                                                                                                        <span className="text-emerald-600 font-semibold text-xs inline-flex items-center gap-1">
+                                                                                                                                            <CheckCircle2 size={12} /> Lunas
+                                                                                                                                        </span>
+                                                                                                                                    ) : (
+                                                                                                                                        <span className="text-rose-600 font-semibold text-xs">
+                                                                                                                                            Belum
+                                                                                                                                        </span>
+                                                                                                                                    )}
+                                                                                                                                </td>
+                                                                                                                            </tr>
+                                                                                                                        ))}
+                                                                                                                    </tbody>
+                                                                                                                </table>
                                                                                                             </div>
                                                                                                         </td>
                                                                                                     </tr>
@@ -1234,7 +1550,7 @@ export default function SessionRecap({
                                                                                 </tbody>
                                                                             </table>
                                                                         ) : (
-                                                                            <div className="p-5 text-center text-xs text-slate-400 italic">
+                                                                            <div className="p-6 text-center text-xs text-slate-400 italic">
                                                                                 Belum ada rekapitulasi honor bulanan untuk pelatih ini.
                                                                             </div>
                                                                         )}
@@ -1249,60 +1565,61 @@ export default function SessionRecap({
                                                                                 <thead className="bg-slate-50/80 border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
                                                                                     <tr>
                                                                                         <th className="px-4 py-2.5 w-28">Tanggal</th>
-                                                                                        <th className="px-4 py-2.5 w-24 text-center">Tipe Sesi</th>
+                                                                                        <th className="px-4 py-2.5 w-24">Tipe Sesi</th>
                                                                                         <th className="px-4 py-2.5 w-40">Klien / Atlet / Grup</th>
                                                                                         <th className="px-4 py-2.5">Nama Sesi / Program</th>
-                                                                                        <th className="px-4 py-2.5 w-24 text-center">Status</th>
+                                                                                        <th className="px-4 py-2.5 w-24 text-center">Status Sesi</th>
                                                                                         <th className="px-4 py-2.5 w-28 text-right">Honor</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody className="divide-y divide-slate-100">
                                                                                     {unpaidSessionsList.map(session => (
                                                                                         <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
-                                                                                            <td className="px-4 py-2.5 font-semibold text-slate-700">
+                                                                                            <td className="px-4 py-2.5 font-medium text-slate-600">
                                                                                                 {session.date ? new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5 text-center">
-                                                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                                                                                    session.type === 'Grup' ? 'bg-orange-50 text-orange-700 border border-orange-200/60' : 
-                                                                                                    session.type === 'Jaga Gym' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 
-                                                                                                    'bg-blue-50 text-blue-700 border border-blue-200/60'
+                                                                                            <td className="px-4 py-2.5">
+                                                                                                <span className={`text-[11px] font-semibold ${
+                                                                                                    session.type === 'Grup' ? 'text-orange-600' : 
+                                                                                                    session.type === 'Jaga Gym' ? 'text-emerald-600' : 
+                                                                                                    'text-blue-600'
                                                                                                 }`}>
                                                                                                     {session.type}
                                                                                                 </span>
                                                                                             </td>
                                                                                             <td className="px-4 py-2.5">
-                                                                                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                                                                                                    <User size={12} className="text-slate-400" />
+                                                                                                <div className="font-bold text-slate-900">
                                                                                                     {session.client_name || '-'}
                                                                                                 </div>
                                                                                                 {session.client_sport && (
-                                                                                                    <div className="text-[10px] text-slate-400 font-medium pl-4">{session.client_sport}</div>
+                                                                                                    <div className="text-[10px] text-slate-400 font-medium">{session.client_sport}</div>
                                                                                                 )}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5">
-                                                                                                <div className="flex items-center">
-                                                                                                    {session.session_number ? (
-                                                                                                        <span className="font-bold text-slate-900 mr-1.5">Sesi {session.session_number}:</span>
-                                                                                                    ) : (
-                                                                                                        <span className="font-bold text-slate-900 mr-1.5">•</span>
-                                                                                                    )}
-                                                                                                    <span className="text-slate-700 font-medium">{session.name}</span>
-                                                                                                </div>
+                                                                                            <td className="px-4 py-2.5 text-slate-700">
+                                                                                                {session.session_number && (
+                                                                                                    <span className="font-semibold text-orange-600 mr-1.5">
+                                                                                                        Sesi {session.session_number}:
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                <span>{session.name}</span>
                                                                                                 {session.notes && (
-                                                                                                    <div className="text-[10.5px] text-slate-500 mt-0.5 italic pl-2.5 border-l-2 border-slate-200">
+                                                                                                    <div className="text-[10.5px] text-slate-400 mt-0.5 italic">
                                                                                                         {session.notes}
                                                                                                     </div>
                                                                                                 )}
                                                                                             </td>
                                                                                             <td className="px-4 py-2.5 text-center">
                                                                                                 {session.status === 'completed' ? (
-                                                                                                    <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[10px]">Selesai</span>
+                                                                                                    <span className="text-emerald-600 font-semibold inline-flex items-center gap-1 text-[11px]">
+                                                                                                        <CheckCircle2 size={12} /> Selesai
+                                                                                                    </span>
                                                                                                 ) : (
-                                                                                                    <span className="text-orange-700 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60 text-[10px]">Terjadwal</span>
+                                                                                                    <span className="text-amber-600 font-semibold text-[11px]">
+                                                                                                        Terjadwal
+                                                                                                    </span>
                                                                                                 )}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5 text-right font-black text-slate-900">
+                                                                                            <td className="px-4 py-2.5 text-right font-bold text-slate-900">
                                                                                                 {formatCurrency(session.fee)}
                                                                                             </td>
                                                                                         </tr>
@@ -1310,7 +1627,7 @@ export default function SessionRecap({
                                                                                 </tbody>
                                                                             </table>
                                                                         ) : (
-                                                                            <div className="p-5 text-center text-xs text-slate-400 italic">
+                                                                            <div className="p-6 text-center text-xs text-slate-400 italic">
                                                                                 Semua sesi pada pelatih ini telah dicairkan (lunas).
                                                                             </div>
                                                                         )}
@@ -1325,7 +1642,7 @@ export default function SessionRecap({
                                                                                 <thead className="bg-slate-50/80 border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
                                                                                     <tr>
                                                                                         <th className="px-4 py-2.5 w-28">Tanggal</th>
-                                                                                        <th className="px-4 py-2.5 w-24 text-center">Tipe Sesi</th>
+                                                                                        <th className="px-4 py-2.5 w-24">Tipe Sesi</th>
                                                                                         <th className="px-4 py-2.5 w-40">Klien / Atlet / Grup</th>
                                                                                         <th className="px-4 py-2.5">Nama Sesi / Program</th>
                                                                                         <th className="px-4 py-2.5 w-24 text-center">Status Sesi</th>
@@ -1336,54 +1653,55 @@ export default function SessionRecap({
                                                                                 <tbody className="divide-y divide-slate-100">
                                                                                     {allSessionsList.map(session => (
                                                                                         <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
-                                                                                            <td className="px-4 py-2.5 font-semibold text-slate-700">
+                                                                                            <td className="px-4 py-2.5 font-medium text-slate-600">
                                                                                                 {session.date ? new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5 text-center">
-                                                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                                                                                    session.type === 'Grup' ? 'bg-orange-50 text-orange-700 border border-orange-200/60' : 
-                                                                                                    session.type === 'Jaga Gym' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 
-                                                                                                    'bg-blue-50 text-blue-700 border border-blue-200/60'
+                                                                                            <td className="px-4 py-2.5">
+                                                                                                <span className={`text-[11px] font-semibold ${
+                                                                                                    session.type === 'Grup' ? 'text-orange-600' : 
+                                                                                                    session.type === 'Jaga Gym' ? 'text-emerald-600' : 
+                                                                                                    'text-blue-600'
                                                                                                 }`}>
                                                                                                     {session.type}
                                                                                                 </span>
                                                                                             </td>
                                                                                             <td className="px-4 py-2.5">
-                                                                                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                                                                                                    <User size={12} className="text-slate-400" />
+                                                                                                <div className="font-bold text-slate-900">
                                                                                                     {session.client_name || '-'}
                                                                                                 </div>
                                                                                                 {session.client_sport && (
-                                                                                                    <div className="text-[10px] text-slate-400 font-medium pl-4">{session.client_sport}</div>
+                                                                                                    <div className="text-[10px] text-slate-400 font-medium">{session.client_sport}</div>
                                                                                                 )}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5">
-                                                                                                <div className="flex items-center">
-                                                                                                    {session.session_number ? (
-                                                                                                        <span className="font-bold text-slate-900 mr-1.5">Sesi {session.session_number}:</span>
-                                                                                                    ) : (
-                                                                                                        <span className="font-bold text-slate-900 mr-1.5">•</span>
-                                                                                                    )}
-                                                                                                    <span className="text-slate-700 font-medium">{session.name}</span>
-                                                                                                </div>
+                                                                                            <td className="px-4 py-2.5 text-slate-700">
+                                                                                                {session.session_number && (
+                                                                                                    <span className="font-semibold text-orange-600 mr-1.5">
+                                                                                                        Sesi {session.session_number}:
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                <span>{session.name}</span>
                                                                                             </td>
                                                                                             <td className="px-4 py-2.5 text-center">
                                                                                                 {session.status === 'completed' ? (
-                                                                                                    <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[10px]">Selesai</span>
+                                                                                                    <span className="text-emerald-600 font-semibold inline-flex items-center gap-1 text-[11px]">
+                                                                                                        <CheckCircle2 size={12} /> Selesai
+                                                                                                    </span>
                                                                                                 ) : (
-                                                                                                    <span className="text-orange-700 font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-200/60 text-[10px]">Terjadwal</span>
+                                                                                                    <span className="text-amber-600 font-semibold text-[11px]">
+                                                                                                        Terjadwal
+                                                                                                    </span>
                                                                                                 )}
                                                                                             </td>
-                                                                                            <td className="px-4 py-2.5 text-right font-black text-slate-900">
+                                                                                            <td className="px-4 py-2.5 text-right font-bold text-slate-900">
                                                                                                 {formatCurrency(session.fee)}
                                                                                             </td>
                                                                                             <td className="px-4 py-2.5 text-right">
                                                                                                 {session.is_paid ? (
-                                                                                                    <span className="text-emerald-600 font-bold text-xs inline-flex items-center gap-1">
+                                                                                                    <span className="text-emerald-600 font-semibold text-xs inline-flex items-center gap-1">
                                                                                                         <CheckCircle2 size={12} /> Lunas
                                                                                                     </span>
                                                                                                 ) : (
-                                                                                                    <span className="text-rose-600 font-bold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-200/60">
+                                                                                                    <span className="text-rose-600 font-semibold text-xs">
                                                                                                         Belum
                                                                                                     </span>
                                                                                                 )}
@@ -1393,7 +1711,7 @@ export default function SessionRecap({
                                                                                 </tbody>
                                                                             </table>
                                                                         ) : (
-                                                                            <div className="p-5 text-center text-xs text-slate-400 italic">
+                                                                            <div className="p-6 text-center text-xs text-slate-400 italic">
                                                                                 Belum ada log sesi yang tercatat.
                                                                             </div>
                                                                         )}

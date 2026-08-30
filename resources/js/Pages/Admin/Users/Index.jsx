@@ -1,16 +1,18 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { 
-    Plus, Search, Edit3, Trash2, Shield, X, UploadCloud, Users, ChevronRight, 
+    Plus, Search, Edit3, Trash2, Shield, X, UploadCloud, Users, UsersRound, ChevronRight, 
     ArrowUpDown, ArrowUp, ArrowDown, Package, Building2, UserCheck, Dumbbell, ShieldCheck 
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import GroupList from './Components/GroupList';
+import SharedPackageList from './Components/SharedPackageList';
 import PageHeader from '@/Components/Common/PageHeader';
 
-export default function Index({ auth, users, filters, activeTab, tabCounts, sports, coachesList, packagesList, groupsList, allAthletes }) {
+export default function Index({ auth, users, filters, activeTab, tabCounts, sports, coachesList, packagesList, groupsList, sharedPackagesList, allAthletes }) {
     const [search, setSearch] = useState(filters.search || '');
     const groupListRef = useRef(null);
+    const sharedPackageListRef = useRef(null);
     const isInitialMount = useRef(true);
 
     useEffect(() => {
@@ -58,7 +60,8 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
         { id: 'superadmin', label: 'Superadmin' },
         { id: 'coach', label: 'Coach' },
         { id: 'athlete', label: 'Athlete / Klien' },
-        { id: 'group', label: 'Grup' }
+        { id: 'group', label: 'Grup' },
+        { id: 'shared_package', label: 'Paket Bersama' }
     ];
 
     return (
@@ -109,9 +112,9 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                             )}
 
                             {/* Tambah Akun Button (Dedicated Page) */}
-                            {auth.user.role === 'superadmin' && activeTab !== 'group' && (
+                            {auth.user.role === 'superadmin' && activeTab !== 'group' && activeTab !== 'shared_package' && (
                                 <Link 
-                                    href={route('admin.users.create', { role: activeTab === 'group' ? 'athlete' : activeTab })}
+                                    href={route('admin.users.create', { role: activeTab === 'group' || activeTab === 'shared_package' ? 'athlete' : activeTab })}
                                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
@@ -123,10 +126,21 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                             {auth.user.role === 'superadmin' && activeTab === 'group' && (
                                 <button 
                                     onClick={() => groupListRef.current?.openCreateModal()}
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95"
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
                                     <span>Buat Grup Baru</span>
+                                </button>
+                            )}
+
+                            {/* Buat Paket Bersama Button */}
+                            {auth.user.role === 'superadmin' && activeTab === 'shared_package' && (
+                                <button 
+                                    onClick={() => sharedPackageListRef.current?.openCreateModal()}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
+                                >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    <span>Tambah Paket Bersama</span>
                                 </button>
                             )}
                         </div>
@@ -171,6 +185,15 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                     <GroupList 
                         ref={groupListRef}
                         groups={groupsList} 
+                        packages={packagesList} 
+                        allAthletes={allAthletes} 
+                        coaches={coachesList}
+                        searchTerm={search}
+                    />
+                ) : activeTab === 'shared_package' ? (
+                    <SharedPackageList 
+                        ref={sharedPackageListRef}
+                        sharedPackages={sharedPackagesList} 
                         packages={packagesList} 
                         allAthletes={allAthletes} 
                         coaches={coachesList}
@@ -277,8 +300,8 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                                     {/* Paket & Status */}
                                                     <td className="px-3 py-3 align-middle">
                                                         <div className="flex flex-col gap-1 max-w-[200px]">
-                                                            {user.package ? (
-                                                                <div className="inline-flex items-center gap-1 text-[9.5px] text-teal-700 bg-teal-50 px-1.5 py-0.2 rounded border border-teal-200/60 font-medium whitespace-nowrap w-fit">
+                                                            {user.package && (
+                                                                <div className="inline-flex items-center gap-1 text-[9.5px] text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60 font-medium whitespace-nowrap w-fit">
                                                                     <Package className="w-2.5 h-2.5 shrink-0" /> 
                                                                     <span className="truncate max-w-[130px]">Privat ({user.package.name})</span>
                                                                     {user.training_exp_date && (
@@ -287,16 +310,30 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                                                         </span>
                                                                     )}
                                                                 </div>
-                                                            ) : (
-                                                                <span className="text-slate-400 text-[11px]">-</span>
                                                             )}
 
+                                                            {(user.shared_packages || user.sharedPackages)?.map(sp => (
+                                                                <div key={sp.id} className="inline-flex items-center gap-1 text-[9.5px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-200/60 font-medium whitespace-nowrap w-fit">
+                                                                    <UsersRound className="w-2.5 h-2.5 shrink-0 text-violet-600" /> 
+                                                                    <span className="truncate max-w-[130px]">Bersama ({sp.name})</span>
+                                                                    {sp.expiration_date && (
+                                                                        <span className="text-rose-600 font-bold ml-0.5 shrink-0">
+                                                                            Exp: {new Date(sp.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'})}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+
                                                             {user.groups?.map(g => (
-                                                                <div key={g.id} className="inline-flex items-center gap-1 text-[9.5px] text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200/60 font-medium whitespace-nowrap w-fit">
+                                                                <div key={g.id} className="inline-flex items-center gap-1 text-[9.5px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/60 font-medium whitespace-nowrap w-fit">
                                                                     <Users className="w-2.5 h-2.5 shrink-0" /> 
                                                                     <span className="truncate max-w-[120px]">{g.name}</span>
                                                                 </div>
                                                             ))}
+
+                                                            {!user.package && (!user.shared_packages || user.shared_packages.length === 0) && (!user.sharedPackages || user.sharedPackages.length === 0) && (!user.groups || user.groups.length === 0) && (
+                                                                <span className="text-slate-400 text-[11px]">-</span>
+                                                            )}
                                                         </div>
                                                     </td>
 
@@ -416,10 +453,20 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                                         </span>
                                                     )}
                                                     {user.package && (
-                                                        <div className="inline-flex items-center gap-1 text-[9px] text-teal-700 bg-teal-50 px-1.5 py-0.2 rounded border border-teal-200/60 font-medium whitespace-nowrap w-fit">
+                                                        <div className="inline-flex items-center gap-1 text-[9px] text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200/60 font-medium whitespace-nowrap w-fit">
                                                             <Package className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[130px]">Privat ({user.package.name})</span>
                                                         </div>
                                                     )}
+                                                    {(user.shared_packages || user.sharedPackages)?.map(sp => (
+                                                        <div key={sp.id} className="inline-flex items-center gap-1 text-[9px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-200/60 font-medium whitespace-nowrap w-fit">
+                                                            <UsersRound className="w-2.5 h-2.5 shrink-0 text-violet-600" /> <span className="truncate max-w-[130px]">Bersama ({sp.name})</span>
+                                                        </div>
+                                                    ))}
+                                                    {user.groups?.map(g => (
+                                                        <div key={g.id} className="inline-flex items-center gap-1 text-[9px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200/60 font-medium whitespace-nowrap w-fit">
+                                                            <Users className="w-2.5 h-2.5 shrink-0" /> <span className="truncate max-w-[130px]">{g.name}</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>

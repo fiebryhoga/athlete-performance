@@ -19,10 +19,16 @@ import {
     Copy, 
     Download, 
     Users, 
+    UsersRound,
     List,
     ShieldCheck,
     Package,
-    Calendar as CalendarIcon
+    Calendar as CalendarIcon,
+    Search,
+    Check,
+    CheckSquare,
+    Square,
+    UserCheck
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
@@ -114,14 +120,49 @@ function getSessionPhasesSummary(session) {
     };
 }
 
-export default function ShowAthlete({ auth, athlete, trainings = [], groupTrainings = [] }) {
+export default function ShowAthlete({ auth, athlete, trainings = [], groupTrainings = [], allAthletes = [], sharedPackages = [] }) {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [sessionFilter, setSessionFilter] = useState('all'); // 'all', 'individual', 'group'
     const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
     const [sessionToDuplicate, setSessionToDuplicate] = useState(null);
     const [duplicateDate, setDuplicateDate] = useState('');
+    const [selectedTargetUserIds, setSelectedTargetUserIds] = useState([]);
+    const [clientSearch, setClientSearch] = useState('');
+    const [isDuplicating, setIsDuplicating] = useState(false);
 
     const isAthlete = auth?.user?.role === 'athlete';
+
+    const filteredAthletes = useMemo(() => {
+        if (!allAthletes || allAthletes.length === 0) return [];
+        if (!clientSearch) return allAthletes;
+        const q = clientSearch.toLowerCase();
+        return allAthletes.filter(a => 
+            a.name?.toLowerCase().includes(q) || 
+            a.sport?.name?.toLowerCase().includes(q)
+        );
+    }, [allAthletes, clientSearch]);
+
+    const toggleTargetUser = (userId) => {
+        setSelectedTargetUserIds(prev => {
+            if (prev.includes(userId)) {
+                return prev.filter(id => id !== userId);
+            } else {
+                return [...prev, userId];
+            }
+        });
+    };
+
+    const selectOnlyCurrentAthlete = () => {
+        setSelectedTargetUserIds([athlete.id]);
+    };
+
+    const selectAllAthletes = () => {
+        setSelectedTargetUserIds(allAthletes.map(a => a.id));
+    };
+
+    const deselectAllAthletes = () => {
+        setSelectedTargetUserIds([]);
+    };
 
     const deleteSession = (e, sessionId) => {
         e.preventDefault();
@@ -340,6 +381,16 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                 • Aktif s/d {expDate}
                                             </span>
                                         )}
+                                        {sharedPackages && sharedPackages.length > 0 && sharedPackages.map((sp) => (
+                                            <Link
+                                                key={sp.id}
+                                                href={route('admin.shared-packages.show', sp.id)}
+                                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200/60 hover:bg-violet-100 transition-colors cursor-pointer"
+                                            >
+                                                <UsersRound size={10} />
+                                                {sp.name} ({sp.used_sessions}/{sp.total_sessions || '∞'} Sesi)
+                                            </Link>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -592,7 +643,9 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                         e.preventDefault();
                                                                                         e.stopPropagation();
                                                                                         setSessionToDuplicate(session);
-                                                                                        setDuplicateDate(getLocalDateStr(new Date()));
+                                                                                        setDuplicateDate(session.date || getLocalDateStr(new Date()));
+                                                                                        setSelectedTargetUserIds([athlete.id]);
+                                                                                        setClientSearch('');
                                                                                         setDuplicateModalOpen(true);
                                                                                     }}
                                                                                     className="p-0.5 rounded-md hover:bg-white/80 text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
@@ -721,13 +774,15 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                     </div>
                 </div>
             </div>
-            
             {/* ─── DUPLICATE MODAL ─── */}
             {duplicateModalOpen && sessionToDuplicate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-                    <div className="bg-white rounded-md border border-slate-200/90 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                            <h3 className="text-xs font-bold text-slate-900">Duplikasi Sesi Latihan</h3>
+                    <div className="bg-white rounded-md border border-slate-200/90 shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                            <div className="flex items-center gap-2">
+                                <Copy className="w-4 h-4 text-orange-600" />
+                                <h3 className="text-xs font-bold text-slate-900">Duplikasi Sesi Latihan</h3>
+                            </div>
                             <button 
                                 type="button"
                                 onClick={() => setDuplicateModalOpen(false)} 
@@ -736,56 +791,260 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                 <X size={14} />
                             </button>
                         </div>
-                        <div className="p-4 space-y-3">
-                            <div className="bg-slate-50 border border-slate-200/80 rounded-md p-2.5">
-                                <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block mb-0.5">
-                                    Sesi Asal
+                        
+                        <div className="p-4 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                            {/* Info Sesi Asal */}
+                            <div className="bg-slate-50 border border-slate-200/80 rounded-md p-3">
+                                <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
+                                    Sesi Asal ({athlete.name})
                                 </span>
                                 <p className="text-xs font-bold text-slate-900">
                                     {sessionToDuplicate.type === 'group' ? `[GRUP] ${sessionToDuplicate.group?.name || 'Sesi Grup'}` : (sessionToDuplicate.name || 'Sesi Privat')}
                                 </p>
-                                {sessionToDuplicate.training_type && (
-                                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-                                        {sessionToDuplicate.training_type}
-                                    </p>
-                                )}
+                                <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium mt-1">
+                                    <span>Tgl: {sessionToDuplicate.date}</span>
+                                    {sessionToDuplicate.training_type && (
+                                        <>
+                                            <span>•</span>
+                                            <span>Fokus: {sessionToDuplicate.training_type}</span>
+                                        </>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Tanggal Tujuan */}
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                                    Tanggal Tujuan
+                                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                    Tanggal Tujuan <span className="text-rose-500">*</span>
                                 </label>
                                 <input 
                                     type="date" 
                                     value={duplicateDate}
                                     onChange={(e) => setDuplicateDate(e.target.value)}
-                                    className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs"
+                                    className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-md px-3 py-2 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 shadow-2xs outline-none"
                                 />
                             </div>
+
+                            {/* Pilih Klien Tujuan */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="block text-xs font-bold text-slate-700">
+                                        Klien Tujuan <span className="text-rose-500">*</span>
+                                    </label>
+                                    <div className="flex items-center gap-2 text-[11px]">
+                                        <button 
+                                            type="button" 
+                                            onClick={selectOnlyCurrentAthlete}
+                                            className="text-orange-600 hover:text-orange-700 font-semibold hover:underline cursor-pointer"
+                                        >
+                                            Hanya {athlete.name.split(' ')[0]}
+                                        </button>
+                                        {allAthletes && allAthletes.length > 1 && (
+                                            <>
+                                                <span className="text-slate-300">•</span>
+                                                <button 
+                                                    type="button" 
+                                                    onClick={selectAllAthletes}
+                                                    className="text-slate-500 hover:text-slate-800 font-semibold hover:underline cursor-pointer"
+                                                >
+                                                    Pilih Semua
+                                                </button>
+                                            </>
+                                        )}
+                                        {selectedTargetUserIds.length > 0 && (
+                                            <>
+                                                <span className="text-slate-300">•</span>
+                                                <button 
+                                                    type="button" 
+                                                    onClick={deselectAllAthletes}
+                                                    className="text-rose-600 hover:text-rose-700 font-semibold hover:underline cursor-pointer"
+                                                >
+                                                    Kosongkan
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {allAthletes && allAthletes.length > 0 ? (
+                                    <div className="border border-slate-200 rounded-md bg-white overflow-hidden">
+                                        {/* Search Filter */}
+                                        <div className="px-3 py-2 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+                                            <Search size={13} className="text-slate-400 shrink-0" />
+                                            <input 
+                                                type="text" 
+                                                value={clientSearch}
+                                                onChange={(e) => setClientSearch(e.target.value)}
+                                                placeholder="Cari nama klien / cabang olahraga..."
+                                                className="w-full text-xs bg-transparent border-none p-0 focus:ring-0 text-slate-800 placeholder-slate-400 font-medium outline-none"
+                                            />
+                                            {clientSearch && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => setClientSearch('')}
+                                                    className="text-slate-400 hover:text-slate-600"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Selected Clients Chips Bar (Always visible & removable) */}
+                                        {selectedTargetUserIds.length > 0 && (
+                                            <div className="px-3 py-2 border-b border-slate-100 bg-orange-50/40 flex flex-wrap items-center gap-1.5 max-h-24 overflow-y-auto custom-scrollbar">
+                                                <span className="text-[10px] font-bold text-slate-500 mr-0.5">Terpilih ({selectedTargetUserIds.length}):</span>
+                                                {selectedTargetUserIds.map((id) => {
+                                                    const targetUser = allAthletes.find(a => a.id === id) || (id === athlete.id ? athlete : null);
+                                                    if (!targetUser) return null;
+                                                    const isCurrent = id === athlete.id;
+                                                    return (
+                                                        <span 
+                                                            key={id}
+                                                            className={`inline-flex items-center gap-1 pl-2 pr-1 py-0.5 rounded-full text-[10.5px] font-bold border transition-all ${
+                                                                isCurrent 
+                                                                    ? 'bg-orange-100/90 text-orange-950 border-orange-300 shadow-2xs' 
+                                                                    : 'bg-white text-slate-800 border-slate-200 shadow-2xs'
+                                                            }`}
+                                                        >
+                                                            <span>{targetUser.name}</span>
+                                                            {isCurrent && <span className="text-[9px] text-orange-700 font-medium">(Asal)</span>}
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    toggleTargetUser(id);
+                                                                }}
+                                                                className="w-3.5 h-3.5 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-rose-600 flex items-center justify-center cursor-pointer transition-colors"
+                                                                title={`Hapus ${targetUser.name}`}
+                                                            >
+                                                                <X size={10} strokeWidth={2.5} />
+                                                            </button>
+                                                        </span>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Client List Checkboxes */}
+                                        <div className="max-h-48 overflow-y-auto divide-y divide-slate-50 custom-scrollbar p-1">
+                                            {filteredAthletes.map((a) => {
+                                                const isSelected = selectedTargetUserIds.includes(a.id);
+                                                const isCurrent = a.id === athlete.id;
+                                                return (
+                                                    <div 
+                                                        key={a.id}
+                                                        onClick={() => toggleTargetUser(a.id)}
+                                                        className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
+                                                            isSelected ? 'bg-orange-50/80 text-orange-950' : 'hover:bg-slate-50'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2.5 min-w-0">
+                                                            <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
+                                                                isSelected 
+                                                                    ? 'bg-orange-600 border-orange-600 text-white' 
+                                                                    : 'border-slate-300 bg-white'
+                                                            }`}>
+                                                                {isSelected && <Check size={11} strokeWidth={3} />}
+                                                            </div>
+                                                            <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600 shrink-0 overflow-hidden">
+                                                                {(a.profile_photo_url || a.profile_photo) ? (
+                                                                    <img src={a.profile_photo_url || `/storage/${a.profile_photo}`} alt={a.name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    getInitials(a.name)
+                                                                )}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="text-xs font-bold truncate">
+                                                                    {a.name} {isCurrent && <span className="text-[10px] font-semibold text-orange-600">(Saat Ini)</span>}
+                                                                </p>
+                                                                {a.sport?.name && (
+                                                                    <p className="text-[10px] text-slate-400 font-medium truncate">
+                                                                        {a.sport.name}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {isSelected && (
+                                                            <span className="text-[9.5px] font-bold text-orange-600 bg-orange-100/80 px-1.5 py-0.5 rounded shrink-0">
+                                                                Terpilih
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+
+                                            {filteredAthletes.length === 0 && (
+                                                <div className="py-4 text-center text-xs text-slate-400 font-medium">
+                                                    Klien tidak ditemukan
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="px-3 py-1.5 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                                            <span>Total Klien: {allAthletes.length}</span>
+                                            <span className="text-orange-600 font-bold">{selectedTargetUserIds.length} Klien Terpilih</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-slate-50 border border-slate-200 rounded-md p-2.5 text-xs text-slate-600 font-medium">
+                                        Duplikasi akan diterapkan untuk: <strong>{athlete.name}</strong>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-                            <button 
-                                type="button"
-                                onClick={() => setDuplicateModalOpen(false)}
-                                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-                            >
-                                Batal
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={() => {
-                                    if (!duplicateDate) return;
-                                    const routeName = sessionToDuplicate.type === 'group' 
-                                        ? 'admin.group-trainings.session.duplicate' 
-                                        : 'admin.individual-trainings.session.duplicate';
-                                    router.post(route(routeName, sessionToDuplicate.id), { target_date: duplicateDate }, {
-                                        preserveScroll: true,
-                                        onSuccess: () => setDuplicateModalOpen(false)
-                                    });
-                                }}
-                                className="px-3.5 py-1.5 text-xs font-semibold bg-orange-500 text-white rounded-md shadow-2xs hover:bg-orange-600 transition-colors cursor-pointer"
-                            >
-                                Duplikasi Sesi
-                            </button>
+
+                        <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                            <span className="text-[11px] text-slate-500 font-medium">
+                                {selectedTargetUserIds.length} sesi akan dibuat
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <button 
+                                    type="button"
+                                    onClick={() => setDuplicateModalOpen(false)}
+                                    disabled={isDuplicating}
+                                    className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                                >
+                                    Batal
+                                </button>
+                                <button 
+                                    type="button"
+                                    disabled={!duplicateDate || selectedTargetUserIds.length === 0 || isDuplicating}
+                                    onClick={() => {
+                                        if (!duplicateDate || selectedTargetUserIds.length === 0) return;
+                                        setIsDuplicating(true);
+                                        const routeName = sessionToDuplicate.type === 'group' 
+                                            ? 'admin.group-trainings.session.duplicate' 
+                                            : 'admin.individual-trainings.session.duplicate';
+                                        router.post(route(routeName, sessionToDuplicate.id), { 
+                                            target_date: duplicateDate,
+                                            target_user_ids: selectedTargetUserIds 
+                                        }, {
+                                            preserveScroll: true,
+                                            onSuccess: () => {
+                                                setDuplicateModalOpen(false);
+                                                setIsDuplicating(false);
+                                            },
+                                            onError: () => {
+                                                setIsDuplicating(false);
+                                            }
+                                        });
+                                    }}
+                                    className="px-4 py-1.5 text-xs font-bold bg-orange-600 text-white rounded-md shadow-2xs hover:bg-orange-700 transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+                                >
+                                    {isDuplicating ? (
+                                        <>
+                                            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                            <span>Menduplikasi...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Copy size={12} />
+                                            <span>Duplikasi ke {selectedTargetUserIds.length} Klien</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

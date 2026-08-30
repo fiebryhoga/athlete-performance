@@ -34,7 +34,10 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <div className="min-h-screen w-full flex bg-slate-50 font-sans selection:bg-orange-500 selection:text-white">
-            <Head title={`Masuk - ${appName}`} />
+            <Head>
+                <title>{`Masuk — ${appName}`}</title>
+                <meta name="description" content="Platform terpadu pemantauan performa atlet, tes fisik, komposisi tubuh, analisis DPA, program latihan, nutrisi, dan manajemen sesi Olympus Training Surabaya." />
+            </Head>
 
             {/* Kiri: Bagian Gambar & Branding (Hanya Desktop) */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 overflow-hidden items-center justify-center p-12">

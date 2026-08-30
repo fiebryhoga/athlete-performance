@@ -450,11 +450,16 @@ export default function Index({
                             const bmi = calculateBMI(athlete.height, athlete.weight);
                             const bmiStatus = getBMIStatus(bmi);
                             const hasGroups = athlete.groups && athlete.groups.length > 0;
+                            const hasShared = athlete.shared_packages && athlete.shared_packages.length > 0;
                             const membershipLabel = hasGroups
                                 ? (athlete.groups.length > 1 ? `${athlete.groups.length} Grup` : athlete.groups[0].name)
+                                : hasShared
+                                ? (athlete.shared_packages.length > 1 ? `${athlete.shared_packages.length} Paket Bersama` : athlete.shared_packages[0].name)
                                 : (athlete.package?.name || "Privat");
                             const fullMembershipTitle = hasGroups
                                 ? `Grup: ${athlete.groups.map((g) => g.name).join(", ")}`
+                                : hasShared
+                                ? `Paket Bersama: ${athlete.shared_packages.map((sp) => sp.name).join(", ")}`
                                 : (athlete.package?.name ? `Paket: ${athlete.package.name}` : "Sesi Privat");
 
                             return (

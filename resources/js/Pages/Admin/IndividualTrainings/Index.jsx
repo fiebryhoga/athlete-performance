@@ -12,8 +12,10 @@ import {
     ArrowUpRight,
     User,
     Users,
+    UsersRound,
     Activity,
     Calendar as CalendarIcon,
+    Package,
 } from "lucide-react";
 
 // --- CUSTOM SELECT COMPONENT ---
@@ -100,7 +102,7 @@ function getInitials(name) {
     return name.substring(0, 2).toUpperCase();
 }
 
-export default function Index({ athletes = [], groups = [], sports = [] }) {
+export default function Index({ athletes = [], groups = [], sharedPackages = [], sports = [] }) {
     const { auth } = usePage().props;
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -166,6 +168,14 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
             group.name.toLowerCase().includes(q),
         );
     }, [groups, searchTerm]);
+
+    const filteredSharedPackages = useMemo(() => {
+        if (!searchTerm.trim()) return sharedPackages || [];
+        const q = searchTerm.toLowerCase();
+        return (sharedPackages || []).filter((sp) =>
+            sp.name.toLowerCase().includes(q),
+        );
+    }, [sharedPackages, searchTerm]);
 
     const activeFilterCount =
         (selectedSport !== "ALL" ? 1 : 0) +
@@ -346,6 +356,18 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                         <Users className="w-3.5 h-3.5" />
                         <span>Grup Latihan</span>
                     </button>
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab("shared")}
+                        className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-2 cursor-pointer ${
+                            activeTab === "shared"
+                                ? "bg-orange-500 text-white font-bold shadow-2xs"
+                                : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                        }`}
+                    >
+                        <UsersRound className="w-3.5 h-3.5" />
+                        <span>Paket Bersama</span>
+                    </button>
                 </div>
 
                 {/* ─── INDIVIDUAL TAB ─── */}
@@ -479,7 +501,7 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                             </div>
                         )}
                     </>
-                ) : (
+                ) : activeTab === "group" ? (
                     /* ─── GROUP TAB ─── */
                     <>
                         {filteredGroups.length === 0 ? (
@@ -613,6 +635,151 @@ export default function Index({ athletes = [], groups = [], sports = [] }) {
                                         </div>
                                     </Link>
                                 ))}
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    /* ─── SHARED PACKAGES TAB ─── */
+                    <>
+                        {filteredSharedPackages.length === 0 ? (
+                            <div className="col-span-full py-16 px-4 flex flex-col items-center justify-center bg-white border border-dashed border-slate-200 rounded-xl text-center space-y-3">
+                                <div className="w-12 h-12 rounded-full bg-orange-50 border border-orange-200/60 flex items-center justify-center text-orange-500 shadow-2xs">
+                                    <UsersRound className="w-5 h-5" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-bold text-slate-800">
+                                        Tidak ada Paket Bersama ditemukan
+                                    </h4>
+                                    <p className="text-xs text-slate-400 font-medium max-w-sm">
+                                        Buat paket bersama baru di menu Manajemen
+                                        Pengguna terlebih dahulu.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                                {filteredSharedPackages.map((sp) => {
+                                    const progress = sp.total_sessions
+                                        ? Math.min(100, Math.round((sp.used_sessions / sp.total_sessions) * 100))
+                                        : 0;
+                                    const isNearLimit = sp.total_sessions && sp.remaining_sessions !== null && sp.remaining_sessions <= 3;
+
+                                    return (
+                                        <Link
+                                            key={sp.id}
+                                            href={route(
+                                                "admin.shared-packages.show",
+                                                sp.id,
+                                            )}
+                                            className="group relative bg-gradient-to-b from-white via-white to-violet-50/15 rounded-lg border border-slate-200/90 hover:border-violet-200/90 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                        >
+                                            <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
+                                                {/* Identity */}
+                                                <div className="flex items-start gap-2.5">
+                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-violet-50/80 text-violet-600 font-bold text-base flex items-center justify-center shrink-0">
+                                                        <UsersRound className="w-5 h-5" />
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1 space-y-0.5">
+                                                        <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-violet-600 transition-colors leading-tight">
+                                                            {sp.name}
+                                                        </h3>
+                                                        <p className="text-[11px] text-slate-500 font-medium truncate">
+                                                            {sp.package?.name || "Paket Bersama"}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Members Preview */}
+                                                {sp.members && sp.members.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {sp.members.slice(0, 4).map((member) => (
+                                                            <span
+                                                                key={member.id}
+                                                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
+                                                            >
+                                                                {member.name}
+                                                            </span>
+                                                        ))}
+                                                        {sp.members.length > 4 && (
+                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-violet-50 border border-violet-200/70 text-violet-600">
+                                                                +{sp.members.length - 4}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Progress Bar */}
+                                                <div className="space-y-1 pt-0.5 border-t border-slate-100/90">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase">
+                                                            Kuota Sesi
+                                                        </span>
+                                                        <span className={`text-[9px] font-bold ${isNearLimit ? 'text-amber-600' : 'text-slate-600'}`}>
+                                                            {sp.used_sessions}/{sp.total_sessions || '∞'}
+                                                        </span>
+                                                    </div>
+                                                    {sp.total_sessions && (
+                                                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                            <div
+                                                                className={`h-full rounded-full transition-all duration-300 ${
+                                                                    progress >= 100
+                                                                        ? 'bg-rose-500'
+                                                                        : isNearLimit
+                                                                        ? 'bg-amber-500'
+                                                                        : 'bg-violet-500'
+                                                                }`}
+                                                                style={{ width: `${progress}%` }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Metric Tiles */}
+                                                <div className="grid grid-cols-2 gap-1.5">
+                                                    <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                            Sisa
+                                                        </span>
+                                                        <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                            <span className={`text-[11.5px] font-black leading-tight ${isNearLimit ? 'text-amber-600' : 'text-violet-600'}`}>
+                                                                {sp.remaining_sessions ?? '∞'}
+                                                            </span>
+                                                            <span className="text-[8px] font-normal text-slate-400">
+                                                                sesi
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-1.5 bg-white/90 rounded-md border border-slate-200/70 shadow-2xs">
+                                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
+                                                            Anggota
+                                                        </span>
+                                                        <div className="flex items-baseline gap-0.5 mt-0.5">
+                                                            <span className="text-[11.5px] font-black text-teal-700 leading-tight">
+                                                                {sp.members?.length || 0}
+                                                            </span>
+                                                            <span className="text-[8px] font-normal text-slate-400">
+                                                                orang
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Card Footer */}
+                                            <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-violet-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                                <span className={`text-[9.5px] font-bold ${sp.status === 'active' ? 'text-emerald-600' : sp.status === 'completed' ? 'text-slate-400' : 'text-amber-600'}`}>
+                                                    {sp.status === 'active' ? 'Aktif' : sp.status === 'completed' ? 'Selesai' : 'Kadaluarsa'}
+                                                </span>
+                                                <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-violet-600 group-hover:text-violet-700 transition-colors">
+                                                    Detail
+                                                    <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         )}
                     </>

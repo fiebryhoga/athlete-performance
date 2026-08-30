@@ -342,6 +342,10 @@ class GroupTrainingController extends Controller
 
         $memberRecord->save();
 
+        // Update overall group training status to completed
+        $training->status = 'completed';
+        $training->save();
+
         return redirect()->back()->with('message', 'Latihan grup berhasil diselesaikan untuk atlet ini!');
     }
 
@@ -597,7 +601,8 @@ class GroupTrainingController extends Controller
         $newTraining->is_extra = $training->is_extra;
         $newTraining->session_number = $session_number;
         $newTraining->status = 'scheduled';
-        $newTraining->attendee_ids = [];
+        $newTraining->attendee_ids = null;
+        $newTraining->coach_ids = null; // Jangan ikutkan pelatih pendamping pada sesi duplikasi
         $newTraining->save();
 
         // Duplicate blocks and items

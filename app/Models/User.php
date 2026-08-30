@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->belongsToMany(TrainingGroup::class, 'training_group_user');
     }
 
+    public function sharedPackages()
+    {
+        return $this->belongsToMany(SharedPackage::class, 'shared_package_members');
+    }
+
     protected $hidden = [
         'password',
         'remember_token',

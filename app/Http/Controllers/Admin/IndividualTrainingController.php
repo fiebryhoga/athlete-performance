@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\IndividualTraining;
 use App\Models\IndividualTrainingRpeRecord;
+use App\Models\SharedPackage;
 use App\Models\TrainingBlock;
 use App\Models\TrainingBlockItem;
 use App\Models\User;
@@ -67,9 +68,30 @@ class IndividualTrainingController extends Controller
             return $group;
         });
 
+        // Shared Packages (Paket Bersama)
+        $sharedPackagesQuery = SharedPackage::with(['package', 'members', 'coaches']);
+
+        if (Auth::user()->role === 'coach') {
+            $sharedPackagesQuery->whereHas('coaches', function($q) {
+                $q->where('coach_id', Auth::id());
+            });
+        }
+
+        if ($request->search) {
+            $sharedPackagesQuery->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $sharedPackages = $sharedPackagesQuery->get()->map(function($sp) {
+            $sp->used_sessions = $sp->usedSessions();
+            $sp->total_sessions = $sp->package?->session_count;
+            $sp->remaining_sessions = $sp->remainingSessions();
+            return $sp;
+        });
+
         return Inertia::render('Admin/IndividualTrainings/Index', [
             'athletes' => $athletes,
             'groups' => $groups,
+            'sharedPackages' => $sharedPackages,
             'filters' => $request->only(['search'])
         ]);
     }
@@ -83,7 +105,9 @@ class IndividualTrainingController extends Controller
             abort(404);
         }
 
-        $user->load(['sport', 'package']);
+        $user->load(['sport', 'package', 'sharedPackages' => function($q) {
+            $q->where('status', 'active')->with('package');
+        }]);
 
         $trainings = IndividualTraining::where('user_id', $user->id)
             ->with(['coach', 'blocks.items.exercise', 'rpeRecords'])
@@ -137,12 +161,34 @@ class IndividualTrainingController extends Controller
         $exercisesList = Exercise::with('category')->orderBy('name', 'asc')->get();
         $packagesList = \App\Models\ExercisePackage::with('exercises')->orderBy('name', 'asc')->get();
 
+        $athletesQuery = User::where('role', 'athlete')->with('sport:id,name');
+        if (Auth::user()->role === 'coach') {
+            $athletesQuery->whereHas('coaches', function($q) {
+                $q->where('coach_id', Auth::id());
+            });
+        }
+        $allAthletes = $athletesQuery->orderBy('name', 'asc')->select('id', 'name', 'sport_id', 'profile_photo')->get();
+
+        // Load shared packages info for display
+        $activeSharedPackages = $user->sharedPackages()
+            ->where('status', 'active')
+            ->with(['package', 'members'])
+            ->get()
+            ->map(function($sp) {
+                $sp->used_sessions = $sp->usedSessions();
+                $sp->total_sessions = $sp->package?->session_count;
+                $sp->remaining_sessions = $sp->remainingSessions();
+                return $sp;
+            });
+
         return Inertia::render('Admin/IndividualTrainings/ShowAthlete', [
             'athlete' => $user,
             'trainings' => $trainings,
             'groupTrainings' => $groupTrainings,
             'exercises' => $exercisesList,
-            'packages' => $packagesList
+            'packages' => $packagesList,
+            'allAthletes' => $allAthletes,
+            'sharedPackages' => $activeSharedPackages,
         ]);
     }
 
@@ -169,6 +215,18 @@ class IndividualTrainingController extends Controller
         
         $coaches = $user->coaches()->orderBy('name', 'asc')->get();
 
+        // Load active shared packages for this athlete
+        $activeSharedPackages = $user->sharedPackages()
+            ->where('status', 'active')
+            ->with(['package', 'members'])
+            ->get()
+            ->map(function($sp) {
+                $sp->used_sessions = $sp->usedSessions();
+                $sp->total_sessions = $sp->package?->session_count;
+                $sp->remaining_sessions = $sp->remainingSessions();
+                return $sp;
+            });
+
         return Inertia::render('Admin/IndividualTrainings/CreateSession', [
             'athlete' => $user,
             'exercises' => $exercisesList,
@@ -176,6 +234,7 @@ class IndividualTrainingController extends Controller
             'coaches' => $coaches,
             'date' => $dateStr,
             'nextSessionNumber' => $nextSessionNumber,
+            'sharedPackages' => $activeSharedPackages,
         ]);
     }
 
@@ -192,9 +251,12 @@ class IndividualTrainingController extends Controller
             'coach_ids' => 'nullable|array',
             'blocks' => 'array',
             'is_extra' => 'boolean',
+            'shared_package_id' => 'nullable|exists:shared_packages,id',
         ]);
 
         $isExtra = $request->input('is_extra', false);
+        $sharedPackageId = $request->input('shared_package_id');
+        $sharedSessionNumber = null;
 
         if ($isExtra) {
             $session_number = null;
@@ -208,6 +270,14 @@ class IndividualTrainingController extends Controller
             $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
         }
 
+        // If linked to a shared package, calculate the shared session number
+        if ($sharedPackageId && !$isExtra) {
+            $sharedPackage = SharedPackage::with('package')->find($sharedPackageId);
+            if ($sharedPackage) {
+                $sharedSessionNumber = $sharedPackage->nextSharedSessionNumber();
+            }
+        }
+
         // Calculate day number
         $firstTrainingDate = IndividualTraining::where('user_id', $user->id)->min('date');
         if (!$firstTrainingDate) {
@@ -219,11 +289,13 @@ class IndividualTrainingController extends Controller
         // Create the training record
         $training = IndividualTraining::create([
             'user_id' => $user->id,
+            'shared_package_id' => $sharedPackageId,
             'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(),
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'day_number' => $day_number,
             'session_number' => $session_number,
+            'shared_session_number' => $sharedSessionNumber,
             'is_extra' => $isExtra,
             'name' => $request->name,
             'training_type' => $request->training_type,
@@ -636,60 +708,82 @@ class IndividualTrainingController extends Controller
     public function duplicateSession(Request $request, IndividualTraining $training)
     {
         $request->validate([
-            'target_date' => 'required|date'
+            'target_date' => 'required|date',
+            'target_user_ids' => 'nullable|array',
+            'target_user_ids.*' => 'exists:users,id',
         ]);
 
-        $user = $training->user;
-
-        // Calculate new session_number
-        if ($training->is_extra) {
-            $session_number = null;
-        } else {
-            $lastUnpaidSession = IndividualTraining::where('user_id', $user->id)
-                ->where('is_athlete_paid', false)
-                ->where('is_extra', false)
-                ->orderBy('session_number', 'desc')
-                ->first();
-            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
+        $targetUserIds = $request->target_user_ids;
+        if (empty($targetUserIds)) {
+            $targetUserIds = [$training->user_id];
         }
 
-        // Calculate day_number
-        $firstTrainingDate = IndividualTraining::where('user_id', $user->id)->min('date');
-        if (!$firstTrainingDate) {
-            $firstTrainingDate = $user->created_at->format('Y-m-d');
-        }
-        $day_number = Carbon::parse($firstTrainingDate)->diffInDays(Carbon::parse($request->target_date)) + 1;
-        if ($day_number < 1) $day_number = 1;
+        $targetUsers = User::whereIn('id', $targetUserIds)->get();
+        $targetDate = $request->target_date;
+        $createdCount = 0;
 
-        // Duplicate the training record
-        $newTraining = $training->replicate(['is_completed', 'completed_at', 'athlete_note', 'proof_photo', 'athlete_rpe']);
-        $newTraining->date = $request->target_date;
-        $newTraining->is_extra = $training->is_extra;
-        $newTraining->day_number = $day_number;
-        $newTraining->session_number = $session_number;
-        $newTraining->status = 'scheduled';
-        $newTraining->is_completed = false;
-        $newTraining->completed_at = null;
-        $newTraining->athlete_note = null;
-        $newTraining->proof_photo = null;
-        $newTraining->athlete_rpe = null;
-        $newTraining->save();
-
-        // Duplicate blocks and items
         $training->load('blocks.items');
-        foreach ($training->blocks as $block) {
-            $newBlock = $block->replicate(['individual_training_id']);
-            $newBlock->individual_training_id = $newTraining->id;
-            $newBlock->save();
 
-            foreach ($block->items as $item) {
-                $newItem = $item->replicate(['training_block_id']);
-                $newItem->training_block_id = $newBlock->id;
-                $newItem->save();
+        foreach ($targetUsers as $targetUser) {
+            // Calculate new session_number for this target client
+            if ($training->is_extra) {
+                $session_number = null;
+            } else {
+                $lastUnpaidSession = IndividualTraining::where('user_id', $targetUser->id)
+                    ->where('is_athlete_paid', false)
+                    ->where('is_extra', false)
+                    ->orderBy('session_number', 'desc')
+                    ->first();
+                $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
             }
+
+            // Calculate day_number for this target client
+            $firstTrainingDate = IndividualTraining::where('user_id', $targetUser->id)->min('date');
+            if (!$firstTrainingDate) {
+                $firstTrainingDate = $targetUser->created_at ? $targetUser->created_at->format('Y-m-d') : $targetDate;
+            }
+            $day_number = Carbon::parse($firstTrainingDate)->diffInDays(Carbon::parse($targetDate)) + 1;
+            if ($day_number < 1) $day_number = 1;
+
+            // Duplicate the training record (kosongkan pelatih & pelatih pendamping pada sesi duplikasi)
+            $newTraining = $training->replicate(['is_completed', 'completed_at', 'athlete_note', 'proof_photo', 'athlete_rpe']);
+            $newTraining->user_id = $targetUser->id;
+            $newTraining->coach_id = null; // Kosongkan pelatih utama agar bisa disesuaikan
+            $newTraining->coach_ids = null; // Kosongkan pelatih pendamping
+            $newTraining->paid_coach_ids = null;
+            $newTraining->is_athlete_paid = false;
+            $newTraining->date = $targetDate;
+            $newTraining->is_extra = $training->is_extra;
+            $newTraining->day_number = $day_number;
+            $newTraining->session_number = $session_number;
+            $newTraining->status = 'scheduled';
+            $newTraining->is_completed = false;
+            $newTraining->completed_at = null;
+            $newTraining->athlete_note = null;
+            $newTraining->proof_photo = null;
+            $newTraining->athlete_rpe = null;
+            $newTraining->save();
+
+            // Duplicate blocks and items
+            foreach ($training->blocks as $block) {
+                $newBlock = $block->replicate(['individual_training_id']);
+                $newBlock->individual_training_id = $newTraining->id;
+                $newBlock->save();
+
+                foreach ($block->items as $item) {
+                    $newItem = $item->replicate(['training_block_id']);
+                    $newItem->training_block_id = $newBlock->id;
+                    $newItem->save();
+                }
+            }
+            $createdCount++;
         }
 
-        return back()->with('message', 'Sesi latihan berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
+        $message = count($targetUsers) === 1 && $targetUsers[0]->id === $training->user_id
+            ? 'Sesi latihan berhasil diduplikasi ke tanggal ' . Carbon::parse($targetDate)->translatedFormat('d M Y') . '!'
+            : 'Sesi latihan berhasil diduplikasi ke ' . $createdCount . ' klien pada tanggal ' . Carbon::parse($targetDate)->translatedFormat('d M Y') . '!';
+
+        return back()->with('message', $message);
     }
 
     /**

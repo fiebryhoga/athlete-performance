@@ -17,7 +17,7 @@ class AthleteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches', 'package', 'groups.package']);
+        $query = User::query()->where('role', 'athlete')->with(['sport', 'coaches', 'package', 'groups.package', 'sharedPackages.package']);
 
         if (auth()->user()->role === 'coach') {
             $coachId = auth()->id();
@@ -50,6 +50,7 @@ class AthleteController extends Controller
             $data['latest_test_score'] = $latestTest ? round($latestTest->results->avg('score') ?? 0, 1) : null;
             $data['package'] = $athlete->package;
             $data['groups'] = $athlete->groups;
+            $data['shared_packages'] = $athlete->sharedPackages;
             return $data;
         });
 

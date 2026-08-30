@@ -8,11 +8,13 @@ class IndividualTraining extends Model
 {
     protected $fillable = [
         'user_id',
+        'shared_package_id',
         'coach_id',
         'coach_ids',
         'date',
         'day_number',
         'session_number',
+        'shared_session_number',
         'name',
         'training_type',
         'location',
@@ -25,14 +27,18 @@ class IndividualTraining extends Model
         'athlete_note',
         'proof_photo',
         'is_extra',
+        'is_athlete_paid',
+        'paid_coach_ids',
     ];
 
     protected $casts = [
         'is_completed' => 'boolean',
         'completed_at' => 'datetime',
         'coach_ids' => 'array',
+        'paid_coach_ids' => 'array',
         'date' => 'date:Y-m-d',
         'is_extra' => 'boolean',
+        'is_athlete_paid' => 'boolean',
     ];
 
     public function user()
@@ -54,6 +60,11 @@ class IndividualTraining extends Model
     public function rpeRecords()
     {
         return $this->hasMany(IndividualTrainingRpeRecord::class);
+    }
+
+    public function sharedPackage()
+    {
+        return $this->belongsTo(SharedPackage::class, 'shared_package_id');
     }
 
     // LEGACY: Keep for data migration, remove later

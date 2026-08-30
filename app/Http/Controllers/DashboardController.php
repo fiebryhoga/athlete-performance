@@ -661,7 +661,7 @@ class DashboardController extends Controller
             $gymShiftFee = (int) ($coach->effective_gym_fee ?? 0);
             $detailedItems = collect();
 
-            // Individual Trainings in month
+            // Individual Trainings in month (hanya yang sudah selesai)
             $indTrainings = \App\Models\IndividualTraining::where(function ($q) use ($coach) {
                     $q->where('coach_id', $coach->id)
                       ->orWhereJsonContains('coach_ids', (string)$coach->id)
@@ -669,6 +669,10 @@ class DashboardController extends Controller
                 })
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->where('is_extra', false)
+                ->where(function ($q) {
+                    $q->where('status', 'completed')
+                      ->orWhere('is_completed', true);
+                })
                 ->with(['user.package'])
                 ->get();
 
@@ -699,7 +703,7 @@ class DashboardController extends Controller
                 ]);
             }
 
-            // Group Trainings in month
+            // Group Trainings in month (hanya yang sudah selesai)
             $grpTrainings = \App\Models\GroupTraining::where(function ($q) use ($coach) {
                     $q->where('coach_id', $coach->id)
                       ->orWhereJsonContains('coach_ids', (string)$coach->id)
@@ -707,7 +711,13 @@ class DashboardController extends Controller
                 })
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->where('is_extra', false)
-                ->with(['group.package'])
+                ->where(function ($q) {
+                    $q->where('status', 'completed')
+                      ->orWhereHas('members_pivot', function ($mq) {
+                          $mq->where('is_completed', true);
+                      });
+                })
+                ->with(['group.package', 'members_pivot'])
                 ->get();
 
             $grpFee = 0;

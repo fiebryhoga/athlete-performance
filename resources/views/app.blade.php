@@ -4,7 +4,26 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Olympus Training System') }}</title>
+        <!-- Primary Meta SEO Tags -->
+        <title inertia>{{ config('app.name', 'Olympus Training Surabaya') }}</title>
+        <meta name="description" content="Platform terpadu pemantauan performa atlet, tes fisik, komposisi tubuh, analisis DPA, program latihan, nutrisi, dan manajemen sesi Olympus Training Surabaya.">
+        <meta name="keywords" content="Olympus Training Surabaya, OTS, Athlete Performance, Gym Management, Tes Fisik, Analisis DPA, Surabaya Fitness, Personal Training">
+        <meta name="author" content="Olympus Training Surabaya">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph / Facebook / WhatsApp -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url('/') }}">
+        <meta property="og:title" content="Olympus Training Surabaya — Athlete Performance & Management System">
+        <meta property="og:description" content="Platform terpadu pemantauan performa atlet, tes fisik, komposisi tubuh, analisis DPA, program latihan, nutrisi, dan manajemen sesi Olympus Training Surabaya.">
+        <meta property="og:image" content="{{ asset('assets/images/otslogo.png') }}">
+        <meta property="og:site_name" content="Olympus Training Surabaya">
+
+        <!-- Twitter Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Olympus Training Surabaya — Athlete Performance & Management System">
+        <meta name="twitter:description" content="Platform terpadu pemantauan performa atlet, tes fisik, komposisi tubuh, analisis DPA, program latihan, nutrisi, dan manajemen sesi Olympus Training Surabaya.">
+        <meta name="twitter:image" content="{{ asset('assets/images/otslogo.png') }}">
 
         <link rel="icon" type="image/png" href="{{ asset('favicon-96x96.png') }}" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />

@@ -11,6 +11,7 @@ import {
     MapPin,
     Target,
     User,
+    UsersRound,
     Package,
     ShieldCheck
 } from "lucide-react";
@@ -28,7 +29,10 @@ export default function CreateSession({
     coaches = [],
     date,
     nextSessionNumber,
+    sharedPackages = [],
 }) {
+    const defaultSharedPackage = sharedPackages && sharedPackages.length > 0 ? sharedPackages[0].id : '';
+
     const { data, setData, post, processing, errors } = useForm({
         date: date || "",
         name: "",
@@ -37,6 +41,7 @@ export default function CreateSession({
         coach_ids: [],
         blocks: [],
         is_extra: false,
+        shared_package_id: defaultSharedPackage || "",
     });
 
     const [isExModalOpen, setIsExModalOpen] = useState(false);
@@ -261,6 +266,31 @@ export default function CreateSession({
                                             className="w-full text-xs font-medium text-slate-800 bg-white border border-slate-200 rounded-md px-3 py-2 focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs placeholder:text-slate-400"
                                         />
                                     </div>
+
+                                    {/* Paket Bersama (Jika ada) */}
+                                    {sharedPackages && sharedPackages.length > 0 && (
+                                        <div className="p-2.5 bg-violet-50/70 border border-violet-200/80 rounded-md space-y-1.5">
+                                            <div className="flex items-center gap-1.5 text-xs font-bold text-violet-900">
+                                                <UsersRound className="w-3.5 h-3.5 text-violet-600" />
+                                                <span>Paket Bersama</span>
+                                            </div>
+                                            <p className="text-[10.5px] text-violet-700 leading-snug">
+                                                Atlet ini terdaftar dalam paket bersama. Sesi ini akan memotong kuota paket bersama yang dipilih.
+                                            </p>
+                                            <select
+                                                value={data.shared_package_id}
+                                                onChange={(e) => setData("shared_package_id", e.target.value)}
+                                                className="w-full text-xs font-medium text-slate-800 bg-white border border-violet-200 rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-violet-400 focus:border-violet-400 shadow-2xs mt-1"
+                                            >
+                                                <option value="">-- Tidak Memotong Paket Bersama (Individu Biasa) --</option>
+                                                {sharedPackages.map((sp) => (
+                                                    <option key={sp.id} value={sp.id}>
+                                                        {sp.name} — Sisa {sp.remaining_sessions ?? '∞'} / {sp.total_sessions || '∞'} Sesi
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
 
                                     {/* Lokasi */}
                                     <div>

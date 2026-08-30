@@ -213,6 +213,7 @@ Route::middleware([
         Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
         Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
         Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
+        Route::post('/admin/reports/sessions/pay-shared-package/{sharedPackage}', [\App\Http\Controllers\Admin\ReportController::class, 'paySharedPackage'])->name('admin.reports.pay-shared-package');
         Route::get('/admin/reports/sessions/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportAthleteReportPdf'])->name('admin.reports.sessions.export-athlete');
         Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
         Route::get('/admin/reports/sessions/coach/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.sessions.export-coach');
@@ -304,6 +305,12 @@ Route::middleware([
         // Packages
         Route::resource('/admin/packages', \App\Http\Controllers\Admin\SubscriptionPackageController::class)->names('admin.packages');
         
+        // Shared Packages (Paket Bersama)
+        Route::get('/admin/shared-packages/{sharedPackage}', [\App\Http\Controllers\Admin\SharedPackageController::class, 'show'])->name('admin.shared-packages.show');
+        Route::post('/admin/shared-packages', [\App\Http\Controllers\Admin\SharedPackageController::class, 'store'])->name('admin.shared-packages.store');
+        Route::put('/admin/shared-packages/{sharedPackage}', [\App\Http\Controllers\Admin\SharedPackageController::class, 'update'])->name('admin.shared-packages.update');
+        Route::delete('/admin/shared-packages/{sharedPackage}', [\App\Http\Controllers\Admin\SharedPackageController::class, 'destroy'])->name('admin.shared-packages.destroy');
+
         // Group Trainings
         Route::resource('/admin/groups', \App\Http\Controllers\Admin\GroupController::class)->names('admin.groups');
         

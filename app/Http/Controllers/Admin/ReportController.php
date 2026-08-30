@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\IndividualTraining;
 use App\Models\GroupTraining;
 use App\Models\TrainingGroup;
+use App\Models\SharedPackage;
 use App\Models\GymAttendance;
 use App\Models\Setting;
 use Carbon\Carbon;
@@ -146,18 +147,32 @@ class ReportController extends Controller
         $coaches = User::where('role', 'coach')
             ->get()
             ->map(function ($coach) use ($monthNames, &$allRecordedMonths) {
-                // Individual sessions
-                $individualTrainings = IndividualTraining::where('coach_id', $coach->id)
-                    ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                    ->orWhereJsonContains('coach_ids', $coach->id)
+                // Individual sessions (hanya yang sudah terselesaikan)
+                $individualTrainings = IndividualTraining::where(function ($q) use ($coach) {
+                        $q->where('coach_id', $coach->id)
+                          ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                          ->orWhereJsonContains('coach_ids', $coach->id);
+                    })
+                    ->where(function ($q) {
+                        $q->where('status', 'completed')
+                          ->orWhere('is_completed', true);
+                    })
                     ->with(['user.package', 'user.sport'])
                     ->get();
 
-                // Group sessions
-                $groupTrainings = GroupTraining::where('coach_id', $coach->id)
-                    ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                    ->orWhereJsonContains('coach_ids', $coach->id)
-                    ->with(['group.package'])
+                // Group sessions (hanya yang sudah terselesaikan)
+                $groupTrainings = GroupTraining::where(function ($q) use ($coach) {
+                        $q->where('coach_id', $coach->id)
+                          ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                          ->orWhereJsonContains('coach_ids', $coach->id);
+                    })
+                    ->where(function ($q) {
+                        $q->where('status', 'completed')
+                          ->orWhereHas('members_pivot', function ($mq) {
+                              $mq->where('is_completed', true);
+                          });
+                    })
+                    ->with(['group.package', 'members_pivot'])
                     ->get();
 
                 // Gym shift fee
@@ -210,7 +225,7 @@ class ReportController extends Controller
                         'client_sport' => 'Grup',
                         'name' => $session->name ?: 'Program Latihan Grup',
                         'session_number' => $session->session_number,
-                        'status' => $session->status,
+                        'status' => ($session->status === 'completed' || ($session->members_pivot && $session->members_pivot->contains('is_completed', true))) ? 'completed' : $session->status,
                         'type' => 'Grup',
                         'fee' => $fee,
                         'is_paid' => $isPaid,
@@ -282,10 +297,11 @@ class ReportController extends Controller
                     ];
                 }
 
-                // Sort monthly breakdown descending by month_key (newest first)
+                // Sort monthly breakdown descending by month_key (newest first) and limit to last 4 months
                 usort($monthlyBreakdown, function ($a, $b) {
                     return strcmp($b['month_key'], $a['month_key']);
                 });
+                $monthlyBreakdown = array_slice($monthlyBreakdown, 0, 4);
 
                 $lastPayout = \App\Models\CoachPayout::where('user_id', $coach->id)->latest('paid_at')->first();
 
@@ -304,8 +320,8 @@ class ReportController extends Controller
                 return $coach;
             });
 
-        // Unique sorted list of months
-        $distinctMonths = $allRecordedMonths->unique()->sortDesc()->values()->map(function ($mKey) use ($monthNames) {
+        // Unique sorted list of months (limit to last 4 months)
+        $distinctMonths = $allRecordedMonths->unique()->sortDesc()->take(4)->values()->map(function ($mKey) use ($monthNames) {
             try {
                 $cM = Carbon::createFromFormat('Y-m', $mKey);
                 return [
@@ -362,21 +378,41 @@ class ReportController extends Controller
         $thisMonthIndRegularCount = IndividualTraining::whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->where('is_extra', false)
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('is_completed', true);
+            })
             ->count();
 
         $thisMonthIndExtraCount = IndividualTraining::whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->where('is_extra', true)
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('is_completed', true);
+            })
             ->count();
 
         $thisMonthGroupRegularCount = GroupTraining::whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->where('is_extra', false)
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhereHas('members_pivot', function ($mq) {
+                      $mq->where('is_completed', true);
+                  });
+            })
             ->count();
 
         $thisMonthGroupExtraCount = GroupTraining::whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->where('is_extra', true)
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhereHas('members_pivot', function ($mq) {
+                      $mq->where('is_completed', true);
+                  });
+            })
             ->count();
 
         $activeCoachesMonth = 0;
@@ -406,9 +442,69 @@ class ReportController extends Controller
             'total_coach_earnings' => $currentMonthSummary['total_fee'] ?? 0,
         ];
 
+        // ─── SHARED PACKAGES (Paket Bersama) ───
+        $sharedPackages = SharedPackage::with(['package', 'members'])
+            ->get()
+            ->map(function ($sp) {
+                $trainings = IndividualTraining::where('shared_package_id', $sp->id)
+                    ->with('coach')
+                    ->orderBy('date', 'desc')
+                    ->get();
+
+                $sp->package_name = $sp->package->name ?? null;
+                $sp->package_type = $sp->package?->package_type ?? 'quota';
+                $sp->package_session_count = $sp->package?->session_count;
+                $sp->members_count = $sp->members->count();
+                $sp->total_sessions = $trainings->count();
+                $sp->regular_sessions = $trainings->where('is_extra', false)->count();
+                $sp->extra_sessions = $trainings->where('is_extra', true)->count();
+                $sp->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
+                $sp->unpaid_regular_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
+                $sp->unpaid_extra_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', true)->count();
+
+                // Member usage stats
+                $sp->member_usage = $sp->members->map(function ($member) use ($sp) {
+                    return [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'sessions_used' => IndividualTraining::where('shared_package_id', $sp->id)
+                            ->where('user_id', $member->id)
+                            ->where('is_athlete_paid', false)
+                            ->where('is_extra', false)
+                            ->count(),
+                    ];
+                });
+
+                // Session list (unpaid only)
+                $sp->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
+                    $coachNames = [];
+                    if ($t->coach) {
+                        $coachNames[] = $t->coach->name;
+                    }
+                    return [
+                        'id' => $t->id,
+                        'date' => $t->date,
+                        'status' => $t->status,
+                        'session_number' => $t->shared_session_number,
+                        'athlete_name' => $t->user?->name,
+                        'name' => $t->name,
+                        'coaches' => array_unique($coachNames),
+                        'is_paid' => (bool) $t->is_athlete_paid,
+                        'is_extra' => (bool) $t->is_extra,
+                    ];
+                })->values();
+
+                $memberNames = $sp->members->pluck('name')->toArray();
+                $sp->member_names = $memberNames;
+                unset($sp->members, $sp->package);
+
+                return $sp;
+            });
+
         return Inertia::render('Admin/Reports/SessionRecap', [
             'athletes' => $athletes,
             'groups' => $groups,
+            'sharedPackages' => $sharedPackages,
             'coaches' => $coaches,
             'available_months' => $distinctMonths,
             'monthly_summary' => $globalMonthlySummary,
@@ -429,10 +525,16 @@ class ReportController extends Controller
     {
         $unpaidEarnings = 0;
 
-        // Mark individual sessions as paid for this coach
-        $individualTrainings = IndividualTraining::where('coach_id', $user->id)
-            ->orWhereJsonContains('coach_ids', (string)$user->id)
-            ->orWhereJsonContains('coach_ids', $user->id)
+        // Mark individual sessions as paid for this coach (hanya sesi yang sudah terselesaikan)
+        $individualTrainings = IndividualTraining::where(function ($q) use ($user) {
+                $q->where('coach_id', $user->id)
+                  ->orWhereJsonContains('coach_ids', (string)$user->id)
+                  ->orWhereJsonContains('coach_ids', $user->id);
+            })
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('is_completed', true);
+            })
             ->with('user.package')
             ->get();
 
@@ -448,12 +550,20 @@ class ReportController extends Controller
             }
         }
 
-        // Mark group sessions as paid for this coach
-        $groupTrainings = GroupTraining::where('coach_id', $user->id)
-            ->orWhereJsonContains('coach_ids', (string)$user->id)
-            ->orWhereJsonContains('coach_ids', $user->id)
+        // Mark group sessions as paid for this coach (hanya sesi yang sudah terselesaikan)
+        $groupTrainings = GroupTraining::where(function ($q) use ($user) {
+                $q->where('coach_id', $user->id)
+                  ->orWhereJsonContains('coach_ids', (string)$user->id)
+                  ->orWhereJsonContains('coach_ids', $user->id);
+            })
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhereHas('members_pivot', function ($mq) {
+                      $mq->where('is_completed', true);
+                  });
+            })
             ->where('is_coach_paid', false)
-            ->with('group.package')
+            ->with(['group.package', 'members_pivot'])
             ->get();
 
         foreach ($groupTrainings as $session) {
@@ -494,6 +604,17 @@ class ReportController extends Controller
             ->update(['is_group_paid' => true]);
 
         return redirect()->back()->with('success', 'Berhasil menandai sesi grup sebagai lunas.');
+    }
+
+    public function paySharedPackage(Request $request, SharedPackage $sharedPackage)
+    {
+        IndividualTraining::where('shared_package_id', $sharedPackage->id)
+            ->where('is_athlete_paid', false)
+            ->update(['is_athlete_paid' => true]);
+
+        $sharedPackage->update(['status' => 'completed']);
+
+        return redirect()->back()->with('success', 'Berhasil menandai sesi paket bersama sebagai lunas.');
     }
     public function exportAthleteReportPdf(Request $request, User $user)
     {
@@ -914,22 +1035,32 @@ class ReportController extends Controller
 
         $filterMonth = $request->query('month'); // e.g. '2026-08' or null
 
-        // Individual sessions
+        // Individual sessions (hanya yang sudah terselesaikan)
         $individualTrainings = IndividualTraining::where(function($q) use ($coach) {
                 $q->where('coach_id', $coach->id)
                   ->orWhereJsonContains('coach_ids', (string)$coach->id)
                   ->orWhereJsonContains('coach_ids', $coach->id);
             })
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhere('is_completed', true);
+            })
             ->with(['user.package', 'user.sport'])
             ->get();
 
-        // Group sessions
+        // Group sessions (hanya yang sudah terselesaikan)
         $groupTrainings = GroupTraining::where(function($q) use ($coach) {
                 $q->where('coach_id', $coach->id)
                   ->orWhereJsonContains('coach_ids', (string)$coach->id)
                   ->orWhereJsonContains('coach_ids', $coach->id);
             })
-            ->with(['group.package'])
+            ->where(function ($q) {
+                $q->where('status', 'completed')
+                  ->orWhereHas('members_pivot', function ($mq) {
+                      $mq->where('is_completed', true);
+                  });
+            })
+            ->with(['group.package', 'members_pivot'])
             ->get();
 
         // Gym shift fee
@@ -982,7 +1113,7 @@ class ReportController extends Controller
                 'client_sport' => 'Grup',
                 'name' => $session->name ?: 'Program Latihan Grup',
                 'session_number' => $session->session_number,
-                'status' => $session->status,
+                'status' => ($session->status === 'completed' || ($session->members_pivot && $session->members_pivot->contains('is_completed', true))) ? 'completed' : $session->status,
                 'type' => 'Grup',
                 'fee' => $fee,
                 'is_paid' => $isPaid,

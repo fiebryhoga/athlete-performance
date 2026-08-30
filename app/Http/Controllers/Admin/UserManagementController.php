@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use App\Models\Sport;
 use App\Models\SubscriptionPackage;
 use App\Models\TrainingGroup;
+use App\Models\SharedPackage;
 
 class UserManagementController extends Controller
 {
@@ -35,7 +36,7 @@ class UserManagementController extends Controller
         $sortField = in_array($sortField, $validSortFields) ? $sortField : 'name';
 
         $users = User::where('role', $tab)
-            ->with(['coaches', 'sport', 'groups.package', 'package'])
+            ->with(['coaches', 'sport', 'groups.package', 'package', 'sharedPackages.package'])
             ->withCount('athletes')
             ->when(auth()->user()->role === 'coach', function($q) {
                 $q->whereHas('coaches', function($subQ) {
@@ -56,6 +57,12 @@ class UserManagementController extends Controller
         $coachesList = User::where('role', 'coach')->get();
         $packages = \App\Models\SubscriptionPackage::all();
         $groupsList = \App\Models\TrainingGroup::with(['members', 'coaches', 'package'])->get();
+        $sharedPackagesList = \App\Models\SharedPackage::with(['members', 'coaches', 'package'])->get()->map(function($sp) {
+            $sp->used_sessions = $sp->usedSessions();
+            $sp->total_sessions = $sp->package?->session_count;
+            $sp->remaining_sessions = $sp->remainingSessions();
+            return $sp;
+        });
         $allAthletes = User::where('role', 'athlete')->with('sport')->orderBy('name')->get();
 
         $tabCounts = [
@@ -65,6 +72,7 @@ class UserManagementController extends Controller
                 ? User::where('role', 'athlete')->whereHas('coaches', fn($subQ) => $subQ->where('coach_id', auth()->id()))->count()
                 : User::where('role', 'athlete')->count(),
             'group' => \App\Models\TrainingGroup::count(),
+            'shared_package' => \App\Models\SharedPackage::count(),
         ];
 
         return Inertia::render('Admin/Users/Index', [
@@ -81,6 +89,7 @@ class UserManagementController extends Controller
             'coachesList' => $coachesList,
             'packagesList' => $packages,
             'groupsList' => $groupsList,
+            'sharedPackagesList' => $sharedPackagesList,
             'allAthletes' => $allAthletes,
         ]);
     }
