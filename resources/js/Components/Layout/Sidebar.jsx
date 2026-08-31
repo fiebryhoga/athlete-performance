@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet
+    LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet, Banknote
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -103,6 +103,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             items: [
                 { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: UserCog, roles: ['superadmin', 'coach'] },
                 { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: FileSpreadsheet, roles: ['superadmin'] },
+                { name: 'Rekap Pelatih', route: 'admin.reports.coaches', checkPath: '/admin/reports/coaches', icon: Banknote, roles: ['superadmin'] },
                 { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
             ]
         }

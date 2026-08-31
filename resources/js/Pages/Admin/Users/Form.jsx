@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import PageHeader from '@/Components/Common/PageHeader';
 
-export default function UserForm({ auth, mode = 'create', defaultRole = 'athlete', targetUser = null, sports = [], coachesList = [], packagesList = [] }) {
+export default function UserForm({ auth, mode = 'create', defaultRole = 'athlete', targetUser = null, sports = [], coachesList = [], packagesList = [], active_shared_package = null }) {
     const isEdit = mode === 'edit';
     const isCoachRole = auth.user.role === 'coach';
 
@@ -281,30 +281,58 @@ export default function UserForm({ auth, mode = 'create', defaultRole = 'athlete
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-700 mb-1">Paket Latihan Privat</label>
-                                        <select
-                                            value={data.subscription_package_id}
-                                            onChange={(e) => setData('subscription_package_id', e.target.value)}
-                                            disabled={isCoachRole}
-                                            className="w-full px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 disabled:opacity-60"
-                                        >
-                                            <option value="">-- Tanpa Paket Privat --</option>
-                                            {packagesList.map(pkg => (
-                                                <option key={pkg.id} value={pkg.id}>
-                                                    {pkg.name} ({pkg.package_type === 'per_session' ? 'Per Pertemuan' : `${pkg.session_count} Sesi`})
-                                                </option>
-                                            ))}
-                                        </select>
+                                        {active_shared_package ? (
+                                            <div className="flex items-center justify-between px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 text-xs">
+                                                <div className="flex items-center gap-1.5 truncate">
+                                                    <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
+                                                    <span className="font-bold text-slate-800 truncate">
+                                                        Paket Bersama: {active_shared_package.name}
+                                                    </span>
+                                                    <span className="text-[10.5px] text-slate-400 font-normal hidden sm:inline">
+                                                        ({active_shared_package.package_name || 'Master'} • {active_shared_package.total_sessions || '∞'} Sesi)
+                                                    </span>
+                                                </div>
+                                                <Link
+                                                    href={route('admin.shared-packages.show', active_shared_package.id)}
+                                                    className="text-[11px] font-bold text-orange-600 hover:text-orange-700 hover:underline shrink-0 ml-2"
+                                                >
+                                                    Lihat Paket
+                                                </Link>
+                                            </div>
+                                        ) : (
+                                            <select
+                                                value={data.subscription_package_id}
+                                                onChange={(e) => setData('subscription_package_id', e.target.value)}
+                                                disabled={isCoachRole}
+                                                className="w-full px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 disabled:opacity-60"
+                                            >
+                                                <option value="">-- Tanpa Paket Privat --</option>
+                                                {packagesList.map(pkg => (
+                                                    <option key={pkg.id} value={pkg.id}>
+                                                        {pkg.name} ({pkg.package_type === 'per_session' ? 'Per Pertemuan' : `${pkg.session_count} Sesi`})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
                                     </div>
 
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-700 mb-1">Kedaluwarsa Paket Privat</label>
-                                        <input
-                                            type="date"
-                                            value={data.training_exp_date}
-                                            onChange={(e) => setData('training_exp_date', e.target.value)}
-                                            disabled={isCoachRole}
-                                            className="w-full px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 disabled:opacity-60"
-                                        />
+                                        {active_shared_package ? (
+                                            <div className="px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-600 font-medium">
+                                                {active_shared_package.expiration_date 
+                                                    ? new Date(active_shared_package.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                                                    : 'Tidak ada batas waktu'}
+                                            </div>
+                                        ) : (
+                                            <input
+                                                type="date"
+                                                value={data.training_exp_date}
+                                                onChange={(e) => setData('training_exp_date', e.target.value)}
+                                                disabled={isCoachRole}
+                                                className="w-full px-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 text-xs text-slate-800 disabled:opacity-60"
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>

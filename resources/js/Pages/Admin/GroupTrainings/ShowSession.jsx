@@ -290,11 +290,14 @@ export default function ShowSession({
     const fromPage = urlParams.get('from');
     const athleteIdParam = urlParams.get('athlete_id');
 
-    let backUrl = route("admin.group-trainings.show", training.training_group_id);
+    let backUrl = route("admin.group-trainings.show", training.training_group_id || group?.id || 1);
+    let backLabel = "Kembali ke Kalender Latihan Grup";
     if (fromPage === 'athlete' && athleteIdParam) {
         backUrl = route("admin.individual-trainings.show", athleteIdParam);
+        backLabel = "Kembali ke Kalender Latihan Atlet";
     } else if (isAthlete) {
-        backUrl = route("admin.individual-trainings.show", auth.user.id);
+        backUrl = route("admin.individual-trainings.show", auth.user?.id);
+        backLabel = "Kembali ke Kalender Latihan";
     }
 
     const openModal = (url, type) => {
@@ -538,10 +541,10 @@ export default function ShowSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={route("admin.group-trainings.show", group?.id || training?.training_group_id || training?.group?.id || 1)}
+                        href={backUrl}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
-                        <ChevronLeft size={13} /> Kembali ke Kalender Latihan Grup
+                        <ChevronLeft size={13} /> {backLabel}
                     </Link>
 
                     <PageHeader

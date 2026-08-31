@@ -97,7 +97,7 @@ class GroupTrainingController extends Controller
             'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(), // Fallback to current user if no coach selected
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
-            'session_number' => $session_number,
+            'session_number' => null,
             'is_extra' => $isExtra,
             'name' => $request->name,
             'training_type' => $request->training_type,
@@ -105,6 +105,8 @@ class GroupTrainingController extends Controller
             'status' => 'scheduled',
             'attendee_ids' => $request->attendee_ids,
         ]);
+
+        self::resequenceGroupSessions($group->id, false);
 
         // Save blocks in ISMS-style hierarchical structure
         if (!empty($request->programs)) {
@@ -410,26 +412,6 @@ class GroupTrainingController extends Controller
 
         $isExtra = $request->input('is_extra', false);
 
-        if ($training->is_extra !== $isExtra) {
-            if ($isExtra) {
-                $oldSessionNumber = $training->session_number;
-                if ($oldSessionNumber) {
-                    \App\Models\GroupTraining::where('training_group_id', $training->training_group_id)
-                        ->where('is_group_paid', $training->is_group_paid)
-                        ->where('session_number', '>', $oldSessionNumber)
-                        ->decrement('session_number');
-                }
-                $training->session_number = null;
-            } else {
-                $lastUnpaidSession = GroupTraining::where('training_group_id', $training->training_group_id)
-                    ->where('is_group_paid', false)
-                    ->where('is_extra', false)
-                    ->orderBy('session_number', 'desc')
-                    ->first();
-                $training->session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
-            }
-        }
-
         $training->update([
             'date' => $request->date,
             'name' => $request->name,
@@ -441,6 +423,8 @@ class GroupTrainingController extends Controller
         $training->attendee_ids = $request->attendee_ids;
         $training->is_extra = $isExtra;
         $training->save();
+
+        self::resequenceGroupSessions($training->training_group_id, (bool)$training->is_group_paid);
 
         // Process blocks
         $existingBlockIds = [];
@@ -556,17 +540,11 @@ class GroupTrainingController extends Controller
     public function destroySession(GroupTraining $training)
     {
         $groupId = $training->training_group_id;
-        $deletedSessionNumber = $training->session_number;
-        $isPaid = $training->is_group_paid;
+        $isPaid = (bool)$training->is_group_paid;
         
         $training->delete();
         
-        if ($deletedSessionNumber) {
-            \App\Models\GroupTraining::where('training_group_id', $groupId)
-                ->where('is_group_paid', $isPaid)
-                ->where('session_number', '>', $deletedSessionNumber)
-                ->decrement('session_number');
-        }
+        self::resequenceGroupSessions($groupId, $isPaid);
         
         return redirect()->route('admin.group-trainings.show', $groupId)
             ->with('message', 'Sesi latihan grup berhasil dihapus dan nomor sesi telah disesuaikan.');
@@ -583,23 +561,11 @@ class GroupTrainingController extends Controller
 
         $group = $training->group;
 
-        // Calculate new session_number
-        if ($training->is_extra) {
-            $session_number = null;
-        } else {
-            $lastUnpaidSession = GroupTraining::where('training_group_id', $group->id)
-                ->where('is_group_paid', false)
-                ->where('is_extra', false)
-                ->orderBy('session_number', 'desc')
-                ->first();
-            $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
-        }
-
         // Duplicate the training record
         $newTraining = $training->replicate(['attendee_ids']);
         $newTraining->date = $request->target_date;
         $newTraining->is_extra = $training->is_extra;
-        $newTraining->session_number = $session_number;
+        $newTraining->session_number = null; // Will be sequenced accurately
         $newTraining->status = 'scheduled';
         $newTraining->attendee_ids = null;
         $newTraining->coach_ids = null; // Jangan ikutkan pelatih pendamping pada sesi duplikasi
@@ -619,7 +585,40 @@ class GroupTrainingController extends Controller
             }
         }
 
+        self::resequenceGroupSessions($group->id, false);
+
         return back()->with('message', 'Sesi latihan grup berhasil diduplikasi ke tanggal ' . $request->target_date . '!');
+    }
+
+    /**
+     * Resequence all sessions for a training group in chronological order.
+     * Extra sessions (is_extra = true) get null session_number.
+     * Regular sessions get continuous numbers: 1, 2, 3, ...
+     */
+    public static function resequenceGroupSessions(int $groupId, bool $isPaid = false): void
+    {
+        // 1. Reset extra sessions
+        GroupTraining::where('training_group_id', $groupId)
+            ->where('is_group_paid', $isPaid)
+            ->where('is_extra', true)
+            ->update(['session_number' => null]);
+
+        // 2. Fetch regular sessions chronologically
+        $sessions = GroupTraining::where('training_group_id', $groupId)
+            ->where('is_group_paid', $isPaid)
+            ->where('is_extra', false)
+            ->orderBy('date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($sessions as $index => $session) {
+            $expectedNumber = $index + 1;
+            if ($session->session_number !== $expectedNumber) {
+                $session->session_number = $expectedNumber;
+                $session->saveQuietly();
+            }
+        }
     }
 
     /**

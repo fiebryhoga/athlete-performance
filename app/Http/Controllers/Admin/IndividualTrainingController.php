@@ -294,14 +294,20 @@ class IndividualTrainingController extends Controller
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'day_number' => $day_number,
-            'session_number' => $session_number,
-            'shared_session_number' => $sharedSessionNumber,
+            'session_number' => null,
+            'shared_session_number' => null,
             'is_extra' => $isExtra,
             'name' => $request->name,
             'training_type' => $request->training_type,
             'location' => $request->location,
             'status' => 'scheduled',
         ]);
+
+        // Resequence sessions accurately in chronological order
+        self::resequenceAthleteSessions($user->id, false);
+        if ($sharedPackageId) {
+            self::resequenceSharedPackageSessions($sharedPackageId);
+        }
 
         // Save blocks in ISMS-style hierarchical structure
         if (!empty($request->blocks)) {
@@ -346,6 +352,12 @@ class IndividualTrainingController extends Controller
             }
         }
 
+        if ($request->input('from') === 'shared-package' && ($request->input('package_id') || $request->input('shared_package_id'))) {
+            $pkgId = $request->input('package_id') ?: $request->input('shared_package_id');
+            return redirect()->route('admin.shared-packages.show', $pkgId)
+                ->with('message', 'Sesi latihan berhasil ditambahkan!');
+        }
+
         return redirect()->route('admin.individual-trainings.show', $user->id)
             ->with('message', 'Sesi latihan berhasil ditambahkan!');
     }
@@ -378,29 +390,7 @@ class IndividualTrainingController extends Controller
         ]);
 
         $isExtra = $request->input('is_extra', false);
-        
-        // Handle session_number recalculation if is_extra changes
-        if ($training->is_extra !== $isExtra) {
-            if ($isExtra) {
-                // Changing to extra: remove session number and decrement others
-                $oldSessionNumber = $training->session_number;
-                if ($oldSessionNumber) {
-                    \App\Models\IndividualTraining::where('user_id', $training->user_id)
-                        ->where('is_athlete_paid', $training->is_athlete_paid)
-                        ->where('session_number', '>', $oldSessionNumber)
-                        ->decrement('session_number');
-                }
-                $training->session_number = null;
-            } else {
-                // Changing from extra to normal: assign new session number at the end
-                $lastUnpaidSession = IndividualTraining::where('user_id', $training->user_id)
-                    ->where('is_athlete_paid', false)
-                    ->where('is_extra', false)
-                    ->orderBy('session_number', 'desc')
-                    ->first();
-                $training->session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
-            }
-        }
+        $oldSharedPackageId = $training->shared_package_id;
 
         $training->update([
             'date' => $request->date,
@@ -410,6 +400,15 @@ class IndividualTrainingController extends Controller
             'coach_ids' => $request->coach_ids,
             'is_extra' => $isExtra,
         ]);
+
+        // Resequence all sessions for the athlete and shared package in chronological order
+        self::resequenceAthleteSessions($training->user_id, (bool)$training->is_athlete_paid);
+        if ($training->shared_package_id) {
+            self::resequenceSharedPackageSessions($training->shared_package_id);
+        }
+        if ($oldSharedPackageId && $oldSharedPackageId !== $training->shared_package_id) {
+            self::resequenceSharedPackageSessions($oldSharedPackageId);
+        }
 
         // Process blocks
         $existingBlockIds = [];
@@ -520,6 +519,12 @@ class IndividualTrainingController extends Controller
             ->whereNotIn('id', $existingBlockIds)
             ->delete();
 
+        if ($request->input('from') === 'shared-package' && ($request->input('package_id') || $training->shared_package_id)) {
+            $pkgId = $request->input('package_id') ?: $training->shared_package_id;
+            return redirect()->route('admin.shared-packages.show', $pkgId)
+                ->with('message', 'Sesi latihan berhasil diperbarui!');
+        }
+
         return redirect()->route('admin.individual-trainings.show', $training->user_id)
             ->with('message', 'Sesi latihan berhasil diperbarui!');
     }
@@ -529,7 +534,7 @@ class IndividualTrainingController extends Controller
      */
     public function showSession(IndividualTraining $training)
     {
-        $training->load(['user', 'coach', 'blocks.items.exercise', 'rpeRecords']);
+        $training->load(['user', 'coach', 'blocks.items.exercise', 'rpeRecords', 'sharedPackage']);
         
         // Fetch all selected coaches manually since it's a json array
         $coaches = [];
@@ -655,16 +660,14 @@ class IndividualTrainingController extends Controller
     public function destroySession(IndividualTraining $training)
     {
         $userId = $training->user_id;
-        $deletedSessionNumber = $training->session_number;
-        $isPaid = $training->is_athlete_paid;
+        $isPaid = (bool)$training->is_athlete_paid;
+        $sharedPackageId = $training->shared_package_id;
 
         $training->delete();
 
-        if ($deletedSessionNumber) {
-            \App\Models\IndividualTraining::where('user_id', $userId)
-                ->where('is_athlete_paid', $isPaid)
-                ->where('session_number', '>', $deletedSessionNumber)
-                ->decrement('session_number');
+        self::resequenceAthleteSessions($userId, $isPaid);
+        if ($sharedPackageId) {
+            self::resequenceSharedPackageSessions($sharedPackageId);
         }
 
         return redirect()->route('admin.individual-trainings.show', $userId)
@@ -725,18 +728,6 @@ class IndividualTrainingController extends Controller
         $training->load('blocks.items');
 
         foreach ($targetUsers as $targetUser) {
-            // Calculate new session_number for this target client
-            if ($training->is_extra) {
-                $session_number = null;
-            } else {
-                $lastUnpaidSession = IndividualTraining::where('user_id', $targetUser->id)
-                    ->where('is_athlete_paid', false)
-                    ->where('is_extra', false)
-                    ->orderBy('session_number', 'desc')
-                    ->first();
-                $session_number = $lastUnpaidSession ? $lastUnpaidSession->session_number + 1 : 1;
-            }
-
             // Calculate day_number for this target client
             $firstTrainingDate = IndividualTraining::where('user_id', $targetUser->id)->min('date');
             if (!$firstTrainingDate) {
@@ -755,7 +746,8 @@ class IndividualTrainingController extends Controller
             $newTraining->date = $targetDate;
             $newTraining->is_extra = $training->is_extra;
             $newTraining->day_number = $day_number;
-            $newTraining->session_number = $session_number;
+            $newTraining->session_number = null; // Will be sequenced accurately
+            $newTraining->shared_session_number = null;
             $newTraining->status = 'scheduled';
             $newTraining->is_completed = false;
             $newTraining->completed_at = null;
@@ -776,6 +768,12 @@ class IndividualTrainingController extends Controller
                     $newItem->save();
                 }
             }
+
+            self::resequenceAthleteSessions($targetUser->id, false);
+            if ($newTraining->shared_package_id) {
+                self::resequenceSharedPackageSessions($newTraining->shared_package_id);
+            }
+
             $createdCount++;
         }
 
@@ -784,6 +782,66 @@ class IndividualTrainingController extends Controller
             : 'Sesi latihan berhasil diduplikasi ke ' . $createdCount . ' klien pada tanggal ' . Carbon::parse($targetDate)->translatedFormat('d M Y') . '!';
 
         return back()->with('message', $message);
+    }
+
+    /**
+     * Resequence all sessions for an athlete in chronological order (date, created_at, id).
+     * Extra sessions (is_extra = true) get null session_number.
+     * Regular sessions get continuous numbers: 1, 2, 3, ...
+     */
+    public static function resequenceAthleteSessions(int $userId, bool $isPaid = false): void
+    {
+        // 1. Reset extra sessions
+        IndividualTraining::where('user_id', $userId)
+            ->where('is_athlete_paid', $isPaid)
+            ->where('is_extra', true)
+            ->update(['session_number' => null]);
+
+        // 2. Fetch regular sessions chronologically
+        $sessions = IndividualTraining::where('user_id', $userId)
+            ->where('is_athlete_paid', $isPaid)
+            ->where('is_extra', false)
+            ->orderBy('date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($sessions as $index => $session) {
+            $expectedNumber = $index + 1;
+            if ($session->session_number !== $expectedNumber) {
+                $session->session_number = $expectedNumber;
+                $session->saveQuietly();
+            }
+        }
+    }
+
+    /**
+     * Resequence all sessions for a shared package in chronological order (date, created_at, id).
+     * Extra sessions (is_extra = true) get null shared_session_number.
+     * Regular sessions get continuous numbers: 1, 2, 3, ...
+     */
+    public static function resequenceSharedPackageSessions(int $sharedPackageId): void
+    {
+        // 1. Reset extra sessions
+        IndividualTraining::where('shared_package_id', $sharedPackageId)
+            ->where('is_extra', true)
+            ->update(['shared_session_number' => null]);
+
+        // 2. Fetch regular sessions chronologically
+        $sessions = IndividualTraining::where('shared_package_id', $sharedPackageId)
+            ->where('is_extra', false)
+            ->orderBy('date', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($sessions as $index => $session) {
+            $expectedNumber = $index + 1;
+            if ($session->shared_session_number !== $expectedNumber) {
+                $session->shared_session_number = $expectedNumber;
+                $session->saveQuietly();
+            }
+        }
     }
 
     /**

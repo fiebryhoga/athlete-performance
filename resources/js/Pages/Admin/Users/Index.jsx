@@ -137,7 +137,7 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                             {auth.user.role === 'superadmin' && activeTab === 'shared_package' && (
                                 <button 
                                     onClick={() => sharedPackageListRef.current?.openCreateModal()}
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
                                     <span>Tambah Paket Bersama</span>
@@ -313,8 +313,8 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                                             )}
 
                                                             {(user.shared_packages || user.sharedPackages)?.map(sp => (
-                                                                <div key={sp.id} className="inline-flex items-center gap-1 text-[9.5px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-200/60 font-medium whitespace-nowrap w-fit">
-                                                                    <UsersRound className="w-2.5 h-2.5 shrink-0 text-violet-600" /> 
+                                                                <div key={sp.id} className="inline-flex items-center gap-1 text-[9.5px] text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60 font-medium whitespace-nowrap w-fit">
+                                                                    <UsersRound className="w-2.5 h-2.5 shrink-0 text-orange-600" /> 
                                                                     <span className="truncate max-w-[130px]">Bersama ({sp.name})</span>
                                                                     {sp.expiration_date && (
                                                                         <span className="text-rose-600 font-bold ml-0.5 shrink-0">
@@ -458,8 +458,8 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                                         </div>
                                                     )}
                                                     {(user.shared_packages || user.sharedPackages)?.map(sp => (
-                                                        <div key={sp.id} className="inline-flex items-center gap-1 text-[9px] text-violet-700 bg-violet-50 px-1.5 py-0.5 rounded border border-violet-200/60 font-medium whitespace-nowrap w-fit">
-                                                            <UsersRound className="w-2.5 h-2.5 shrink-0 text-violet-600" /> <span className="truncate max-w-[130px]">Bersama ({sp.name})</span>
+                                                        <div key={sp.id} className="inline-flex items-center gap-1 text-[9px] text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60 font-medium whitespace-nowrap w-fit">
+                                                            <UsersRound className="w-2.5 h-2.5 shrink-0 text-orange-600" /> <span className="truncate max-w-[130px]">Bersama ({sp.name})</span>
                                                         </div>
                                                     ))}
                                                     {user.groups?.map(g => (

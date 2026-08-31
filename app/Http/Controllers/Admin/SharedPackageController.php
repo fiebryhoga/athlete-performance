@@ -101,6 +101,9 @@ class SharedPackageController extends Controller
 
         $sharedPackage->members()->sync($validated['member_ids']);
 
+        // Anggota paket bersama otomatis tidak memiliki paket privat solo sendiri
+        User::whereIn('id', $validated['member_ids'])->update(['subscription_package_id' => null]);
+
         if (!empty($validated['coach_ids'])) {
             $sharedPackage->coaches()->sync($validated['coach_ids']);
         }
@@ -136,6 +139,9 @@ class SharedPackageController extends Controller
         ]);
 
         $sharedPackage->members()->sync($validated['member_ids']);
+
+        // Anggota paket bersama otomatis tidak memiliki paket privat solo sendiri
+        User::whereIn('id', $validated['member_ids'])->update(['subscription_package_id' => null]);
 
         if (isset($validated['coach_ids'])) {
             $sharedPackage->coaches()->sync($validated['coach_ids']);

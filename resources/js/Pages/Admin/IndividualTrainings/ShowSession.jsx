@@ -451,6 +451,26 @@ export default function ShowSession({
         );
     };
 
+    // Back URL logic
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const fromParam = urlParams.get('from');
+    const packageIdParam = urlParams.get('package_id') || training.shared_package_id;
+    const athleteIdParam = urlParams.get('athlete_id');
+
+    let backUrl = route("admin.individual-trainings.show", training.user_id || training.athlete_id || training.athlete?.id || auth.user?.id);
+    let backLabel = "Kembali ke Kalender Latihan";
+
+    if (fromParam === 'shared-package' && packageIdParam) {
+        backUrl = route("admin.shared-packages.show", packageIdParam);
+        backLabel = "Kembali ke Paket Bersama";
+    } else if (fromParam === 'recap') {
+        backUrl = route("admin.reports.session-recap");
+        backLabel = "Kembali ke Rekap Sesi";
+    } else if (fromParam === 'athlete' && athleteIdParam) {
+        backUrl = route("admin.individual-trainings.show", athleteIdParam);
+        backLabel = "Kembali ke Kalender Latihan";
+    }
+
     return (
         <AppLayout title={`Detail Sesi - ${training.name || "Latihan"}`}>
             <Head title={`Detail Sesi - ${training.name || "Latihan"}`} />
@@ -459,10 +479,10 @@ export default function ShowSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={route("admin.individual-trainings.show", training.user_id || training.athlete_id || training.athlete?.id || auth.user?.id)}
+                        href={backUrl}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
-                        <ChevronLeft size={13} /> Kembali ke Kalender Latihan
+                        <ChevronLeft size={13} /> {backLabel}
                     </Link>
 
                     <PageHeader
@@ -491,7 +511,7 @@ export default function ShowSession({
 
                                 {isCoachOrAdmin && (
                                     <Link
-                                        href={route("admin.individual-trainings.session.edit", training.id)}
+                                        href={route("admin.individual-trainings.session.edit", training.id) + (fromParam ? `?from=${fromParam}&package_id=${packageIdParam || ''}` : '')}
                                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs transition-colors"
                                     >
                                         <Edit2 size={13} />

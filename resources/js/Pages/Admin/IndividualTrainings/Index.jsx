@@ -97,12 +97,16 @@ function CustomSelect({
 function getInitials(name) {
     if (!name) return "??";
     const words = name.trim().split(" ");
-    if (words.length >= 2)
-        return `${words[0][0]}${words[1][0]}`.toUpperCase();
+    if (words.length >= 2) return `${words[0][0]}${words[1][0]}`.toUpperCase();
     return name.substring(0, 2).toUpperCase();
 }
 
-export default function Index({ athletes = [], groups = [], sharedPackages = [], sports = [] }) {
+export default function Index({
+    athletes = [],
+    groups = [],
+    sharedPackages = [],
+    sports = [],
+}) {
     const { auth } = usePage().props;
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -131,9 +135,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
             .filter((athlete) => {
                 if (searchTerm.trim()) {
                     const q = searchTerm.toLowerCase();
-                    const nameMatch = athlete.name
-                        ?.toLowerCase()
-                        .includes(q);
+                    const nameMatch = athlete.name?.toLowerCase().includes(q);
                     const sportMatch = athlete.sport?.name
                         ?.toLowerCase()
                         .includes(q);
@@ -154,9 +156,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                 if (sortBy === "name_desc")
                     return (b.name || "").localeCompare(a.name || "");
                 if (sortBy === "sessions_desc")
-                    return (
-                        (b.total_records || 0) - (a.total_records || 0)
-                    );
+                    return (b.total_records || 0) - (a.total_records || 0);
                 return 0;
             });
     }, [athletes, searchTerm, selectedSport, sortBy]);
@@ -178,8 +178,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
     }, [sharedPackages, searchTerm]);
 
     const activeFilterCount =
-        (selectedSport !== "ALL" ? 1 : 0) +
-        (sortBy !== "name_asc" ? 1 : 0);
+        (selectedSport !== "ALL" ? 1 : 0) + (sortBy !== "name_asc" ? 1 : 0);
 
     const resetFilters = () => {
         setSearchTerm("");
@@ -229,9 +228,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                 {isFilterOpen && (
                                     <div
                                         className="fixed inset-0 z-20 cursor-default"
-                                        onClick={() =>
-                                            setIsFilterOpen(false)
-                                        }
+                                        onClick={() => setIsFilterOpen(false)}
                                     />
                                 )}
 
@@ -251,9 +248,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                     )}
                                     <ChevronDown
                                         className={`w-3 h-3 text-orange-400 transition-transform ${
-                                            isFilterOpen
-                                                ? "rotate-180"
-                                                : ""
+                                            isFilterOpen ? "rotate-180" : ""
                                         }`}
                                     />
                                 </button>
@@ -266,13 +261,10 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                 Filter Program Latihan
                                             </h4>
                                             <div className="flex items-center gap-2">
-                                                {activeFilterCount >
-                                                    0 && (
+                                                {activeFilterCount > 0 && (
                                                     <button
                                                         type="button"
-                                                        onClick={
-                                                            resetFilters
-                                                        }
+                                                        onClick={resetFilters}
                                                         className="text-[11px] font-semibold text-rose-600 hover:underline cursor-pointer"
                                                     >
                                                         Reset
@@ -281,9 +273,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        setIsFilterOpen(
-                                                            false,
-                                                        )
+                                                        setIsFilterOpen(false)
                                                     }
                                                     className="text-slate-400 hover:text-slate-600 p-0.5 rounded transition-colors cursor-pointer"
                                                     title="Tutup"
@@ -293,17 +283,14 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                             </div>
                                         </div>
 
-                                        {sports &&
-                                            sports.length > 0 && (
-                                                <CustomSelect
-                                                    label="Cabang Olahraga"
-                                                    value={selectedSport}
-                                                    options={sportOptions}
-                                                    onChange={
-                                                        setSelectedSport
-                                                    }
-                                                />
-                                            )}
+                                        {sports && sports.length > 0 && (
+                                            <CustomSelect
+                                                label="Cabang Olahraga"
+                                                value={selectedSport}
+                                                options={sportOptions}
+                                                onChange={setSelectedSport}
+                                            />
+                                        )}
 
                                         <CustomSelect
                                             label="Urutkan"
@@ -383,9 +370,8 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                         Tidak ada Athlete ditemukan
                                     </h4>
                                     <p className="text-xs text-slate-400 font-medium max-w-sm">
-                                        Ubah kata kunci pencarian Anda
-                                        atau pastikan data athlete
-                                        tersedia.
+                                        Ubah kata kunci pencarian Anda atau
+                                        pastikan data athlete tersedia.
                                     </p>
                                 </div>
                                 {activeFilterCount > 0 && (
@@ -420,9 +406,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                     <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-orange-50/80 text-orange-600 font-bold text-base flex items-center justify-center shrink-0 overflow-hidden">
                                                         {photo ? (
                                                             <img
-                                                                src={
-                                                                    photo
-                                                                }
+                                                                src={photo}
                                                                 alt={
                                                                     athlete.name
                                                                 }
@@ -542,8 +526,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                         {group.name}
                                                     </h3>
                                                     <p className="text-[11px] text-slate-500 font-medium truncate">
-                                                        {group.package
-                                                            ?.name ||
+                                                        {group.package?.name ||
                                                             "Tidak ada paket"}
                                                     </p>
                                                 </div>
@@ -551,36 +534,28 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
 
                                             {/* Members Preview */}
                                             {group.members &&
-                                                group.members.length >
-                                                    0 && (
+                                                group.members.length > 0 && (
                                                     <div className="flex flex-wrap gap-1">
                                                         {group.members
                                                             .slice(0, 4)
-                                                            .map(
-                                                                (
-                                                                    member,
-                                                                ) => (
-                                                                    <span
-                                                                        key={
-                                                                            member.id
-                                                                        }
-                                                                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
-                                                                    >
-                                                                        {
-                                                                            member.name
-                                                                        }
-                                                                    </span>
-                                                                ),
-                                                            )}
-                                                        {group.members
-                                                            .length >
+                                                            .map((member) => (
+                                                                <span
+                                                                    key={
+                                                                        member.id
+                                                                    }
+                                                                    className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
+                                                                >
+                                                                    {
+                                                                        member.name
+                                                                    }
+                                                                </span>
+                                                            ))}
+                                                        {group.members.length >
                                                             4 && (
                                                             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-50 border border-orange-200/70 text-orange-600">
                                                                 +
-                                                                {group
-                                                                    .members
-                                                                    .length -
-                                                                    4}
+                                                                {group.members
+                                                                    .length - 4}
                                                             </span>
                                                         )}
                                                     </div>
@@ -610,8 +585,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                     <div className="flex items-baseline gap-0.5 mt-0.5">
                                                         <span className="text-[11.5px] font-black text-teal-700 leading-tight">
                                                             {group.members
-                                                                ?.length ||
-                                                                0}
+                                                                ?.length || 0}
                                                         </span>
                                                         <span className="text-[8px] font-normal text-slate-400">
                                                             orang
@@ -624,8 +598,7 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                         {/* Card Footer */}
                                         <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
                                             <span className="text-[9.5px] font-bold text-slate-500">
-                                                {group.members?.length ||
-                                                    0}{" "}
+                                                {group.members?.length || 0}{" "}
                                                 Anggota
                                             </span>
                                             <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
@@ -651,8 +624,8 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                         Tidak ada Paket Bersama ditemukan
                                     </h4>
                                     <p className="text-xs text-slate-400 font-medium max-w-sm">
-                                        Buat paket bersama baru di menu Manajemen
-                                        Pengguna terlebih dahulu.
+                                        Buat paket bersama baru di menu
+                                        Manajemen Pengguna terlebih dahulu.
                                     </p>
                                 </div>
                             </div>
@@ -660,9 +633,19 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
                                 {filteredSharedPackages.map((sp) => {
                                     const progress = sp.total_sessions
-                                        ? Math.min(100, Math.round((sp.used_sessions / sp.total_sessions) * 100))
+                                        ? Math.min(
+                                              100,
+                                              Math.round(
+                                                  (sp.used_sessions /
+                                                      sp.total_sessions) *
+                                                      100,
+                                              ),
+                                          )
                                         : 0;
-                                    const isNearLimit = sp.total_sessions && sp.remaining_sessions !== null && sp.remaining_sessions <= 3;
+                                    const isNearLimit =
+                                        sp.total_sessions &&
+                                        sp.remaining_sessions !== null &&
+                                        sp.remaining_sessions <= 3;
 
                                     return (
                                         <Link
@@ -685,29 +668,45 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                             {sp.name}
                                                         </h3>
                                                         <p className="text-[11px] text-slate-500 font-medium truncate">
-                                                            {sp.package?.name || "Paket Bersama"}
+                                                            {sp.package?.name ||
+                                                                "Paket Bersama"}
                                                         </p>
                                                     </div>
                                                 </div>
 
                                                 {/* Members Preview */}
-                                                {sp.members && sp.members.length > 0 && (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {sp.members.slice(0, 4).map((member) => (
-                                                            <span
-                                                                key={member.id}
-                                                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
-                                                            >
-                                                                {member.name}
-                                                            </span>
-                                                        ))}
-                                                        {sp.members.length > 4 && (
-                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-violet-50 border border-violet-200/70 text-violet-600">
-                                                                +{sp.members.length - 4}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                {sp.members &&
+                                                    sp.members.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {sp.members
+                                                                .slice(0, 4)
+                                                                .map(
+                                                                    (
+                                                                        member,
+                                                                    ) => (
+                                                                        <span
+                                                                            key={
+                                                                                member.id
+                                                                            }
+                                                                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-white/80 border border-slate-200/70 text-slate-600"
+                                                                        >
+                                                                            {
+                                                                                member.name
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            {sp.members.length >
+                                                                4 && (
+                                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-violet-50 border border-violet-200/70 text-violet-600">
+                                                                    +
+                                                                    {sp.members
+                                                                        .length -
+                                                                        4}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
 
                                                 {/* Progress Bar */}
                                                 <div className="space-y-1 pt-0.5 border-t border-slate-100/90">
@@ -715,21 +714,28 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                         <span className="text-[8px] font-bold text-slate-400 uppercase">
                                                             Kuota Sesi
                                                         </span>
-                                                        <span className={`text-[9px] font-bold ${isNearLimit ? 'text-amber-600' : 'text-slate-600'}`}>
-                                                            {sp.used_sessions}/{sp.total_sessions || '∞'}
+                                                        <span
+                                                            className={`text-[9px] font-bold ${isNearLimit ? "text-amber-600" : "text-slate-600"}`}
+                                                        >
+                                                            {sp.used_sessions}/
+                                                            {sp.total_sessions ||
+                                                                "∞"}
                                                         </span>
                                                     </div>
                                                     {sp.total_sessions && (
                                                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                             <div
                                                                 className={`h-full rounded-full transition-all duration-300 ${
-                                                                    progress >= 100
-                                                                        ? 'bg-rose-500'
+                                                                    progress >=
+                                                                    100
+                                                                        ? "bg-rose-500"
                                                                         : isNearLimit
-                                                                        ? 'bg-amber-500'
-                                                                        : 'bg-violet-500'
+                                                                          ? "bg-amber-500"
+                                                                          : "bg-violet-500"
                                                                 }`}
-                                                                style={{ width: `${progress}%` }}
+                                                                style={{
+                                                                    width: `${progress}%`,
+                                                                }}
                                                             />
                                                         </div>
                                                     )}
@@ -742,8 +748,11 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                             Sisa
                                                         </span>
                                                         <div className="flex items-baseline gap-0.5 mt-0.5">
-                                                            <span className={`text-[11.5px] font-black leading-tight ${isNearLimit ? 'text-amber-600' : 'text-violet-600'}`}>
-                                                                {sp.remaining_sessions ?? '∞'}
+                                                            <span
+                                                                className={`text-[11.5px] font-black leading-tight ${isNearLimit ? "text-amber-600" : "text-violet-600"}`}
+                                                            >
+                                                                {sp.remaining_sessions ??
+                                                                    "∞"}
                                                             </span>
                                                             <span className="text-[8px] font-normal text-slate-400">
                                                                 sesi
@@ -757,7 +766,9 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
                                                         </span>
                                                         <div className="flex items-baseline gap-0.5 mt-0.5">
                                                             <span className="text-[11.5px] font-black text-teal-700 leading-tight">
-                                                                {sp.members?.length || 0}
+                                                                {sp.members
+                                                                    ?.length ||
+                                                                    0}
                                                             </span>
                                                             <span className="text-[8px] font-normal text-slate-400">
                                                                 orang
@@ -769,8 +780,15 @@ export default function Index({ athletes = [], groups = [], sharedPackages = [],
 
                                             {/* Card Footer */}
                                             <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-violet-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
-                                                <span className={`text-[9.5px] font-bold ${sp.status === 'active' ? 'text-emerald-600' : sp.status === 'completed' ? 'text-slate-400' : 'text-amber-600'}`}>
-                                                    {sp.status === 'active' ? 'Aktif' : sp.status === 'completed' ? 'Selesai' : 'Kadaluarsa'}
+                                                <span
+                                                    className={`text-[9.5px] font-bold ${sp.status === "active" ? "text-emerald-600" : sp.status === "completed" ? "text-slate-400" : "text-amber-600"}`}
+                                                >
+                                                    {sp.status === "active"
+                                                        ? "Aktif"
+                                                        : sp.status ===
+                                                            "completed"
+                                                          ? "Selesai"
+                                                          : "Kadaluarsa"}
                                                 </span>
                                                 <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-violet-600 group-hover:text-violet-700 transition-colors">
                                                     Detail

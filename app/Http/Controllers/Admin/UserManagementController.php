@@ -271,7 +271,15 @@ class UserManagementController extends Controller
             abort(403, 'Akses Ditolak.');
         }
 
-        $user->load(['sport', 'coaches:id,name', 'package', 'groups']);
+        $user->load(['sport', 'coaches:id,name', 'package', 'groups', 'sharedPackages' => function($q) {
+            $q->where('status', 'active')->with('package');
+        }]);
+
+        $activeShared = $user->sharedPackages->first();
+        if ($activeShared && $user->subscription_package_id) {
+            $user->subscription_package_id = null;
+            $user->save();
+        }
 
         $sports = Sport::orderBy('name')->get();
         $coachesList = User::where('role', 'coach')->select('id', 'name', 'profile_photo')->get();
@@ -299,6 +307,13 @@ class UserManagementController extends Controller
             'sports' => $sports,
             'coachesList' => $coachesList,
             'packagesList' => $packages,
+            'active_shared_package' => $activeShared ? [
+                'id' => $activeShared->id,
+                'name' => $activeShared->name,
+                'package_name' => $activeShared->package?->name,
+                'total_sessions' => $activeShared->package?->session_count,
+                'expiration_date' => $activeShared->expiration_date ? \Carbon\Carbon::parse($activeShared->expiration_date)->format('Y-m-d') : null,
+            ] : null,
         ]);
     }
 

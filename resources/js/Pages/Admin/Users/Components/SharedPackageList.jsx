@@ -116,9 +116,9 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                             <div>
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="min-w-0 pr-2">
-                                        <h3 className="font-bold text-xs text-slate-900 truncate group-hover:text-violet-600 transition-colors flex items-center gap-1.5">
+                                        <h3 className="font-bold text-xs text-slate-900 truncate group-hover:text-orange-600 transition-colors flex items-center gap-1.5">
                                             <span>{sp.name}</span>
-                                            <ExternalLink size={11} className="text-slate-300 group-hover:text-violet-500 transition-colors opacity-0 group-hover:opacity-100" />
+                                            <ExternalLink size={11} className="text-slate-300 group-hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100" />
                                         </h3>
                                         {sp.description && <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{sp.description}</p>}
                                     </div>
@@ -145,7 +145,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 <div className="space-y-2 mt-2.5">
                                     <div className="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-1 rounded border border-slate-100">
                                         <div className="flex items-center gap-1.5 text-slate-700 font-medium truncate text-[11px]">
-                                            <Package size={12} className="text-violet-600 shrink-0" />
+                                            <Package size={12} className="text-orange-600 shrink-0" />
                                             <span className="truncate">{sp.package?.name || 'Tanpa Paket'}</span>
                                         </div>
                                         {sp.expiration_date && (
@@ -159,12 +159,12 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                     <div className="space-y-1 bg-slate-50/70 p-2 rounded border border-slate-100">
                                         <div className="flex items-center justify-between text-[10.5px]">
                                             <span className="text-slate-500 font-medium">Kuota Terpakai</span>
-                                            <span className="font-bold text-violet-700">{sp.used_sessions || 0} / {sp.total_sessions || '∞'} Sesi</span>
+                                            <span className="font-bold text-orange-700">{sp.used_sessions || 0} / {sp.total_sessions || '∞'} Sesi</span>
                                         </div>
                                         {sp.total_sessions && (
                                             <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                                 <div 
-                                                    className="h-full bg-violet-600 rounded-full transition-all duration-300"
+                                                    className="h-full bg-orange-600 rounded-full transition-all duration-300"
                                                     style={{ width: `${progress}%` }}
                                                 />
                                             </div>
@@ -204,7 +204,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 <span className="text-slate-400">
                                     Sisa: <strong className="text-slate-700 font-bold">{sp.remaining_sessions ?? '∞'} sesi</strong>
                                 </span>
-                                <span className="text-violet-600 font-bold group-hover:underline flex items-center gap-0.5">
+                                <span className="text-orange-600 font-bold group-hover:underline flex items-center gap-0.5">
                                     Lihat Detail &rarr;
                                 </span>
                             </div>
@@ -241,7 +241,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 value={data.name}
                                 onChange={e => setData('name', e.target.value)}
                                 placeholder="Masukkan nama paket bersama..."
-                                className="w-full text-xs rounded-md border-slate-200 focus:border-violet-500 focus:ring-violet-500 shadow-2xs"
+                                className="w-full text-xs rounded-md border-slate-200 focus:border-orange-500 focus:ring-orange-500 shadow-2xs"
                                 required
                             />
                             {errors.name && <p className="text-rose-500 text-[11px] mt-1">{errors.name}</p>}
@@ -254,7 +254,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 onChange={e => setData('description', e.target.value)}
                                 placeholder="Catatan opsional..."
                                 rows="2"
-                                className="w-full text-xs rounded-md border-slate-200 focus:border-violet-500 focus:ring-violet-500 shadow-2xs"
+                                className="w-full text-xs rounded-md border-slate-200 focus:border-orange-500 focus:ring-orange-500 shadow-2xs"
                             />
                             {errors.description && <p className="text-rose-500 text-[11px] mt-1">{errors.description}</p>}
                         </div>
@@ -265,7 +265,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 <select 
                                     value={data.subscription_package_id}
                                     onChange={e => setData('subscription_package_id', e.target.value)}
-                                    className="w-full text-xs rounded-md border-slate-200 focus:border-violet-500 focus:ring-violet-500 shadow-2xs"
+                                    className="w-full text-xs rounded-md border-slate-200 focus:border-orange-500 focus:ring-orange-500 shadow-2xs"
                                     required
                                 >
                                     <option value="">-- Pilih Paket Master --</option>
@@ -284,7 +284,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                     type="date"
                                     value={data.start_date}
                                     onChange={e => setData('start_date', e.target.value)}
-                                    className="w-full text-xs rounded-md border-slate-200 focus:border-violet-500 focus:ring-violet-500 shadow-2xs"
+                                    className="w-full text-xs rounded-md border-slate-200 focus:border-orange-500 focus:ring-orange-500 shadow-2xs"
                                 />
                                 {errors.start_date && <p className="text-rose-500 text-[11px] mt-1">{errors.start_date}</p>}
                             </div>
@@ -295,7 +295,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                     type="date"
                                     value={data.expiration_date}
                                     onChange={e => setData('expiration_date', e.target.value)}
-                                    className="w-full text-xs rounded-md border-slate-200 focus:border-violet-500 focus:ring-violet-500 shadow-2xs"
+                                    className="w-full text-xs rounded-md border-slate-200 focus:border-orange-500 focus:ring-orange-500 shadow-2xs"
                                 />
                                 {errors.expiration_date && <p className="text-rose-500 text-[11px] mt-1">{errors.expiration_date}</p>}
                             </div>
@@ -311,7 +311,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                             type="checkbox"
                                             checked={data.coach_ids.includes(coach.id)}
                                             onChange={() => toggleCoach(coach.id)}
-                                            className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                                            className="rounded border-slate-300 text-orange-600 focus:ring-orange-500"
                                         />
                                         <span className="text-xs text-slate-700 font-medium">{coach.name}</span>
                                     </label>
@@ -332,14 +332,14 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                                 {allAthletes?.map(athlete => (
                                     <label key={athlete.id} className={`flex items-center gap-2 p-1.5 border rounded cursor-pointer transition-all ${
                                         data.member_ids.includes(athlete.id) 
-                                            ? 'bg-violet-50/80 border-violet-200 text-violet-900 font-semibold' 
+                                            ? 'bg-orange-50/80 border-orange-200 text-orange-900 font-semibold' 
                                             : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50'
                                     }`}>
                                         <input 
                                             type="checkbox"
                                             checked={data.member_ids.includes(athlete.id)}
                                             onChange={() => toggleMember(athlete.id)}
-                                            className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                                            className="rounded border-slate-300 text-orange-600 focus:ring-orange-500"
                                         />
                                         <div className="min-w-0 flex-1">
                                             <span className="text-xs block truncate leading-tight">{athlete.name}</span>
@@ -363,7 +363,7 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                         <button
                             type="submit"
                             disabled={processing}
-                            className="px-4 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-md text-xs font-bold shadow-2xs cursor-pointer transition-all disabled:opacity-50"
+                            className="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs cursor-pointer transition-all disabled:opacity-50"
                         >
                             {processing ? 'Menyimpan...' : (editPackage ? 'Perbarui Paket Bersama' : 'Buat Paket Bersama')}
                         </button>

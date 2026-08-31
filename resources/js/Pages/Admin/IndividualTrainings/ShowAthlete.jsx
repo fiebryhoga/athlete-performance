@@ -288,10 +288,22 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
 
     const photo = athlete.photo_url || (athlete.profile_photo ? `/storage/${athlete.profile_photo}` : null);
 
+    // Back URL logic
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const fromParam = urlParams.get('from');
+
+    let backUrl = route("admin.individual-trainings.index");
+    let backLabel = "Kembali ke Program Latihan";
+
+    if (fromParam === 'profiling') {
+        backUrl = route("admin.athletes.show", athlete.id);
+        backLabel = "Kembali ke Profiling";
+    }
+
     return (
         <AppLayout 
             title={`Program Latihan - ${athlete.name}`}
-            description="Manajemen kalender jadwal program latihan atlet."
+            description="Jadwal program latihan individual & grup atlet."
         >
             <Head title={`Program Latihan - ${athlete.name}`} />
             
@@ -300,10 +312,10 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                 <div className="space-y-1">
                     {!isAthlete && (
                         <Link
-                            href={route("admin.athletes.index")}
+                            href={backUrl}
                             className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                         >
-                            <ChevronLeft size={13} /> Kembali ke Daftar Client
+                            <ChevronLeft size={13} /> {backLabel}
                         </Link>
                     )}
 
@@ -373,6 +385,19 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                 <Package size={11} className="text-orange-500" />
                                                 {athlete.package.name} ({athlete.package.package_type === 'per_session' ? 'Per Pertemuan' : `${maxSession}/${athlete.package.session_count || '∞'} Sesi`})
                                             </span>
+                                        ) : sharedPackages && sharedPackages.length > 0 ? (
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                {sharedPackages.map((sp) => (
+                                                    <Link
+                                                        key={sp.id}
+                                                        href={route('admin.shared-packages.show', sp.id) + '?from=athlete&athlete_id=' + athlete.id}
+                                                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer"
+                                                    >
+                                                        <UsersRound size={11} className="text-orange-600" />
+                                                        <span>Paket Bersama: {sp.name} ({sp.used_sessions}/{sp.total_sessions || '∞'} Sesi)</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
                                         ) : (
                                             <span className="text-slate-400">Tidak Ada Paket</span>
                                         )}
@@ -381,16 +406,6 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                 • Aktif s/d {expDate}
                                             </span>
                                         )}
-                                        {sharedPackages && sharedPackages.length > 0 && sharedPackages.map((sp) => (
-                                            <Link
-                                                key={sp.id}
-                                                href={route('admin.shared-packages.show', sp.id)}
-                                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200/60 hover:bg-violet-100 transition-colors cursor-pointer"
-                                            >
-                                                <UsersRound size={10} />
-                                                {sp.name} ({sp.used_sessions}/{sp.total_sessions || '∞'} Sesi)
-                                            </Link>
-                                        ))}
                                     </div>
                                 </div>
                             </div>

@@ -31,7 +31,19 @@ export default function CreateSession({
     nextSessionNumber,
     sharedPackages = [],
 }) {
-    const defaultSharedPackage = sharedPackages && sharedPackages.length > 0 ? sharedPackages[0].id : '';
+    // Back URL & from param logic
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const fromParam = urlParams.get('from');
+    const packageIdParam = urlParams.get('package_id');
+    const defaultSharedPackage = packageIdParam || (sharedPackages && sharedPackages.length > 0 ? sharedPackages[0].id : '');
+
+    let backUrl = route("admin.individual-trainings.show", athlete.id);
+    let backLabel = "Kembali ke Kalender Latihan";
+
+    if (fromParam === 'shared-package' && (packageIdParam || defaultSharedPackage)) {
+        backUrl = route("admin.shared-packages.show", packageIdParam || defaultSharedPackage);
+        backLabel = "Kembali ke Paket Bersama";
+    }
 
     const { data, setData, post, processing, errors } = useForm({
         date: date || "",
@@ -48,7 +60,8 @@ export default function CreateSession({
 
     const submitSession = (e) => {
         e.preventDefault();
-        post(route("admin.individual-trainings.session.store", athlete.id));
+        const query = fromParam ? `?from=${fromParam}&package_id=${packageIdParam || data.shared_package_id || ''}` : '';
+        post(route("admin.individual-trainings.session.store", athlete.id) + query);
     };
 
     const onDragEnd = (result) => {
@@ -163,10 +176,10 @@ export default function CreateSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={route("admin.individual-trainings.show", athlete.id)}
+                        href={backUrl}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
-                        <ChevronLeft size={13} /> Kembali ke Kalender Latihan
+                        <ChevronLeft size={13} /> {backLabel}
                     </Link>
 
                     <PageHeader
@@ -175,7 +188,7 @@ export default function CreateSession({
                         actions={
                             <div className="flex items-center gap-2">
                                 <Link
-                                    href={route("admin.individual-trainings.show", athlete.id)}
+                                    href={backUrl}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors"
                                 >
                                     <ChevronLeft size={13} />
@@ -269,18 +282,18 @@ export default function CreateSession({
 
                                     {/* Paket Bersama (Jika ada) */}
                                     {sharedPackages && sharedPackages.length > 0 && (
-                                        <div className="p-2.5 bg-violet-50/70 border border-violet-200/80 rounded-md space-y-1.5">
-                                            <div className="flex items-center gap-1.5 text-xs font-bold text-violet-900">
-                                                <UsersRound className="w-3.5 h-3.5 text-violet-600" />
+                                        <div className="p-2.5 bg-orange-50/70 border border-orange-200/80 rounded-md space-y-1.5">
+                                            <div className="flex items-center gap-1.5 text-xs font-bold text-orange-900">
+                                                <UsersRound className="w-3.5 h-3.5 text-orange-600" />
                                                 <span>Paket Bersama</span>
                                             </div>
-                                            <p className="text-[10.5px] text-violet-700 leading-snug">
+                                            <p className="text-[10.5px] text-orange-700 leading-snug">
                                                 Atlet ini terdaftar dalam paket bersama. Sesi ini akan memotong kuota paket bersama yang dipilih.
                                             </p>
                                             <select
                                                 value={data.shared_package_id}
                                                 onChange={(e) => setData("shared_package_id", e.target.value)}
-                                                className="w-full text-xs font-medium text-slate-800 bg-white border border-violet-200 rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-violet-400 focus:border-violet-400 shadow-2xs mt-1"
+                                                className="w-full text-xs font-medium text-slate-800 bg-white border border-orange-200 rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs mt-1"
                                             >
                                                 <option value="">-- Tidak Memotong Paket Bersama (Individu Biasa) --</option>
                                                 {sharedPackages.map((sp) => (

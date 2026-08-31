@@ -210,6 +210,8 @@ Route::middleware([
     
     Route::middleware(['role:superadmin'])->group(function () {
         Route::get('/admin/reports/sessions', [\App\Http\Controllers\Admin\ReportController::class, 'sessionRecap'])->name('admin.reports.sessions');
+        Route::get('/admin/reports/coaches', [\App\Http\Controllers\Admin\ReportController::class, 'coachSalaryRecap'])->name('admin.reports.coaches');
+        Route::get('/admin/reports/coaches/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'showCoach'])->name('admin.reports.coaches.show');
         Route::post('/admin/reports/sessions/pay-athlete/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payAthlete'])->name('admin.reports.pay-athlete');
         Route::post('/admin/reports/sessions/pay-coach/{user}', [\App\Http\Controllers\Admin\ReportController::class, 'payCoach'])->name('admin.reports.pay-coach');
         Route::post('/admin/reports/sessions/pay-group/{group}', [\App\Http\Controllers\Admin\ReportController::class, 'payGroup'])->name('admin.reports.pay-group');
@@ -217,6 +219,7 @@ Route::middleware([
         Route::get('/admin/reports/sessions/athlete/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportAthleteReportPdf'])->name('admin.reports.sessions.export-athlete');
         Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
         Route::get('/admin/reports/sessions/coach/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.sessions.export-coach');
+        Route::get('/admin/reports/coaches/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.coaches.export-pdf');
     });
     
     Route::middleware(['role:superadmin,coach'])->group(function () {

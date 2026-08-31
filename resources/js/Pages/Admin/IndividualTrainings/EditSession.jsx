@@ -25,11 +25,25 @@ export default function EditSession({
         is_extra: training.is_extra || false,
     });
 
-    const [isExModalOpen, setIsExModalOpen] = useState(false);
+    // Back URL logic
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const fromParam = urlParams.get('from');
+    const packageIdParam = urlParams.get('package_id') || training.shared_package_id;
+    const athleteIdParam = urlParams.get('athlete_id');
+
+    let backUrl = route("admin.individual-trainings.session.show", training.id);
+    let backLabel = "Kembali ke Detail Sesi";
+
+    if (fromParam === 'shared-package' && packageIdParam) {
+        backUrl = route("admin.individual-trainings.session.show", training.id) + `?from=shared-package&package_id=${packageIdParam}`;
+    } else if (fromParam === 'athlete' && athleteIdParam) {
+        backUrl = route("admin.individual-trainings.session.show", training.id) + `?from=athlete&athlete_id=${athleteIdParam}`;
+    }
 
     const submit = (e) => {
         e.preventDefault();
-        put(route("admin.individual-trainings.session.update", training.id));
+        const query = fromParam ? `?from=${fromParam}&package_id=${packageIdParam || ''}&athlete_id=${athleteIdParam || ''}` : '';
+        put(route("admin.individual-trainings.session.update", training.id) + query);
     };
 
     const onDragEnd = (result) => {
@@ -152,10 +166,10 @@ export default function EditSession({
                 {/* ─── BREADCRUMB & HEADER ─── */}
                 <div className="space-y-1">
                     <Link
-                        href={route("admin.individual-trainings.show", user.id)}
+                        href={backUrl}
                         className="inline-flex items-center text-xs font-semibold text-slate-400 hover:text-orange-500 transition-colors gap-1.5"
                     >
-                        <ChevronLeft size={13} /> Kembali ke Kalender Latihan
+                        <ChevronLeft size={13} /> {backLabel}
                     </Link>
 
                     <PageHeader
@@ -164,7 +178,7 @@ export default function EditSession({
                         actions={
                             <div className="flex items-center gap-2">
                                 <Link
-                                    href={route("admin.individual-trainings.show", user.id)}
+                                    href={backUrl}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors"
                                 >
                                     <ChevronLeft size={13} />
