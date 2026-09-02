@@ -64,9 +64,18 @@ class ExerciseController extends Controller
             $name = trim($exerciseData['name'] ?? '');
             if (empty($name)) continue;
 
+            $bodyParts = null;
+            if (!empty($exerciseData['body_parts'])) {
+                $bodyParts = is_string($exerciseData['body_parts']) ? json_decode($exerciseData['body_parts'], true) : $exerciseData['body_parts'];
+                if (is_array($bodyParts)) {
+                    $bodyParts = array_values(array_filter($bodyParts));
+                }
+            }
+
             $data = [
                 'name' => $name,
                 'exercise_category_id' => $exerciseData['category_id'] ?? null,
+                'body_parts' => $bodyParts,
             ];
 
             // Handle image upload
@@ -129,6 +138,12 @@ class ExerciseController extends Controller
         
         $data = $request->only('name', 'description', 'exercise_category_id');
 
+        $bodyParts = $request->body_parts;
+        if (is_string($bodyParts)) {
+            $bodyParts = json_decode($bodyParts, true);
+        }
+        $data['body_parts'] = is_array($bodyParts) ? array_values(array_filter($bodyParts)) : null;
+
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -168,6 +183,12 @@ class ExerciseController extends Controller
         ]);
         
         $data = $request->only('name', 'description', 'exercise_category_id');
+
+        $bodyParts = $request->body_parts;
+        if (is_string($bodyParts)) {
+            $bodyParts = json_decode($bodyParts, true);
+        }
+        $data['body_parts'] = is_array($bodyParts) ? array_values(array_filter($bodyParts)) : null;
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -212,6 +233,12 @@ class ExerciseController extends Controller
         ]);
 
         $data = $request->only('name', 'description', 'exercise_category_id');
+
+        $bodyParts = $request->body_parts;
+        if (is_string($bodyParts)) {
+            $bodyParts = json_decode($bodyParts, true);
+        }
+        $data['body_parts'] = is_array($bodyParts) ? array_values(array_filter($bodyParts)) : null;
 
         // Handle Images (Append new ones, keep existing ones handled by frontend passing 'existing_images')
         $existingImages = $request->existing_images ? (is_string($request->existing_images) ? json_decode($request->existing_images, true) : $request->existing_images) : [];

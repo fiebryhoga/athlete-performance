@@ -26,6 +26,8 @@ class IndividualTraining extends Model
         'completed_at',
         'athlete_note',
         'proof_photo',
+        'signature_photo',
+        'signed_at',
         'is_extra',
         'is_athlete_paid',
         'paid_coach_ids',
@@ -34,6 +36,7 @@ class IndividualTraining extends Model
     protected $casts = [
         'is_completed' => 'boolean',
         'completed_at' => 'datetime',
+        'signed_at' => 'datetime',
         'coach_ids' => 'array',
         'paid_coach_ids' => 'array',
         'date' => 'date:Y-m-d',

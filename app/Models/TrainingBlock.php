@@ -14,6 +14,8 @@ class TrainingBlock extends Model
         'target_filled_by',
         'title',
         'description',
+        'program_name',
+        'athlete_ids',
         'sort_order',
     ];
 

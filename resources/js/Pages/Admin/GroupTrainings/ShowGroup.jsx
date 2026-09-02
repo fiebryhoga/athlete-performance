@@ -23,84 +23,149 @@ import {
     Package, 
     Copy, 
     Download,
-    ShieldCheck
+    ShieldCheck,
+    Loader2
 } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { pdf } from '@react-pdf/renderer';
+import AthleteSessionReportPdfDocument, { prepareTrainingsWithCompressedImages } from '@/Components/Pdf/AthleteSessionReportPdfDocument';
 
-function getSessionPhasesSummary(session) {
+function getSessionPhasesSummary(session, targetAthleteId = null) {
     if (!session || !session.blocks || !Array.isArray(session.blocks)) {
         return null;
     }
-
-    let hasStrength = false;
-    let strengthVolume = 0;
-    let hasCardioInterval = false;
-    let cardioDistance = 0;
 
     const rpeRecords = session.rpeRecords || session.rpe_records || [];
     const rpeMap = {};
     if (Array.isArray(rpeRecords)) {
         rpeRecords.forEach((r) => {
             if (r.training_block_item_id && r.rpe_data) {
-                rpeMap[r.training_block_item_id] = r.rpe_data;
+                if (!targetAthleteId || r.athlete_id === targetAthleteId || r.athlete_id === Number(targetAthleteId)) {
+                    rpeMap[r.training_block_item_id] = r.rpe_data;
+                }
             }
         });
     }
 
+    const calcBlocksLoad = (blocksList) => {
+        let hasStrength = false;
+        let strengthVolume = 0;
+        let hasCardioInterval = false;
+        let cardioDistance = 0;
+
+        blocksList.forEach((block) => {
+            const cat = block.category;
+            const isStrength = cat === 'strength_training' || cat === 'free_strength';
+            const isCardioInterval = cat === 'interval' || cat === 'cardio';
+
+            if (isStrength) hasStrength = true;
+            if (isCardioInterval) hasCardioInterval = true;
+
+            if (block.items && Array.isArray(block.items)) {
+                block.items.forEach((item) => {
+                    const actual = rpeMap[item.id] || {};
+
+                    if (isStrength) {
+                        const loads = (actual.load_array && actual.load_array.length > 0) ? actual.load_array : (item.load_array || []);
+                        const reps = (actual.reps_array && actual.reps_array.length > 0) ? actual.reps_array : (item.reps_array || []);
+
+                        if (Array.isArray(loads) && Array.isArray(reps) && (loads.length > 0 || reps.length > 0)) {
+                            const count = Math.max(loads.length, reps.length);
+                            for (let i = 0; i < count; i++) {
+                                const l = parseFloat(loads[i]) || 0;
+                                const r = parseFloat(reps[i]) || 0;
+                                strengthVolume += l * r;
+                            }
+                        } else {
+                            const s = parseFloat(item.sets) || 0;
+                            const r = parseFloat(item.reps) || 0;
+                            const l = parseFloat(item.load) || 0;
+                            if (s > 0 && r > 0 && l > 0) {
+                                strengthVolume += s * r * l;
+                            }
+                        }
+                    }
+
+                    if (isCardioInterval) {
+                        const distances = (actual.distance_array && actual.distance_array.length > 0) ? actual.distance_array : (item.distance_array || []);
+                        if (Array.isArray(distances) && distances.length > 0) {
+                            distances.forEach((d) => {
+                                cardioDistance += parseFloat(d) || 0;
+                            });
+                        } else if (item.distance) {
+                            cardioDistance += parseFloat(item.distance) || 0;
+                        }
+                    }
+                });
+            }
+        });
+
+        return {
+            hasStrength,
+            strengthVolume: Math.round(strengthVolume),
+            hasCardioInterval,
+            cardioDistance: Math.round(cardioDistance),
+            totalLoad: Math.round(strengthVolume + cardioDistance),
+        };
+    };
+
+    // If target athlete is specified (Option 3: Athlete View)
+    if (targetAthleteId) {
+        const athleteBlocks = session.blocks.filter((block) => {
+            const athleteIds = block.program_athlete_ids || block.athlete_ids || [];
+            if (!Array.isArray(athleteIds) || athleteIds.length === 0) return true;
+            return athleteIds.includes(targetAthleteId) || athleteIds.includes(Number(targetAthleteId));
+        });
+        const summary = calcBlocksLoad(athleteBlocks);
+        if (!summary.hasStrength && !summary.hasCardioInterval) return null;
+        return summary;
+    }
+
+    // Option 1: Coach / Admin multi-program breakdown
+    const programMap = new Map();
     session.blocks.forEach((block) => {
-        const cat = block.category;
-        const isStrength = cat === 'strength_training' || cat === 'free_strength';
-        const isCardioInterval = cat === 'interval' || cat === 'cardio';
+        const pName = (block.program_name && block.program_name.trim()) || 'Program Utama';
+        const athleteIds = block.program_athlete_ids || block.athlete_ids || [];
 
-        if (isStrength) hasStrength = true;
-        if (isCardioInterval) hasCardioInterval = true;
-
-        if (block.items && Array.isArray(block.items)) {
-            block.items.forEach((item) => {
-                const actual = rpeMap[item.id] || {};
-
-                if (isStrength) {
-                    const loads = (actual.load_array && actual.load_array.length > 0) ? actual.load_array : (item.load_array || []);
-                    const reps = (actual.reps_array && actual.reps_array.length > 0) ? actual.reps_array : (item.reps_array || []);
-
-                    if (Array.isArray(loads) && Array.isArray(reps) && (loads.length > 0 || reps.length > 0)) {
-                        const count = Math.max(loads.length, reps.length);
-                        for (let i = 0; i < count; i++) {
-                            const l = parseFloat(loads[i]) || 0;
-                            const r = parseFloat(reps[i]) || 0;
-                            strengthVolume += l * r;
-                        }
-                    } else {
-                        const s = parseFloat(item.sets) || 0;
-                        const r = parseFloat(item.reps) || 0;
-                        const l = parseFloat(item.load) || 0;
-                        if (s > 0 && r > 0 && l > 0) {
-                            strengthVolume += s * r * l;
-                        }
-                    }
-                }
-
-                if (isCardioInterval) {
-                    const distances = (actual.distance_array && actual.distance_array.length > 0) ? actual.distance_array : (item.distance_array || []);
-                    if (Array.isArray(distances) && distances.length > 0) {
-                        distances.forEach((d) => {
-                            cardioDistance += parseFloat(d) || 0;
-                        });
-                    } else if (item.distance) {
-                        cardioDistance += parseFloat(item.distance) || 0;
-                    }
-                }
+        if (!programMap.has(pName)) {
+            programMap.set(pName, {
+                name: pName,
+                athleteIds: [...(Array.isArray(athleteIds) ? athleteIds : [])],
+                blocks: [],
             });
         }
+        const prog = programMap.get(pName);
+        if (Array.isArray(athleteIds)) {
+            athleteIds.forEach((id) => {
+                if (!prog.athleteIds.includes(id)) prog.athleteIds.push(id);
+            });
+        }
+        prog.blocks.push(block);
     });
 
-    if (!hasStrength && !hasCardioInterval) return null;
+    const isMultiProgram = programMap.size > 1;
+    const programsList = [];
+
+    programMap.forEach((prog) => {
+        const res = calcBlocksLoad(prog.blocks);
+        programsList.push({
+            name: prog.name,
+            athleteCount: prog.athleteIds.length,
+            athleteIds: prog.athleteIds,
+            ...res,
+        });
+    });
+
+    const overall = calcBlocksLoad(session.blocks);
+
+    if (!overall.hasStrength && !overall.hasCardioInterval && programsList.every(p => !p.hasStrength && !p.hasCardioInterval)) {
+        return null;
+    }
 
     return {
-        hasStrength,
-        strengthVolume: Math.round(strengthVolume),
-        hasCardioInterval,
-        cardioDistance: Math.round(cardioDistance),
-        totalLoad: Math.round(strengthVolume + cardioDistance),
+        isMultiProgram,
+        programs: programsList,
+        ...overall,
     };
 }
 
@@ -108,6 +173,41 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
     const [sessionToDuplicate, setSessionToDuplicate] = useState(null);
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+    const handleDownloadPdf = async () => {
+        if (isExportingPdf) return;
+        setIsExportingPdf(true);
+        try {
+            const optimizedTrainings = await prepareTrainingsWithCompressedImages(trainings);
+            const doc = (
+                <AthleteSessionReportPdfDocument
+                    athlete={{ name: group.name, package: group.package }}
+                    trainings={optimizedTrainings}
+                />
+            );
+            const blob = await pdf(doc).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const cleanName = (group?.name || "Grup").replace(/[^A-Za-z0-9_\-]/g, "_");
+            link.download = `Laporan_Sesi_Grup_${cleanName}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Failed to generate PDF:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Generate PDF",
+                text: "Terjadi kesalahan saat memproses laporan PDF sesi grup.",
+                confirmButtonColor: "#ea580c",
+            });
+        } finally {
+            setIsExportingPdf(false);
+        }
+    };
     const [duplicateDate, setDuplicateDate] = useState('');
 
     const deleteSession = (e, sessionId) => {
@@ -226,15 +326,19 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                         description="Pantau dan kelola jadwal program latihan grup dalam tampilan kalender."
                         actions={
                             <div className="flex items-center gap-2">
-                                <a
-                                    href={route('admin.reports.sessions.export-group', group.id)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs hover:shadow-xs transition-all"
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadPdf}
+                                    disabled={isExportingPdf}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold shadow-2xs hover:shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                                 >
-                                    <Download size={13} />
-                                    <span>Download Laporan Sesi</span>
-                                </a>
+                                    {isExportingPdf ? (
+                                        <Loader2 size={13} className="animate-spin" />
+                                    ) : (
+                                        <Download size={13} />
+                                    )}
+                                    <span>{isExportingPdf ? "Memproses PDF..." : "Download Laporan Sesi"}</span>
+                                </button>
                                 <Link
                                     href={route('admin.individual-trainings.index')}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors"
@@ -548,6 +652,31 @@ export default function ShowGroup({ auth, group, trainings = [], groupTrainings 
                                                             {(() => {
                                                                 const phases = getSessionPhasesSummary(session);
                                                                 if (!phases) return null;
+
+                                                                if (phases.isMultiProgram) {
+                                                                    return (
+                                                                        <div className="flex flex-col gap-1 mt-1.5 pt-1.5 border-t border-slate-100 text-[9px]">
+                                                                            <div className="flex items-center justify-between text-slate-400 font-bold uppercase tracking-wider text-[8px]">
+                                                                                <span>Beban per Program:</span>
+                                                                                <span className="text-slate-500 font-bold">{phases.programs.length} Program</span>
+                                                                            </div>
+                                                                            <div className="space-y-1">
+                                                                                {phases.programs.map((prog, pIdx) => (
+                                                                                    <div key={pIdx} className="flex items-center justify-between bg-slate-50/80 hover:bg-slate-100/80 px-1.5 py-0.5 rounded border border-slate-100 text-slate-700 transition-colors">
+                                                                                        <span className="truncate max-w-[105px] font-semibold flex items-center gap-1">
+                                                                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${pIdx === 0 ? 'bg-orange-500' : pIdx === 1 ? 'bg-blue-500' : 'bg-emerald-500'}`} />
+                                                                                            {prog.name}
+                                                                                            {prog.athleteCount > 0 && <span className="text-[8px] text-slate-400 font-normal">({prog.athleteCount})</span>}
+                                                                                        </span>
+                                                                                        <strong className="text-orange-600 font-bold shrink-0 ml-1">
+                                                                                            {prog.totalLoad > 0 ? `${prog.totalLoad >= 1000 ? (prog.totalLoad / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'k' : prog.totalLoad.toLocaleString('id-ID')} AU` : '-'}
+                                                                                        </strong>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
 
                                                                 return (
                                                                     <div className="flex flex-col gap-0.5 mt-1.5 pt-1 border-t border-slate-100 text-[9.5px]">

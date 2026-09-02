@@ -54,6 +54,8 @@ class GroupTrainingController extends Controller
         $coaches = $group->coaches()->orderBy('name', 'asc')->get();
         $allAthletes = \App\Models\User::where('role', 'athlete')->orderBy('name', 'asc')->get();
 
+        $workoutTemplates = \App\Models\WorkoutTemplate::orderBy('order', 'asc')->get();
+
         return Inertia::render('Admin/GroupTrainings/CreateSession', [
             'group' => $group,
             'exercises' => $exercisesList,
@@ -62,6 +64,7 @@ class GroupTrainingController extends Controller
             'date' => $dateStr,
             'nextSessionNumber' => $nextSessionNumber,
             'availableAthletes' => $allAthletes,
+            'workoutTemplates' => $workoutTemplates,
         ]);
     }
 
@@ -94,7 +97,7 @@ class GroupTrainingController extends Controller
 
         $training = GroupTraining::create([
             'training_group_id' => $group->id,
-            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(), // Fallback to current user if no coach selected
+            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : null,
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'session_number' => null,
@@ -162,15 +165,15 @@ class GroupTrainingController extends Controller
 
     public function showSession(GroupTraining $training)
     {
-        $training->load(['group.members', 'members_pivot', 'rpe_records', 'coach', 'blocks.items.exercise.category']);
+        $training->load(['group.members', 'members_pivot', 'rpe_records', 'coach', 'signer', 'blocks.items.exercise.category']);
         
         $availableAthletes = User::where('role', 'athlete')
             ->select('id', 'name')
             ->get();
             
         $coaches = [];
-        if (!empty($training->coach_ids)) {
-            $coaches = User::whereIn('id', $training->coach_ids)->get();
+        if (is_array($training->coach_ids)) {
+            $coaches = !empty($training->coach_ids) ? User::whereIn('id', $training->coach_ids)->get() : [];
         } elseif ($training->coach_id) {
             $c = User::find($training->coach_id);
             if ($c) {
@@ -250,13 +253,63 @@ class GroupTrainingController extends Controller
     {
         $request->validate([
             'athlete_id' => 'nullable|exists:users,id',
+            'signer_id' => 'nullable|exists:users,id',
+            'signer_name' => 'nullable|string|max:255',
             'apply_to_all' => 'nullable',
             'proof_photo' => 'nullable|image|max:5120',
+            'signature_data' => 'nullable|string',
             'rpes' => 'nullable|array',
             'group_note' => 'nullable|string',
         ]);
 
         $applyToAll = $request->boolean('apply_to_all') || $request->input('apply_to_all') == '1' || $request->input('apply_to_all') === 'true';
+
+        // Handle group proof photo
+        $proofPhotoPath = null;
+        if ($request->hasFile('proof_photo')) {
+            if ($training->proof_photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($training->proof_photo);
+            }
+            $proofPhotoPath = $request->file('proof_photo')->store('proofs', 'public');
+            $training->proof_photo = $proofPhotoPath;
+        }
+
+        // Handle representative digital signature (Base64 data URL or uploaded file)
+        if ($request->filled('signature_data')) {
+            $dataUrl = $request->input('signature_data');
+            if (preg_match('/^data:image\/(\w+);base64,/', $dataUrl, $type)) {
+                $data = substr($dataUrl, strpos($dataUrl, ',') + 1);
+                $type = strtolower($type[1]);
+                $data = base64_decode($data);
+
+                if ($data !== false) {
+                    if ($training->signature_photo) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($training->signature_photo);
+                    }
+                    $filename = 'signatures/' . uniqid('sig_grp_') . '.' . $type;
+                    \Illuminate\Support\Facades\Storage::disk('public')->put($filename, $data);
+                    $training->signature_photo = $filename;
+                    $training->signed_at = now();
+                }
+            }
+        } elseif ($request->hasFile('signature_photo')) {
+            if ($training->signature_photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($training->signature_photo);
+            }
+            $training->signature_photo = $request->file('signature_photo')->store('signatures', 'public');
+            $training->signed_at = now();
+        }
+
+        // Handle signer
+        if ($request->filled('signer_id')) {
+            $training->signer_id = $request->signer_id;
+            $signerUser = \App\Models\User::find($request->signer_id);
+            if ($signerUser) {
+                $training->signer_name = $signerUser->name;
+            }
+        } elseif ($request->filled('signer_name')) {
+            $training->signer_name = $request->signer_name;
+        }
 
         if ($applyToAll) {
             $training->load(['members_pivot', 'group.members']);
@@ -293,6 +346,9 @@ class GroupTrainingController extends Controller
 
                 $memberRecord->is_completed = true;
                 $memberRecord->completed_at = now();
+                if ($proofPhotoPath) {
+                    $memberRecord->proof_photo = $proofPhotoPath;
+                }
                 $memberRecord->save();
             }
 
@@ -330,7 +386,9 @@ class GroupTrainingController extends Controller
         $memberRecord->is_completed = true;
         $memberRecord->completed_at = now();
 
-        if ($request->hasFile('proof_photo')) {
+        if ($proofPhotoPath) {
+            $memberRecord->proof_photo = $proofPhotoPath;
+        } elseif ($request->hasFile('proof_photo')) {
             if ($memberRecord->proof_photo) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($memberRecord->proof_photo);
             }
@@ -348,7 +406,7 @@ class GroupTrainingController extends Controller
         $training->status = 'completed';
         $training->save();
 
-        return redirect()->back()->with('message', 'Latihan grup berhasil diselesaikan untuk atlet ini!');
+        return redirect()->back()->with('message', 'Latihan grup berhasil diselesaikan!');
     }
 
     public function editSession(GroupTraining $training)
@@ -387,6 +445,8 @@ class GroupTrainingController extends Controller
         $coaches = $training->group->coaches()->orderBy('name', 'asc')->get();
         $allAthletes = \App\Models\User::where('role', 'athlete')->orderBy('name', 'asc')->get();
         
+        $workoutTemplates = \App\Models\WorkoutTemplate::orderBy('order', 'asc')->get();
+        
         return Inertia::render('Admin/GroupTrainings/EditSession', [
             'training' => $training,
             'exercisesList' => $exercises,
@@ -394,6 +454,7 @@ class GroupTrainingController extends Controller
             'coachesList' => $coaches,
             'group' => $training->group,
             'availableAthletes' => $allAthletes,
+            'workoutTemplates' => $workoutTemplates,
         ]);
     }
 
@@ -419,6 +480,7 @@ class GroupTrainingController extends Controller
             'location' => $request->location,
         ]);
 
+        $training->coach_id = !empty($request->coach_ids) ? $request->coach_ids[0] : null;
         $training->coach_ids = $request->coach_ids ?? [];
         $training->attendee_ids = $request->attendee_ids;
         $training->is_extra = $isExtra;
@@ -664,34 +726,17 @@ class GroupTrainingController extends Controller
             }
         }
 
-        $training->blocks->each(function ($block) {
-            $block->items->each(function ($item) {
-                if ($item->exercise) {
-                    $base64Images = [];
-                    if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
-                        foreach ($item->exercise->images as $img) {
-                            $imgClean = str_replace('storage/', '', ltrim($img, '/'));
-                            $imgPath1 = public_path('storage/' . $imgClean);
-                            $imgPath2 = storage_path('app/public/' . $imgClean);
-                            $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
-                            
-                            if ($finalImgPath) {
-                                $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
-                                $data = file_get_contents($finalImgPath);
-                                $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                            }
-                        }
-                    }
-                    $item->exercise->setAttribute('base64_images', $base64Images);
-                }
-            });
-        });
+        \App\Services\PdfImageHelper::processTrainingImages($training);
 
         $coachNames = [];
-        if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
-            $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
-                ->pluck('name')
-                ->toArray();
+        if (is_array($training->coach_ids)) {
+            if (count($training->coach_ids) > 0) {
+                $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } elseif ($training->coach_id && $training->coach) {
+            $coachNames = [$training->coach->name];
         }
         $coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
 

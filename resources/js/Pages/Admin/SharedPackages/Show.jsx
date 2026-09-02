@@ -58,6 +58,7 @@ export default function Show({
     allAthletes = [],
     coachesList = []
 }) {
+    const [cycleTab, setCycleTab] = useState('current'); // 'current' | 'history' | 'all'
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'completed' | 'scheduled'
     const [isCreateSessionModalOpen, setIsCreateSessionModalOpen] = useState(false);
@@ -81,8 +82,18 @@ export default function Show({
     const isExpired = sharedPackage.status === 'expired';
     const isCompleted = sharedPackage.status === 'completed';
 
+    const currentTrainings = useMemo(() => trainings.filter(t => !t.is_athlete_paid), [trainings]);
+    const historyTrainings = useMemo(() => trainings.filter(t => t.is_athlete_paid), [trainings]);
+
     const filteredTrainings = useMemo(() => {
-        return trainings.filter(t => {
+        let baseList = trainings;
+        if (cycleTab === 'current') {
+            baseList = currentTrainings;
+        } else if (cycleTab === 'history') {
+            baseList = historyTrainings;
+        }
+
+        return baseList.filter(t => {
             if (searchTerm.trim()) {
                 const q = searchTerm.toLowerCase();
                 const matchName = t.name?.toLowerCase().includes(q);
@@ -100,7 +111,7 @@ export default function Show({
 
             return true;
         });
-    }, [trainings, searchTerm, statusFilter]);
+    }, [trainings, currentTrainings, historyTrainings, cycleTab, searchTerm, statusFilter]);
 
     const expDate = sharedPackage.expiration_date
         ? new Date(sharedPackage.expiration_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -340,11 +351,16 @@ export default function Show({
                                                     >
                                                         {member.name}
                                                     </Link>
-                                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                                         <span className="text-[9.5px] text-slate-400 truncate">{member.sport || 'Atlet'}</span>
                                                         <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-1 py-0.2 rounded border border-orange-100">
                                                             {member.sessions_used} sesi ({memberPercent}%)
                                                         </span>
+                                                        {member.history_sessions > 0 && (
+                                                            <span className="text-[8.5px] font-semibold text-slate-400">
+                                                                • {member.history_sessions} sesi lalu
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     {/* Mini bar */}
                                                     <div className="w-full h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
@@ -381,15 +397,109 @@ export default function Show({
                     {/* ═══════════════════════════════════════════════════════
                         KOLOM KANAN (8 Kolom di LG) — Riwayat Sesi Latihan Pool
                        ═══════════════════════════════════════════════════════ */}
-                    <div className="lg:col-span-8 space-y-4">
+                    <div className="lg:col-span-8 space-y-3">
                         
+                        {/* ─── CYCLE TABS (Siklus Berjalan vs Riwayat Sebelumnya) ─── */}
+                        <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-lg border border-slate-200/70 text-xs">
+                            <button
+                                type="button"
+                                onClick={() => setCycleTab('current')}
+                                className={`flex-1 py-1.5 px-3 rounded-md font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    cycleTab === 'current'
+                                        ? 'bg-white text-orange-700 shadow-2xs border border-orange-200/70'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                <Sparkles size={12} className={cycleTab === 'current' ? 'text-orange-600' : 'text-slate-400'} />
+                                <span>Siklus Berjalan</span>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                                    cycleTab === 'current' ? 'bg-orange-100 text-orange-800' : 'bg-slate-200 text-slate-600'
+                                }`}>
+                                    {currentTrainings.length}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCycleTab('history')}
+                                className={`flex-1 py-1.5 px-3 rounded-md font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    cycleTab === 'history'
+                                        ? 'bg-white text-slate-800 shadow-2xs border border-slate-200'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                <Clock size={12} className={cycleTab === 'history' ? 'text-slate-700' : 'text-slate-400'} />
+                                <span>Riwayat Selesai (Lunas)</span>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                                    cycleTab === 'history' ? 'bg-slate-200 text-slate-800' : 'bg-slate-200 text-slate-600'
+                                }`}>
+                                    {historyTrainings.length}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCycleTab('all')}
+                                className={`py-1.5 px-3 rounded-md font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    cycleTab === 'all'
+                                        ? 'bg-white text-slate-800 shadow-2xs border border-slate-200'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                <span>Semua</span>
+                                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                                    cycleTab === 'all' ? 'bg-slate-200 text-slate-800' : 'bg-slate-200 text-slate-600'
+                                }`}>
+                                    {trainings.length}
+                                </span>
+                            </button>
+                        </div>
+
+                        {/* ─── CYCLE CONTEXT BANNER ─── */}
+                        {cycleTab === 'current' && (
+                            <div className="bg-orange-50/70 border border-orange-200/80 rounded-lg p-2.5 flex items-center justify-between gap-2 text-xs">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center shrink-0 font-bold">
+                                        <Sparkles size={12} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-[11.5px] text-orange-950">Sesi Siklus Kuota Berjalan (Saat Ini)</p>
+                                        <p className="text-[10px] text-orange-700">Sesi yang sedang berjalan aktif dalam kuota paket bersama saat ini.</p>
+                                    </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <span className="text-[11px] font-extrabold text-orange-900">{usedSessions}/{totalSessions || '∞'} Sesi Terpakai</span>
+                                    <span className="text-[10px] text-orange-600 font-semibold block">(Sisa {remainingSessions ?? '∞'} sesi)</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {cycleTab === 'history' && (
+                            <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2.5 flex items-center justify-between gap-2 text-xs text-slate-800">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center shrink-0 font-bold">
+                                        <CheckCircle2 size={12} />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-[11.5px] text-slate-900">Riwayat Sesi Sebelumnya (Sudah Lunas)</p>
+                                        <p className="text-[10px] text-slate-500">Sesi-sesi dari siklus sebelumnya yang telah ditandai lunas dan tersimpan sebagai arsip.</p>
+                                    </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <span className="text-[11px] font-extrabold text-slate-800">{historyTrainings.length} Sesi Lunas</span>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-white border border-slate-200/90 rounded-lg shadow-2xs overflow-hidden">
                             {/* Feed Header with Search & Filters */}
                             <div className="p-3 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-2">
                                 <div className="flex items-center gap-1.5">
                                     <Activity className="w-3.5 h-3.5 text-orange-600" />
                                     <h3 className="text-xs font-bold text-slate-900">
-                                        Riwayat Latihan Bersama ({filteredTrainings.length})
+                                        {cycleTab === 'current'
+                                            ? `Sesi Siklus Berjalan (${filteredTrainings.length})`
+                                            : cycleTab === 'history'
+                                                ? `Riwayat Sesi Selesai / Lunas (${filteredTrainings.length})`
+                                                : `Semua Sesi (${filteredTrainings.length})`}
                                     </h3>
                                 </div>
 
@@ -447,110 +557,151 @@ export default function Show({
                             {/* Feed Items */}
                             <div className="divide-y divide-slate-100">
                                 {filteredTrainings.length > 0 ? (
-                                    filteredTrainings.map((training) => {
+                                    filteredTrainings.map((training, idx) => {
+                                        const isPaid = Boolean(training.is_athlete_paid);
                                         const isCompleted = training.status === 'completed' || training.is_completed;
                                         const athletePhoto = training.user?.profile_photo_url;
                                         const blockCount = training.blocks?.length || 0;
 
+                                        // In 'all' tab, show section divider when crossing from current to history
+                                        const prevTraining = idx > 0 ? filteredTrainings[idx - 1] : null;
+                                        const showHistoryDivider = cycleTab === 'all' && isPaid && (!prevTraining || !prevTraining.is_athlete_paid);
+                                        const showCurrentDivider = cycleTab === 'all' && !isPaid && idx === 0;
+
                                         return (
-                                            <Link
-                                                key={training.id}
-                                                href={route('admin.individual-trainings.session.show', training.id) + '?from=shared-package&package_id=' + sharedPackage.id}
-                                                className="p-3 hover:bg-slate-50/80 transition-all flex items-start gap-2.5 group cursor-pointer block"
-                                            >
-                                                {/* Sesi Pool Number Badge */}
-                                                <div className="flex flex-col items-center shrink-0 w-9">
-                                                    <div className={`w-8 h-8 rounded-md flex flex-col items-center justify-center font-bold border shadow-2xs ${
-                                                        training.is_extra
-                                                            ? 'bg-amber-50 text-amber-700 border-amber-200/70'
-                                                            : 'bg-orange-50 text-orange-700 border-orange-200/80 group-hover:bg-orange-600 group-hover:text-white transition-all'
-                                                    }`}>
-                                                        <span className="text-[7.5px] uppercase tracking-wider font-semibold opacity-75 leading-none">
-                                                            {training.is_extra ? 'Extra' : 'Sesi'}
+                                            <React.Fragment key={training.id}>
+                                                {showCurrentDivider && (
+                                                    <div className="bg-orange-50/50 border-y border-orange-100 px-3 py-1.5 flex items-center justify-between text-[11px] font-bold text-orange-800">
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Sparkles size={11} className="text-orange-600" /> Sesi Siklus Berjalan (Aktif)
                                                         </span>
-                                                        <span className="text-xs font-black leading-none mt-0.5">
-                                                            {training.is_extra ? '+' : (training.shared_session_number || training.session_number || '#')}
-                                                        </span>
+                                                        <span className="text-[10px] font-semibold text-orange-600">{currentTrainings.length} Sesi</span>
                                                     </div>
-                                                </div>
+                                                )}
+                                                {showHistoryDivider && (
+                                                    <div className="bg-slate-100/80 border-y border-slate-200 px-3 py-1.5 flex items-center justify-between text-[11px] font-bold text-slate-700">
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Clock size={11} className="text-slate-500" /> Riwayat Sesi Sebelumnya (Sudah Lunas)
+                                                        </span>
+                                                        <span className="text-[10px] font-semibold text-slate-500">{historyTrainings.length} Sesi</span>
+                                                    </div>
+                                                )}
+                                                <Link
+                                                    href={route('admin.individual-trainings.session.show', training.id) + '?from=shared-package&package_id=' + sharedPackage.id}
+                                                    className={`p-3 hover:bg-slate-50/80 transition-all flex items-start gap-2.5 group cursor-pointer block ${
+                                                        isPaid ? 'bg-slate-50/30' : 'bg-white'
+                                                    }`}
+                                                >
+                                                    {/* Sesi Pool Number Badge */}
+                                                    <div className="flex flex-col items-center shrink-0 w-9">
+                                                        <div className={`w-8 h-8 rounded-md flex flex-col items-center justify-center font-bold border shadow-2xs transition-all ${
+                                                            training.is_extra
+                                                                ? 'bg-amber-50 text-amber-700 border-amber-200/70'
+                                                                : isPaid
+                                                                    ? 'bg-slate-100 text-slate-600 border-slate-200/80 group-hover:bg-slate-700 group-hover:text-white'
+                                                                    : 'bg-orange-50 text-orange-700 border-orange-200/80 group-hover:bg-orange-600 group-hover:text-white'
+                                                        }`}>
+                                                            <span className="text-[7.5px] uppercase tracking-wider font-semibold opacity-75 leading-none">
+                                                                {training.is_extra ? 'Extra' : 'Sesi'}
+                                                            </span>
+                                                            <span className="text-xs font-black leading-none mt-0.5">
+                                                                {training.is_extra ? '+' : (training.shared_session_number || training.session_number || '#')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
 
-                                                {/* Sesi Details */}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <div>
-                                                            <h4 className="font-bold text-xs text-slate-900 group-hover:text-orange-600 transition-colors flex items-center gap-1.5">
-                                                                <span>{training.name || 'Program Latihan'}</span>
-                                                                {training.training_type && (
-                                                                    <span className="text-[9px] font-medium text-slate-400 bg-slate-100 px-1 py-0.2 rounded">
-                                                                        {training.training_type}
-                                                                    </span>
-                                                                )}
-                                                            </h4>
+                                                    {/* Sesi Details */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div>
+                                                                <h4 className="font-bold text-xs text-slate-900 group-hover:text-orange-600 transition-colors flex items-center gap-1.5 flex-wrap">
+                                                                    <span>{training.name || 'Program Latihan'}</span>
+                                                                    {training.training_type && (
+                                                                        <span className="text-[9px] font-medium text-slate-400 bg-slate-100 px-1 py-0.2 rounded">
+                                                                            {training.training_type}
+                                                                        </span>
+                                                                    )}
+                                                                </h4>
 
-                                                            {/* Athlete Info */}
-                                                            <div className="flex items-center gap-1.5 mt-0.5">
-                                                                <div className="flex items-center gap-1 text-[10.5px] font-semibold text-slate-700">
-                                                                    <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-[7.5px] font-bold flex items-center justify-center overflow-hidden">
-                                                                        {athletePhoto ? (
-                                                                            <img src={athletePhoto} alt={training.user?.name} className="w-full h-full object-cover" />
-                                                                        ) : (
-                                                                            <span>{getInitials(training.user?.name)}</span>
-                                                                        )}
+                                                                {/* Athlete Info */}
+                                                                <div className="flex items-center gap-1.5 mt-0.5">
+                                                                    <div className="flex items-center gap-1 text-[10.5px] font-semibold text-slate-700">
+                                                                        <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-[7.5px] font-bold flex items-center justify-center overflow-hidden">
+                                                                            {athletePhoto ? (
+                                                                                <img src={athletePhoto} alt={training.user?.name} className="w-full h-full object-cover" />
+                                                                            ) : (
+                                                                                <span>{getInitials(training.user?.name)}</span>
+                                                                            )}
+                                                                        </div>
+                                                                        <span>{training.user?.name || 'Atlet'}</span>
                                                                     </div>
-                                                                    <span>{training.user?.name || 'Atlet'}</span>
+                                                                    {training.user?.sport && (
+                                                                        <span className="text-[9.5px] text-slate-400">• {training.user.sport.name}</span>
+                                                                    )}
                                                                 </div>
-                                                                {training.user?.sport && (
-                                                                    <span className="text-[9.5px] text-slate-400">• {training.user.sport.name}</span>
-                                                                )}
+                                                            </div>
+
+                                                            {/* Status Badges */}
+                                                            <div className="shrink-0 flex flex-col items-end gap-1">
+                                                                <div className="flex items-center gap-1 flex-wrap justify-end">
+                                                                    {/* Cycle Tag */}
+                                                                    {isPaid ? (
+                                                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200 shadow-2xs">
+                                                                            <CheckCircle2 size={9} className="text-slate-500" /> Lunas (Lalu)
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded-md border border-orange-200/70 shadow-2xs">
+                                                                            <Sparkles size={9} className="text-orange-600" /> Siklus Berjalan
+                                                                        </span>
+                                                                    )}
+
+                                                                    {/* Completion Status Badge */}
+                                                                    {isCompleted ? (
+                                                                        <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70 shadow-2xs">
+                                                                            <CheckCircle2 size={10} className="text-emerald-600" /> Selesai
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/70 shadow-2xs">
+                                                                            <Clock size={10} className="text-amber-600" /> Terjadwal
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        {/* Status Badge */}
-                                                        <div className="shrink-0 flex flex-col items-end gap-1">
-                                                            {isCompleted ? (
-                                                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-gradient-to-r from-emerald-50 to-teal-50/70 px-2 py-0.5 rounded-full border border-emerald-200/70 shadow-2xs">
-                                                                    <CheckCircle2 size={10} className="text-emerald-600" /> Selesai
+                                                        {/* Metadata row: Tanggal, Lokasi, Coach */}
+                                                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1.5 text-[10px] text-slate-500 pt-1.5 border-t border-slate-100/80">
+                                                            <span className="inline-flex items-center gap-1">
+                                                                <CalendarIcon className="w-2.5 h-2.5 text-slate-400" />
+                                                                {formatDate(training.date)}
+                                                            </span>
+                                                            {training.location && (
+                                                                <span className="inline-flex items-center gap-1">
+                                                                    <MapPin className="w-2.5 h-2.5 text-slate-400" />
+                                                                    {training.location}
                                                                 </span>
-                                                            ) : (
-                                                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-800 bg-gradient-to-r from-amber-50 to-orange-50/70 px-2 py-0.5 rounded-full border border-amber-200/70 shadow-2xs">
-                                                                    <Clock size={10} className="text-amber-600" /> Terjadwal
+                                                            )}
+                                                            {training.coach && (
+                                                                <span className="inline-flex items-center gap-1 text-slate-600">
+                                                                    <ShieldCheck className="w-2.5 h-2.5 text-amber-500" />
+                                                                    Coach: <strong>{training.coach.name}</strong>
+                                                                </span>
+                                                            )}
+                                                            {blockCount > 0 && (
+                                                                <span className="inline-flex items-center gap-1 text-slate-400 ml-auto">
+                                                                    <Layers className="w-2.5 h-2.5 text-orange-500" />
+                                                                    {blockCount} Blok
                                                                 </span>
                                                             )}
                                                         </div>
                                                     </div>
 
-                                                    {/* Metadata row: Tanggal, Lokasi, Coach */}
-                                                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1.5 text-[10px] text-slate-500 pt-1.5 border-t border-slate-100/80">
-                                                        <span className="inline-flex items-center gap-1">
-                                                            <CalendarIcon className="w-2.5 h-2.5 text-slate-400" />
-                                                            {formatDate(training.date)}
-                                                        </span>
-                                                        {training.location && (
-                                                            <span className="inline-flex items-center gap-1">
-                                                                <MapPin className="w-2.5 h-2.5 text-slate-400" />
-                                                                {training.location}
-                                                            </span>
-                                                        )}
-                                                        {training.coach && (
-                                                            <span className="inline-flex items-center gap-1 text-slate-600">
-                                                                <ShieldCheck className="w-2.5 h-2.5 text-amber-500" />
-                                                                Coach: <strong>{training.coach.name}</strong>
-                                                            </span>
-                                                        )}
-                                                        {blockCount > 0 && (
-                                                            <span className="inline-flex items-center gap-1 text-slate-400 ml-auto">
-                                                                <Layers className="w-2.5 h-2.5 text-orange-500" />
-                                                                {blockCount} Blok
-                                                            </span>
-                                                        )}
+                                                    {/* Arrow */}
+                                                    <div className="self-center pl-0.5">
+                                                        <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-600 group-hover:translate-x-0.5 transition-all" />
                                                     </div>
-                                                </div>
-
-                                                {/* Arrow */}
-                                                <div className="self-center pl-0.5">
-                                                    <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-orange-600 group-hover:translate-x-0.5 transition-all" />
-                                                </div>
-                                            </Link>
+                                                </Link>
+                                            </React.Fragment>
                                         );
                                     })
                                 ) : (
@@ -559,18 +710,28 @@ export default function Show({
                                             <Dumbbell className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-0.5 max-w-sm mx-auto">
-                                            <h4 className="text-xs font-bold text-slate-800">Belum Ada Sesi Latihan</h4>
+                                            <h4 className="text-xs font-bold text-slate-800">
+                                                {cycleTab === 'current'
+                                                    ? 'Belum Ada Sesi pada Siklus Ini'
+                                                    : cycleTab === 'history'
+                                                        ? 'Belum Ada Riwayat Sesi Selesai'
+                                                        : 'Belum Ada Sesi Latihan'}
+                                            </h4>
                                             <p className="text-[10.5px] text-slate-400">
-                                                Gunakan tombol "Input Sesi Baru" untuk menjadwalkan latihan bagi anggota paket bersama ini.
+                                                {cycleTab === 'current'
+                                                    ? 'Jadwalkan sesi latihan baru untuk anggota paket bersama pada kuota siklus ini.'
+                                                    : 'Sesi yang sudah ditandai lunas akan tersimpan secara otomatis di riwayat.'}
                                             </p>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsCreateSessionModalOpen(true)}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
-                                        >
-                                            <Plus size={11} /> Mulai Sesi Pertama
-                                        </button>
+                                        {cycleTab === 'current' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsCreateSessionModalOpen(true)}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                                            >
+                                                <Plus size={11} /> Input Sesi Baru
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>

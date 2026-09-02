@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             AthleteSeeder::class,
             SportSeeder::class,
             SettingSeeder::class,
+            WorkoutTemplateSeeder::class,
         ]);
     }
 }

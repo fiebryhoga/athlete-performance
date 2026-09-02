@@ -272,10 +272,10 @@ class UserManagementController extends Controller
         }
 
         $user->load(['sport', 'coaches:id,name', 'package', 'groups', 'sharedPackages' => function($q) {
-            $q->where('status', 'active')->with('package');
+            $q->with('package');
         }]);
 
-        $activeShared = $user->sharedPackages->first();
+        $activeShared = $user->sharedPackages->where('status', 'active')->first() ?? $user->sharedPackages->first();
         if ($activeShared && $user->subscription_package_id) {
             $user->subscription_package_id = null;
             $user->save();

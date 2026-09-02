@@ -3,9 +3,9 @@ import { Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
     page: {
-        paddingTop: 14,
-        paddingBottom: 22,
-        paddingHorizontal: 14,
+        paddingTop: 22,
+        paddingBottom: 26,
+        paddingHorizontal: 40,
         backgroundColor: '#ffffff',
         fontFamily: 'Helvetica',
     },
@@ -13,35 +13,36 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth: 0.8,
-        borderBottomColor: '#e2e8f0',
-        paddingBottom: 6,
-        marginBottom: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#cbd5e1',
+        paddingBottom: 8,
+        marginBottom: 12,
     },
     headerLeft: {
         flex: 1,
         justifyContent: 'center',
     },
     title: {
-        fontSize: 13,
+        fontSize: 13.5,
         fontFamily: 'Helvetica-Bold',
         color: '#0f172a',
         textTransform: 'uppercase',
-        marginBottom: 2,
-        letterSpacing: 0.2,
+        marginBottom: 2.5,
+        letterSpacing: 0.3,
     },
     subtitle: {
-        fontSize: 7.5,
+        fontSize: 8,
         fontFamily: 'Helvetica',
         color: '#64748b',
+        lineHeight: 1.3,
     },
     headerRight: {
-        marginLeft: 12,
+        marginLeft: 14,
         justifyContent: 'center',
         alignItems: 'flex-end',
     },
     logo: {
-        width: 130,
+        width: 125,
         height: 32,
         objectFit: 'contain',
     },
@@ -50,23 +51,23 @@ const styles = StyleSheet.create({
     },
     footer: {
         position: 'absolute',
-        bottom: 10,
-        left: 14,
-        right: 14,
+        bottom: 12,
+        left: 40,
+        right: 40,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTopWidth: 0.8,
-        borderTopColor: '#e2e8f0',
-        paddingTop: 3.5,
+        borderTopColor: '#cbd5e1',
+        paddingTop: 5,
     },
     footerText: {
-        fontSize: 6,
+        fontSize: 6.5,
         fontFamily: 'Helvetica',
         color: '#94a3b8',
     },
     pageNumber: {
-        fontSize: 6,
+        fontSize: 6.5,
         fontFamily: 'Helvetica-Bold',
         color: '#94a3b8',
     }
@@ -78,6 +79,7 @@ export const PdfPageTemplate = ({
     logoUrl, 
     orientation = "portrait",
     footerLeftText = "Olympus Training Surabaya • Profiling & Integrated Performance Report",
+    headerFixed = false,
     children 
 }) => {
     const resolvedLogoUrl = logoUrl || (typeof window !== 'undefined' ? `${window.location.origin}/assets/images/otslogo2.png` : '/assets/images/otslogo2.png');
@@ -85,7 +87,7 @@ export const PdfPageTemplate = ({
     return (
         <Page size="A4" orientation={orientation} style={styles.page}>
             {/* ====== HEADER ====== */}
-            <View style={styles.header} fixed>
+            <View style={styles.header} fixed={headerFixed}>
                 <View style={styles.headerLeft}>
                     {title && <Text style={styles.title}>{title}</Text>}
                     {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}

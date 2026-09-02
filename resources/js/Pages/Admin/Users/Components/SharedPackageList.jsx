@@ -116,11 +116,11 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
                             <div>
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="min-w-0 pr-2">
-                                        <h3 className="font-bold text-xs text-slate-900 truncate group-hover:text-orange-600 transition-colors flex items-center gap-1.5">
+                                        <h3 className="font-bold text-sm text-slate-900 truncate group-hover:text-orange-600 transition-colors flex items-center gap-1.5 leading-snug">
                                             <span>{sp.name}</span>
-                                            <ExternalLink size={11} className="text-slate-300 group-hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100" />
+                                            <ExternalLink size={12} className="text-slate-300 group-hover:text-orange-500 transition-colors opacity-0 group-hover:opacity-100" />
                                         </h3>
-                                        {sp.description && <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{sp.description}</p>}
+                                        {sp.description && <p className="text-[11.5px] text-slate-400 mt-0.5 line-clamp-1">{sp.description}</p>}
                                     </div>
                                     <div className="flex items-center gap-1 shrink-0">
                                         <button 
@@ -173,8 +173,8 @@ const SharedPackageList = forwardRef(({ sharedPackages, packages, allAthletes, c
 
                                     {/* Coach list */}
                                     {sp.coaches && sp.coaches.length > 0 && (
-                                        <div className="flex items-center gap-1 text-[11px] text-slate-500 bg-amber-50/60 border border-amber-100/60 px-2 py-0.5 rounded">
-                                            <ShieldCheck size={11} className="text-amber-600 shrink-0" />
+                                        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 py-0.5">
+                                            <ShieldCheck size={12} className="text-orange-500 shrink-0" />
                                             <span className="truncate font-medium">Coach: {sp.coaches.map(c => c.name).join(', ')}</span>
                                         </div>
                                     )}

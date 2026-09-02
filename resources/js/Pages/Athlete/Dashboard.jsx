@@ -62,15 +62,15 @@ const parseLocalYMD = (str) => {
 
 const AthleteHeroGreeting = ({ user, stats }) => {
     return (
-        <div className="relative overflow-hidden bg-white rounded-lg p-7 md:p-8 lg:p-9 border border-slate-200/90 shadow-2xs group min-h-[210px] flex items-center">
+        <div className="relative overflow-hidden bg-white rounded-xl p-4 sm:p-6 md:p-8 border border-slate-200/90 shadow-2xs group">
             {/* Subtle Warm Ambient Background */}
             <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-orange-50/50 via-amber-50/20 to-transparent pointer-events-none"></div>
 
             <div className="relative z-10 flex items-center justify-between w-full">
                 {/* Left: Rich Structured Content */}
-                <div className="flex-1 min-w-0 pr-4 md:pr-10">
+                <div className="flex-1 min-w-0 pr-0 lg:pr-10">
                     {/* Top Row: Clean System Status Indicator */}
-                    <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-600 mb-3">
+                    <div className="flex items-center gap-2 text-[10.5px] sm:text-[11px] font-semibold text-emerald-600 mb-2 sm:mb-3">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -79,7 +79,7 @@ const AthleteHeroGreeting = ({ user, stats }) => {
                     </div>
 
                     {/* Main Greeting Title */}
-                    <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 mb-2 leading-snug">
+                    <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 mb-1.5 sm:mb-2 leading-snug">
                         Selamat Datang Kembali,{" "}
                         <span className="text-orange-600 font-bold">
                             {user?.name}
@@ -88,23 +88,23 @@ const AthleteHeroGreeting = ({ user, stats }) => {
                     </h2>
 
                     {/* Professional Performance Description */}
-                    <p className="text-slate-500 text-[11px] sm:text-xs font-medium leading-relaxed sm:leading-5 mb-5 max-w-xl">
+                    <p className="text-slate-500 text-[11px] sm:text-xs font-medium leading-relaxed sm:leading-5 mb-0 sm:mb-4 max-w-xl">
                         Pantau kesiapan dan progres latihan atlet secara langsung (<span className="italic">real-time</span>). Selesaikan agenda harianmu hari ini untuk mendorong performa dan pemulihan optimal.
                     </p>
 
-                    {/* Divider & Footer Hub */}
-                    <div className="border-t border-slate-100 pt-4 mt-10 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700">
+                    {/* Divider & Footer Hub (Hidden on Mobile) */}
+                    <div className="hidden sm:flex border-t border-slate-100 pt-3 sm:pt-3.5 mt-3 sm:mt-5 flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] sm:text-[11px] font-semibold text-slate-700">
                             <span className="text-slate-800 font-bold">
                                 OTS Performance Hub
                             </span>
                             <span className="text-slate-300">•</span>
-                            <span className="text-slate-500 font-medium">
+                            <span className="text-slate-500 font-medium truncate max-w-[140px] sm:max-w-none">
                                 Olympus Training Surabaya
                             </span>
                         </div>
 
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-50 border border-slate-200/90 rounded text-[10px] font-bold text-slate-700 shadow-2xs">
+                        <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-0.5 bg-slate-50 border border-slate-200/90 rounded text-[9.5px] sm:text-[10px] font-bold text-slate-700 shadow-2xs shrink-0">
                             <Zap
                                 size={11}
                                 className="text-orange-500 fill-orange-500"
@@ -115,11 +115,11 @@ const AthleteHeroGreeting = ({ user, stats }) => {
                 </div>
 
                 {/* Right: Athlete Model Graphic */}
-                <div className="relative hidden lg:flex items-end shrink-0 -mb-9 -mr-3 z-10 pointer-events-none self-end">
+                <div className="relative hidden lg:flex items-end shrink-0 -mb-8 -mr-3 z-10 pointer-events-none self-end">
                     <img
                         src="/assets/images/model2.png"
                         alt="Athlete Performance"
-                        className="h-[200px] xl:h-[220px] w-auto object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
+                        className="h-[180px] xl:h-[200px] w-auto object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
                     />
                 </div>
             </div>
@@ -341,46 +341,64 @@ const AthleteWellnessCard = ({ hasWellnessToday, wellnessRecord, todayDate }) =>
                 date: todayDate,
                 mode: "wellness",
             })}
-            className="relative overflow-hidden bg-white border border-slate-200/80 hover:border-orange-300 rounded-xl p-5 flex flex-col justify-between h-full hover:shadow-xs transition-all group cursor-pointer block"
+            className={`relative overflow-hidden rounded-xl p-5 flex flex-col justify-between h-full transition-all group cursor-pointer block border shadow-xs ${
+                hasWellnessToday
+                    ? "bg-white border-slate-200/90 hover:border-indigo-300 hover:shadow-sm"
+                    : "bg-gradient-to-br from-indigo-50/90 via-violet-50/40 to-white border-indigo-200/90 hover:border-indigo-400 hover:shadow-md hover:shadow-indigo-500/10"
+            }`}
         >
-            {/* Subtle Warm Ambient Background Glow */}
-            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+            {/* Ambient Background Glow */}
+            <div className={`absolute right-0 top-0 w-36 h-36 bg-gradient-to-bl pointer-events-none rounded-tr-xl ${
+                hasWellnessToday
+                    ? "from-emerald-100/40 via-teal-50/20 to-transparent"
+                    : "from-indigo-200/50 via-violet-100/30 to-transparent"
+            }`}></div>
 
             <div className="relative z-10">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs ${
+                            hasWellnessToday
+                                ? "bg-emerald-600 text-white shadow-emerald-600/20"
+                                : "bg-indigo-600 text-white shadow-indigo-600/30"
+                        }`}>
                             <HeartPulse size={16} />
                         </div>
                         <div className="min-w-0">
-                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                            <h4 className="text-[10px] font-bold text-indigo-600/90 uppercase tracking-wider">
                                 Log Kebugaran
                             </h4>
-                            <h3 className="text-sm font-bold text-slate-800 group-hover:text-orange-600 transition-colors leading-tight truncate">
+                            <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight truncate">
                                 Kuisioner Wellness
                             </h3>
                         </div>
                     </div>
 
                     <span
-                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 ${
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 flex items-center gap-1.5 shadow-xs ${
                             hasWellnessToday
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-orange-50 text-orange-700 border-orange-200"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-indigo-600 text-white"
                         }`}
                     >
-                        {hasWellnessToday ? "Sudah Terisi" : "Wajib Diisi"}
+                        {!hasWellnessToday && (
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-200 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                            </span>
+                        )}
+                        <span>{hasWellnessToday ? "Sudah Terisi ✓" : "Wajib Diisi"}</span>
                     </span>
                 </div>
 
-                <p className="text-xs text-slate-500 font-normal leading-relaxed mb-3">
+                <p className="text-xs text-slate-600 font-normal leading-relaxed mb-3">
                     Pantau kualitas tidur, tingkat stres, rasa lelah, dan nyeri otot untuk evaluasi pemulihan fisik.
                 </p>
 
                 {/* Data preview when filled */}
                 {hasWellnessToday && wellnessRecord ? (
-                    <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 mb-1 text-center">
+                    <div className="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-slate-50/80 border border-slate-200/80 mb-1 text-center">
                         <div>
                             <span className="block text-[10px] text-slate-400 font-semibold">Tidur</span>
                             <span className="text-xs font-bold text-slate-800">
@@ -401,19 +419,21 @@ const AthleteWellnessCard = ({ hasWellnessToday, wellnessRecord, todayDate }) =>
                         </div>
                     </div>
                 ) : (
-                    <div className="p-2.5 rounded-lg bg-orange-50/40 border border-orange-100 text-[11px] text-orange-700 font-medium">
+                    <div className="p-2.5 rounded-lg bg-indigo-50/90 border border-indigo-200/80 text-[11px] text-indigo-900 font-medium leading-relaxed">
                         Belum ada input evaluasi kesiapan fisik untuk hari ini.
                     </div>
                 )}
             </div>
 
             {/* Footer Link */}
-            <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+            <div className={`relative z-10 pt-3 mt-3 border-t flex items-center justify-between ${
+                hasWellnessToday ? "border-slate-100" : "border-indigo-100"
+            }`}>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 group-hover:text-indigo-700 transition-colors">
                     <span>{hasWellnessToday ? "Lihat / Ubah Kuisioner" : "Isi Kuisioner Sekarang"}</span>
                     <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium">Form Harian</span>
+                <span className="text-[10px] text-indigo-400 font-semibold">Form Harian</span>
             </div>
         </Link>
     );
@@ -430,46 +450,64 @@ const AthleteRpeCard = ({ hasRpeToday, wellnessRecord, todayDate }) => {
                 date: todayDate,
                 mode: "rpe",
             })}
-            className="relative overflow-hidden bg-white border border-slate-200/80 hover:border-orange-300 rounded-xl p-5 flex flex-col justify-between h-full hover:shadow-xs transition-all group cursor-pointer block"
+            className={`relative overflow-hidden rounded-xl p-5 flex flex-col justify-between h-full transition-all group cursor-pointer block border shadow-xs ${
+                hasRpeToday
+                    ? "bg-white border-slate-200/90 hover:border-rose-300 hover:shadow-sm"
+                    : "bg-gradient-to-br from-rose-50/90 via-pink-50/40 to-white border-rose-200/90 hover:border-rose-400 hover:shadow-md hover:shadow-rose-500/10"
+            }`}
         >
-            {/* Subtle Warm Ambient Background Glow */}
-            <div className="absolute right-0 top-0 w-32 h-32 bg-gradient-to-bl from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none rounded-tr-xl"></div>
+            {/* Ambient Background Glow */}
+            <div className={`absolute right-0 top-0 w-36 h-36 bg-gradient-to-bl pointer-events-none rounded-tr-xl ${
+                hasRpeToday
+                    ? "from-emerald-100/40 via-teal-50/20 to-transparent"
+                    : "from-rose-200/50 via-pink-100/30 to-transparent"
+            }`}></div>
 
             <div className="relative z-10">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs ${
+                            hasRpeToday
+                                ? "bg-emerald-600 text-white shadow-emerald-600/20"
+                                : "bg-rose-600 text-white shadow-rose-600/30"
+                        }`}>
                             <Activity size={16} />
                         </div>
                         <div className="min-w-0">
-                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                            <h4 className="text-[10px] font-bold text-rose-600/90 uppercase tracking-wider">
                                 Log Latihan
                             </h4>
-                            <h3 className="text-sm font-bold text-slate-800 group-hover:text-orange-600 transition-colors leading-tight truncate">
+                            <h3 className="text-sm font-bold text-slate-900 group-hover:text-rose-600 transition-colors leading-tight truncate">
                                 Pengerahan Tenaga (RPE)
                             </h3>
                         </div>
                     </div>
 
                     <span
-                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 ${
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 flex items-center gap-1.5 shadow-xs ${
                             hasRpeToday
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-orange-50 text-orange-700 border-orange-200"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-rose-600 text-white"
                         }`}
                     >
-                        {hasRpeToday ? "Sudah Terisi" : "Wajib Diisi"}
+                        {!hasRpeToday && (
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-200 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
+                            </span>
+                        )}
+                        <span>{hasRpeToday ? "Sudah Terisi ✓" : "Wajib Diisi"}</span>
                     </span>
                 </div>
 
-                <p className="text-xs text-slate-500 font-normal leading-relaxed mb-3">
+                <p className="text-xs text-slate-600 font-normal leading-relaxed mb-3">
                     Catat skala intensitas kelelahan dan beban pengerahan tenaga (Skala 1 - 10 RPE) sesi latihan hari ini.
                 </p>
 
                 {/* Data preview when filled */}
                 {hasRpeToday && wellnessRecord ? (
-                    <div className="grid grid-cols-3 gap-2 p-2 rounded-lg bg-slate-50 border border-slate-100 mb-1 text-center">
+                    <div className="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-slate-50/80 border border-slate-200/80 mb-1 text-center">
                         <div>
                             <span className="block text-[10px] text-slate-400 font-semibold">RPE Pagi</span>
                             <span className="text-xs font-bold text-slate-800">
@@ -484,25 +522,27 @@ const AthleteRpeCard = ({ hasRpeToday, wellnessRecord, todayDate }) => {
                         </div>
                         <div>
                             <span className="block text-[10px] text-slate-400 font-semibold">Daily Load</span>
-                            <span className="text-xs font-bold text-orange-600">
+                            <span className="text-xs font-bold text-rose-600">
                                 {wellnessRecord.daily_load ? `${wellnessRecord.daily_load} AU` : "Terisi"}
                             </span>
                         </div>
                     </div>
                 ) : (
-                    <div className="p-2.5 rounded-lg bg-orange-50/40 border border-orange-100 text-[11px] text-orange-700 font-medium">
+                    <div className="p-2.5 rounded-lg bg-rose-50/90 border border-rose-200/80 text-[11px] text-rose-900 font-medium leading-relaxed">
                         Belum ada catatan skala pengerahan tenaga yang dimasukkan hari ini.
                     </div>
                 )}
             </div>
 
             {/* Footer Link */}
-            <div className="relative z-10 pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
+            <div className={`relative z-10 pt-3 mt-3 border-t flex items-center justify-between ${
+                hasRpeToday ? "border-slate-100" : "border-rose-100"
+            }`}>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
                     <span>{hasRpeToday ? "Lihat / Ubah Catatan RPE" : "Isi Catatan RPE Sekarang"}</span>
                     <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium">Beban Sesi</span>
+                <span className="text-[10px] text-rose-400 font-semibold">Beban Sesi</span>
             </div>
         </Link>
     );
@@ -734,30 +774,30 @@ export default function AthleteDashboard({
                         {/* Hero Greeting */}
                         <AthleteHeroGreeting user={user} stats={stats} />
 
-                        {/* Row 1: Skor Tes Fisik & Radar Kategori Fisik (2 Columns) */}
+                        {/* Row 1: 2 Standalone Daily Log Cards (Wellness & RPE) — Prioritized at Top */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Card 1: Skor Tes Fisik */}
-                            <AthletePhysicalScoreCard stats={stats} />
-
-                            {/* Card 2: Radar Kategori Fisik */}
-                            <AthleteCategoryRadarCard data={category_averages} />
-                        </div>
-
-                        {/* Row 2: 2 Standalone Daily Log Cards (Wellness & RPE) */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Card 3: Kuisioner Wellness */}
+                            {/* Card 1: Kuisioner Wellness */}
                             <AthleteWellnessCard
                                 hasWellnessToday={has_wellness_today}
                                 wellnessRecord={today_wellness_record}
                                 todayDate={today_date}
                             />
 
-                            {/* Card 4: Log Beban Latihan RPE */}
+                            {/* Card 2: Log Beban Latihan RPE */}
                             <AthleteRpeCard
                                 hasRpeToday={has_rpe_today}
                                 wellnessRecord={today_wellness_record}
                                 todayDate={today_date}
                             />
+                        </div>
+
+                        {/* Row 2: Skor Tes Fisik & Radar Kategori Fisik (2 Columns) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Card 3: Skor Tes Fisik */}
+                            <AthletePhysicalScoreCard stats={stats} />
+
+                            {/* Card 4: Radar Kategori Fisik */}
+                            <AthleteCategoryRadarCard data={category_averages} />
                         </div>
                     </div>
 

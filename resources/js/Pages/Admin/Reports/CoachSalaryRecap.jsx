@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Common/PageHeader';
 import PageFooter from '@/Components/Common/PageFooter';
+import CoachPayoutModal from '@/Components/Admin/CoachPayoutModal';
 import { Head, Link, router } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 import {
@@ -41,7 +42,8 @@ export default function CoachSalaryRecap({
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('all'); // 'all' | 'YYYY-MM'
     const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'unpaid' | 'paid'
-    const [processing, setProcessing] = useState(false);
+    const [selectedCoachForPayout, setSelectedCoachForPayout] = useState(null);
+    const [payoutModalOpen, setPayoutModalOpen] = useState(false);
 
     // Filter coaches
     const filteredCoaches = useMemo(() => {
@@ -85,48 +87,8 @@ export default function CoachSalaryRecap({
             return;
         }
 
-        Swal.fire({
-            title: 'Cairkan Honor Pelatih?',
-            html: `
-                <div class="text-left text-xs space-y-2 p-2 bg-slate-50 rounded border border-slate-200">
-                    <div><strong>Pelatih:</strong> ${coach.name}</div>
-                    <div><strong>Total Honor:</strong> <span class="text-emerald-700 font-bold">${formatCurrency(coach.unpaid_earnings)}</span></div>
-                    <div><strong>Sesi Belum Dicairkan:</strong> ${coach.unpaid_sessions} sesi</div>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Tindakan ini akan menandai seluruh sesi belum dibayar coach ini sebagai lunas dan mencatat riwayat payout.</p>
-            `,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#ea580c',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Cairkan Honor',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setProcessing(true);
-                router.post(route('admin.reports.pay-coach', coach.id), {}, {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        setProcessing(false);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil Dicairkan!',
-                            text: `Honor untuk Coach ${coach.name} berhasil dicairkan.`,
-                            confirmButtonColor: '#ea580c',
-                        });
-                    },
-                    onError: () => {
-                        setProcessing(false);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat memproses pencairan.',
-                            confirmButtonColor: '#ea580c',
-                        });
-                    }
-                });
-            }
-        });
+        setSelectedCoachForPayout(coach);
+        setPayoutModalOpen(true);
     };
 
     const handleExportPdf = (coachId, e) => {
@@ -361,11 +323,11 @@ export default function CoachSalaryRecap({
                                             >
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center gap-2.5">
-                                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-white font-bold text-xs flex items-center justify-center shrink-0 border border-orange-500 shadow-2xs group-hover:ring-2 group-hover:ring-orange-400/40 transition-all">
+                                                        <div className="w-9 h-9 min-w-[36px] min-h-[36px] max-w-[36px] max-h-[36px] aspect-square rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 border border-orange-500 shadow-2xs group-hover:ring-2 group-hover:ring-orange-400/40 transition-all overflow-hidden leading-none select-none">
                                                             {coach.profile_photo_url ? (
-                                                                <img src={coach.profile_photo_url} alt={coach.name} className="w-full h-full object-cover rounded-full" />
+                                                                <img src={coach.profile_photo_url} alt={coach.name} className="w-full h-full object-cover rounded-full aspect-square" />
                                                             ) : (
-                                                                <span>{getInitials(coach.name)}</span>
+                                                                <span className="leading-none">{getInitials(coach.name)}</span>
                                                             )}
                                                         </div>
                                                         <div>
@@ -424,8 +386,7 @@ export default function CoachSalaryRecap({
                                                             <button
                                                                 type="button"
                                                                 onClick={(e) => handlePayCoach(coach, e)}
-                                                                disabled={processing}
-                                                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+                                                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
                                                             >
                                                                 <Banknote className="w-3.5 h-3.5" />
                                                                 <span>Cairkan</span>
@@ -459,6 +420,17 @@ export default function CoachSalaryRecap({
 
                 <PageFooter className="!mt-8 !pt-4 !pb-1" />
             </div>
+
+            {/* Payout Modal */}
+            <CoachPayoutModal
+                show={payoutModalOpen}
+                onClose={() => {
+                    setPayoutModalOpen(false);
+                    setSelectedCoachForPayout(null);
+                }}
+                coach={selectedCoachForPayout}
+                defaultMonth={selectedMonth}
+            />
         </AppLayout>
     );
 }

@@ -183,6 +183,55 @@ class LoadAnalysisController extends Controller
         // Sort by total volume desc, take top exercises
         $exerciseStats = collect($exerciseStats)->sortByDesc('total_volume')->values()->all();
 
+        // 4b. Aggregate per-body-part / muscle stats
+        $bodyPartStats = [];
+        foreach ($sessionsData as $session) {
+            foreach ($session['exercises'] as $exercise) {
+                $bodyParts = $exercise['body_parts'] ?? [];
+                if (!empty($bodyParts) && is_array($bodyParts)) {
+                    foreach ($bodyParts as $part) {
+                        if (!isset($bodyPartStats[$part])) {
+                            $bodyPartStats[$part] = [
+                                'name' => $part,
+                                'total_volume' => 0,
+                                'total_sets' => 0,
+                                'total_reps' => 0,
+                                'session_count' => 0,
+                                'exercises' => [],
+                            ];
+                        }
+                        $bodyPartStats[$part]['total_volume'] += $exercise['volume'];
+                        $bodyPartStats[$part]['total_sets'] += $exercise['sets'];
+                        $bodyPartStats[$part]['total_reps'] += $exercise['reps'];
+                        $bodyPartStats[$part]['session_count']++;
+
+                        $exKey = $exercise['name'];
+                        if (!isset($bodyPartStats[$part]['exercises'][$exKey])) {
+                            $bodyPartStats[$part]['exercises'][$exKey] = [
+                                'name' => $exercise['name'],
+                                'category' => $exercise['category'] ?? 'Lainnya',
+                                'volume' => 0,
+                                'sets' => 0,
+                                'reps' => 0,
+                            ];
+                        }
+                        $bodyPartStats[$part]['exercises'][$exKey]['volume'] += $exercise['volume'];
+                        $bodyPartStats[$part]['exercises'][$exKey]['sets'] += $exercise['sets'];
+                        $bodyPartStats[$part]['exercises'][$exKey]['reps'] += $exercise['reps'];
+                    }
+                }
+            }
+        }
+
+        // Convert exercises dictionary to sorted array for each body part
+        foreach ($bodyPartStats as &$bp) {
+            $bp['exercises'] = collect($bp['exercises'])->sortByDesc('volume')->values()->all();
+            $bp['exercise_count'] = count($bp['exercises']);
+        }
+        unset($bp);
+
+        $bodyPartStats = collect($bodyPartStats)->sortByDesc('total_volume')->values()->all();
+
         // 5. Weekly aggregation with Monotony, Strain, ACWR, and StdDev
         $weeklyData = [];
         
@@ -298,6 +347,7 @@ class LoadAnalysisController extends Controller
             'athlete' => $user,
             'sessions' => $sessionsData->all(),
             'exerciseStats' => $exerciseStats,
+            'bodyPartStats' => $bodyPartStats,
             'weeklyData' => $weeklyData,
             'summary' => [
                 'total_volume' => $totalVolume,
@@ -310,7 +360,34 @@ class LoadAnalysisController extends Controller
     }
 
     /**
-     * Calculate total volume load for a set of training blocks
+     * Helper to safely parse numeric value from strings like "60 second", "12/12", "2.5kg", etc.
+     */
+    private function parseNumericValue($val)
+    {
+        if (is_null($val)) return 0;
+        if (is_numeric($val)) return floatval($val);
+        if (is_string($val)) {
+            $val = trim($val);
+            // Handle fractional formats like "12/12"
+            if (strpos($val, '/') !== false) {
+                $parts = explode('/', $val);
+                $sum = 0;
+                foreach ($parts as $p) {
+                    if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', $p, $m)) {
+                        $sum += floatval($m[1]);
+                    }
+                }
+                return $sum;
+            }
+            if (preg_match('/([0-9]+(?:\.[0-9]+)?)/', $val, $m)) {
+                return floatval($m[1]);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Calculate total volume load for a set of training blocks across all training types
      */
     private function calculateSessionLoad($blocks, $athleteId = null)
     {
@@ -330,40 +407,82 @@ class LoadAnalysisController extends Controller
                 if (!$item->exercise) continue;
 
                 $exerciseName = $item->exercise->name;
-                $categoryName = $item->exercise->category ? $item->exercise->category->name : 'Lainnya';
+                $categoryName = $item->exercise->category ? $item->exercise->category->name : ($block->category ?: 'Lainnya');
+                $bodyParts = $item->exercise->body_parts ?? [];
 
-                // Calculate volume from array data if available, otherwise from simple fields
+                // Calculate volume from detailed array or simple fields
                 $itemVolume = 0;
                 $itemSets = 0;
                 $itemReps = 0;
                 $itemMaxLoad = 0;
 
-                if (!empty($item->load_array) && !empty($item->reps_array)) {
-                    // Use detailed per-set data
-                    $loads = is_array($item->load_array) ? $item->load_array : [];
-                    $reps = is_array($item->reps_array) ? $item->reps_array : [];
+                $hasLoads = !empty($item->load_array) && is_array($item->load_array);
+                $hasReps = !empty($item->reps_array) && is_array($item->reps_array);
+                $hasMinutes = !empty($item->minutes_array) && is_array($item->minutes_array);
+                $hasDist = !empty($item->distance_array) && is_array($item->distance_array);
 
-                    $setCount = max(count($loads), count($reps));
+                if ($hasLoads || $hasReps || $hasMinutes || $hasDist) {
+                    $setCount = max(
+                        $hasLoads ? count($item->load_array) : 0,
+                        $hasReps ? count($item->reps_array) : 0,
+                        $hasMinutes ? count($item->minutes_array) : 0,
+                        $hasDist ? count($item->distance_array) : 0,
+                        floatval($item->sets ?? 1)
+                    );
                     $itemSets = $setCount;
 
                     for ($i = 0; $i < $setCount; $i++) {
-                        $setLoad = isset($loads[$i]) ? floatval($loads[$i]) : 0;
-                        $setReps = isset($reps[$i]) ? floatval($reps[$i]) : 0;
-                        $itemVolume += $setReps * $setLoad;
+                        $setLoad = $hasLoads && isset($item->load_array[$i]) ? $this->parseNumericValue($item->load_array[$i]) : $this->parseNumericValue($item->load ?? 0);
+                        $setReps = $hasReps && isset($item->reps_array[$i]) ? $this->parseNumericValue($item->reps_array[$i]) : $this->parseNumericValue($item->reps ?? 0);
+                        $setMins = $hasMinutes && isset($item->minutes_array[$i]) ? $this->parseNumericValue($item->minutes_array[$i]) : 0;
+                        $setD = $hasDist && isset($item->distance_array[$i]) ? $this->parseNumericValue($item->distance_array[$i]) : 0;
+
+                        if ($setLoad > 0 && $setReps > 0) {
+                            $itemVolume += $setReps * $setLoad;
+                        } elseif ($setReps > 0) {
+                            // Bodyweight or agility reps (e.g. 1 AU per rep / second)
+                            $itemVolume += $setReps * 1;
+                        } elseif ($setMins > 0) {
+                            // Cardio in minutes (e.g. minutes * intensity)
+                            $intensity = floatval($item->intensity ?? 5);
+                            $itemVolume += $setMins * max(1, $intensity);
+                        } elseif ($setD > 0) {
+                            // Distance in meters
+                            $itemVolume += ($setD / 10);
+                        } else {
+                            // Nominal load for completed set
+                            $itemVolume += 10;
+                        }
+
                         $itemMaxLoad = max($itemMaxLoad, $setLoad);
                         $itemReps += $setReps;
                     }
                 } else {
-                    // Fallback to simple sets × reps × load
-                    $sets = floatval($item->sets ?? 0);
-                    $reps = floatval($item->reps ?? 0);
-                    $load = floatval($item->load ?? 0);
+                    // Fallback to simple fields
+                    $sets = max(1, floatval($item->sets ?? 0));
+                    $reps = $this->parseNumericValue($item->reps ?? 0);
+                    $load = $this->parseNumericValue($item->load ?? 0);
+                    $duration = $this->parseNumericValue($item->duration ?? 0);
 
-                    if ($sets > 0 && $reps > 0 && $load > 0) {
+                    if ($reps > 0 && $load > 0) {
                         $itemVolume = $sets * $reps * $load;
                         $itemSets = $sets;
                         $itemReps = $sets * $reps;
                         $itemMaxLoad = $load;
+                    } elseif ($reps > 0) {
+                        // Bodyweight reps
+                        $itemVolume = $sets * $reps * 1;
+                        $itemSets = $sets;
+                        $itemReps = $sets * $reps;
+                        $itemMaxLoad = 0;
+                    } elseif ($duration > 0) {
+                        $intensity = floatval($item->intensity ?? 5);
+                        $itemVolume = $sets * ($duration > 60 ? $duration / 60 : $duration) * max(1, $intensity);
+                        $itemSets = $sets;
+                    } else {
+                        // Nominal set volume
+                        $itemVolume = $sets * 10;
+                        $itemSets = $sets;
                     }
                 }
 
@@ -371,6 +490,7 @@ class LoadAnalysisController extends Controller
                     $exercises[] = [
                         'name' => $exerciseName,
                         'category' => $categoryName,
+                        'body_parts' => $bodyParts,
                         'volume' => round($itemVolume),
                         'sets' => $itemSets,
                         'reps' => $itemReps,

@@ -4,29 +4,30 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import PageHeader from '@/Components/Common/PageHeader';
 import PageFooter from '@/Components/Common/PageFooter';
 import { 
-    Users, UsersRound, UserCheck, User, Activity, Search, Trophy, CheckCircle2, Calendar, 
+    Users, UsersRound, UserCheck, User, UserX, Activity, Search, Trophy, CheckCircle2, Calendar, 
     Banknote, ChevronDown, ChevronRight, Package, Dumbbell, Filter, 
     Clock, DollarSign, Layers, Eye, ShieldCheck, Sparkles, TrendingUp, FileText,
     X, AlertCircle
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-export default function SessionRecap({ 
-    athletes = [], 
-    groups = [], 
+export default function SessionRecap({
+    athletes = [],
+    groups = [],
     sharedPackages = [],
-    sessionSummary = {}
+    noPackageAthletes = [],
+    sessionSummary = {},
 }) {
     // Read from URL query param or localStorage
     const getInitialTab = () => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const tabParam = params.get('tab');
-            if (tabParam && ['individual', 'group', 'shared_package'].includes(tabParam)) {
+            if (tabParam && ['individual', 'group', 'shared_package', 'no_package'].includes(tabParam)) {
                 return tabParam;
             }
             const saved = localStorage.getItem('session_recap_client_active_tab');
-            if (saved && ['individual', 'group', 'shared_package'].includes(saved)) {
+            if (saved && ['individual', 'group', 'shared_package', 'no_package'].includes(saved)) {
                 return saved;
             }
         }
@@ -60,7 +61,7 @@ export default function SessionRecap({
         setExpandedRows(newExpanded);
     };
 
-    // Filter Athletes (Individual)
+    // Filter Athletes (Private Package Only)
     const filteredAthletes = useMemo(() => {
         return athletes.filter(a => {
             if (searchQuery.trim()) {
@@ -116,6 +117,24 @@ export default function SessionRecap({
             return true;
         });
     }, [sharedPackages, searchQuery, statusFilter]);
+
+    // Filter No Package Athletes
+    const filteredNoPackageAthletes = useMemo(() => {
+        return (noPackageAthletes || []).filter(a => {
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                const matchName = a.name?.toLowerCase().includes(q);
+                const matchSport = a.sport?.name?.toLowerCase().includes(q);
+                if (!matchName && !matchSport) return false;
+            }
+            if (statusFilter === 'unpaid') {
+                if ((a.unpaid_sessions || 0) <= 0) return false;
+            } else if (statusFilter === 'paid') {
+                if ((a.unpaid_sessions || 0) > 0) return false;
+            }
+            return true;
+        });
+    }, [noPackageAthletes, searchQuery, statusFilter]);
 
     // Handle Payment Actions
     const handlePayAthlete = (athlete) => {
@@ -222,15 +241,15 @@ export default function SessionRecap({
                 {/* ─── PAGE HEADER ─── */}
                 <PageHeader
                     title="Rekap Sesi Latihan"
-                    description="Rekapitulasi dan pelunasan sesi latihan klien individu, grup latihan, dan paket bersama."
+                    description="Rekapitulasi dan pelunasan sesi latihan klien privat, grup latihan, paket bersama, dan tanpa paket."
                 />
 
                 {/* ─── KPI SUMMARY CARDS ─── */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     {/* Total Unpaid */}
                     <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-slate-500">Total Sesi Belum Lunas</span>
+                            <span className="text-[11px] font-bold text-slate-500">Total Belum Lunas</span>
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${sessionSummary.total_unpaid > 0 ? 'bg-orange-50 text-orange-600' : 'bg-emerald-50 text-emerald-600'}`}>
                                 <AlertCircle className="w-4 h-4" />
                             </div>
@@ -240,13 +259,13 @@ export default function SessionRecap({
                                 {sessionSummary.total_unpaid || 0} Sesi
                             </span>
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-1">Akumulasi seluruh sesi yang belum ditandai lunas</p>
+                        <p className="text-[10px] text-slate-400 mt-1">Akumulasi seluruh sesi belum bayar</p>
                     </div>
 
-                    {/* Individual Client */}
+                    {/* Private Packages */}
                     <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-slate-500">Klien Individu</span>
+                            <span className="text-[11px] font-bold text-slate-500">Paket Privat</span>
                             <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
                                 <UserCheck className="w-4 h-4" />
                             </div>
@@ -257,7 +276,7 @@ export default function SessionRecap({
                             </span>
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1">
-                            {sessionSummary.unpaid_individual || 0} sesi belum lunas • {athletes.length} atlet terdaftar
+                            {sessionSummary.unpaid_individual || 0} sesi belum lunas • {athletes.length} atlet
                         </p>
                     </div>
 
@@ -275,7 +294,7 @@ export default function SessionRecap({
                             </span>
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1">
-                            {sessionSummary.unpaid_group || 0} sesi belum lunas • {groups.length} grup aktif
+                            {sessionSummary.unpaid_group || 0} sesi belum lunas • {groups.length} grup
                         </p>
                     </div>
 
@@ -293,7 +312,25 @@ export default function SessionRecap({
                             </span>
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1">
-                            {sessionSummary.unpaid_shared || 0} sesi belum lunas • {sharedPackages.length} paket bersama
+                            {sessionSummary.unpaid_shared || 0} sesi belum lunas • {sharedPackages.length} paket
+                        </p>
+                    </div>
+
+                    {/* No Package */}
+                    <div className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold text-slate-500">Tanpa Paket</span>
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                                <UserX className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <div className="mt-2 flex items-baseline gap-2">
+                            <span className="text-xl font-black text-slate-900">
+                                {sessionSummary.total_no_package || 0} Sesi
+                            </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-1">
+                            {sessionSummary.unpaid_no_package || 0} sesi belum lunas • {noPackageAthletes.length} atlet
                         </p>
                     </div>
                 </div>
@@ -311,7 +348,7 @@ export default function SessionRecap({
                             }`}
                         >
                             <UserCheck size={13.5} />
-                            <span>Klien Individu ({athletes.length})</span>
+                            <span>Klien Privat ({athletes.length})</span>
                         </button>
 
                         <button
@@ -332,12 +369,25 @@ export default function SessionRecap({
                             onClick={() => setActiveTab('shared_package')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                 activeTab === 'shared_package' 
-                                    ? 'bg-white text-orange-700 shadow-2xs border border-slate-200/70' 
+                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/70' 
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                             }`}
                         >
                             <UsersRound size={13.5} />
                             <span>Paket Bersama ({sharedPackages.length})</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('no_package')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                                activeTab === 'no_package' 
+                                    ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/70' 
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                            }`}
+                        >
+                            <UserX size={13.5} />
+                            <span>Tanpa Paket ({noPackageAthletes.length})</span>
                         </button>
                     </div>
 
@@ -862,6 +912,163 @@ export default function SessionRecap({
                                     )) : (
                                         <tr>
                                             <td colSpan="6" className="px-5 py-8 text-center text-slate-400 text-xs font-medium italic">Tidak ada data paket bersama.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {/* ── 4. NO PACKAGE TAB ── */}
+                    {activeTab === 'no_package' && (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[700px]">
+                                <thead className="bg-slate-50/70 border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <tr>
+                                        <th className="px-4 py-2.5 w-10"></th>
+                                        <th className="px-4 py-2.5">Nama Atlet</th>
+                                        <th className="px-4 py-2.5">Status Paket</th>
+                                        <th className="px-4 py-2.5">Total Sesi Latihan</th>
+                                        <th className="px-4 py-2.5 text-center">Belum Bayar</th>
+                                        <th className="px-4 py-2.5 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 text-xs">
+                                    {filteredNoPackageAthletes.length > 0 ? filteredNoPackageAthletes.map(athlete => (
+                                        <React.Fragment key={athlete.id}>
+                                            <tr className="hover:bg-slate-50/60 transition-colors group">
+                                                <td className="px-4 py-3">
+                                                    <button onClick={() => toggleRow(`no-pkg-${athlete.id}`)} className="p-1 text-slate-400 hover:text-slate-800 rounded cursor-pointer">
+                                                        {expandedRows.has(`no-pkg-${athlete.id}`) ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                                                    </button>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex flex-col">
+                                                        <Link 
+                                                            href={route('admin.individual-trainings.show', athlete.id)}
+                                                            className="font-bold text-xs text-slate-900 hover:text-orange-600 transition-colors"
+                                                        >
+                                                            {athlete.name}
+                                                        </Link>
+                                                        <span className="text-[10px] font-medium text-slate-400 flex items-center gap-1 mt-0.5">
+                                                            <Trophy className="w-2.5 h-2.5 text-slate-300" />
+                                                            {athlete.sport?.name || '-'}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10.5px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                                        Tanpa Paket (Sesi Lepas)
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                                                        <span>{athlete.total_sessions || 0} Sesi Total</span>
+                                                        <span className="text-[10.5px] text-slate-400 font-normal">
+                                                            ({athlete.completed_sessions || 0} selesai)
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-center">
+                                                    {athlete.unpaid_sessions > 0 ? (
+                                                        <span className="font-bold text-orange-600 text-xs">
+                                                            {athlete.unpaid_sessions} Sesi
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-slate-300">-</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        <Link
+                                                            href={route('admin.individual-trainings.show', athlete.id)}
+                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 rounded-md text-xs font-semibold shadow-2xs transition-colors"
+                                                        >
+                                                            <Eye size={12} /> Sesi
+                                                        </Link>
+                                                        {athlete.unpaid_sessions > 0 ? (
+                                                            <button
+                                                                onClick={() => handlePayAthlete(athlete)}
+                                                                disabled={processing}
+                                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 text-white hover:bg-orange-700 rounded-md text-xs font-semibold transition-all disabled:opacity-50 shadow-2xs cursor-pointer"
+                                                            >
+                                                                <Banknote className="w-3.5 h-3.5" /> Tandai Lunas
+                                                            </button>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                                                                <CheckCircle2 size={13} /> Lunas
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {/* Expanded Details */}
+                                            {expandedRows.has(`no-pkg-${athlete.id}`) && (
+                                                <tr className="bg-slate-50/40">
+                                                    <td colSpan="6" className="px-6 py-3 border-b border-slate-100">
+                                                        <div className="bg-white border border-slate-200/80 rounded-md overflow-hidden shadow-2xs">
+                                                            <div className="px-3.5 py-2 bg-slate-50/70 border-b border-slate-100 text-xs font-bold text-slate-800">
+                                                                Riwayat Sesi Latihan Atlet (Belum Bayar)
+                                                            </div>
+                                                            {athlete.sessions && athlete.sessions.length > 0 ? (
+                                                                <table className="w-full text-left">
+                                                                    <tbody className="divide-y divide-slate-100 text-xs">
+                                                                        {athlete.sessions.map(session => (
+                                                                            <tr key={session.id} className="hover:bg-slate-50/60 transition-colors">
+                                                                                <td className="px-3.5 py-2 font-medium text-slate-600 w-32 border-r border-slate-50">
+                                                                                    {session.date ? new Date(session.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                                                                </td>
+                                                                                <td className="px-3.5 py-2">
+                                                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                                                        <span className="font-bold text-slate-900">
+                                                                                            {session.session_number ? `Sesi ${session.session_number}:` : '•'}
+                                                                                        </span>
+                                                                                        <span className="text-slate-700">{session.name || 'Program Latihan'}</span>
+                                                                                        {session.is_extra && (
+                                                                                            <span className="text-[10px] font-semibold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200/60">
+                                                                                                Sesi Tambahan
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="px-3.5 py-2 text-slate-500">
+                                                                                    {session.coaches?.length > 0 ? session.coaches.join(', ') : '-'}
+                                                                                </td>
+                                                                                <td className="px-3.5 py-2 w-28">
+                                                                                    {session.status === 'completed' ? (
+                                                                                        <span className="text-emerald-600 font-semibold inline-flex items-center gap-1 text-[11px]">
+                                                                                            <CheckCircle2 size={12} /> Selesai
+                                                                                        </span>
+                                                                                    ) : (
+                                                                                        <span className="text-amber-600 font-semibold text-[11px]">
+                                                                                            Terjadwal
+                                                                                        </span>
+                                                                                    )}
+                                                                                </td>
+                                                                                <td className="px-3.5 py-2 w-28 text-right">
+                                                                                    {session.is_paid ? (
+                                                                                        <span className="text-emerald-600 font-semibold text-xs inline-flex items-center gap-1">
+                                                                                            <CheckCircle2 size={12} /> Lunas
+                                                                                        </span>
+                                                                                    ) : (
+                                                                                        <span className="text-rose-600 font-semibold text-xs">Belum Bayar</span>
+                                                                                    )}
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            ) : (
+                                                                <div className="p-4 text-center text-xs text-slate-400 italic">Belum ada sesi belum bayar.</div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan="6" className="px-5 py-8 text-center text-slate-400 text-xs font-medium italic">Tidak ada data atlet tanpa paket.</td>
                                         </tr>
                                     )}
                                 </tbody>

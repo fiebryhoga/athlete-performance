@@ -2,10 +2,14 @@ import React, { useState, useMemo } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import PageHeader from '@/Components/Common/PageHeader';
 import PageFooter from '@/Components/Common/PageFooter';
+import CoachPayoutModal from '@/Components/Admin/CoachPayoutModal';
 import { Head, Link, router } from '@inertiajs/react';
 import Swal from 'sweetalert2';
 import {
     ChevronLeft,
+    ChevronDown,
+    ChevronUp,
+    ChevronRight,
     Banknote,
     Printer,
     CheckCircle2,
@@ -57,7 +61,28 @@ export default function CoachShow({
     const [activeTab, setActiveTab] = useState('monthly'); // 'monthly' | 'unpaid' | 'all'
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('all'); // 'all' | 'Individu' | 'Grup' | 'Jaga Gym'
-    const [processing, setProcessing] = useState(false);
+    const [payoutModalOpen, setPayoutModalOpen] = useState(false);
+    const [payoutDefaultMonth, setPayoutDefaultMonth] = useState('all');
+    const [expandedMonths, setExpandedMonths] = useState(new Set());
+
+    const toggleMonthExpand = (monthKey) => {
+        setExpandedMonths(prev => {
+            const next = new Set(prev);
+            if (next.has(monthKey)) {
+                next.delete(monthKey);
+            } else {
+                next.add(monthKey);
+            }
+            return next;
+        });
+    };
+
+    const coachForPayout = useMemo(() => ({
+        ...coach,
+        unpaid_earnings: stats.unpaid_earnings || 0,
+        unpaid_sessions: stats.unpaid_sessions_count || 0,
+        monthly_breakdown: monthly_breakdown || []
+    }), [coach, stats, monthly_breakdown]);
 
     // Filtered list for "all" and "unpaid" tabs
     const displayedSessions = useMemo(() => {
@@ -75,7 +100,7 @@ export default function CoachShow({
         });
     }, [activeTab, unpaid_sessions, all_sessions, typeFilter, searchTerm]);
 
-    const handlePayCoach = () => {
+    const handlePayCoach = (monthKey = 'all') => {
         if (!stats.unpaid_earnings || stats.unpaid_earnings <= 0) {
             Swal.fire({
                 icon: 'info',
@@ -86,48 +111,8 @@ export default function CoachShow({
             return;
         }
 
-        Swal.fire({
-            title: 'Cairkan Honor Pelatih?',
-            html: `
-                <div class="text-left text-xs space-y-2 p-3 bg-slate-50 rounded border border-slate-200">
-                    <div><strong>Pelatih:</strong> ${coach.name}</div>
-                    <div><strong>Total Honor Dicairkan:</strong> <span class="text-emerald-700 font-bold">${formatCurrency(stats.unpaid_earnings)}</span></div>
-                    <div><strong>Jumlah Sesi:</strong> ${stats.unpaid_sessions_count || 0} sesi pending</div>
-                </div>
-                <p class="text-xs text-slate-500 mt-3">Tindakan ini akan menandai seluruh sesi belum dibayar coach ini sebagai lunas dan mencatat riwayat payout.</p>
-            `,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#ea580c',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Cairkan Honor',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setProcessing(true);
-                router.post(route('admin.reports.pay-coach', coach.id), {}, {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        setProcessing(false);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil Dicairkan!',
-                            text: `Honor untuk Coach ${coach.name} sebesar ${formatCurrency(stats.unpaid_earnings)} berhasil dicairkan.`,
-                            confirmButtonColor: '#ea580c',
-                        });
-                    },
-                    onError: () => {
-                        setProcessing(false);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan saat memproses pencairan.',
-                            confirmButtonColor: '#ea580c',
-                        });
-                    }
-                });
-            }
-        });
+        setPayoutDefaultMonth(monthKey || 'all');
+        setPayoutModalOpen(true);
     };
 
     const handleExportPdf = (monthKey = null) => {
@@ -156,27 +141,26 @@ export default function CoachShow({
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
                             >
                                 <ChevronLeft className="w-3.5 h-3.5" />
-                                <span>Kembali ke Rekap Pelatih</span>
+                                <span>Kembali</span>
                             </Link>
 
                             <button
                                 type="button"
                                 onClick={() => handleExportPdf(null)}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-orange-700 rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-md text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                             >
                                 <Printer className="w-3.5 h-3.5 text-slate-500" />
-                                <span>Cetak Semua Slip PDF</span>
+                                <span>Cetak Slip</span>
                             </button>
 
                             {hasUnpaid && (
                                 <button
                                     type="button"
-                                    onClick={handlePayCoach}
-                                    disabled={processing}
-                                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                                    onClick={() => handlePayCoach('all')}
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
                                     <Banknote className="w-3.5 h-3.5" />
-                                    <span>Cairkan Honor ({formatCurrency(stats.unpaid_earnings)})</span>
+                                    <span>Cairkan ({formatCurrency(stats.unpaid_earnings)})</span>
                                 </button>
                             )}
                         </div>
@@ -193,18 +177,18 @@ export default function CoachShow({
                         
                         {/* 1. KARTU PROFIL PELATIH */}
                         <div className="bg-white border border-slate-200/90 rounded-lg shadow-2xs overflow-hidden">
-                            <div className="p-4 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/30 border-b border-slate-100 flex items-start gap-3">
-                                <div className="w-13 h-13 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-black text-base flex items-center justify-center shrink-0 shadow-2xs overflow-hidden border border-orange-600">
+                            <div className="p-4 bg-white border-b border-slate-100 flex items-start gap-3">
+                                <div className="w-12 h-12 min-w-[48px] min-h-[48px] max-w-[48px] max-h-[48px] aspect-square rounded-full bg-slate-800 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-2xs overflow-hidden border border-slate-700 leading-none select-none">
                                     {coach.profile_photo_url ? (
-                                        <img src={coach.profile_photo_url} alt={coach.name} className="w-full h-full object-cover" />
+                                        <img src={coach.profile_photo_url} alt={coach.name} className="w-full h-full object-cover rounded-full aspect-square" />
                                     ) : (
-                                        <span>{getInitials(coach.name)}</span>
+                                        <span className="leading-none">{getInitials(coach.name)}</span>
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5 flex-wrap">
                                         <h3 className="font-bold text-sm text-slate-900 truncate">{coach.name}</h3>
-                                        <span className="inline-flex items-center px-2 py-0.2 rounded text-[10px] font-bold bg-orange-100/80 text-orange-800 border border-orange-200/70">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
                                             Pelatih OTS
                                         </span>
                                     </div>
@@ -228,7 +212,7 @@ export default function CoachShow({
                             <div className="p-3.5 space-y-2.5 bg-slate-50/40 text-xs">
                                 <div className="flex items-center justify-between py-1 px-2.5 bg-white rounded border border-slate-200/60">
                                     <span className="text-slate-500 flex items-center gap-1.5 font-medium">
-                                        <Building2 className="w-3.5 h-3.5 text-orange-500" />
+                                        <Building2 className="w-3.5 h-3.5 text-slate-500" />
                                         Honor Shift Jaga Gym
                                     </span>
                                     <span className="font-bold text-slate-800">
@@ -251,15 +235,15 @@ export default function CoachShow({
                         <div className="bg-white border border-slate-200/90 rounded-lg shadow-2xs overflow-hidden">
                             <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
                                 <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                                    <Banknote className="w-3.5 h-3.5 text-orange-600" />
+                                    <Banknote className="w-3.5 h-3.5 text-slate-500" />
                                     Ringkasan Honor Kepelatihan
                                 </h4>
                                 {hasUnpaid ? (
-                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    <span className="text-xs font-semibold text-amber-600">
                                         Ada Pending
                                     </span>
                                 ) : (
-                                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                    <span className="text-xs font-semibold text-emerald-600">
                                         Semua Lunas
                                     </span>
                                 )}
@@ -267,28 +251,23 @@ export default function CoachShow({
 
                             <div className="p-4 space-y-3">
                                 {/* Highlight Box: Belum Dicairkan */}
-                                <div className={`p-3.5 rounded-lg border ${
-                                    hasUnpaid 
-                                        ? 'bg-amber-50/70 border-amber-200 text-amber-900' 
-                                        : 'bg-emerald-50/60 border-emerald-200 text-emerald-900'
-                                }`}>
+                                <div className="p-3.5 rounded-lg border border-slate-200/80 bg-slate-50/70 text-slate-900">
                                     <div className="flex items-center justify-between text-[11px] font-bold">
-                                        <span className="uppercase text-[9.5px] tracking-wider opacity-80">Honor Belum Dicairkan</span>
-                                        <span className="text-[10.5px]">{stats.unpaid_sessions_count || 0} sesi pending</span>
+                                        <span className="uppercase text-[9.5px] text-slate-500 tracking-wider">Honor Belum Dicairkan</span>
+                                        <span className="text-[10.5px] text-slate-600">{stats.unpaid_sessions_count || 0} sesi pending</span>
                                     </div>
-                                    <div className="text-xl font-black mt-1">
+                                    <div className="text-xl font-black mt-1 text-slate-900">
                                         {formatCurrency(stats.unpaid_earnings)}
                                     </div>
 
                                     {hasUnpaid && (
                                         <button
                                             type="button"
-                                            onClick={handlePayCoach}
-                                            disabled={processing}
-                                            className="w-full mt-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                            onClick={() => handlePayCoach('all')}
+                                            className="w-full mt-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                                         >
                                             <Banknote size={13} />
-                                            <span>Cairkan Honor Sekarang</span>
+                                            <span>Cairkan Sekarang</span>
                                         </button>
                                     )}
                                 </div>
@@ -310,15 +289,15 @@ export default function CoachShow({
                                 </div>
 
                                 {/* Sesi Breakdown */}
-                                <div className="p-3 bg-orange-50/30 border border-orange-100 rounded-md space-y-1.5 text-xs">
+                                <div className="p-3 bg-slate-50/70 border border-slate-200/80 rounded-md space-y-1.5 text-xs">
                                     <div className="flex items-center justify-between font-bold text-slate-800">
                                         <span className="flex items-center gap-1">
-                                            <Dumbbell className="w-3.5 h-3.5 text-orange-600" />
+                                            <Dumbbell className="w-3.5 h-3.5 text-slate-500" />
                                             Total Sesi Dilatih
                                         </span>
-                                        <span className="text-orange-700 font-black">{stats.total_sessions || 0} Sesi</span>
+                                        <span className="text-slate-900 font-black">{stats.total_sessions || 0} Sesi</span>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-1 text-center pt-1 border-t border-orange-100 text-[10.5px]">
+                                    <div className="grid grid-cols-3 gap-1 text-center pt-1 border-t border-slate-200/70 text-[10.5px]">
                                         <div className="bg-white p-1 rounded border border-slate-200/60">
                                             <span className="text-slate-400 block text-[9px]">Individu</span>
                                             <strong className="text-slate-800">{stats.individual_sessions || 0}</strong>
@@ -351,8 +330,8 @@ export default function CoachShow({
                                         onClick={() => setActiveTab('monthly')}
                                         className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                             activeTab === 'monthly'
-                                                ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                                ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/80'
+                                                : 'text-slate-500 hover:text-slate-900 font-semibold'
                                         }`}
                                     >
                                         Rekap Bulanan ({monthly_breakdown.length})
@@ -363,13 +342,13 @@ export default function CoachShow({
                                         onClick={() => setActiveTab('unpaid')}
                                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                             activeTab === 'unpaid'
-                                                ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                                ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/80'
+                                                : 'text-slate-500 hover:text-slate-900 font-semibold'
                                         }`}
                                     >
                                         <span>Sesi Belum Dicairkan</span>
                                         {unpaid_sessions.length > 0 && (
-                                            <span className="px-1.5 py-0.2 rounded-full bg-orange-100 text-orange-800 text-[10px]">
+                                            <span className="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">
                                                 {unpaid_sessions.length}
                                             </span>
                                         )}
@@ -380,8 +359,8 @@ export default function CoachShow({
                                         onClick={() => setActiveTab('all')}
                                         className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                             activeTab === 'all'
-                                                ? 'bg-white text-orange-600 shadow-2xs border border-slate-200/80'
-                                                : 'text-slate-600 hover:text-slate-900'
+                                                ? 'bg-white text-slate-900 shadow-2xs border border-slate-200/80'
+                                                : 'text-slate-500 hover:text-slate-900 font-semibold'
                                         }`}
                                     >
                                         Semua Sesi ({all_sessions.length})
@@ -431,68 +410,212 @@ export default function CoachShow({
                                 TAB 1: REKAP BULANAN
                                ═══════════════════════════════════════════════════════ */}
                             {activeTab === 'monthly' && (
-                                <div className="p-4 space-y-3">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left border-collapse min-w-[650px]">
+                                <div className="p-3 sm:p-4 space-y-3">
+                                    <div className="w-full overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
                                             <thead className="bg-slate-50/70 border-b border-slate-100 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
                                                 <tr>
-                                                    <th className="px-4 py-2.5">Periode Bulan</th>
-                                                    <th className="px-4 py-2.5 text-center">Individu</th>
-                                                    <th className="px-4 py-2.5 text-center">Grup</th>
-                                                    <th className="px-4 py-2.5 text-center">Jaga Gym</th>
-                                                    <th className="px-4 py-2.5 text-center">Total Sesi</th>
-                                                    <th className="px-4 py-2.5 text-right">Total Honor</th>
-                                                    <th className="px-4 py-2.5 text-center">Status</th>
-                                                    <th className="px-4 py-2.5 text-right">Aksi</th>
+                                                    <th className="px-3.5 py-2.5">Periode Bulan</th>
+                                                    <th className="px-3 py-2.5 text-right">Total Honor</th>
+                                                    <th className="px-3 py-2.5 text-center">Status Pembayaran</th>
+                                                    <th className="px-3.5 py-2.5 text-right">Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 text-xs">
                                                 {monthly_breakdown.length > 0 ? (
-                                                    monthly_breakdown.map((mb) => (
-                                                        <tr key={mb.month_key} className="hover:bg-slate-50/70 transition-colors">
-                                                            <td className="px-4 py-3 font-bold text-slate-800">
-                                                                <div className="flex items-center gap-1.5">
-                                                                    <Calendar className="w-3.5 h-3.5 text-orange-600" />
-                                                                    <span>{mb.month_label}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-4 py-3 text-center font-semibold text-slate-700">{mb.individual_sessions}</td>
-                                                            <td className="px-4 py-3 text-center font-semibold text-slate-700">{mb.group_sessions}</td>
-                                                            <td className="px-4 py-3 text-center font-semibold text-slate-700">{mb.gym_sessions}</td>
-                                                            <td className="px-4 py-3 text-center">
-                                                                <span className="px-2 py-0.5 rounded bg-slate-100 font-bold text-slate-800 text-[11px]">
-                                                                    {mb.total_sessions} Sesi
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-4 py-3 text-right font-black text-slate-900">
-                                                                {formatCurrency(mb.total_fee)}
-                                                            </td>
-                                                            <td className="px-4 py-3 text-center">
-                                                                {mb.unpaid_fee > 0 ? (
-                                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                                                        <Clock size={11} /> Pending {formatCurrency(mb.unpaid_fee)}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                                                        <CheckCircle2 size={11} /> Lunas
-                                                                    </span>
-                                                                )}
-                                                            </td>
-                                                            <td className="px-4 py-3 text-right">
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => handleExportPdf(mb.month_key)}
-                                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 hover:border-orange-300 text-slate-700 hover:text-orange-700 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                                    monthly_breakdown.map((mb) => {
+                                                        const isExpanded = expandedMonths.has(mb.month_key);
+                                                        const monthSessions = mb.sessions || [];
+
+                                                        return (
+                                                            <React.Fragment key={mb.month_key}>
+                                                                <tr 
+                                                                    onClick={() => toggleMonthExpand(mb.month_key)}
+                                                                    className={`hover:bg-slate-50/80 transition-colors cursor-pointer select-none ${
+                                                                        isExpanded ? 'bg-slate-50/70' : ''
+                                                                    }`}
                                                                 >
-                                                                    <Printer size={12} className="text-slate-500" />
-                                                                    <span>Cetak Slip</span>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
+                                                                    <td className="px-3.5 py-3">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className={`w-5 h-5 rounded hover:bg-slate-200/70 flex items-center justify-center text-slate-400 transition-transform duration-200 shrink-0 ${
+                                                                                isExpanded ? 'rotate-180 text-slate-800' : ''
+                                                                            }`}>
+                                                                                <ChevronDown size={14} />
+                                                                            </span>
+                                                                            <div>
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                                                                    <span className="font-bold text-slate-900 text-sm">{mb.month_label}</span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500">
+                                                                                    <span className="font-semibold text-slate-700">{mb.total_sessions} Sesi</span>
+                                                                                    <span>&bull;</span>
+                                                                                    <span>{mb.individual_sessions} Individu</span>
+                                                                                    {mb.group_sessions > 0 && <span>&bull; {mb.group_sessions} Grup</span>}
+                                                                                    {mb.gym_sessions > 0 && <span>&bull; {mb.gym_sessions} Shift Gym</span>}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="px-3 py-3 text-right">
+                                                                        <span className="font-black text-slate-900 text-sm block">
+                                                                            {formatCurrency(mb.total_fee)}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                                        {mb.unpaid_fee > 0 ? (
+                                                                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600">
+                                                                                <Clock size={12} /> Pending {formatCurrency(mb.unpaid_fee)}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                                                                                <CheckCircle2 size={12} /> Lunas
+                                                                            </span>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="px-3.5 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                                                                        <div className="flex items-center justify-end gap-1.5">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => toggleMonthExpand(mb.month_key)}
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-900 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                                                                title="Lihat rincian sesi"
+                                                                            >
+                                                                                <span>{isExpanded ? 'Tutup' : 'Rincian'}</span>
+                                                                                <ChevronDown size={12} className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => handleExportPdf(mb.month_key)}
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                                                                title="Cetak Slip Gaji"
+                                                                            >
+                                                                                <Printer size={12} className="text-slate-500" />
+                                                                                <span>Slip</span>
+                                                                            </button>
+                                                                            {mb.unpaid_fee > 0 && (
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => handlePayCoach(mb.month_key)}
+                                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                                                                                    title={`Cairkan honor ${mb.month_label}`}
+                                                                                >
+                                                                                    <Banknote size={12} />
+                                                                                    <span>Cairkan</span>
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+
+                                                                {/* EXPANDED DETAIL ROW */}
+                                                                {isExpanded && (
+                                                                    <tr className="bg-slate-50/40">
+                                                                        <td colSpan="4" className="p-0 border-b border-slate-200/80">
+                                                                            <div className="p-3 sm:p-4 bg-slate-50/60 space-y-3 animate-in fade-in duration-150">
+                                                                                {/* Month Mini Header & Summary Breakdown */}
+                                                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-white p-3 rounded-md border border-slate-200/80 shadow-2xs">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Calendar size={16} className="text-slate-600 shrink-0" />
+                                                                                        <div>
+                                                                                            <h4 className="text-xs font-bold text-slate-900">
+                                                                                                Rincian Sesi & Honor &bull; {mb.month_label}
+                                                                                            </h4>
+                                                                                            <p className="text-[11px] text-slate-500">
+                                                                                                {monthSessions.length} sesi terlaksana &bull; Total: <span className="font-bold text-slate-800">{formatCurrency(mb.total_fee)}</span>
+                                                                                            </p>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    {/* Summary Breakdown Text */}
+                                                                                    <div className="flex items-center gap-2 flex-wrap text-xs text-slate-600">
+                                                                                        <span>Individu: <strong className="text-slate-900">{mb.individual_sessions}</strong> ({formatCurrency(monthSessions.filter(s => s.type === 'Individu').reduce((sum, s) => sum + s.fee, 0))})</span>
+                                                                                        {mb.group_sessions > 0 && (
+                                                                                            <span>&bull; Grup: <strong className="text-slate-900">{mb.group_sessions}</strong> ({formatCurrency(monthSessions.filter(s => s.type === 'Grup').reduce((sum, s) => sum + s.fee, 0))})</span>
+                                                                                        )}
+                                                                                        {mb.gym_sessions > 0 && (
+                                                                                            <span>&bull; Gym: <strong className="text-slate-900">{mb.gym_sessions}</strong> ({formatCurrency(monthSessions.filter(s => s.type === 'Jaga Gym').reduce((sum, s) => sum + s.fee, 0))})</span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                {/* Nested Sessions Table */}
+                                                                                <div className="bg-white rounded-md border border-slate-200/80 shadow-2xs overflow-hidden">
+                                                                                    <table className="w-full text-left text-xs">
+                                                                                        <thead className="bg-slate-50 border-b border-slate-200/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                                                            <tr>
+                                                                                                <th className="px-3.5 py-2">Tanggal</th>
+                                                                                                <th className="px-3.5 py-2">Klien / Program Latihan</th>
+                                                                                                <th className="px-2.5 py-2 text-center">Tipe</th>
+                                                                                                <th className="px-2.5 py-2 text-center">Sesi</th>
+                                                                                                <th className="px-3.5 py-2 text-right">Honor</th>
+                                                                                                <th className="px-3 py-2 text-center">Status</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody className="divide-y divide-slate-100">
+                                                                                            {monthSessions.length > 0 ? (
+                                                                                                monthSessions.map((sess, sIdx) => (
+                                                                                                    <tr key={sess.id || sIdx} className="hover:bg-slate-50/80 transition-colors">
+                                                                                                        <td className="px-3.5 py-2.5 font-medium text-slate-700 whitespace-nowrap">
+                                                                                                            {formatDate(sess.date)}
+                                                                                                        </td>
+                                                                                                        <td className="px-3.5 py-2.5">
+                                                                                                            <div className="flex items-center gap-2">
+                                                                                                                {sess.client_photo ? (
+                                                                                                                    <img src={sess.client_photo} alt={sess.client_name} className="w-6 h-6 min-w-[24px] min-h-[24px] rounded-full object-cover shrink-0 aspect-square" />
+                                                                                                                ) : (
+                                                                                                                    <div className="w-6 h-6 min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] aspect-square rounded-full bg-slate-100 text-slate-700 font-bold text-[8.5px] flex items-center justify-center shrink-0 leading-none select-none">
+                                                                                                                        {getInitials(sess.client_name)}
+                                                                                                                    </div>
+                                                                                                                )}
+                                                                                                                <div className="min-w-0">
+                                                                                                                    <span className="font-bold text-slate-900 block truncate">{sess.client_name}</span>
+                                                                                                                    <span className="text-[10.5px] text-slate-400 block truncate">{sess.name}</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                        <td className="px-2.5 py-2.5 text-center text-slate-600 font-medium">
+                                                                                                            {sess.type}
+                                                                                                        </td>
+                                                                                                        <td className="px-2.5 py-2.5 text-center font-semibold text-slate-700">
+                                                                                                            {sess.session_number ? `Sesi ${sess.session_number}` : '-'}
+                                                                                                        </td>
+                                                                                                        <td className="px-3.5 py-2.5 text-right font-bold text-slate-900 whitespace-nowrap">
+                                                                                                            {formatCurrency(sess.fee)}
+                                                                                                        </td>
+                                                                                                        <td className="px-3 py-2.5 text-center whitespace-nowrap">
+                                                                                                            {sess.is_paid ? (
+                                                                                                                <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 text-xs">
+                                                                                                                    <CheckCircle2 size={11} /> Lunas
+                                                                                                                </span>
+                                                                                                            ) : (
+                                                                                                                <span className="inline-flex items-center gap-1 font-semibold text-amber-600 text-xs">
+                                                                                                                    <Clock size={11} /> Pending
+                                                                                                                </span>
+                                                                                                            )}
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                ))
+                                                                                            ) : (
+                                                                                                <tr>
+                                                                                                    <td colSpan="6" className="py-4 text-center text-slate-400 italic">
+                                                                                                        Tidak ada data sesi untuk bulan ini.
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            )}
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
+                                                            </React.Fragment>
+                                                        );
+                                                    })
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="8" className="px-5 py-8 text-center text-slate-400 italic">
+                                                        <td colSpan="4" className="px-5 py-8 text-center text-slate-400 italic">
                                                             Belum ada rekapitulasi bulanan untuk pelatih ini.
                                                         </td>
                                                     </tr>
@@ -542,16 +665,8 @@ export default function CoachShow({
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-4 py-3 text-center">
-                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                                                sess.type === 'Individu'
-                                                                    ? 'bg-orange-50 text-orange-700 border-orange-200/70'
-                                                                    : sess.type === 'Grup'
-                                                                    ? 'bg-sky-50 text-sky-700 border-sky-200/70'
-                                                                    : 'bg-amber-50 text-amber-700 border-amber-200/70'
-                                                            }`}>
-                                                                {sess.type}
-                                                            </span>
+                                                        <td className="px-4 py-3 text-center text-slate-600 font-medium">
+                                                            {sess.type}
                                                         </td>
                                                         <td className="px-4 py-3 text-center font-semibold text-slate-700">
                                                             {sess.session_number ? `Sesi ${sess.session_number}` : '-'}
@@ -559,14 +674,14 @@ export default function CoachShow({
                                                         <td className="px-4 py-3 text-right font-black text-slate-900">
                                                             {formatCurrency(sess.fee)}
                                                         </td>
-                                                        <td className="px-4 py-3 text-center">
+                                                        <td className="px-4 py-3 text-center whitespace-nowrap">
                                                             {sess.is_paid ? (
-                                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                                                    <CheckCircle2 size={11} /> Lunas
+                                                                <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 text-xs">
+                                                                    <CheckCircle2 size={12} /> Lunas
                                                                 </span>
                                                             ) : (
-                                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                                                    <Clock size={11} /> Belum Dicairkan
+                                                                <span className="inline-flex items-center gap-1 font-semibold text-amber-600 text-xs">
+                                                                    <Clock size={12} /> Belum Dicairkan
                                                                 </span>
                                                             )}
                                                         </td>
@@ -592,6 +707,14 @@ export default function CoachShow({
 
                 <PageFooter className="!mt-8 !pt-4 !pb-1" />
             </div>
+
+            {/* Payout Modal */}
+            <CoachPayoutModal
+                show={payoutModalOpen}
+                onClose={() => setPayoutModalOpen(false)}
+                coach={coachForPayout}
+                defaultMonth={payoutDefaultMonth}
+            />
         </AppLayout>
     );
 }

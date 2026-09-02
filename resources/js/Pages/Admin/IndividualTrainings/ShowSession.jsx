@@ -27,6 +27,8 @@ import {
 import ActionFooter from "./Partials/ActionFooter";
 import ExerciseItem from "./Partials/ExerciseItem";
 import PageHeader from "@/Components/Common/PageHeader";
+import SignaturePad from "@/Components/Common/SignaturePad";
+import { PenTool } from "lucide-react";
 
 export default function ShowSession({
     auth,
@@ -225,6 +227,7 @@ export default function ShowSession({
         athlete_note: training.athlete_note || "",
         proof_photo: null,
         remove_proof_photo: false,
+        signature_data: null,
     });
 
     const [mainTab, setMainTab] = useState("detail");
@@ -418,22 +421,14 @@ export default function ShowSession({
     };
 
     const completeTraining = () => {
-        const hasPhoto =
-            data.proof_photo ||
-            (training.proof_photo && !data.remove_proof_photo);
-
         const missingFields = getMissingRequiredActuals();
         
-        if (isAthlete && !hasPhoto) {
-            missingFields.push("Foto Bukti (wajib diunggah)");
-        }
-
         if (missingFields.length > 0) {
             const formattedMissing = missingFields
                 .map((m) => `• ${m}`)
                 .join("\n");
             setWarningMessage(
-                `Pengisian belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
+                `Pengisian target/aktual belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
             );
             return;
         }
@@ -442,6 +437,27 @@ export default function ShowSession({
     };
 
     const confirmAndComplete = () => {
+        const hasPhoto =
+            data.proof_photo ||
+            (training.proof_photo && !data.remove_proof_photo);
+
+        const hasSig = data.signature_data || training.signature_photo;
+
+        let missing = [];
+        if (!hasPhoto) {
+            missing.push("Foto Bukti Latihan (wajib diunggah)");
+        }
+        if (!hasSig) {
+            missing.push("Tanda Tangan Digital Klien (wajib dibubuhkan)");
+        }
+
+        if (missing.length > 0) {
+            setWarningMessage(
+                `Penyelesaian belum lengkap:\n\n${missing.map(m => `• ${m}`).join('\n')}`
+            );
+            return;
+        }
+
         post(
             route("admin.individual-trainings.session.complete", training.id),
             {
@@ -595,7 +611,7 @@ export default function ShowSession({
                                                 </span>
                                             ))
                                         ) : (
-                                            <span className="text-slate-400 italic">Admin</span>
+                                            <span className="text-slate-400 italic text-xs">-</span>
                                         )}
                                     </div>
                                 </div>
@@ -679,6 +695,31 @@ export default function ShowSession({
                                             <FileImage size={13} className="text-orange-500" />
                                             <span>Lihat Foto Bukti</span>
                                         </button>
+                                    </div>
+                                )}
+
+                                {/* Client Signature Preview */}
+                                {training.signature_photo && (
+                                    <div className="pt-2 border-t border-slate-100">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tanda Tangan Klien</span>
+                                            {training.signed_at && (
+                                                <span className="text-[9.5px] text-slate-400">
+                                                    {new Date(training.signed_at).toLocaleDateString("id-ID", { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div
+                                            onClick={() => openModal("/storage/" + training.signature_photo, "image")}
+                                            className="bg-white border border-slate-200 rounded-md p-2 flex items-center justify-center cursor-pointer hover:border-orange-300 transition-all shadow-2xs group"
+                                            title="Klik untuk melihat tanda tangan penuh"
+                                        >
+                                            <img
+                                                src={"/storage/" + training.signature_photo}
+                                                alt="Tanda Tangan Klien"
+                                                className="h-14 max-w-full object-contain filter contrast-125 group-hover:scale-105 transition-transform"
+                                            />
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -1027,41 +1068,123 @@ export default function ShowSession({
             )}
 
             {confirmComplete && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-6 animate-in fade-in zoom-in-95 duration-200">
-                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <CheckCircle2
-                                className="text-green-500"
-                                size={24}
-                            />
-                            Konfirmasi Selesai
-                        </h2>
-                        <p className="text-slate-600 mb-6 text-sm leading-relaxed">
-                            Apakah Anda yakin ingin menyelesaikan dan
-                            menyerahkan program latihan ini? Setelah diserahkan,
-                            data aktual sudah{" "}
-                            <strong className="text-slate-800">tidak bisa diedit lagi</strong>.
-                        </p>
-                        <div className="flex justify-end gap-3">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xs transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col p-5 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <CheckCircle2 className="text-emerald-500" size={18} />
+                                <span>Selesaikan & Verifikasi Latihan</span>
+                            </h2>
                             <button
+                                type="button"
                                 onClick={() => setConfirmComplete(false)}
-                                className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors"
+                                className="p-1 text-slate-400 hover:text-slate-600 rounded-md cursor-pointer"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        {/* Photo Proof Upload Section */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <FileImage size={13} className="text-orange-500" />
+                                <span>Foto Bukti Latihan</span>
+                                <span className="text-rose-500 text-xs">*</span>
+                            </label>
+
+                            <div className="flex items-center gap-3">
+                                {data.proof_photo ? (
+                                    <div className="relative group shrink-0 w-16 h-16 rounded-md overflow-hidden border border-orange-300 shadow-2xs">
+                                        <img
+                                            src={URL.createObjectURL(data.proof_photo)}
+                                            alt="Preview Foto"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setData("proof_photo", null)}
+                                            className="absolute top-1 right-1 p-0.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors"
+                                        >
+                                            <X size={10} strokeWidth={3} />
+                                        </button>
+                                    </div>
+                                ) : training?.proof_photo && !data.remove_proof_photo ? (
+                                    <div className="relative group shrink-0 w-16 h-16 rounded-md overflow-hidden border border-slate-200 shadow-2xs">
+                                        <img
+                                            src={"/storage/" + training.proof_photo}
+                                            alt="Foto Tersimpan"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                ) : null}
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="modal-proof-photo"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        setData((d) => ({ ...d, remove_proof_photo: false }));
+                                        handlePhotoChange(e.target.files[0]);
+                                    }}
+                                />
+                                <label
+                                    htmlFor="modal-proof-photo"
+                                    className="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 hover:border-orange-400 rounded-lg cursor-pointer bg-slate-50/50 hover:bg-orange-50/20 transition-all text-center"
+                                >
+                                    <FileImage size={16} className="text-orange-500 mb-1" />
+                                    <span className="text-xs font-semibold text-slate-700">
+                                        {data.proof_photo || (training?.proof_photo && !data.remove_proof_photo)
+                                            ? "Ganti Foto Bukti"
+                                            : "Pilih / Ambil Foto Bukti"}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400">JPG, PNG maks 5MB</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Signature Pad Section */}
+                        <div className="pt-1">
+                            <SignaturePad
+                                value={data.signature_data}
+                                onChange={(sig) => setData("signature_data", sig)}
+                                label="Tanda Tangan Digital Klien / Atlet"
+                                height={160}
+                            />
+                        </div>
+
+                        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-left">
+                            <div className="p-1.5 rounded-lg bg-orange-100 text-orange-600 shrink-0 mt-0.5">
+                                <Info size={14} />
+                            </div>
+                            <div className="space-y-0.5 text-left">
+                                <p className="text-xs font-bold text-slate-800">
+                                    Verifikasi Selesai Latihan
+                                </p>
+                                <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+                                    Pastikan foto bukti telah terunggah dan klien/atlet membubuhkan tanda tangan digital sebagai persetujuan penyelesaian sesi latihan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                            <button
+                                type="button"
+                                onClick={() => setConfirmComplete(false)}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-semibold transition-colors cursor-pointer"
                             >
                                 Batal
                             </button>
                             <button
+                                type="button"
                                 onClick={confirmAndComplete}
-                                disabled={processing}
-                                className="px-5 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-md shadow-orange-500/20"
+                                disabled={processing || (!data.proof_photo && !training.proof_photo) || (!data.signature_data && !training.signature_photo)}
+                                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                             >
-                                <CheckCircle2 size={16} /> Ya, Selesai
+                                <CheckCircle2 size={14} />
+                                <span>{processing ? "Menyimpan..." : "Konfirmasi & Selesaikan"}</span>
                             </button>
                         </div>
-                        {errors.error && (
-                            <div className="text-red-500 text-sm font-bold text-right mt-3">
-                                {errors.error}
-                            </div>
-                        )}
                     </div>
                 </div>
             )}

@@ -28,7 +28,11 @@ export default function PhaseBlock({
     onOpenExerciseModal,
     onRemove,
     onDuplicate,
+    isGlobalSimpleMode = true,
 }) {
+    const [showAdvanced, setShowAdvanced] = React.useState(false);
+    const isSimple = isGlobalSimpleMode && !showAdvanced;
+
     const categories = [
         { id: "warm_up", label: "Warm Up", columns: "medium", icon: Flame },
         {
@@ -1135,7 +1139,7 @@ export default function PhaseBlock({
                                                                                                 </div>
                                                                                             </div>
 
-                                                                                            {currentCat.columns ===
+                                                                                            {!isSimple && currentCat.columns ===
                                                                                                 "full" && (
                                                                                                 <>
                                                                                                     {/* Tempo */}
@@ -1269,7 +1273,7 @@ export default function PhaseBlock({
                                                                                                 </>
                                                                                             )}
 
-                                                                                            {(currentCat.columns ===
+                                                                                            {!isSimple && (currentCat.columns ===
                                                                                                 "full" ||
                                                                                                 currentCat.columns ===
                                                                                                     "medium") && (

@@ -34,6 +34,11 @@ class SharedPackageController extends Controller
                 ->where('is_extra', false)
                 ->count();
 
+            $historyTrainings = IndividualTraining::where('shared_package_id', $sharedPackage->id)
+                ->where('user_id', $member->id)
+                ->where('is_athlete_paid', true)
+                ->count();
+
             $completedTrainings = IndividualTraining::where('shared_package_id', $sharedPackage->id)
                 ->where('user_id', $member->id)
                 ->where(function($q) {
@@ -47,6 +52,8 @@ class SharedPackageController extends Controller
                 'profile_photo_url' => $member->profile_photo_url,
                 'sport' => $member->sport?->name,
                 'sessions_used' => $memberTrainings,
+                'history_sessions' => $historyTrainings,
+                'total_sessions' => $memberTrainings + $historyTrainings,
                 'completed_sessions' => $completedTrainings,
             ];
         });
@@ -182,8 +189,10 @@ class SharedPackageController extends Controller
             ->where('is_athlete_paid', false)
             ->update(['is_athlete_paid' => true]);
 
-        // Optionally mark the shared package as completed
-        $sharedPackage->update(['status' => 'completed']);
+        \App\Http\Controllers\Admin\IndividualTrainingController::resequenceSharedPackageSessions($sharedPackage->id);
+        foreach ($sharedPackage->members as $member) {
+            \App\Http\Controllers\Admin\IndividualTrainingController::resequenceAthleteSessions($member->id);
+        }
 
         return redirect()->back()->with('success', 'Berhasil menandai sesi paket bersama sebagai lunas.');
     }

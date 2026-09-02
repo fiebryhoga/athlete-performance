@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/Components/Layout/Navbar";
 import Sidebar from "@/Components/Layout/Sidebar";
+import MobileBottomNav from "@/Components/Layout/MobileBottomNav";
 
 export default function AppLayout({ children, title }) {
     // State untuk Mobile (Overlay)
@@ -49,11 +50,16 @@ export default function AppLayout({ children, title }) {
                 />
 
                 {/* CONTENT PAGE */}
-                <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar">
+                <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden relative scroll-smooth custom-scrollbar pb-24 lg:pb-0">
                     <div className="w-full mx-auto p-4 md:p-8 lg:p-7 md:py-6 lg:py-3 animate-in fade-in duration-500">
                         {children}
                     </div>
                 </main>
+
+                {/* MOBILE BOTTOM NAVIGATION BAR */}
+                <MobileBottomNav
+                    onOpenMenu={() => setIsMobileSidebarOpen(true)}
+                />
             </div>
         </div>
     );

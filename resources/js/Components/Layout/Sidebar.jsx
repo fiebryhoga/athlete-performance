@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { 
-    LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet, Banknote
+    LayoutDashboard, Users, LogOut, Trophy, Shield, Settings, HeartPulse, Dumbbell, Scale, ChevronLeft, ChevronRight, Target, BarChart3, Package, Building2, Calculator, Scan, UtensilsCrossed, BatteryCharging, CalendarCheck, CalendarDays, Timer, BookOpen, UserCog, FileSpreadsheet, Banknote, HelpCircle, Sparkles
 } from 'lucide-react';
 
 export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onToggleCollapse }) {
@@ -94,6 +94,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             items: [
                 { name: 'Kategori Olahraga', route: 'admin.sports.index', checkPath: '/admin/sports', icon: Trophy, roles: ['superadmin', 'coach'] },
                 { name: 'Master Exercise', route: 'admin.exercises.index', checkPath: '/admin/exercises', icon: Dumbbell, roles: ['superadmin', 'coach'] },
+                { name: 'Template Sesi', route: 'admin.workout-templates.index', checkPath: '/admin/workout-templates', icon: Sparkles, roles: ['superadmin', 'coach'] },
                 { name: 'DPA Compensations', route: 'admin.dpa-compensations.index', checkPath: '/admin/dpa-compensations', icon: BookOpen, roles: ['superadmin', 'coach'] },
                 { name: 'Manajemen Paket', route: 'admin.packages.index', checkPath: '/admin/packages', icon: Package, roles: ['superadmin'] },
             ]
@@ -102,9 +103,16 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onMobileClose, onTo
             title: 'Pengaturan',
             items: [
                 { name: userRole === 'superadmin' ? 'Manajemen Pengguna' : 'Manajemen Klien', route: 'admin.users.index', checkPath: '/admin/users', icon: UserCog, roles: ['superadmin', 'coach'] },
+                { name: 'Kelola Panduan', route: 'admin.help-guides.index', checkPath: '/admin/help-guides', icon: BookOpen, roles: ['superadmin'] },
                 { name: 'Rekap Sesi', route: 'admin.reports.sessions', checkPath: '/admin/reports/sessions', icon: FileSpreadsheet, roles: ['superadmin'] },
                 { name: 'Rekap Pelatih', route: 'admin.reports.coaches', checkPath: '/admin/reports/coaches', icon: Banknote, roles: ['superadmin'] },
                 { name: 'Pengaturan Sistem', route: 'admin.settings.index', checkPath: '/admin/settings', icon: Settings, roles: ['superadmin'] },
+            ]
+        },
+        {
+            title: 'Bantuan & Dukungan',
+            items: [
+                { name: 'Pusat Bantuan', route: 'help.index', checkPath: '/help', icon: HelpCircle, roles: ['superadmin', 'coach', 'athlete'] },
             ]
         }
     ];

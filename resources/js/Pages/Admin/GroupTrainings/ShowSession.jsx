@@ -30,6 +30,8 @@ import {
 import ActionFooter from "../IndividualTrainings/Partials/ActionFooter";
 import ExerciseItem from "../IndividualTrainings/Partials/ExerciseItem";
 import PageHeader from "@/Components/Common/PageHeader";
+import SignaturePad from "@/Components/Common/SignaturePad";
+import { PenTool } from "lucide-react";
 
 export default function ShowSession({
     auth,
@@ -277,6 +279,14 @@ export default function ShowSession({
     const [confirmComplete, setConfirmComplete] = useState(false);
     const [completeMode, setCompleteMode] = useState("single"); // 'single' | 'all'
     const [isEditingActuals, setIsEditingActuals] = useState(false);
+    const [signerId, setSignerId] = useState(selectedAthleteId || sortedMembers[0]?.id || "");
+    const [signatureData, setSignatureData] = useState(null);
+
+    useEffect(() => {
+        if (selectedAthleteId && !signerId) {
+            setSignerId(selectedAthleteId);
+        }
+    }, [selectedAthleteId]);
 
     const currentAthlete = sortedMembers.find((m) => m.id === selectedAthleteId);
     const allMembersCompleted = sortedMembers.length > 0 && sortedMembers.every(m => membersPivot.find(p => p.athlete_id === m.id)?.is_completed);
@@ -489,37 +499,56 @@ export default function ShowSession({
     };
 
     const completeTraining = (applyToAll = false) => {
-        if (isAthlete) {
-            const hasPhoto =
-                data.proof_photo ||
-                (currentPivot?.proof_photo && !data.remove_proof_photo);
-
-            const missingFields = getMissingRequiredActuals();
-            
-            if (!hasPhoto) {
-                missingFields.push("Foto Bukti (wajib diunggah)");
-            }
-
-            if (missingFields.length > 0) {
-                const formattedMissing = missingFields
-                    .map((m) => `• ${m}`)
-                    .join("\n");
-                setWarningMessage(
-                    `Pengisian belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
-                );
-                return;
-            }
+        const missingFields = getMissingRequiredActuals();
+        
+        if (missingFields.length > 0) {
+            const formattedMissing = missingFields
+                .map((m) => `• ${m}`)
+                .join("\n");
+            setWarningMessage(
+                `Pengisian target/aktual belum lengkap. Anda belum mengisi:\n\n${formattedMissing}`,
+            );
+            return;
         }
 
+        if (!signerId) {
+            setSignerId(selectedAthleteId || sortedMembers[0]?.id || "");
+        }
         setCompleteMode(applyToAll ? "all" : "single");
         setConfirmComplete(true);
     };
 
     const confirmAndComplete = () => {
+        const hasPhoto =
+            data.proof_photo ||
+            ((training.proof_photo || currentPivot?.proof_photo) && !data.remove_proof_photo);
+
+        const hasSig = signatureData || training.signature_photo;
+
+        let missing = [];
+        if (!signerId) {
+            missing.push("Perwakilan atlet yang menandatangani (wajib dipilih)");
+        }
+        if (!hasPhoto) {
+            missing.push("Foto Bukti Sesi Latihan (wajib diunggah)");
+        }
+        if (!hasSig) {
+            missing.push("Tanda Tangan Digital Perwakilan (wajib dibubuhkan)");
+        }
+
+        if (missing.length > 0) {
+            setWarningMessage(
+                `Penyelesaian belum lengkap:\n\n${missing.map(m => `• ${m}`).join('\n')}`
+            );
+            return;
+        }
+
         router.post(
             route("admin.group-trainings.session.complete", training.id),
             {
                 athlete_id: selectedAthleteId,
+                signer_id: signerId,
+                signature_data: signatureData,
                 rpes: data.rpes,
                 apply_to_all: completeMode === "all" ? 1 : 0,
                 group_note: data.group_note,
@@ -528,7 +557,10 @@ export default function ShowSession({
             {
                 preserveScroll: true,
                 forceFormData: true,
-                onSuccess: () => setConfirmComplete(false),
+                onSuccess: () => {
+                    setConfirmComplete(false);
+                    setSignatureData(null);
+                },
             },
         );
     };
@@ -657,7 +689,7 @@ export default function ShowSession({
                                                 </span>
                                             ))
                                         ) : (
-                                            <span className="text-slate-400 italic">Admin</span>
+                                            <span className="text-slate-400 italic text-xs">-</span>
                                         )}
                                     </div>
                                 </div>
@@ -774,17 +806,47 @@ export default function ShowSession({
                                 )}
 
                                 {/* Proof Photo Preview */}
-                                {currentPivot?.proof_photo && (
+                                {(training.proof_photo || currentPivot?.proof_photo) && (
                                     <div>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Foto Bukti</span>
                                         <button
                                             type="button"
-                                            onClick={() => openModal("/storage/" + currentPivot.proof_photo, "image")}
+                                            onClick={() => openModal("/storage/" + (training.proof_photo || currentPivot.proof_photo), "image")}
                                             className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold transition-colors cursor-pointer"
                                         >
                                             <FileImage size={13} className="text-orange-500" />
                                             <span>Lihat Foto Bukti</span>
                                         </button>
+                                    </div>
+                                )}
+
+                                {/* Representative Signature Preview */}
+                                {training.signature_photo && (
+                                    <div className="pt-2 border-t border-slate-100">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tanda Tangan Perwakilan</span>
+                                            {training.signed_at && (
+                                                <span className="text-[9.5px] text-slate-400">
+                                                    {new Date(training.signed_at).toLocaleDateString("id-ID", { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {(training.signer?.name || training.signer_name) && (
+                                            <span className="text-[11px] font-semibold text-slate-700 block mb-1">
+                                                Oleh: {training.signer?.name || training.signer_name}
+                                            </span>
+                                        )}
+                                        <div
+                                            onClick={() => openModal("/storage/" + training.signature_photo, "image")}
+                                            className="bg-white border border-slate-200 rounded-md p-2 flex items-center justify-center cursor-pointer hover:border-orange-300 transition-all shadow-2xs group"
+                                            title="Klik untuk melihat tanda tangan penuh"
+                                        >
+                                            <img
+                                                src={"/storage/" + training.signature_photo}
+                                                alt="Tanda Tangan Perwakilan"
+                                                className="h-14 max-w-full object-contain filter contrast-125 group-hover:scale-105 transition-transform"
+                                            />
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -1226,49 +1288,152 @@ export default function ShowSession({
 
             {/* Confirm Complete Modal */}
             {confirmComplete && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity">
-                    <div className="bg-white border border-slate-200 rounded-md shadow-2xl w-full max-w-md overflow-hidden flex flex-col p-5">
-                        <h2 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                            <CheckCircle2 className="text-emerald-600" size={16} />
-                            {completeMode === "all" ? "Konfirmasi Selesai Semua Atlet" : "Konfirmasi Selesai Latihan"}
-                        </h2>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xs transition-opacity">
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col p-5 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200 space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <CheckCircle2 className="text-emerald-500" size={18} />
+                                <span>{completeMode === "all" ? "Selesaikan Latihan Seluruh Grup" : "Selesaikan Latihan Atlet"}</span>
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={() => setConfirmComplete(false)}
+                                className="p-1 text-slate-400 hover:text-slate-600 rounded-md cursor-pointer"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
                         
-                        <div className="mb-3 bg-slate-50 p-3 rounded-md border border-slate-200/80">
-                            <p className="text-xs text-slate-700">
-                                {completeMode === "all" ? (
-                                    <>Menyelesaikan latihan untuk: <strong className="text-slate-900">Semua Atlet ({sortedMembers.length} orang)</strong></>
-                                ) : (
-                                    <>Menyelesaikan latihan untuk: <strong className="text-slate-900">{currentAthlete?.name}</strong></>
-                                )}
-                            </p>
+                        <div className="bg-slate-50 p-3 rounded-md border border-slate-200/80 text-xs text-slate-700">
+                            {completeMode === "all" ? (
+                                <span>Menyelesaikan sesi untuk: <strong className="text-slate-900">Semua Atlet ({sortedMembers.length} orang)</strong></span>
+                            ) : (
+                                <span>Menyelesaikan sesi untuk: <strong className="text-slate-900">{currentAthlete?.name}</strong></span>
+                            )}
                         </div>
 
-                        <p className="text-slate-600 mb-4 text-xs leading-relaxed">
-                            {completeMode === "all"
-                                ? "Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan ini untuk SEMUA atlet di sesi grup sekaligus? Status seluruh member akan ditandai selesai."
-                                : "Apakah Anda yakin ingin menyelesaikan dan menyerahkan program latihan untuk atlet ini? Setelah diserahkan, data aktual atlet ini sudah tidak bisa diedit lagi."}
-                        </p>
-                        <div className="flex justify-end gap-2">
+                        {/* Representative Selection (Perwakilan Penandatangan) */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <Users size={13} className="text-orange-500" />
+                                <span>Perwakilan Atlet yang Menandatangani</span>
+                                <span className="text-rose-500 text-xs">*</span>
+                            </label>
+                            <select
+                                value={signerId}
+                                onChange={(e) => setSignerId(e.target.value)}
+                                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-800 focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                            >
+                                <option value="" disabled>-- Pilih Perwakilan Atlet --</option>
+                                {sortedMembers.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                        {m.name} {m.id === selectedAthleteId ? "(Atlet Aktif)" : ""}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Photo Proof Upload Section */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <FileImage size={13} className="text-orange-500" />
+                                <span>Foto Bukti Sesi Latihan</span>
+                                <span className="text-rose-500 text-xs">*</span>
+                            </label>
+
+                            <div className="flex items-center gap-3">
+                                {data.proof_photo ? (
+                                    <div className="relative group shrink-0 w-16 h-16 rounded-md overflow-hidden border border-orange-300 shadow-2xs">
+                                        <img
+                                            src={URL.createObjectURL(data.proof_photo)}
+                                            alt="Preview Foto"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setData("proof_photo", null)}
+                                            className="absolute top-1 right-1 p-0.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors"
+                                        >
+                                            <X size={10} strokeWidth={3} />
+                                        </button>
+                                    </div>
+                                ) : (training.proof_photo || currentPivot?.proof_photo) && !data.remove_proof_photo ? (
+                                    <div className="relative group shrink-0 w-16 h-16 rounded-md overflow-hidden border border-slate-200 shadow-2xs">
+                                        <img
+                                            src={"/storage/" + (training.proof_photo || currentPivot.proof_photo)}
+                                            alt="Foto Tersimpan"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                ) : null}
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="modal-group-proof-photo"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        setData((d) => ({ ...d, remove_proof_photo: false }));
+                                        handlePhotoChange(e.target.files[0]);
+                                    }}
+                                />
+                                <label
+                                    htmlFor="modal-group-proof-photo"
+                                    className="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 hover:border-orange-400 rounded-lg cursor-pointer bg-slate-50/50 hover:bg-orange-50/20 transition-all text-center"
+                                >
+                                    <FileImage size={16} className="text-orange-500 mb-1" />
+                                    <span className="text-xs font-semibold text-slate-700">
+                                        {data.proof_photo || ((training.proof_photo || currentPivot?.proof_photo) && !data.remove_proof_photo)
+                                            ? "Ganti Foto Bukti"
+                                            : "Pilih / Ambil Foto Bukti"}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400">JPG, PNG maks 5MB</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Signature Pad Section */}
+                        <div className="pt-1">
+                            <SignaturePad
+                                value={signatureData}
+                                onChange={(sig) => setSignatureData(sig)}
+                                label={`Tanda Tangan Digital Perwakilan (${sortedMembers.find(m => String(m.id) === String(signerId))?.name || "Atlet"})`}
+                                height={160}
+                            />
+                        </div>
+
+                        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-left">
+                            <div className="p-1.5 rounded-lg bg-orange-100 text-orange-600 shrink-0 mt-0.5">
+                                <Info size={14} />
+                            </div>
+                            <div className="space-y-0.5 text-left">
+                                <p className="text-xs font-bold text-slate-800">
+                                    Verifikasi Sesi Latihan Grup
+                                </p>
+                                <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+                                    Pastikan foto bukti telah terunggah dan perwakilan atlet membubuhkan tanda tangan digital sebagai persetujuan penyelesaian sesi grup.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                             <button
+                                type="button"
                                 onClick={() => setConfirmComplete(false)}
-                                className="px-3.5 py-1.5 bg-slate-100 text-slate-700 rounded-md text-xs font-semibold hover:bg-slate-200 transition-colors"
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-semibold transition-colors cursor-pointer"
                             >
                                 Batal
                             </button>
                             <button
+                                type="button"
                                 onClick={confirmAndComplete}
-                                disabled={processing}
-                                className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-2xs"
+                                disabled={processing || !signerId || (!data.proof_photo && !training.proof_photo && !currentPivot?.proof_photo) || (!signatureData && !training.signature_photo)}
+                                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                             >
-                                <CheckCircle2 size={13} />
-                                <span>{completeMode === "all" ? "Ya, Selesaikan Semua" : "Ya, Selesai"}</span>
+                                <CheckCircle2 size={14} />
+                                <span>{processing ? "Menyimpan..." : (completeMode === "all" ? "Selesaikan Semua" : "Selesaikan")}</span>
                             </button>
                         </div>
-                        {errors.error && (
-                            <div className="text-red-500 text-xs font-bold text-right mt-2">
-                                {errors.error}
-                            </div>
-                        )}
                     </div>
                 </div>
             )}

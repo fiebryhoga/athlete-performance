@@ -140,7 +140,7 @@ export default function Index({ auth, users, filters, activeTab, tabCounts, spor
                                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all active:scale-95 cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>Tambah Paket Bersama</span>
+                                    <span>Tambah</span>
                                 </button>
                             )}
                         </div>

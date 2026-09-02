@@ -23,6 +23,11 @@ class GroupTraining extends Model
         'is_coach_paid',
         'attendee_ids',
         'is_extra',
+        'proof_photo',
+        'signature_photo',
+        'signer_id',
+        'signer_name',
+        'signed_at',
     ];
 
     protected $casts = [
@@ -32,6 +37,7 @@ class GroupTraining extends Model
         'is_coach_paid' => 'boolean',
         'date' => 'date:Y-m-d',
         'is_extra' => 'boolean',
+        'signed_at' => 'datetime',
     ];
 
     public function group()
@@ -42,6 +48,11 @@ class GroupTraining extends Model
     public function coach()
     {
         return $this->belongsTo(User::class, 'coach_id');
+    }
+
+    public function signer()
+    {
+        return $this->belongsTo(User::class, 'signer_id');
     }
 
     public function blocks()

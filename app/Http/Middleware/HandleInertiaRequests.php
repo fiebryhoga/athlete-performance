@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Models\Setting; 
+use Illuminate\Support\Facades\Cache;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -30,11 +31,10 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        
-        
-        
         try {
-            $settings = Setting::pluck('value', 'key');
+            $settings = Cache::remember('app_settings_global', 1800, function () {
+                return Setting::pluck('value', 'key');
+            });
         } catch (\Exception $e) {
             $settings = [];
         }

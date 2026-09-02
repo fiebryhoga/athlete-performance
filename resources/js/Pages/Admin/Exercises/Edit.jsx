@@ -19,6 +19,7 @@ import {
     Sparkles
 } from "lucide-react";
 import PageHeader from "@/Components/Common/PageHeader";
+import BodyPartSelector from "@/Components/BodyPartSelector";
 
 export default function Edit({ exercise, categories = [] }) {
     const {
@@ -32,6 +33,7 @@ export default function Edit({ exercise, categories = [] }) {
         name: exercise.name || "",
         description: exercise.description || "",
         exercise_category_id: exercise.exercise_category_id || "",
+        body_parts: exercise.body_parts || [],
         images: [],
         existing_images: exercise.images || [],
         videos: exercise.videos && exercise.videos.length > 0 ? exercise.videos : [""],
@@ -44,6 +46,7 @@ export default function Edit({ exercise, categories = [] }) {
         
         post(route("admin.exercises.update", exercise.id), {
             ...data,
+            body_parts: JSON.stringify(data.body_parts || []),
             videos: JSON.stringify(cleanVideos),
             existing_images: JSON.stringify(data.existing_images),
             forceFormData: true,
@@ -194,6 +197,14 @@ export default function Edit({ exercise, categories = [] }) {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Card 1.5: Target Bagian Tubuh & Otot */}
+                            <BodyPartSelector
+                                value={data.body_parts}
+                                onChange={(parts) => setData("body_parts", parts)}
+                                label="Target Bagian Tubuh & Otot"
+                                description="Tentukan bagian tubuh atau otot yang dilatih pada gerakan ini untuk pemetaan beban latihan."
+                            />
 
                             {/* Card 2: Tautan Video Referensi */}
                             <div className="bg-white border border-slate-200/80 rounded-md shadow-2xs overflow-hidden">

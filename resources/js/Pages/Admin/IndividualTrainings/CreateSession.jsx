@@ -13,12 +13,18 @@ import {
     User,
     UsersRound,
     Package,
-    ShieldCheck
+    ShieldCheck,
+    Sparkles,
+    Zap,
+    SlidersHorizontal,
+    PlusCircle,
+    Layers
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import PhaseBlock from "./Partials/PhaseBlock";
 import TextBlock from "./Partials/TextBlock";
 import ExerciseQuickModal from "./Partials/ExerciseQuickModal";
+import WorkoutTemplateModal from "./Partials/WorkoutTemplateModal";
 import PageHeader from "@/Components/Common/PageHeader";
 
 export default function CreateSession({
@@ -30,6 +36,7 @@ export default function CreateSession({
     date,
     nextSessionNumber,
     sharedPackages = [],
+    workoutTemplates = [],
 }) {
     // Back URL & from param logic
     const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
@@ -57,11 +64,79 @@ export default function CreateSession({
     });
 
     const [isExModalOpen, setIsExModalOpen] = useState(false);
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+    const [isSimpleMode, setIsSimpleMode] = useState(true);
 
     const submitSession = (e) => {
         e.preventDefault();
         const query = fromParam ? `?from=${fromParam}&package_id=${packageIdParam || data.shared_package_id || ''}` : '';
         post(route("admin.individual-trainings.session.store", athlete.id) + query);
+    };
+
+    const handleApplyTemplate = (template) => {
+        if (!template || !template.blocks) return;
+        setData((prev) => ({
+            ...prev,
+            name: prev.name || template.title,
+            training_type: prev.training_type || "Strength",
+            blocks: template.blocks,
+        }));
+    };
+
+    const generateDefaultPhases = () => {
+        const defaultBlocks = [
+            {
+                name: "Pemanasan & Mobilitas (Warm Up)",
+                category: "warm_up",
+                target_filled_by: "coach",
+                set_scheme: "straight_set",
+                items: [
+                    {
+                        exercise_id: "",
+                        exercise_name: "",
+                        sets: 2,
+                        reps: "10",
+                        reps_array: ["10", "10"],
+                        load_unit: "kg",
+                    }
+                ]
+            },
+            {
+                name: "Latihan Inti (Strength Training)",
+                category: "strength_training",
+                target_filled_by: "coach",
+                set_scheme: "straight_set",
+                items: [
+                    {
+                        exercise_id: "",
+                        exercise_name: "",
+                        sets: 3,
+                        reps: "10",
+                        reps_array: ["10", "10", "10"],
+                        load: "",
+                        load_array: ["", "", ""],
+                        load_unit: "kg",
+                    }
+                ]
+            },
+            {
+                name: "Pendinginan & Peregangan (Cool Down)",
+                category: "stretching",
+                target_filled_by: "coach",
+                set_scheme: "straight_set",
+                items: [
+                    {
+                        exercise_id: "",
+                        exercise_name: "",
+                        sets: 1,
+                        reps: "30s",
+                        reps_array: ["30s"],
+                        note: "Peregangan otot seluruh tubuh secara perlahan.",
+                    }
+                ]
+            }
+        ];
+        setData("blocks", defaultBlocks);
     };
 
     const onDragEnd = (result) => {
@@ -282,26 +357,32 @@ export default function CreateSession({
 
                                     {/* Paket Bersama (Jika ada) */}
                                     {sharedPackages && sharedPackages.length > 0 && (
-                                        <div className="p-2.5 bg-orange-50/70 border border-orange-200/80 rounded-md space-y-1.5">
-                                            <div className="flex items-center gap-1.5 text-xs font-bold text-orange-900">
-                                                <UsersRound className="w-3.5 h-3.5 text-orange-600" />
-                                                <span>Paket Bersama</span>
+                                        <div className="p-3 bg-orange-50/80 border border-orange-200/80 rounded-md space-y-1.5">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-1.5 text-xs font-bold text-orange-900">
+                                                    <UsersRound className="w-3.5 h-3.5 text-orange-600" />
+                                                    <span>Paket Bersama: {sharedPackages[0].name}</span>
+                                                </div>
+                                                <span className="text-[10px] font-bold text-orange-700 bg-orange-100/80 px-2 py-0.5 rounded">
+                                                    {sharedPackages[0].used_sessions || 0}/{sharedPackages[0].total_sessions || '∞'} Sesi
+                                                </span>
                                             </div>
                                             <p className="text-[10.5px] text-orange-700 leading-snug">
-                                                Atlet ini terdaftar dalam paket bersama. Sesi ini akan memotong kuota paket bersama yang dipilih.
+                                                Atlet ini terdaftar dalam paket bersama. Sesi latihan privat ini otomatis menggunakan kuota Paket Bersama (Sisa: {sharedPackages[0].remaining_sessions ?? '∞'} sesi).
                                             </p>
-                                            <select
-                                                value={data.shared_package_id}
-                                                onChange={(e) => setData("shared_package_id", e.target.value)}
-                                                className="w-full text-xs font-medium text-slate-800 bg-white border border-orange-200 rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs mt-1"
-                                            >
-                                                <option value="">-- Tidak Memotong Paket Bersama (Individu Biasa) --</option>
-                                                {sharedPackages.map((sp) => (
-                                                    <option key={sp.id} value={sp.id}>
-                                                        {sp.name} — Sisa {sp.remaining_sessions ?? '∞'} / {sp.total_sessions || '∞'} Sesi
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            {sharedPackages.length > 1 && (
+                                                <select
+                                                    value={data.shared_package_id}
+                                                    onChange={(e) => setData("shared_package_id", e.target.value)}
+                                                    className="w-full text-xs font-medium text-slate-800 bg-white border border-orange-200 rounded-md px-2.5 py-1.5 focus:ring-1 focus:ring-orange-400 focus:border-orange-400 shadow-2xs mt-1"
+                                                >
+                                                    {sharedPackages.map((sp) => (
+                                                        <option key={sp.id} value={sp.id}>
+                                                            {sp.name} — {sp.used_sessions || 0}/{sp.total_sessions || '∞'} Sesi Terpakai (Sisa: {sp.remaining_sessions ?? '∞'} sesi)
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            )}
                                         </div>
                                     )}
 
@@ -390,30 +471,73 @@ export default function CreateSession({
                             KOLOM KANAN (8 Kolom di LG) — Skema & Program Latihan
                            ═══════════════════════════════════════════════════════ */}
                         <div className="lg:col-span-8 space-y-3">
-                            <div className="flex justify-between items-center bg-white border border-slate-200/80 rounded-md px-4 py-2.5 shadow-2xs">
+                            <div className="flex flex-wrap justify-between items-center gap-2 bg-white border border-slate-200/80 rounded-md px-4 py-2.5 shadow-2xs">
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-900">
-                                        Skema & Program Latihan
+                                        Program Latihan
                                     </h3>
                                     <p className="text-[10.5px] text-slate-400 font-medium">
-                                        {data.blocks.length} blok latihan tersusun
+                                        {data.blocks.length} blok tersusun
                                     </p>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {/* Mode Simpel / Pro Toggle */}
+                                    <div className="flex items-center bg-slate-100 p-0.5 rounded-md border border-slate-200/80 text-xs">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsSimpleMode(true)}
+                                            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                                                isSimpleMode
+                                                    ? 'bg-white text-orange-600 shadow-2xs'
+                                                    : 'text-slate-500 hover:text-slate-800'
+                                            }`}
+                                            title="Mode Ringkas"
+                                        >
+                                            <Zap size={11} className={isSimpleMode ? "text-orange-500" : "text-slate-400"} />
+                                            <span>Ringkas</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsSimpleMode(false)}
+                                            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
+                                                !isSimpleMode
+                                                    ? 'bg-white text-orange-600 shadow-2xs'
+                                                    : 'text-slate-500 hover:text-slate-800'
+                                            }`}
+                                            title="Mode Pro"
+                                        >
+                                            <SlidersHorizontal size={11} className={!isSimpleMode ? "text-orange-500" : "text-slate-400"} />
+                                            <span>Pro</span>
+                                        </button>
+                                    </div>
+
+                                    {/* Template Button */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsTemplateModalOpen(true)}
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-b from-orange-50 to-orange-100/60 border border-orange-200/90 text-orange-700 hover:bg-orange-100 rounded-md text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+                                        title="Gunakan Template Sesi Siap Pakai"
+                                    >
+                                        <Sparkles size={12} className="text-orange-500" />
+                                        <span>Template</span>
+                                    </button>
+
                                     <button
                                         type="button"
                                         onClick={addTextBlock}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                        title="Tambah Blok Catatan Teks"
                                     >
-                                        <Type size={13} className="text-slate-500" />
-                                        <span>Catatan Teks</span>
+                                        <Type size={12} className="text-slate-500" />
+                                        <span>Catatan</span>
                                     </button>
                                     <button
                                         type="button"
                                         onClick={addPhaseBlock}
-                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-xs font-bold shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                                        title="Tambah Fase Latihan Baru"
                                     >
-                                        <Activity size={13} />
+                                        <Activity size={12} />
                                         <span>Fase Latihan</span>
                                     </button>
                                 </div>
@@ -457,6 +581,7 @@ export default function CreateSession({
                                                                     onRemove={() => removeBlock(index)}
                                                                     onDuplicate={() => duplicateBlock(index)}
                                                                     onOpenExerciseModal={() => setIsExModalOpen(true)}
+                                                                    isGlobalSimpleMode={isSimpleMode}
                                                                 />
                                                             )}
                                                         </div>
@@ -470,16 +595,38 @@ export default function CreateSession({
                             </DragDropContext>
 
                             {data.blocks.length === 0 && (
-                                <div className="text-center py-14 bg-white border border-dashed border-slate-200 rounded-md shadow-2xs">
-                                    <div className="w-10 h-10 bg-slate-100 rounded-md flex items-center justify-center mx-auto mb-2 text-slate-400">
+                                <div className="text-center py-10 px-4 bg-white border border-dashed border-slate-200 rounded-lg shadow-2xs space-y-4">
+                                    <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto border border-orange-100">
                                         <Dumbbell size={18} />
                                     </div>
-                                    <p className="text-xs font-bold text-slate-700">
-                                        Belum Ada Blok Program Latihan
-                                    </p>
-                                    <p className="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">
-                                        Gunakan tombol <strong>Fase Latihan</strong> atau <strong>Catatan Teks</strong> di atas untuk mulai menyusun program.
-                                    </p>
+                                    <div>
+                                        <h4 className="text-xs font-bold text-slate-800">
+                                            Belum Ada Program Latihan yang Disusun
+                                        </h4>
+                                        <p className="text-[11px] text-slate-400 mt-0.5 max-w-md mx-auto">
+                                            Pilih salah satu cara tercepat di bawah ini untuk mulai mengisi latihan:
+                                        </p>
+                                    </div>
+
+                                    {/* QUICK ACTION BUTTONS */}
+                                    <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsTemplateModalOpen(true)}
+                                            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-b from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-md text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                                        >
+                                            <Sparkles size={14} />
+                                            <span>Gunakan Template Siap Pakai (1-Klik)</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={generateDefaultPhases}
+                                            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                                        >
+                                            <Layers size={14} className="text-orange-500" />
+                                            <span>Buat 3 Fase Standar (Pemanasan, Inti, Pendinginan)</span>
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
@@ -504,14 +651,21 @@ export default function CreateSession({
                                 </div>
                             )}
                         </div>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
 
-    <ExerciseQuickModal
-        isOpen={isExModalOpen}
-        onClose={() => setIsExModalOpen(false)}
-    />
-</AppLayout>
-);
+            <ExerciseQuickModal
+                isOpen={isExModalOpen}
+                onClose={() => setIsExModalOpen(false)}
+            />
+
+            <WorkoutTemplateModal
+                isOpen={isTemplateModalOpen}
+                onClose={() => setIsTemplateModalOpen(false)}
+                onSelectTemplate={handleApplyTemplate}
+                templates={workoutTemplates}
+            />
+        </AppLayout>
+    );
 }

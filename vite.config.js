@@ -10,4 +10,16 @@ export default defineConfig({
         }),
         react(),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', '@inertiajs/react', 'axios'],
+                    lucide: ['lucide-react'],
+                    recharts: ['recharts'],
+                },
+            },
+        },
+        chunkSizeWarningLimit: 1000,
+    },
 });

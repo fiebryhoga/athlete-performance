@@ -33,16 +33,21 @@ import {
     HeartPulse,
     CalendarDays,
     CalendarCheck,
-    BatteryCharging
+    BatteryCharging,
+    HelpCircle
 } from 'lucide-react';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import axios from 'axios'; 
 
 export default function Navbar({ onMobileMenuClick }) {
-    const { auth, url } = usePage().props;
+    const { auth, url, app_settings, appSettings, club_logo_url, club_name } = usePage().props;
     const pageUrl = usePage().url;
     const user = auth.user;
     const isAthlete = user.role === 'athlete';
+    const userRole = user?.role || 'athlete';
+    const appConfig = app_settings || appSettings || {};
+    const appLogo = appConfig?.logo || club_logo_url || '/assets/images/otslogo.png';
+    const appName = appConfig?.name || club_name || "Olympus Training Surabaya";
 
     const [keyword, setKeyword] = useState('');
     const [results, setResults] = useState([]);
@@ -90,6 +95,8 @@ export default function Navbar({ onMobileMenuClick }) {
             'gym-attendance': 'Absensi Gym',
             'individual-trainings': 'Program Latihan',
             'group-trainings': 'Latihan Grup',
+            'help': 'Pusat Bantuan',
+            'help-guides': 'Kelola Panduan',
             'create': 'Tambah Baru',
             'edit': 'Edit Data',
         };
@@ -332,14 +339,38 @@ export default function Navbar({ onMobileMenuClick }) {
                         </div>
                     ) : (
                         <>
-                            {/* Left Side: Mobile Menu & Breadcrumbs */}
+                            {/* Left Side: Mobile App Logo & Desktop Breadcrumbs */}
                             <div className="flex items-center gap-2.5 shrink-0">
-                                {/* Mobile Menu Button */}
-                                <button onClick={onMobileMenuClick} className="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-orange-600 rounded-lg lg:hidden transition-all">
-                                    <Menu className="h-5 w-5" />
-                                </button>
+                                {/* Mobile Logo & Title */}
+                                <Link 
+                                    href="/dashboard" 
+                                    className="flex items-center gap-2.5 lg:hidden group py-1"
+                                    title="Ke Dashboard"
+                                >
+                                    {appLogo ? (
+                                        <div className="flex-shrink-0 flex items-center justify-center">
+                                            <img 
+                                                src={appLogo} 
+                                                alt="Logo" 
+                                                className="w-8 h-8 object-contain group-hover:scale-105 transition-transform" 
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 text-white rounded-md flex items-center justify-center font-bold text-sm shadow-xs">
+                                            {appName.charAt(0)}
+                                        </div>
+                                    )}
+                                    <div className="flex flex-col truncate min-w-0 max-w-[180px] xs:max-w-[220px]">
+                                        <span className="font-bold text-slate-900 text-xs truncate leading-tight">
+                                            {appName}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-slate-400 capitalize">
+                                            {userRole === 'superadmin' ? 'Superadmin Hub' : userRole === 'coach' ? 'Pelatih Hub' : 'Atlet Hub'}
+                                        </span>
+                                    </div>
+                                </Link>
                                 
-                                {/* Breadcrumb Navigation */}
+                                {/* Breadcrumb Navigation (Desktop) */}
                                 <nav className="hidden md:flex items-center gap-1.5 text-xs" aria-label="Breadcrumb">
                                     <Link 
                                         href="/dashboard" 
@@ -531,6 +562,15 @@ export default function Navbar({ onMobileMenuClick }) {
                                     </div>
                                 )}
 
+                                {/* Help Center Quick Link Button */}
+                                <Link
+                                    href={route('help.index')}
+                                    title="Pusat Bantuan & Panduan"
+                                    className="p-1.5 text-slate-500 hover:text-orange-600 hover:bg-orange-50/70 rounded-full transition-colors hidden sm:flex items-center justify-center"
+                                >
+                                    <HelpCircle className="h-4 w-4" />
+                                </Link>
+
                                 {/* Profile Dropdown Button */}
                                 <div className="relative" ref={dropdownRef}>
                                     <button 
@@ -578,6 +618,16 @@ export default function Navbar({ onMobileMenuClick }) {
                                                     </div>
                                                     Edit Profile
                                                 </button>
+                                                <Link 
+                                                    href={route('help.index')}
+                                                    onClick={() => setIsDropdownOpen(false)}
+                                                    className="w-full flex items-center gap-2.5 px-2.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium rounded-lg transition-colors group"
+                                                >
+                                                    <div className="p-1 rounded-md bg-slate-100 text-slate-500 group-hover:text-slate-800 transition-all">
+                                                        <HelpCircle className="w-3.5 h-3.5" />
+                                                    </div>
+                                                    Pusat Bantuan
+                                                </Link>
                                             </div>
                                             <div className="h-px bg-slate-100 my-1 mx-1.5"></div>
                                             <div className="px-1.5">

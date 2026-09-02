@@ -1194,15 +1194,15 @@ const HeroGreeting = ({ user, stats }) => {
     const roleLabel = user?.role === "superadmin" ? "Super Admin" : "Pelatih";
 
     return (
-        <div className="relative overflow-hidden bg-white rounded-lg p-7 md:p-8 lg:p-9 border border-slate-200/90 shadow-2xs group min-h-[210px] flex items-center">
+        <div className="relative overflow-hidden bg-white rounded-xl p-4 sm:p-6 md:p-8 border border-slate-200/90 shadow-2xs group">
             {/* Subtle Warm Ambient Background */}
             <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-orange-50/50 via-amber-50/20 to-transparent pointer-events-none"></div>
 
             <div className="relative z-10 flex items-center justify-between w-full">
                 {/* Left: Rich Structured Content */}
-                <div className="flex-1 min-w-0 pr-4 md:pr-10">
+                <div className="flex-1 min-w-0 pr-0 lg:pr-10">
                     {/* Top Row: Clean System Status Indicator */}
-                    <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-600 mb-3">
+                    <div className="flex items-center gap-2 text-[10.5px] sm:text-[11px] font-semibold text-emerald-600 mb-2 sm:mb-3">
                         <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -1211,7 +1211,7 @@ const HeroGreeting = ({ user, stats }) => {
                     </div>
 
                     {/* Main Greeting Title */}
-                    <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 mb-2 leading-snug">
+                    <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 mb-1.5 sm:mb-2 leading-snug">
                         Selamat Datang Kembali,{" "}
                         <span className="text-orange-600 font-bold">
                             {user?.name}
@@ -1220,7 +1220,7 @@ const HeroGreeting = ({ user, stats }) => {
                     </h2>
 
                     {/* Professional Performance Description */}
-                    <p className="text-slate-500 text-[11px] sm:text-xs font-medium leading-relaxed sm:leading-5 mb-5 max-w-xl">
+                    <p className="text-slate-500 text-[11px] sm:text-xs font-medium leading-relaxed sm:leading-5 mb-0 sm:mb-4 max-w-xl">
                         Pantau kesiapan dan progres latihan klien secara langsung (<span className="italic">real-time</span>). Saat ini mengelola{" "}
                         <span className="font-bold text-slate-900">
                             {stats?.total_atlet || 0} klien aktif
@@ -1232,19 +1232,19 @@ const HeroGreeting = ({ user, stats }) => {
                         bulan ini untuk mendorong performa optimal.
                     </p>
 
-                    {/* Divider & Footer Hub */}
-                    <div className="border-t border-slate-100 pt-4 mt-10 flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-[11px] font-semibold text-slate-700">
+                    {/* Divider & Footer Hub (Hidden on Mobile) */}
+                    <div className="hidden sm:flex border-t border-slate-100 pt-3 sm:pt-3.5 mt-3 sm:mt-5 flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-[10.5px] sm:text-[11px] font-semibold text-slate-700">
                             <span className="text-slate-800 font-bold">
                                 OTS Performance Hub
                             </span>
                             <span className="text-slate-300">•</span>
-                            <span className="text-slate-500 font-medium">
+                            <span className="text-slate-500 font-medium truncate max-w-[140px] sm:max-w-none">
                                 Olympus Training Surabaya
                             </span>
                         </div>
 
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-slate-50 border border-slate-200/90 rounded text-[10px] font-bold text-slate-700 shadow-2xs">
+                        <div className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-0.5 bg-slate-50 border border-slate-200/90 rounded text-[9.5px] sm:text-[10px] font-bold text-slate-700 shadow-2xs shrink-0">
                             <Zap
                                 size={11}
                                 className="text-orange-500 fill-orange-500"
@@ -1255,11 +1255,11 @@ const HeroGreeting = ({ user, stats }) => {
                 </div>
 
                 {/* Right: Athlete Model Graphic */}
-                <div className="relative hidden lg:flex items-end shrink-0 -mb-9 -mr-3 z-10 pointer-events-none self-end">
+                <div className="relative hidden lg:flex items-end shrink-0 -mb-8 -mr-3 z-10 pointer-events-none self-end">
                     <img
                         src="/assets/images/model2.png"
                         alt="Athlete Performance"
-                        className="h-[200px] xl:h-[220px] w-auto object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
+                        className="h-[180px] xl:h-[200px] w-auto object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-transform duration-500"
                     />
                 </div>
             </div>

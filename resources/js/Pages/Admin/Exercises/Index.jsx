@@ -315,6 +315,22 @@ export default function Index({ auth, exercises, categories = [], packages = [],
 
                                             {ex.description && <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">{ex.description}</p>}
 
+                                            {/* Target Body Parts / Muscles Badges */}
+                                            {ex.body_parts && Array.isArray(ex.body_parts) && ex.body_parts.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 pt-0.5">
+                                                    {ex.body_parts.slice(0, 3).map((bp, bpIdx) => (
+                                                        <span key={bpIdx} className="px-1.5 py-0.2 bg-orange-50 text-orange-700 border border-orange-200/60 rounded text-[9px] font-bold">
+                                                            {bp}
+                                                        </span>
+                                                    ))}
+                                                    {ex.body_parts.length > 3 && (
+                                                        <span className="px-1 py-0.2 bg-slate-100 text-slate-600 rounded text-[9px] font-bold" title={ex.body_parts.slice(3).join(', ')}>
+                                                            +{ex.body_parts.length - 3}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
                                             <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
                                                 <div className="p-1.5 bg-slate-50/80 rounded border border-slate-100 shadow-2xs">
                                                     <span className="text-[8.5px] font-bold text-slate-400 uppercase tracking-wider block">Gambar</span>

@@ -106,11 +106,11 @@ class IndividualTrainingController extends Controller
         }
 
         $user->load(['sport', 'package', 'sharedPackages' => function($q) {
-            $q->where('status', 'active')->with('package');
+            $q->with('package');
         }]);
 
         $trainings = IndividualTraining::where('user_id', $user->id)
-            ->with(['coach', 'blocks.items.exercise', 'rpeRecords'])
+            ->with(['coach', 'blocks.items.exercise', 'rpeRecords', 'sharedPackage.package'])
             ->orderBy('date', 'asc')
             ->orderBy('session_number', 'asc')
             ->get();
@@ -171,7 +171,6 @@ class IndividualTrainingController extends Controller
 
         // Load shared packages info for display
         $activeSharedPackages = $user->sharedPackages()
-            ->where('status', 'active')
             ->with(['package', 'members'])
             ->get()
             ->map(function($sp) {
@@ -217,7 +216,6 @@ class IndividualTrainingController extends Controller
 
         // Load active shared packages for this athlete
         $activeSharedPackages = $user->sharedPackages()
-            ->where('status', 'active')
             ->with(['package', 'members'])
             ->get()
             ->map(function($sp) {
@@ -227,6 +225,8 @@ class IndividualTrainingController extends Controller
                 return $sp;
             });
 
+        $workoutTemplates = \App\Models\WorkoutTemplate::orderBy('order', 'asc')->get();
+
         return Inertia::render('Admin/IndividualTrainings/CreateSession', [
             'athlete' => $user,
             'exercises' => $exercisesList,
@@ -235,6 +235,7 @@ class IndividualTrainingController extends Controller
             'date' => $dateStr,
             'nextSessionNumber' => $nextSessionNumber,
             'sharedPackages' => $activeSharedPackages,
+            'workoutTemplates' => $workoutTemplates,
         ]);
     }
 
@@ -256,6 +257,15 @@ class IndividualTrainingController extends Controller
 
         $isExtra = $request->input('is_extra', false);
         $sharedPackageId = $request->input('shared_package_id');
+
+        // Athlete yang terdaftar di paket bersama selalu otomatis terhubung ke paket bersamanya
+        if (!$sharedPackageId) {
+            $activeShared = $user->sharedPackages()->where('status', 'active')->first() ?? $user->sharedPackages()->first();
+            if ($activeShared) {
+                $sharedPackageId = $activeShared->id;
+            }
+        }
+
         $sharedSessionNumber = null;
 
         if ($isExtra) {
@@ -290,7 +300,7 @@ class IndividualTrainingController extends Controller
         $training = IndividualTraining::create([
             'user_id' => $user->id,
             'shared_package_id' => $sharedPackageId,
-            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : Auth::id(),
+            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : null,
             'coach_ids' => $request->coach_ids ?? [],
             'date' => $request->date,
             'day_number' => $day_number,
@@ -369,12 +379,15 @@ class IndividualTrainingController extends Controller
         $exercisePackages = \App\Models\ExercisePackage::with('exercises')->get();
         $coaches = $training->user->coaches()->orderBy('name', 'asc')->get();
         
+        $workoutTemplates = \App\Models\WorkoutTemplate::orderBy('order', 'asc')->get();
+
         return inertia('Admin/IndividualTrainings/EditSession', [
             'training' => $training,
             'exercisesList' => $exercises,
             'packagesList' => $exercisePackages,
             'coachesList' => $coaches,
             'user' => $training->user,
+            'workoutTemplates' => $workoutTemplates,
         ]);
     }
 
@@ -397,7 +410,8 @@ class IndividualTrainingController extends Controller
             'name' => $request->name,
             'training_type' => $request->training_type,
             'location' => $request->location,
-            'coach_ids' => $request->coach_ids,
+            'coach_id' => !empty($request->coach_ids) ? $request->coach_ids[0] : null,
+            'coach_ids' => $request->coach_ids ?? [],
             'is_extra' => $isExtra,
         ]);
 
@@ -538,10 +552,10 @@ class IndividualTrainingController extends Controller
         
         // Fetch all selected coaches manually since it's a json array
         $coaches = [];
-        if (!empty($training->coach_ids)) {
-            $coaches = User::whereIn('id', $training->coach_ids)->get();
+        if (is_array($training->coach_ids)) {
+            $coaches = !empty($training->coach_ids) ? User::whereIn('id', $training->coach_ids)->get() : [];
         } elseif ($training->coach_id) {
-            $coaches = [$training->coach];
+            $coaches = $training->coach ? [$training->coach] : [];
         }
         
         return inertia('Admin/IndividualTrainings/ShowSession', [
@@ -617,6 +631,7 @@ class IndividualTrainingController extends Controller
             'rpes' => 'array',
             'athlete_note' => 'nullable|string',
             'proof_photo' => 'nullable|image|max:5120',
+            'signature_data' => 'nullable|string',
         ]);
 
         // Save final RPE data
@@ -643,6 +658,32 @@ class IndividualTrainingController extends Controller
                 \Storage::disk('public')->delete($training->proof_photo);
             }
             $training->proof_photo = $request->file('proof_photo')->store('proof-photos', 'public');
+        }
+
+        // Handle client digital signature (Base64 data URL or uploaded file)
+        if ($request->filled('signature_data')) {
+            $dataUrl = $request->input('signature_data');
+            if (preg_match('/^data:image\/(\w+);base64,/', $dataUrl, $type)) {
+                $data = substr($dataUrl, strpos($dataUrl, ',') + 1);
+                $type = strtolower($type[1]);
+                $data = base64_decode($data);
+
+                if ($data !== false) {
+                    if ($training->signature_photo) {
+                        \Storage::disk('public')->delete($training->signature_photo);
+                    }
+                    $filename = 'signatures/' . uniqid('sig_ind_') . '.' . $type;
+                    \Storage::disk('public')->put($filename, $data);
+                    $training->signature_photo = $filename;
+                    $training->signed_at = now();
+                }
+            }
+        } elseif ($request->hasFile('signature_photo')) {
+            if ($training->signature_photo) {
+                \Storage::disk('public')->delete($training->signature_photo);
+            }
+            $training->signature_photo = $request->file('signature_photo')->store('signatures', 'public');
+            $training->signed_at = now();
         }
 
         // Mark as completed
@@ -739,8 +780,13 @@ class IndividualTrainingController extends Controller
             // Duplicate the training record (kosongkan pelatih & pelatih pendamping pada sesi duplikasi)
             $newTraining = $training->replicate(['is_completed', 'completed_at', 'athlete_note', 'proof_photo', 'athlete_rpe']);
             $newTraining->user_id = $targetUser->id;
+
+            // Pastikan jika target user memiliki paket bersama, sesi langsung terhubung ke paket bersamanya
+            $targetShared = $targetUser->sharedPackages()->where('status', 'active')->first() ?? $targetUser->sharedPackages()->first();
+            $newTraining->shared_package_id = $targetShared ? $targetShared->id : null;
+
             $newTraining->coach_id = null; // Kosongkan pelatih utama agar bisa disesuaikan
-            $newTraining->coach_ids = null; // Kosongkan pelatih pendamping
+            $newTraining->coach_ids = []; // Kosongkan pelatih pendamping
             $newTraining->paid_coach_ids = null;
             $newTraining->is_athlete_paid = false;
             $newTraining->date = $targetDate;
@@ -789,8 +835,14 @@ class IndividualTrainingController extends Controller
      * Extra sessions (is_extra = true) get null session_number.
      * Regular sessions get continuous numbers: 1, 2, 3, ...
      */
-    public static function resequenceAthleteSessions(int $userId, bool $isPaid = false): void
+    public static function resequenceAthleteSessions(int $userId, ?bool $isPaid = null): void
     {
+        if ($isPaid === null) {
+            self::resequenceAthleteSessions($userId, false);
+            self::resequenceAthleteSessions($userId, true);
+            return;
+        }
+
         // 1. Reset extra sessions
         IndividualTraining::where('user_id', $userId)
             ->where('is_athlete_paid', $isPaid)
@@ -819,16 +871,25 @@ class IndividualTrainingController extends Controller
      * Resequence all sessions for a shared package in chronological order (date, created_at, id).
      * Extra sessions (is_extra = true) get null shared_session_number.
      * Regular sessions get continuous numbers: 1, 2, 3, ...
+     * Unpaid and Paid cycles are numbered independently starting from 1.
      */
-    public static function resequenceSharedPackageSessions(int $sharedPackageId): void
+    public static function resequenceSharedPackageSessions(int $sharedPackageId, ?bool $isPaid = null): void
     {
+        if ($isPaid === null) {
+            self::resequenceSharedPackageSessions($sharedPackageId, false);
+            self::resequenceSharedPackageSessions($sharedPackageId, true);
+            return;
+        }
+
         // 1. Reset extra sessions
         IndividualTraining::where('shared_package_id', $sharedPackageId)
+            ->where('is_athlete_paid', $isPaid)
             ->where('is_extra', true)
             ->update(['shared_session_number' => null]);
 
-        // 2. Fetch regular sessions chronologically
+        // 2. Fetch regular sessions chronologically for this payment cycle
         $sessions = IndividualTraining::where('shared_package_id', $sharedPackageId)
+            ->where('is_athlete_paid', $isPaid)
             ->where('is_extra', false)
             ->orderBy('date', 'asc')
             ->orderBy('created_at', 'asc')
@@ -883,38 +944,21 @@ class IndividualTrainingController extends Controller
             ];
         }
 
-        $training->blocks->each(function ($block) {
-            $block->items->each(function ($item) {
-                if ($item->exercise) {
-                    $base64Images = [];
-                    if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
-                        foreach ($item->exercise->images as $img) {
-                            $imgClean = str_replace('storage/', '', ltrim($img, '/'));
-                            $imgPath1 = public_path('storage/' . $imgClean);
-                            $imgPath2 = storage_path('app/public/' . $imgClean);
-                            $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
-                            
-                            if ($finalImgPath) {
-                                $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
-                                $data = file_get_contents($finalImgPath);
-                                $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                            }
-                        }
-                    }
-                    $item->exercise->setAttribute('base64_images', $base64Images);
-                }
-            });
-        });
+        \App\Services\PdfImageHelper::processTrainingImages($training);
 
         // Pastikan nama dan tanggal tersedia untuk title
         $training->title = $training->name ?: ($training->is_extra ? 'Extra Activity / Tournament' : 'Individual Training Session #' . $training->session_number);
         $training->focus = ($athlete ? $athlete->name : 'Athlete') . ($training->location ? ' | ' . $training->location : '');
         
         $coachNames = [];
-        if (is_array($training->coach_ids) && count($training->coach_ids) > 0) {
-            $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
-                ->pluck('name')
-                ->toArray();
+        if (is_array($training->coach_ids)) {
+            if (count($training->coach_ids) > 0) {
+                $coachNames = \App\Models\User::whereIn('id', $training->coach_ids)
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } elseif ($training->coach_id && $training->coach) {
+            $coachNames = [$training->coach->name];
         }
         $training->coachList = count($coachNames) > 0 ? implode(', ', array_unique($coachNames)) : '-';
 

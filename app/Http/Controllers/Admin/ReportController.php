@@ -21,87 +21,72 @@ class ReportController extends Controller
      */
     public function sessionRecap()
     {
-        // ─── ATHLETES (Individual) ───
-        $athletes = User::where('role', 'athlete')
-            ->with(['sport', 'package', 'sharedPackages.package'])
-            ->get()
-            ->map(function ($athlete) {
-                $activeShared = $athlete->sharedPackages->first();
+        // Helper mapping function for individual athlete data
+        $mapAthleteData = function ($athlete) {
+            $trainings = IndividualTraining::where('user_id', $athlete->id)
+                ->with(['coach', 'sharedPackage'])
+                ->orderBy('date', 'desc')
+                ->get();
 
-                // Sesi latihan individu atlet (termasuk yang masuk paket bersama)
-                $trainings = IndividualTraining::where('user_id', $athlete->id)
-                    ->with(['coach', 'sharedPackage'])
-                    ->orderBy('date', 'desc')
-                    ->get();
+            if ($athlete->package) {
+                $athlete->package_name = $athlete->package->name;
+                $athlete->package_type = $athlete->package->package_type ?? 'quota';
+                $athlete->package_session_count = $athlete->package->session_count;
+                $athlete->is_shared_package = false;
+                $athlete->sessions_used = $trainings->whereNull('shared_package_id')->where('is_extra', false)->count();
+            } else {
+                $athlete->package_name = null;
+                $athlete->package_type = null;
+                $athlete->package_session_count = null;
+                $athlete->is_shared_package = false;
+                $athlete->sessions_used = $trainings->count();
+            }
 
-                if ($athlete->package) {
-                    $athlete->package_name = $athlete->package->name;
-                    $athlete->package_type = $athlete->package->package_type ?? 'quota';
-                    $athlete->package_session_count = $athlete->package->session_count;
-                    $athlete->is_shared_package = false;
-                    $athlete->sessions_used = $trainings->whereNull('shared_package_id')->where('is_extra', false)->count();
-                } elseif ($activeShared) {
-                    // Paket bersama ADALAH paket privat atlet ini
-                    $athlete->package_name = $activeShared->name;
-                    $athlete->package_type = 'shared';
-                    $athlete->package_session_count = $activeShared->package?->session_count;
-                    $athlete->is_shared_package = true;
-                    $athlete->shared_package_id = $activeShared->id;
-                    $athlete->sessions_used = $activeShared->usedSessions();
-                } else {
-                    $athlete->package_name = null;
-                    $athlete->package_type = null;
-                    $athlete->package_session_count = null;
-                    $athlete->is_shared_package = false;
-                    $athlete->sessions_used = $trainings->count();
+            $athlete->total_sessions = $trainings->count();
+            $athlete->regular_sessions = $trainings->where('is_extra', false)->count();
+            $athlete->extra_sessions = $trainings->where('is_extra', true)->count();
+            $athlete->completed_sessions = $trainings->where('status', 'completed')->count();
+            $athlete->scheduled_sessions = $trainings->whereNotIn('status', ['completed'])->count();
+            $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
+            $athlete->unpaid_regular_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
+            $athlete->unpaid_extra_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', true)->count();
+
+            // Session list for drill-down
+            $athlete->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
+                $coachNames = [];
+                if (is_array($t->coach_ids)) {
+                    $coachNames = !empty($t->coach_ids) ? User::whereIn('id', $t->coach_ids)->pluck('name')->toArray() : [];
+                } elseif ($t->coach) {
+                    $coachNames[] = $t->coach->name;
                 }
 
-                $athlete->shared_package_names = $athlete->sharedPackages->pluck('name')->toArray();
-                $athlete->total_sessions = $trainings->count();
-                $athlete->regular_sessions = $trainings->where('is_extra', false)->count();
-                $athlete->extra_sessions = $trainings->where('is_extra', true)->count();
-                $athlete->completed_sessions = $trainings->where('status', 'completed')->count();
-                $athlete->scheduled_sessions = $trainings->whereNotIn('status', ['completed'])->count();
-                $athlete->unpaid_sessions = $trainings->where('is_athlete_paid', false)->count();
-                $athlete->unpaid_regular_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', false)->count();
-                $athlete->unpaid_extra_sessions = $trainings->where('is_athlete_paid', false)->where('is_extra', true)->count();
+                return [
+                    'id' => $t->id,
+                    'date' => $t->date,
+                    'status' => $t->status,
+                    'session_number' => $t->session_number,
+                    'name' => $t->name,
+                    'training_type' => $t->training_type,
+                    'coaches' => array_unique($coachNames),
+                    'is_paid' => (bool) $t->is_athlete_paid,
+                    'is_extra' => (bool) $t->is_extra,
+                    'is_shared' => !is_null($t->shared_package_id),
+                ];
+            })->values();
 
-                // Session list for drill-down
-                $athlete->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
-                    $coachNames = [];
-                    if ($t->coach) {
-                        $coachNames[] = $t->coach->name;
-                    }
-                    if ($t->coach_ids && is_array($t->coach_ids)) {
-                        $extraCoaches = User::whereIn('id', $t->coach_ids)
-                            ->where('id', '!=', $t->coach_id)
-                            ->pluck('name')
-                            ->toArray();
-                        $coachNames = array_merge($coachNames, $extraCoaches);
-                    }
+            unset($athlete->package, $athlete->sharedPackages, $athlete->groups);
+            return $athlete;
+        };
 
-                    return [
-                        'id' => $t->id,
-                        'date' => $t->date,
-                        'status' => $t->status,
-                        'session_number' => $t->session_number,
-                        'name' => $t->name,
-                        'training_type' => $t->training_type,
-                        'coaches' => array_unique($coachNames),
-                        'is_paid' => (bool) $t->is_athlete_paid,
-                        'is_extra' => (bool) $t->is_extra,
-                        'is_shared' => !is_null($t->shared_package_id),
-                        'shared_package_name' => $t->sharedPackage?->name,
-                    ];
-                })->values();
+        // ─── 1. ATHLETES (Private Packages Only) ───
+        $athletes = User::where('role', 'athlete')
+            ->whereNotNull('subscription_package_id')
+            ->whereDoesntHave('sharedPackages')
+            ->with(['sport', 'package'])
+            ->get()
+            ->map($mapAthleteData);
 
-                // Unset relationship to keep payload clean
-                unset($athlete->package, $athlete->sharedPackages);
-
-                return $athlete;
-            });
-
-        // ─── GROUPS ───
+        // ─── 2. GROUPS ───
         $groups = TrainingGroup::with(['package', 'members'])
             ->get()
             ->map(function ($group) {
@@ -127,15 +112,10 @@ class ReportController extends Controller
                 // Session list for drill-down (hanya yang belum dibayar)
                 $group->sessions = $trainings->where('is_group_paid', false)->map(function ($t) {
                     $coachNames = [];
-                    if ($t->coach) {
+                    if (is_array($t->coach_ids)) {
+                        $coachNames = !empty($t->coach_ids) ? User::whereIn('id', $t->coach_ids)->pluck('name')->toArray() : [];
+                    } elseif ($t->coach) {
                         $coachNames[] = $t->coach->name;
-                    }
-                    if ($t->coach_ids && is_array($t->coach_ids)) {
-                        $extraCoaches = User::whereIn('id', $t->coach_ids)
-                            ->where('id', '!=', $t->coach_id)
-                            ->pluck('name')
-                            ->toArray();
-                        $coachNames = array_merge($coachNames, $extraCoaches);
                     }
 
                     return [
@@ -158,7 +138,7 @@ class ReportController extends Controller
                 return $group;
             });
 
-        // ─── SHARED PACKAGES (Paket Bersama) ───
+        // ─── 3. SHARED PACKAGES (Paket Bersama) ───
         $sharedPackages = SharedPackage::with(['package', 'members'])
             ->get()
             ->map(function ($sp) {
@@ -194,7 +174,9 @@ class ReportController extends Controller
                 // Session list (unpaid only)
                 $sp->sessions = $trainings->where('is_athlete_paid', false)->map(function ($t) {
                     $coachNames = [];
-                    if ($t->coach) {
+                    if (is_array($t->coach_ids)) {
+                        $coachNames = !empty($t->coach_ids) ? User::whereIn('id', $t->coach_ids)->pluck('name')->toArray() : [];
+                    } elseif ($t->coach) {
                         $coachNames[] = $t->coach->name;
                     }
                     return [
@@ -217,28 +199,42 @@ class ReportController extends Controller
                 return $sp;
             });
 
+        // ─── 4. NO PACKAGE ATHLETES (Tanpa Paket) ───
+        $noPackageAthletes = User::where('role', 'athlete')
+            ->whereNull('subscription_package_id')
+            ->whereDoesntHave('sharedPackages')
+            ->whereDoesntHave('groups')
+            ->with(['sport'])
+            ->get()
+            ->map($mapAthleteData);
+
         // ─── SUMMARY STATS FOR CLIENT SESSIONS ───
         $totalIndUnpaid = $athletes->sum('unpaid_sessions');
         $totalGroupUnpaid = $groups->sum('unpaid_sessions');
         $totalSharedUnpaid = $sharedPackages->sum('unpaid_sessions');
-        $totalUnpaidSessions = $totalIndUnpaid + $totalGroupUnpaid + $totalSharedUnpaid;
+        $totalNoPkgUnpaid = $noPackageAthletes->sum('unpaid_sessions');
+        $totalUnpaidSessions = $totalIndUnpaid + $totalGroupUnpaid + $totalSharedUnpaid + $totalNoPkgUnpaid;
 
         $totalIndSessions = $athletes->sum('total_sessions');
         $totalGroupSessions = $groups->sum('total_sessions');
         $totalSharedSessions = $sharedPackages->sum('total_sessions');
+        $totalNoPkgSessions = $noPackageAthletes->sum('total_sessions');
 
         return Inertia::render('Admin/Reports/SessionRecap', [
             'athletes' => $athletes,
             'groups' => $groups,
             'sharedPackages' => $sharedPackages,
+            'noPackageAthletes' => $noPackageAthletes,
             'sessionSummary' => [
                 'total_unpaid' => $totalUnpaidSessions,
                 'total_individual' => $totalIndSessions,
                 'total_group' => $totalGroupSessions,
                 'total_shared' => $totalSharedSessions,
+                'total_no_package' => $totalNoPkgSessions,
                 'unpaid_individual' => $totalIndUnpaid,
                 'unpaid_group' => $totalGroupUnpaid,
                 'unpaid_shared' => $totalSharedUnpaid,
+                'unpaid_no_package' => $totalNoPkgUnpaid,
             ],
         ]);
     }
@@ -261,9 +257,12 @@ class ReportController extends Controller
             ->map(function ($coach) use ($monthNames, &$allRecordedMonths) {
                 // Individual sessions (hanya yang sudah terselesaikan)
                 $individualTrainings = IndividualTraining::where(function ($q) use ($coach) {
-                        $q->where('coach_id', $coach->id)
-                          ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                          ->orWhereJsonContains('coach_ids', $coach->id);
+                        $q->where(function ($sub) use ($coach) {
+                            $sub->whereNull('coach_ids')
+                                ->where('coach_id', $coach->id);
+                        })
+                        ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                        ->orWhereJsonContains('coach_ids', $coach->id);
                     })
                     ->where(function ($q) {
                         $q->where('status', 'completed')
@@ -274,9 +273,12 @@ class ReportController extends Controller
 
                 // Group sessions (hanya yang sudah terselesaikan)
                 $groupTrainings = GroupTraining::where(function ($q) use ($coach) {
-                        $q->where('coach_id', $coach->id)
-                          ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                          ->orWhereJsonContains('coach_ids', $coach->id);
+                        $q->where(function ($sub) use ($coach) {
+                            $sub->whereNull('coach_ids')
+                                ->where('coach_id', $coach->id);
+                        })
+                        ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                        ->orWhereJsonContains('coach_ids', $coach->id);
                     })
                     ->where(function ($q) {
                         $q->where('status', 'completed')
@@ -409,11 +411,10 @@ class ReportController extends Controller
                     ];
                 }
 
-                // Sort monthly breakdown descending by month_key (newest first) and limit to last 4 months
+                // Sort monthly breakdown descending by month_key (newest first)
                 usort($monthlyBreakdown, function ($a, $b) {
                     return strcmp($b['month_key'], $a['month_key']);
                 });
-                $monthlyBreakdown = array_slice($monthlyBreakdown, 0, 4);
 
                 $lastPayout = \App\Models\CoachPayout::where('user_id', $coach->id)->latest('paid_at')->first();
 
@@ -432,8 +433,8 @@ class ReportController extends Controller
                 return $coach;
             });
 
-        // Unique sorted list of months (limit to last 4 months)
-        $distinctMonths = $allRecordedMonths->unique()->sortDesc()->take(4)->values()->map(function ($mKey) use ($monthNames) {
+        // Unique sorted list of months (all recorded months)
+        $distinctMonths = $allRecordedMonths->unique()->sortDesc()->values()->map(function ($mKey) use ($monthNames) {
             try {
                 $cM = Carbon::createFromFormat('Y-m', $mKey);
                 return [
@@ -580,9 +581,12 @@ class ReportController extends Controller
 
         // Individual sessions
         $individualTrainings = IndividualTraining::where(function ($q) use ($coach) {
-                $q->where('coach_id', $coach->id)
-                  ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                  ->orWhereJsonContains('coach_ids', $coach->id);
+                $q->where(function ($sub) use ($coach) {
+                    $sub->whereNull('coach_ids')
+                        ->where('coach_id', $coach->id);
+                })
+                ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                ->orWhereJsonContains('coach_ids', $coach->id);
             })
             ->where(function ($q) {
                 $q->where('status', 'completed')
@@ -594,9 +598,12 @@ class ReportController extends Controller
 
         // Group sessions
         $groupTrainings = GroupTraining::where(function ($q) use ($coach) {
-                $q->where('coach_id', $coach->id)
-                  ->orWhereJsonContains('coach_ids', (string)$coach->id)
-                  ->orWhereJsonContains('coach_ids', $coach->id);
+                $q->where(function ($sub) use ($coach) {
+                    $sub->whereNull('coach_ids')
+                        ->where('coach_id', $coach->id);
+                })
+                ->orWhereJsonContains('coach_ids', (string)$coach->id)
+                ->orWhereJsonContains('coach_ids', $coach->id);
             })
             ->where(function ($q) {
                 $q->where('status', 'completed')
@@ -770,25 +777,56 @@ class ReportController extends Controller
             ->where('is_athlete_paid', false)
             ->update(['is_athlete_paid' => true]);
 
+        \App\Http\Controllers\Admin\IndividualTrainingController::resequenceAthleteSessions($user->id);
+        foreach ($user->sharedPackages as $sp) {
+            \App\Http\Controllers\Admin\IndividualTrainingController::resequenceSharedPackageSessions($sp->id);
+        }
+
         return redirect()->back()->with('success', 'Berhasil menandai sesi atlet sebagai lunas.');
     }
 
     public function payCoach(Request $request, User $user)
     {
+        $targetMonth = $request->input('month'); // e.g. '2026-07' or 'all' or null
+        $carbonMonth = null;
+        $monthLabel = null;
+
+        if (!empty($targetMonth) && $targetMonth !== 'all') {
+            try {
+                $carbonMonth = Carbon::createFromFormat('Y-m', $targetMonth);
+                $monthNames = [
+                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                ];
+                $monthLabel = $monthNames[(int)$carbonMonth->format('n')] . ' ' . $carbonMonth->format('Y');
+            } catch (\Exception $e) {
+                $carbonMonth = null;
+            }
+        }
+
         $unpaidEarnings = 0;
 
-        // Mark individual sessions as paid for this coach (hanya sesi yang sudah terselesaikan)
-        $individualTrainings = IndividualTraining::where(function ($q) use ($user) {
-                $q->where('coach_id', $user->id)
-                  ->orWhereJsonContains('coach_ids', (string)$user->id)
-                  ->orWhereJsonContains('coach_ids', $user->id);
+        // 1. Individual Trainings (hanya sesi yang sudah terselesaikan)
+        $individualQuery = IndividualTraining::where(function ($q) use ($user) {
+                $q->where(function ($sub) use ($user) {
+                    $sub->whereNull('coach_ids')
+                        ->where('coach_id', $user->id);
+                })
+                ->orWhereJsonContains('coach_ids', (string)$user->id)
+                ->orWhereJsonContains('coach_ids', $user->id);
             })
             ->where(function ($q) {
                 $q->where('status', 'completed')
                   ->orWhere('is_completed', true);
-            })
-            ->with(['user.package', 'sharedPackage.package'])
-            ->get();
+            });
+
+        if ($carbonMonth) {
+            $individualQuery->whereYear('date', $carbonMonth->year)
+                ->whereMonth('date', $carbonMonth->month);
+        }
+
+        $individualTrainings = $individualQuery->with(['user.package', 'sharedPackage.package'])->get();
 
         foreach ($individualTrainings as $session) {
             $paidIds = is_string($session->paid_coach_ids) ? json_decode($session->paid_coach_ids, true) : $session->paid_coach_ids;
@@ -801,11 +839,14 @@ class ReportController extends Controller
             }
         }
 
-        // Mark group sessions as paid for this coach (hanya sesi yang sudah terselesaikan)
-        $groupTrainings = GroupTraining::where(function ($q) use ($user) {
-                $q->where('coach_id', $user->id)
-                  ->orWhereJsonContains('coach_ids', (string)$user->id)
-                  ->orWhereJsonContains('coach_ids', $user->id);
+        // 2. Group Trainings (hanya sesi yang sudah terselesaikan)
+        $groupQuery = GroupTraining::where(function ($q) use ($user) {
+                $q->where(function ($sub) use ($user) {
+                    $sub->whereNull('coach_ids')
+                        ->where('coach_id', $user->id);
+                })
+                ->orWhereJsonContains('coach_ids', (string)$user->id)
+                ->orWhereJsonContains('coach_ids', $user->id);
             })
             ->where(function ($q) {
                 $q->where('status', 'completed')
@@ -813,9 +854,14 @@ class ReportController extends Controller
                       $mq->where('is_completed', true);
                   });
             })
-            ->where('is_coach_paid', false)
-            ->with(['group.package', 'members_pivot'])
-            ->get();
+            ->where('is_coach_paid', false);
+
+        if ($carbonMonth) {
+            $groupQuery->whereYear('date', $carbonMonth->year)
+                ->whereMonth('date', $carbonMonth->month);
+        }
+
+        $groupTrainings = $groupQuery->with(['group.package', 'members_pivot'])->get();
 
         foreach ($groupTrainings as $session) {
             $unpaidEarnings += $session->group?->package?->coach_fee_per_session ?? 0;
@@ -823,13 +869,19 @@ class ReportController extends Controller
             $session->save();
         }
 
-        // Mark gym shifts as paid for this coach
+        // 3. Gym shifts
         $gymShiftFee = (int) ($user->effective_gym_fee ?? 0);
-        $unpaidGymShifts = GymAttendance::where('user_id', $user->id)
+        $gymQuery = GymAttendance::where('user_id', $user->id)
             ->where('is_paid', false)
             ->whereNotNull('check_in_time')
-            ->whereNotNull('check_out_time')
-            ->get();
+            ->whereNotNull('check_out_time');
+
+        if ($carbonMonth) {
+            $gymQuery->whereYear('date', $carbonMonth->year)
+                ->whereMonth('date', $carbonMonth->month);
+        }
+
+        $unpaidGymShifts = $gymQuery->get();
 
         foreach ($unpaidGymShifts as $shift) {
             $unpaidEarnings += $gymShiftFee;
@@ -842,10 +894,12 @@ class ReportController extends Controller
                 'user_id' => $user->id,
                 'amount' => $unpaidEarnings,
                 'paid_at' => now(),
+                'notes' => $monthLabel ? "Pencairan honor periode {$monthLabel}" : "Pencairan honor semua periode",
             ]);
         }
 
-        return redirect()->back()->with('success', 'Berhasil mencairkan honor pelatih sebesar Rp ' . number_format($unpaidEarnings, 0, ',', '.'));
+        $periodText = $monthLabel ? " periode {$monthLabel}" : "";
+        return redirect()->back()->with('success', "Berhasil mencairkan honor pelatih{$periodText} sebesar Rp " . number_format($unpaidEarnings, 0, ',', '.'));
     }
 
     public function payGroup(Request $request, TrainingGroup $group)
@@ -863,12 +917,18 @@ class ReportController extends Controller
             ->where('is_athlete_paid', false)
             ->update(['is_athlete_paid' => true]);
 
-        $sharedPackage->update(['status' => 'completed']);
+        \App\Http\Controllers\Admin\IndividualTrainingController::resequenceSharedPackageSessions($sharedPackage->id);
+        foreach ($sharedPackage->members as $member) {
+            \App\Http\Controllers\Admin\IndividualTrainingController::resequenceAthleteSessions($member->id);
+        }
 
         return redirect()->back()->with('success', 'Berhasil menandai sesi paket bersama sebagai lunas.');
     }
     public function exportAthleteReportPdf(Request $request, User $user)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(180);
+
         // Load all trainings for this athlete
         $trainings = IndividualTraining::where('user_id', $user->id)
             ->with(['coach', 'blocks.items.exercise', 'rpeRecords'])
@@ -877,39 +937,13 @@ class ReportController extends Controller
 
         $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
         $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
-        
-        $clubLogo = null;
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
+        $clubLogo = \App\Services\PdfImageHelper::getOptimizedBase64($logoPath, 200, 200);
+
+        // Optimize all exercise images across sessions
+        \App\Services\PdfImageHelper::processTrainingImages($trainings);
 
         // Prepare each training's data
         $trainings->each(function ($training) use ($user) {
-            $training->blocks->each(function ($block) {
-                $block->items->each(function ($item) {
-                    if ($item->exercise) {
-                        $base64Images = [];
-                        if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
-                            foreach ($item->exercise->images as $img) {
-                                $imgClean = str_replace('storage/', '', ltrim($img, '/'));
-                                $imgPath1 = public_path('storage/' . $imgClean);
-                                $imgPath2 = storage_path('app/public/' . $imgClean);
-                                $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
-                                
-                                if ($finalImgPath) {
-                                    $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
-                                    $data = file_get_contents($finalImgPath);
-                                    $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
-                            }
-                        }
-                        $item->exercise->setAttribute('base64_images', $base64Images);
-                    }
-                });
-            });
-
             // Set title and focus
             $training->title = $training->name ?: 'Session #' . $training->session_number;
             $training->focus = ($training->location ? $training->location : '');
@@ -955,6 +989,9 @@ class ReportController extends Controller
 
     public function exportGroupReportPdf(Request $request, \App\Models\TrainingGroup $group)
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(180);
+
         // Load all trainings for this group
         $trainings = GroupTraining::where('training_group_id', $group->id)
             ->with(['coach', 'blocks.items.exercise', 'rpe_records'])
@@ -963,39 +1000,13 @@ class ReportController extends Controller
 
         $logoSetting = \App\Models\Setting::where('key', 'app_logo')->value('value');
         $logoPath = $logoSetting ? storage_path('app/public/' . $logoSetting) : public_path('assets/images/app-logo.png');
-        
-        $clubLogo = null;
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $clubLogo = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
+        $clubLogo = \App\Services\PdfImageHelper::getOptimizedBase64($logoPath, 200, 200);
+
+        // Optimize all exercise images across sessions
+        \App\Services\PdfImageHelper::processTrainingImages($trainings);
 
         // Prepare each training's data
         $trainings->each(function ($training) use ($group) {
-            $training->blocks->each(function ($block) {
-                $block->items->each(function ($item) {
-                    if ($item->exercise) {
-                        $base64Images = [];
-                        if (!empty($item->exercise->images) && is_array($item->exercise->images)) {
-                            foreach ($item->exercise->images as $img) {
-                                $imgClean = str_replace('storage/', '', ltrim($img, '/'));
-                                $imgPath1 = public_path('storage/' . $imgClean);
-                                $imgPath2 = storage_path('app/public/' . $imgClean);
-                                $finalImgPath = file_exists($imgPath1) ? $imgPath1 : (file_exists($imgPath2) ? $imgPath2 : null);
-                                
-                                if ($finalImgPath) {
-                                    $type = pathinfo($finalImgPath, PATHINFO_EXTENSION);
-                                    $data = file_get_contents($finalImgPath);
-                                    $base64Images[] = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                                }
-                            }
-                        }
-                        $item->exercise->setAttribute('base64_images', $base64Images);
-                    }
-                });
-            });
-
             // Set title and focus
             $training->title = $training->name ?: 'Session #' . $training->session_number;
             $training->focus = ($training->location ? $training->location : '');

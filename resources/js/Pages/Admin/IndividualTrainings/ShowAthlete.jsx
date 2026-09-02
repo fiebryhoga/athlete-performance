@@ -28,9 +28,12 @@ import {
     Check,
     CheckSquare,
     Square,
-    UserCheck
+    UserCheck,
+    Loader2
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { pdf } from '@react-pdf/renderer';
+import AthleteSessionReportPdfDocument, { prepareTrainingsWithCompressedImages } from '@/Components/Pdf/AthleteSessionReportPdfDocument';
 
 function getInitials(name) {
     if (!name) return "AT";
@@ -42,7 +45,7 @@ function getInitials(name) {
         .toUpperCase();
 }
 
-function getSessionPhasesSummary(session) {
+function getSessionPhasesSummary(session, targetAthleteId = null) {
     if (!session || !session.blocks || !Array.isArray(session.blocks)) {
         return null;
     }
@@ -57,12 +60,31 @@ function getSessionPhasesSummary(session) {
     if (Array.isArray(rpeRecords)) {
         rpeRecords.forEach((r) => {
             if (r.training_block_item_id && r.rpe_data) {
-                rpeMap[r.training_block_item_id] = r.rpe_data;
+                if (!targetAthleteId || Number(r.athlete_id) === Number(targetAthleteId)) {
+                    rpeMap[r.training_block_item_id] = r.rpe_data;
+                }
             }
         });
     }
 
-    session.blocks.forEach((block) => {
+    // Filter blocks if target athlete is given (e.g. In multi-program group training)
+    let blocksToCalculate = session.blocks;
+    if (targetAthleteId) {
+        const targetId = Number(targetAthleteId);
+        const hasAssignedBlocks = session.blocks.some((b) => {
+            const ids = b.program_athlete_ids || b.athlete_ids;
+            return Array.isArray(ids) && ids.map(Number).includes(targetId);
+        });
+
+        if (hasAssignedBlocks) {
+            blocksToCalculate = session.blocks.filter((b) => {
+                const ids = b.program_athlete_ids || b.athlete_ids;
+                return Array.isArray(ids) && ids.map(Number).includes(targetId);
+            });
+        }
+    }
+
+    blocksToCalculate.forEach((block) => {
         const cat = block.category;
         const isStrength = cat === 'strength_training' || cat === 'free_strength';
         const isCardioInterval = cat === 'interval' || cat === 'cardio';
@@ -129,6 +151,41 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
     const [selectedTargetUserIds, setSelectedTargetUserIds] = useState([]);
     const [clientSearch, setClientSearch] = useState('');
     const [isDuplicating, setIsDuplicating] = useState(false);
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+    const handleDownloadPdf = async () => {
+        if (isExportingPdf) return;
+        setIsExportingPdf(true);
+        try {
+            const optimizedTrainings = await prepareTrainingsWithCompressedImages(trainings);
+            const doc = (
+                <AthleteSessionReportPdfDocument
+                    athlete={athlete}
+                    trainings={optimizedTrainings}
+                />
+            );
+            const blob = await pdf(doc).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            const cleanName = (athlete?.name || "Athlete").replace(/[^A-Za-z0-9_\-]/g, "_");
+            link.download = `Laporan_Sesi_${cleanName}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Failed to generate PDF:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Generate PDF",
+                text: "Terjadi kesalahan saat memproses laporan PDF sesi.",
+                confirmButtonColor: "#ea580c",
+            });
+        } finally {
+            setIsExportingPdf(false);
+        }
+    };
 
     const isAthlete = auth?.user?.role === 'athlete';
 
@@ -324,15 +381,19 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                         description="Kelola dan pantau seluruh jadwal sesi program latihan atlet dalam tampilan kalender interaktif."
                         actions={
                             <div className="flex items-center gap-2">
-                                <a
-                                    href={route('admin.reports.sessions.export-athlete', athlete.id)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold transition-all shadow-2xs hover:shadow-xs"
+                                <button
+                                    type="button"
+                                    onClick={handleDownloadPdf}
+                                    disabled={isExportingPdf}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-semibold transition-all shadow-2xs hover:shadow-xs disabled:opacity-50 cursor-pointer"
                                 >
-                                    <Download size={13} className="text-orange-500" />
-                                    <span>Download Laporan Sesi</span>
-                                </a>
+                                    {isExportingPdf ? (
+                                        <Loader2 size={13} className="text-orange-500 animate-spin" />
+                                    ) : (
+                                        <Download size={13} className="text-orange-500" />
+                                    )}
+                                    <span>{isExportingPdf ? "Memproses PDF..." : "Download Laporan Sesi"}</span>
+                                </button>
                             </div>
                         }
                     />
@@ -385,7 +446,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                 <Package size={11} className="text-orange-500" />
                                                 {athlete.package.name} ({athlete.package.package_type === 'per_session' ? 'Per Pertemuan' : `${maxSession}/${athlete.package.session_count || '∞'} Sesi`})
                                             </span>
-                                        ) : sharedPackages && sharedPackages.length > 0 ? (
+                                        ) : (sharedPackages && sharedPackages.length > 0) ? (
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                 {sharedPackages.map((sp) => (
                                                     <Link
@@ -394,7 +455,33 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                         className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer"
                                                     >
                                                         <UsersRound size={11} className="text-orange-600" />
-                                                        <span>Paket Bersama: {sp.name} ({sp.used_sessions}/{sp.total_sessions || '∞'} Sesi)</span>
+                                                        <span>Paket Bersama: {sp.name} ({sp.used_sessions ?? (sp.trainings ? sp.trainings.filter(t => !t.is_athlete_paid && !t.is_extra).length : 0)}/{sp.total_sessions || sp.package?.session_count || '∞'} Sesi)</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        ) : (athlete.shared_packages && athlete.shared_packages.length > 0) ? (
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                {athlete.shared_packages.map((sp) => (
+                                                    <Link
+                                                        key={sp.id}
+                                                        href={route('admin.shared-packages.show', sp.id) + '?from=athlete&athlete_id=' + athlete.id}
+                                                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer"
+                                                    >
+                                                        <UsersRound size={11} className="text-orange-600" />
+                                                        <span>Paket Bersama: {sp.name}</span>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        ) : (athlete.sharedPackages && athlete.sharedPackages.length > 0) ? (
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                {athlete.sharedPackages.map((sp) => (
+                                                    <Link
+                                                        key={sp.id}
+                                                        href={route('admin.shared-packages.show', sp.id) + '?from=athlete&athlete_id=' + athlete.id}
+                                                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-bold bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors cursor-pointer"
+                                                    >
+                                                        <UsersRound size={11} className="text-orange-600" />
+                                                        <span>Paket Bersama: {sp.name}</span>
                                                     </Link>
                                                 ))}
                                             </div>
@@ -630,7 +717,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                         : isGroup
                                                                             ? 'bg-indigo-50/70 border-indigo-100 text-indigo-800'
                                                                             : session.is_extra
-                                                                                ? 'bg-violet-50/70 border-violet-100 text-violet-800'
+                                                                                ? 'bg-slate-100 border-slate-200 text-slate-700'
                                                                                 : 'bg-orange-50/60 border-orange-100/80 text-orange-800'
                                                                 }`}>
                                                                     <div className="flex items-center gap-1.5 min-w-0">
@@ -640,11 +727,19 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
                                                                                 : isGroup 
                                                                                     ? 'bg-indigo-500' 
                                                                                     : session.is_extra 
-                                                                                        ? 'bg-violet-500' 
+                                                                                        ? 'bg-slate-400' 
                                                                                         : 'bg-orange-500'
                                                                         }`} />
                                                                         <span className="text-[9.5px] font-bold tracking-tight truncate">
-                                                                            {session.is_extra ? 'Tambahan' : `Sesi ${session.display_session_number || session.session_number}/${isGroup ? (session.group?.package?.session_count || '∞') : (athlete.package?.session_count || '∞')}`}
+                                                                            {session.is_extra ? 'Tambahan' : (() => {
+                                                                                const maxCount = isGroup
+                                                                                    ? (session.group?.package?.session_count || '∞')
+                                                                                    : (session.shared_package?.total_sessions || session.shared_package?.package?.session_count || athlete.package?.session_count || (sharedPackages && sharedPackages.length > 0 ? (sharedPackages[0].total_sessions || sharedPackages[0].package?.session_count) : null) || '∞');
+                                                                                const sessionNum = isGroup
+                                                                                    ? (session.display_session_number || session.session_number)
+                                                                                    : (session.shared_package_id ? (session.shared_session_number || session.session_number) : (session.display_session_number || session.session_number));
+                                                                                return `Sesi ${sessionNum}/${maxCount}`;
+                                                                            })()}
                                                                         </span>
                                                                     </div>
 
@@ -706,14 +801,35 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
 
                                                                 {/* Card Body */}
                                                                 <div className="p-1.5 flex flex-col gap-0.5 bg-white">
-                                                                    <div className="text-[11px] font-bold leading-tight line-clamp-1 text-slate-900 group-hover/session:text-orange-600 transition-colors">
-                                                                        {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
-                                                                        {session.is_makeup && (
-                                                                            <span className="ml-1 text-[8px] bg-orange-100 text-orange-700 px-1 py-0.2 rounded-md font-bold uppercase tracking-wider inline-block">
-                                                                            GUEST
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
+                                                                    {(() => {
+                                                                        const targetId = Number(athlete?.id);
+                                                                        const athleteProgramBlock = isGroup && session.blocks ? session.blocks.find((b) => {
+                                                                            const ids = b.program_athlete_ids || b.athlete_ids;
+                                                                            return Array.isArray(ids) && ids.map(Number).includes(targetId);
+                                                                        }) : null;
+                                                                        const assignedProgramName = athleteProgramBlock?.program_name;
+
+                                                                        return (
+                                                                            <>
+                                                                                <div className="text-[11px] font-bold leading-tight line-clamp-1 text-slate-900 group-hover/session:text-orange-600 transition-colors">
+                                                                                    {isGroup ? `[GRUP] ${session.group?.name || 'Sesi Grup'}` : (session.name || 'Sesi Privat')}
+                                                                                    {session.is_makeup && (
+                                                                                        <span className="ml-1 text-[8px] bg-orange-100 text-orange-700 px-1 py-0.2 rounded-md font-bold uppercase tracking-wider inline-block">
+                                                                                        GUEST
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                                {assignedProgramName && (
+                                                                                    <div className="flex items-center gap-1 mt-0.5">
+                                                                                        <span className="text-[8.5px] font-bold text-indigo-700 bg-indigo-50/90 px-1.5 py-0.2 rounded border border-indigo-200/70 inline-flex items-center gap-1 truncate max-w-full">
+                                                                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                                                                                            <span className="truncate">{assignedProgramName}</span>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                )}
+                                                                            </>
+                                                                        );
+                                                                    })()}
 
                                                                     {/* Metadata: Focus, Location, Duration */}
                                                                     {(session.location || session.training_type || session.duration_minutes) && (
@@ -741,7 +857,7 @@ export default function ShowAthlete({ auth, athlete, trainings = [], groupTraini
 
                                                                     {/* Phase Summary (Strength, Cardio Distance & Total Load in AU) */}
                                                                     {(() => {
-                                                                        const phases = getSessionPhasesSummary(session);
+                                                                        const phases = getSessionPhasesSummary(session, athlete?.id);
                                                                         if (!phases) return null;
 
                                                                         return (

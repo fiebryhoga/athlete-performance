@@ -179,10 +179,7 @@ Route::middleware([
         Route::get('/admin/load-analysis', [\App\Http\Controllers\Admin\LoadAnalysisController::class, 'index'])->name('admin.load-analysis.index');
         Route::get('/admin/load-analysis/{user}', [\App\Http\Controllers\Admin\LoadAnalysisController::class, 'show'])->name('admin.load-analysis.show');
 
-        Route::get('composition-tests/create', [CompositionTestController::class, 'create'])->name('admin.composition-tests.create');
-        Route::post('composition-tests', [CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
         Route::get('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'index'])->name('admin.composition-tests.index');
-
         Route::post('/admin/composition', [\App\Http\Controllers\Admin\CompositionTestController::class, 'store'])->name('admin.composition-tests.store');
         Route::put('/admin/composition/{compositionTest}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'update'])->name('admin.composition-tests.update');
         Route::delete('/admin/composition/{compositionTest}', [\App\Http\Controllers\Admin\CompositionTestController::class, 'destroy'])->name('admin.composition-tests.destroy');
@@ -220,7 +217,15 @@ Route::middleware([
         Route::get('/admin/reports/sessions/group/{group}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportGroupReportPdf'])->name('admin.reports.sessions.export-group');
         Route::get('/admin/reports/sessions/coach/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.sessions.export-coach');
         Route::get('/admin/reports/coaches/{user}/export-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCoachReportPdf'])->name('admin.reports.coaches.export-pdf');
+        
+        // Help Guides Management (Superadmin)
+        Route::resource('/admin/help-guides', \App\Http\Controllers\Admin\HelpGuideManagementController::class)->names('admin.help-guides');
+        Route::post('/admin/help-guides/{helpGuide}/toggle-publish', [\App\Http\Controllers\Admin\HelpGuideManagementController::class, 'togglePublish'])->name('admin.help-guides.toggle-publish');
     });
+
+    // Help Center (All Roles: Superadmin, Coach, Athlete)
+    Route::get('/help', [\App\Http\Controllers\HelpCenterController::class, 'index'])->name('help.index');
+    Route::get('/help/{slug}', [\App\Http\Controllers\HelpCenterController::class, 'show'])->name('help.show');
     
     Route::middleware(['role:superadmin,coach'])->group(function () {
         
@@ -303,6 +308,10 @@ Route::middleware([
         Route::delete('/admin/exercise-categories/{exerciseCategory}', [\App\Http\Controllers\Admin\ExerciseController::class, 'destroyCategory'])->name('admin.exercise-categories.destroy');
 
         Route::resource('/admin/exercise-packages', \App\Http\Controllers\Admin\ExercisePackageController::class)->names('admin.exercise-packages')->except(['show']);
+
+        // Workout Templates (Template Sesi Latihan)
+        Route::resource('/admin/workout-templates', \App\Http\Controllers\Admin\WorkoutTemplateController::class)->names('admin.workout-templates')->except(['show']);
+        Route::post('/admin/workout-templates/{workoutTemplate}/duplicate', [\App\Http\Controllers\Admin\WorkoutTemplateController::class, 'duplicate'])->name('admin.workout-templates.duplicate');
 
         // --- RESTORED ROUTES ---
         // Packages

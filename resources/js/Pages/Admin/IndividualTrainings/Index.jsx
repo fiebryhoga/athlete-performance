@@ -654,17 +654,17 @@ export default function Index({
                                                 "admin.shared-packages.show",
                                                 sp.id,
                                             )}
-                                            className="group relative bg-gradient-to-b from-white via-white to-violet-50/15 rounded-lg border border-slate-200/90 hover:border-violet-200/90 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                                            className="group relative bg-gradient-to-b from-white via-white to-orange-50/15 rounded-lg border border-slate-200/90 hover:border-orange-300 shadow-2xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between overflow-hidden"
                                         >
                                             <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between">
                                                 {/* Identity */}
                                                 <div className="flex items-start gap-2.5">
-                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-violet-50/80 text-violet-600 font-bold text-base flex items-center justify-center shrink-0">
+                                                    <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-md border border-slate-100 shadow-2xs bg-orange-50 text-orange-600 font-bold text-base flex items-center justify-center shrink-0">
                                                         <UsersRound className="w-5 h-5" />
                                                     </div>
 
                                                     <div className="min-w-0 flex-1 space-y-0.5">
-                                                        <h3 className="font-bold text-slate-900 text-xs sm:text-[13px] truncate group-hover:text-violet-600 transition-colors leading-tight">
+                                                        <h3 className="font-bold text-slate-900 text-sm truncate group-hover:text-orange-600 transition-colors leading-tight">
                                                             {sp.name}
                                                         </h3>
                                                         <p className="text-[11px] text-slate-500 font-medium truncate">
@@ -698,7 +698,7 @@ export default function Index({
                                                                 )}
                                                             {sp.members.length >
                                                                 4 && (
-                                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-violet-50 border border-violet-200/70 text-violet-600">
+                                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-50 border border-orange-200/70 text-orange-600">
                                                                     +
                                                                     {sp.members
                                                                         .length -
@@ -731,7 +731,7 @@ export default function Index({
                                                                         ? "bg-rose-500"
                                                                         : isNearLimit
                                                                           ? "bg-amber-500"
-                                                                          : "bg-violet-500"
+                                                                          : "bg-orange-500"
                                                                 }`}
                                                                 style={{
                                                                     width: `${progress}%`,
@@ -749,7 +749,7 @@ export default function Index({
                                                         </span>
                                                         <div className="flex items-baseline gap-0.5 mt-0.5">
                                                             <span
-                                                                className={`text-[11.5px] font-black leading-tight ${isNearLimit ? "text-amber-600" : "text-violet-600"}`}
+                                                                className={`text-[11.5px] font-black leading-tight ${isNearLimit ? "text-amber-600" : "text-orange-600"}`}
                                                             >
                                                                 {sp.remaining_sessions ??
                                                                     "∞"}
@@ -779,7 +779,7 @@ export default function Index({
                                             </div>
 
                                             {/* Card Footer */}
-                                            <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-violet-50/30 border-t border-slate-100 flex items-center justify-between text-xs">
+                                            <div className="px-3.5 py-2 bg-gradient-to-r from-slate-50/90 via-white to-orange-50/20 border-t border-slate-100 flex items-center justify-between text-xs">
                                                 <span
                                                     className={`text-[9.5px] font-bold ${sp.status === "active" ? "text-emerald-600" : sp.status === "completed" ? "text-slate-400" : "text-amber-600"}`}
                                                 >
@@ -790,7 +790,7 @@ export default function Index({
                                                           ? "Selesai"
                                                           : "Kadaluarsa"}
                                                 </span>
-                                                <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-violet-600 group-hover:text-violet-700 transition-colors">
+                                                <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-orange-600 group-hover:text-orange-700 transition-colors">
                                                     Detail
                                                     <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                                 </span>
@@ -803,7 +803,7 @@ export default function Index({
                     </>
                 )}
 
-                <PageFooter className="!mt-8 !pt-4 !pb-1" />
+                <PageFooter className="!mt-auto !pt-8 !pb-1" />
             </div>
         </AppLayout>
     );
